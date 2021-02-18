@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/plot.png</file>
+        <file>icons/subplot.png</file>
+        <file>sym.png</file>
+        <file>icons/save-3-fill.png</file>
+        <file>icons/save-3-line.png</file>
+        <file>icons/list-settings-fill.png</file>
+        <file>icons/list-settings-line.png</file>
+        <file>icons/folder-open-line.png</file>
+        <file>icons/close-circle-line.png</file>
+        <file>icons/close-fill.png</file>
+        <file>icons/base-station-line.png</file>
+        <file>icons/layout-right-2-line.png</file>
+        <file>icons/collage-line.png</file>
+        <file>icons/file-code-line (1).png</file>
+        <file>sym_about.png</file>
+    </qresource>
+</RCC>
