@@ -45,10 +45,8 @@ TEMPLATE = app
 INCLUDEPATH += C:/libraries/boost_1_59_0
 INCLUDEPATH += C:/libraries/matOut-master
 
-
 SOURCES += main.cpp\
         DropWidgets/CreateID.cpp \
-        DropWidgets/DropWidget.cpp \
         DropWidgets/DropWidgetsUiLoader.cpp \
         DropWidgets/Plots/PlotWidget.cpp \
         DropWidgets/Plots/qcustomplot.cpp \
