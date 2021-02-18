@@ -2,7 +2,6 @@
     <qresource prefix="/icons">
         <file>icons/plot.png</file>
         <file>icons/subplot.png</file>
-        <file>sym.png</file>
         <file>icons/save-3-fill.png</file>
         <file>icons/save-3-line.png</file>
         <file>icons/list-settings-fill.png</file>
@@ -14,6 +13,7 @@
         <file>icons/layout-right-2-line.png</file>
         <file>icons/collage-line.png</file>
         <file>icons/file-code-line (1).png</file>
-        <file>sym_about.png</file>
+        <file>icons/sym.png</file>
+        <file>icons/sym_about.png</file>
     </qresource>
 </RCC>
