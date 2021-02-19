@@ -1,6 +1,7 @@
 /***************************************************************************
 **                                                                        **
-**  This file is part of LabAnlyser.                                      **
+**  LabAnlyser, a plugin based data modification and visualization tool   **
+**  Copyright (C) 2015-2021 Andreas Hoffmann                              **
 **                                                                        **
 **  LabAnlyser is free software: you can redistribute it and/or modify ´  **
 **  it under the terms of the GNU General Public License as published by  **
@@ -1560,11 +1561,14 @@ void MainWindow::on_actionAbout_LabAnalyzer_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    auto about = new QDialog(0,Qt::WindowSystemMenuHint | Qt::WindowTitleHint);
+    auto about = new QDialog(0,Qt::WindowSystemMenuHint | Qt::WindowTitleHint |  Qt::WindowCloseButtonHint);
     about->setWindowTitle("About LabAnaylser");
     Ui::About aboutUi;
     aboutUi.setupUi(about);
-    aboutUi.label_5->setText(QString("<html><head/><body><p><span style=\" font-weight:600;\">LabAnalyser %1.%2.%3 (git %4) </span></p></body></html>").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD).arg(GIT_VERSION));
+    about->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //aboutUi.label_5->setText(QString("<html><head/><body><p><span style=\" font-weight:600;\">LabAnalyser %1.%2.%3 (git %4) </span></p></body></html>").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD).arg(GIT_VERSION));
+    about->setFixedSize(518,401);
+    aboutUi.label_5->setText(QString("<html><head/><body><p><span style=\" font-weight:600;\">LabAnalyser %1</span></p></body></html>").arg(GIT_VERSION));
 
     about->exec();
 

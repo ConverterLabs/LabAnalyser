@@ -1,6 +1,7 @@
 /***************************************************************************
 **                                                                        **
-**  This file is part of LabAnlyser.                                      **
+**  LabAnlyser, a plugin based data modification and visualization tool   **
+**  Copyright (C) 2015-2021 Andreas Hoffmann                              **
 **                                                                        **
 **  LabAnlyser is free software: you can redistribute it and/or modify ´  **
 **  it under the terms of the GNU General Public License as published by  **
@@ -312,8 +313,10 @@ void XmlExperimentReader::LoadDevice()
             if(PluginLoader.GetNewDevice())
             {
                 Messenger->NewDeviceRegistration(PluginLoader.GetNewDevice()->GetObject());
-                Messenger->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName() + "::" + Filename,InterfaceData());
-                Messenger->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName() +  "::" + Filename,InterfaceData());
+                InterfaceData Data;
+                Data.SetData(Filename);
+                Messenger->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
+                Messenger->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
             }
         }
     }

@@ -1,6 +1,7 @@
 /***************************************************************************
 **                                                                        **
-**  This file is part of LabAnlyser.                                      **
+**  LabAnlyser, a plugin based data modification and visualization tool   **
+**  Copyright (C) 2015-2021 Andreas Hoffmann                              **
 **                                                                        **
 **  LabAnlyser is free software: you can redistribute it and/or modify ´  **
 **  it under the terms of the GNU General Public License as published by  **
@@ -155,8 +156,11 @@ bool UIDataManagementSetClass::LoadPlugin(QString FileName)
         {
             #undef GetObject
             GetMessenger()->NewDeviceRegistration(PluginLoader.GetNewDevice()->GetObject());
-            GetMessenger()->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName() + "::" + FileName,InterfaceData());
-            GetMessenger()->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName() +  "::" + FileName,InterfaceData());
+            InterfaceData Data;
+            Data.SetData(FileName);
+            GetMessenger()->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
+            GetMessenger()->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
+
         }
     }
 }

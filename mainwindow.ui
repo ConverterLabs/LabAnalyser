@@ -565,7 +565,7 @@ Parameter</string>
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/sym_about.png</normaloff>:/icons/sym_about.png</iconset>
+     <normaloff>:/icons/icons/sym_about.png</normaloff>:/icons/icons/sym_about.png</iconset>
    </property>
    <property name="text">
     <string>About</string>

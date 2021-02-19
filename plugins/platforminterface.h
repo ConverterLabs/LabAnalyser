@@ -1,7 +1,6 @@
 /***************************************************************************
 **                                                                        **
-**  LabAnlyser, a plugin based data modification and visualization tool   **
-**  Copyright (C) 2015-2021 Andreas Hoffmann                              **
+**  This file is part of LabAnlyser.                                      **
 **                                                                        **
 **  LabAnlyser is free software: you can redistribute it and/or modify ´  **
 **  it under the terms of the GNU General Public License as published by  **
@@ -19,41 +18,44 @@
 ****************************************************************************
 ****************************************************************************/
 
-#pragma once
+#ifndef PLATFORMINTERFACE
+#define PLATFORMINTERFACE
 
-#include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QToolBar>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QProgressBar>
-#include <QtUiTools>
-#include <QtWidgets/QSlider>
-#include "QTimer"
-#include "../DataManagement/mapper.h"
-#include "../DataManagement/DataManagementSetClass.h"
+#include <QString>
+#include <QObject>
+#include "InterfaceDataType.h"
+#undef GetObject  // undefine this windows macro
 
-class VariantDropWidget
+class Platform_Interface;
+
+class Platform_Fabric
 {
 public:
-    VariantDropWidget(QWidget *parent=0){};
-    virtual ~VariantDropWidget(){};
-    virtual void SetVariantData(ToFormMapper Data) = 0;
-    virtual void GetVariantData(ToFormMapper *Data) = 0;
-
-    virtual bool LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text) = 0;
-    virtual bool SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text) = 0;
-    virtual void ConnectToID(DataManagementSetClass* DM, QString ID) = 0;
-
-
-    //virtual void GetVariantData() = 0;
-
+    virtual ~Platform_Fabric() {}
+    virtual Platform_Interface* GetInterface(QObject* messenger) = 0;
 };
+
+class Platform_Interface
+{
+public:
+    virtual ~Platform_Interface() {}
+    virtual InterfaceData* GetSymbol(const QString &ID) = 0;
+    virtual QObject* GetObject() = 0;
+
+public slots:
+    virtual void MessageReceiver(const QString &Command, const QString &ID, InterfaceData Data) = 0;
+
+signals:
+    virtual void MessageSender(const QString &Command, const QString &ID, InterfaceData Data) = 0;
+};
+
+#define EchoInterface_iid "org.qt-project.Qt.Examples.EchoInterface"
+//#define EchoInterface_iid2 "org.qt-project.Qt.Examples.EchoInterface2"
+
+
+Q_DECLARE_INTERFACE(Platform_Fabric, EchoInterface_iid)
+//Q_DECLARE_INTERFACE(Platform_Fabric, EchoInterface_iid2)
+
+
+#endif // PLATFORMINTERFACE
+

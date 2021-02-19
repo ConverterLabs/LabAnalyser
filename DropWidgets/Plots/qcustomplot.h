@@ -10,7 +10,8 @@
 **          Version: 1.3.1                                                **
 ****************************************************************************
 **                                                                        **
-**  This file is part of LabAnlyser.                                      **
+**  LabAnlyser, a plugin based data modification and visualization tool   **
+**  Copyright (C) 2015-2021 Andreas Hoffmann                              **
 **                                                                        **
 **  LabAnlyser is free software: you can redistribute it and/or modify ´  **
 **  it under the terms of the GNU General Public License as published by  **

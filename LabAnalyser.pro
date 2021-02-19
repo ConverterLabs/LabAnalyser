@@ -1,6 +1,7 @@
 #***************************************************************************
 #*                                                                        **
-#*  This file is part of LabAnlyser.                                      **
+#*  LabAnlyser, a plugin based data modification and visualization tool   **
+#*  Copyright (C) 2015-2021 Andreas Hoffmann                              **
 #*                                                                        **
 #*  LabAnlyser is free software: you can redistribute it and/or modify ´  **
 #*  it under the terms of the GNU General Public License as published by  **
@@ -72,7 +73,7 @@ SOURCES += main.cpp\
         LoadSave/xmlexperimentreader.cpp \
         LoadSave/xmlexperimentwriter.cpp \
         mainwindow.cpp\
-        ../plugins/InterfaceDataType.cpp \
+        plugins/InterfaceDataType.cpp \
         DataManagement/DataManagementClass.cpp \
         DataManagement/DataManagementSetClass.cpp \
         DataManagement/DataMessengerClass.cpp \
@@ -116,8 +117,8 @@ HEADERS  += mainwindow.h\
             LoadSave/xmlexperimentreader.h \
             LoadSave/xmlexperimentwriter.h \
             DataManagement/mapper.h \
-            ../plugins/platforminterface.h\
-            ../plugins/InterfaceDataType.h\
+            plugins/platforminterface.h\
+            plugins/InterfaceDataType.h\
             DataManagement/DataManagementClass.h \
             DataManagement/DataManagementSetClass.h \
             DataManagement/DataMessengerClass.h \
