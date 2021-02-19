@@ -31,13 +31,13 @@ class xmlexperimentwriter: public QObject
    Q_OBJECT
 public:
     xmlexperimentwriter(QObject *parent = nullptr, MessengerClass* Messenger_ = nullptr );
-    bool write(QIODevice *device, QDir T);
+    bool write(QString LoadPath_);
 private:
     MessengerClass* Messenger = nullptr;
     DataManagementClass* Manager = nullptr;
     QXmlStreamWriter xmlWriter;
     QDir T;
-
+    QString LoadPath;
 
     void writeExperiment();
     void writeTabs();

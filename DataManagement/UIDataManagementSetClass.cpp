@@ -66,26 +66,22 @@ bool UIDataManagementSetClass::SaveExperiment(QString Path)
 
     bool Error = false;
     //create a backup
-    QFile file(Path);
-    QDir T(QFileInfo(file).absoluteDir());
-    if(!file.open(QIODevice::WriteOnly)){
-        qDebug() << "Cannot open file" << file.errorString();
-        return true;
-    }
+
     xmlexperimentwriter Writer(this, GetMessenger());
-    if (!Writer.write(&file, T))
+    if (!Writer.write(Path))
     {
         Info("Error saving File ");
         Error = true;
     }
 
-    file.close();
     //Signal Plugins to save there properties as well
     QList<QString> Devices = this->GetDevices();
     for(int i = 0; i < Devices.size(); i++)
     {
-        QString Name = (((this->GetDevice(Devices[i])))->GetObject()->objectName() + "::" + Path);
-        this->GetDevice(Devices[i])->MessageReceiver("save" ,Name,InterfaceData());
+        QString Name = ((this->GetDevice(Devices[i])))->GetObject()->objectName() ;
+        InterfaceData tmp;
+        tmp.SetData(Path);
+        MessageSender("save" ,Name,tmp);
     }
     if(!Error)
         GetMessenger()->WriteStatusMessage(QString("Experiment saved to '%1'.").arg(Path));
@@ -98,14 +94,9 @@ bool UIDataManagementSetClass::LoadExperiment(QString Path)
 {
      bool Error = false;
      LoadPath = Path;
-     QFile file(LoadPath);
-     Info("Loading Experiment: " + Path);
-     if(!file.open(QFile::ReadOnly | QFile::Text)){
-         qDebug() << "Cannot read file" << file.errorString();
-         return true;
-     }
+
      XmlExperimentReader Reader(this, this->GetMessenger());
-     if (!Reader.read(&file))
+     if (!Reader.read(LoadPath))
      {
          Info("Parse error in file " + Reader.errorString());
          Error = true;

@@ -180,16 +180,24 @@ void xmlexperimentwriter::writeState()
 
 }
 
-bool xmlexperimentwriter::write(QIODevice *device, QDir T_)
+bool xmlexperimentwriter::write(QString LoadPath_)
 {
-    T = T_;
-
-    xmlWriter.setDevice(device);
+    LoadPath = LoadPath_;
+    QFile file(LoadPath);
+    T = (QFileInfo(file).absoluteDir());
+    if(!file.open(QIODevice::WriteOnly)){
+        qDebug() << "Cannot open file" << file.errorString();
+        return true;
+    }
+    xmlWriter.setDevice(&file);
     xmlWriter.setAutoFormatting(true);
     xmlWriter.writeStartDocument();
 
     writeExperiment();
 
     xmlWriter.writeEndDocument();
+
+    file.close();
+
 
 }

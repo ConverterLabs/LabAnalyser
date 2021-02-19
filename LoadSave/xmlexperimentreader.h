@@ -30,7 +30,7 @@ class XmlExperimentReader: public QObject
    Q_OBJECT
 public:
     XmlExperimentReader(QObject *parent = nullptr, MessengerClass* Messenger_ = nullptr );
-    bool read(QIODevice *device);
+    bool read(QString LoadPath_);
     QString errorString() { return QString();};
 private:
     QXmlStreamReader reader;
@@ -48,6 +48,7 @@ private:
     void CreateConnection();
 
     MessengerClass* Messenger = nullptr;
+    QString LoadPath;
 
 signals:
     void NewDeviceRegistration(QObject *NewDevice);

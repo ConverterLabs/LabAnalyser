@@ -537,6 +537,7 @@ void MainWindow::LoadFormFromXML(QString Path)
 
 void MainWindow::LoadFormFromXML(QString UiFileName, QString LastFormName, bool skip)
 {
+    UiFileName.replace("\\","/");
     auto FilePartsI = UiFileName.split("/");
     auto FilePartsII = FilePartsI.at(FilePartsI.size()-1);
     auto FilePartsIII = FilePartsII.split(".");

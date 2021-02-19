@@ -35,9 +35,17 @@ XmlExperimentReader::XmlExperimentReader(QObject *parent, MessengerClass* Messen
 
 }
 
-bool XmlExperimentReader::read(QIODevice *device)
+bool XmlExperimentReader::read(QString LoadPath_)
 {
-    reader.setDevice(device);
+    LoadPath = LoadPath_;
+    QFile file(LoadPath);
+    Messenger->SendInfo("Loading Experiment: " + LoadPath);
+    if(!file.open(QFile::ReadOnly | QFile::Text)){
+        qDebug() << "Cannot read file" << file.errorString();
+        return true;
+    }
+
+    reader.setDevice(&file);
 
     if (reader.readNextStartElement()) {
         if (reader.name() == "Experiment")
@@ -45,6 +53,8 @@ bool XmlExperimentReader::read(QIODevice *device)
         else
             reader.raiseError(QObject::tr("Not a Experiment file"));
     }
+    file.close();
+
     return !reader.error();
 }
 
@@ -232,30 +242,33 @@ void XmlExperimentReader::readTab()
 void XmlExperimentReader::LoadForm(QString Name)
 {
     QString Filename;
+ QString FilenameT;
     while(reader.readNextStartElement()){
        if(reader.name() == "AbsPath")
        {
-           QString FilenameT = reader.readElementText();
+           FilenameT = reader.readElementText();
            QFile file(FilenameT);
            if(file.exists())
            {
-               Filename = FilenameT;
+               Filename = QFileInfo(file).absoluteFilePath();
            }
        }
        else if(reader.name() == "RelPath")
        {
-           QString FilenameT = reader.readElementText();
+           FilenameT = QFileInfo(LoadPath).absolutePath() + "/" + reader.readElementText();
            QFile file(FilenameT);
            if(file.exists())
            {
-               Filename = FilenameT;
+               Filename = QFileInfo(file).absoluteFilePath();
            }
        }
        else
            reader.skipCurrentElement();
    }
-
-    emit LoadFormFromXML(Filename, Name, true);
+    if(Filename.size())
+        emit LoadFormFromXML(Filename, Name, true);
+    else
+        Messenger->ErrorWriter(this->parent()->objectName(), "Form File " + FilenameT + " not found!");
 
 
 }
@@ -282,16 +295,16 @@ void XmlExperimentReader::LoadDevice()
            QFile file(FilenameT);
            if(file.exists())
            {
-               Filename = FilenameT;
+               Filename = QFileInfo(file).absoluteFilePath();
            }
        }
        else if(reader.name() == "RelPath")
        {
-           FilenameT = reader.readElementText();
+           QString FilenameT = QFileInfo(LoadPath).absolutePath() + "/" + reader.readElementText();
            QFile file(FilenameT);
            if(file.exists())
            {
-               Filename = FilenameT;
+               Filename = QFileInfo(file).absoluteFilePath();
            }
        }
        else
@@ -315,7 +328,8 @@ void XmlExperimentReader::LoadDevice()
                 Messenger->NewDeviceRegistration(PluginLoader.GetNewDevice()->GetObject());
                 InterfaceData Data;
                 Data.SetData(Filename);
-                Messenger->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
+                Messenger->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);                
+                Data.SetData(LoadPath);
                 Messenger->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
             }
         }
