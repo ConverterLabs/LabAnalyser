@@ -51,10 +51,12 @@ class InterfaceData{
         Type = TypeI;
     }
     // Copy constructor
-    InterfaceData(const InterfaceData &Obj) { DataType = Obj.DataType;
-                                              StateDependency = Obj.StateDependency;
-                                              Type = Obj.Type;
-                                              m_Data = Obj.m_Data; };
+    InterfaceData(const InterfaceData &Obj) {
+          DataType = Obj.DataType;
+          StateDependency = Obj.StateDependency;
+          Type = Obj.Type;
+          m_Data = Obj.m_Data;
+    };
 
     bool IsEditable();
 
@@ -86,8 +88,6 @@ class InterfaceData{
     void SetDataKeepType(bool);
     void SetDataKeepType(QString);
     void SetDataKeepType(double);
-    void SetDataKeepType(GuiSelection);
-    void SetDataKeepType(QStringList);
 
     uint64_t GetUnsignedData();
     int64_t GetSignedData();
@@ -108,7 +108,6 @@ class InterfaceData{
 
     double GetAsDouble();
 
-
     void SetData(DataPair Data);
     void SetData(QString);
     void SetData(uint64_t);
@@ -126,8 +125,6 @@ class InterfaceData{
     void SetData(GuiSelection);
 
     void SetDataRaw( boost::variant<DataTypes>);
-
-
 
     QString GetString();
     DataPair GetPointerPair();

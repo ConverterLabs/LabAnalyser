@@ -181,6 +181,7 @@ bool InterfaceData::IsBool()
     if(type == typeid(bool))
         ret = true;
 
+
     return ret;
 }
 bool InterfaceData::IsFloatingPointNumber()
@@ -564,7 +565,7 @@ void InterfaceData::SetDataKeepType(QString data_in)
     else if(type == typeid(uint64_t))
         m_Data = (uint64_t) data_in.toUInt();
     else if(type == typeid(bool))
-        m_Data = (bool) data_in.toUInt();
+        m_Data = (bool) data_in.toInt();
     else if(type == typeid(float))
         m_Data = (float) data_in.toFloat();
     else if(type == typeid(double))
@@ -615,8 +616,6 @@ void InterfaceData::SetDataKeepType(double data_in)
     else
          throw std::invalid_argument( "Unknown cast neccessary" );
 }
-
-
 
 void InterfaceData::SetData(DataPair Data)
 {
