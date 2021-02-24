@@ -32,7 +32,6 @@
 #include "DropWidgets/DropWidgetsUiLoader.h"
 
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -1027,7 +1026,7 @@ void MainWindow::on_actionDaten_Exportieren_mat_triggered()
     }
 
     auto UiFileName = QFileDialog::getSaveFileName(this,
-                                                   tr("Export Data to *.mat"), this->StdSavePath, tr("Expermiment Files (*.mat)"));
+                                                   tr("Export Data to *.mat"), this->StdSavePath, tr("Mat Files (*.mat)"));
     QFileInfo fi = UiFileName;
     this->StdSavePath = fi.absolutePath();
 
@@ -1569,7 +1568,7 @@ void MainWindow::on_actionAbout_triggered()
     about->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     //aboutUi.label_5->setText(QString("<html><head/><body><p><span style=\" font-weight:600;\">LabAnalyser %1.%2.%3 (git %4) </span></p></body></html>").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD).arg(GIT_VERSION));
     about->setFixedSize(518,401);
-    aboutUi.label_5->setText(QString("<html><head/><body><p><span style=\" font-weight:600;\">LabAnalyser %1</span></p></body></html>").arg(GIT_VERSION));
+    aboutUi.label_5->setText(QString("<html><head/><body><p><span style=\"  font-size:12pt; font-weight:600;\">LabAnalyser %1</span></p></body></html>").arg(GIT_VERSION));
 
     about->exec();
 
@@ -1577,5 +1576,79 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_pushButton_clicked()
 {
+
+}
+
+void MainWindow::on_actionExport_Data_h5_triggered()
+{
+    QStringList Ids;
+    {
+        QList<QTreeWidgetItem*> selectedItems = this->ui->ParameterTreeWidget->selectedItems();
+        QString ID;
+        std::map<QString, DataPair> Data;
+        int f = 0;
+        for(auto si : selectedItems)
+        {
+            if(si->childCount() == 0)
+            {
+                auto sit = si;
+                while(sit)
+                {
+                    ID.insert(0,sit->text( 0 ));
+                    sit = sit->parent();
+                    if(sit)
+                        ID.insert(0,"::");
+                }
+                if(this->GetLogic()->GetContainer(ID))
+                {
+                    Ids.push_back(ID);
+                }
+                ID.clear();
+            }
+        }
+    }
+    {
+        QList<QTreeWidgetItem*> selectedItems = this->ui->DataTreeWidget->selectedItems();
+        QString ID;
+        std::map<QString, DataPair> Data;
+        int f = 0;
+        for(auto si : selectedItems)
+        {
+            if(si->childCount() == 0)
+            {
+                auto sit = si;
+                while(sit)
+                {
+                    ID.insert(0,sit->text( 0 ));
+                    sit = sit->parent();
+                    if(sit)
+                        ID.insert(0,"::");
+                }
+                if(this->GetLogic()->GetContainer(ID))
+                {
+                    Ids.push_back(ID);
+                }
+                ID.clear();
+            }
+        }
+    }
+
+    if(!Ids.size())
+    {
+        Error("Please select the Data in the Explorer that shell be exported.");
+        return;
+    }
+
+    auto UiFileName = QFileDialog::getSaveFileName(this,
+                                                   tr("Export Data to *.h5"), this->StdSavePath, tr("HDF5 Files (*.h5)"));
+    QFileInfo fi = UiFileName;
+    this->StdSavePath = fi.absolutePath();
+
+    if(UiFileName.size())
+    {
+       GetLogic()->Export2Hdf5(UiFileName,Ids);
+    }
+
+    return;
 
 }

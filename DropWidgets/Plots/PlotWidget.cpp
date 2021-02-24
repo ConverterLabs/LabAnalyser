@@ -486,12 +486,12 @@ void PlotWidget::UpdataGraphs(QString ID)
                 {
                     if(i == 0)
                     {
-                        Tmin = DP.first->at(0);
+                        Tmin = DP.third;
                     }
                     else
                     {
-                        if(DP.first->at(0) < Tmin)
-                            Tmin = DP.first->at(0);
+                        if(DP.third < Tmin)
+                            Tmin = DP.third;
                     }
                 }
             }

@@ -24,12 +24,14 @@
 #include <QFile>
 #include <QXmlStreamReader>
 #include "../DataManagement/DataMessengerClass.h"
+#include "../DataManagement/UIDataManagementSetClass.h"
+
 
 class XmlExperimentReader: public QObject
 {
    Q_OBJECT
 public:
-    XmlExperimentReader(QObject *parent = nullptr, MessengerClass* Messenger_ = nullptr );
+    XmlExperimentReader(QObject *parent = nullptr, MessengerClass* Messenger_ = nullptr , UIDataManagementSetClass* Manage = nullptr);
     bool read(QString LoadPath_);
     QString errorString() { return QString();};
 private:
@@ -47,6 +49,7 @@ private:
     void CreateConnections();
     void CreateConnection();
 
+    UIDataManagementSetClass* Manager = nullptr;
     MessengerClass* Messenger = nullptr;
     QString LoadPath;
 

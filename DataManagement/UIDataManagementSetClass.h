@@ -36,6 +36,8 @@ public:
     bool LoadExperiment(QString Path);
 
     bool Export2Mat(QString Path, QStringList);
+    bool Export2Hdf5(QString Path, QStringList);
+
     bool Export2Xml(QString Path,  QStringList);
     bool ImportFromXml(QString Path  );
 

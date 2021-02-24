@@ -28,8 +28,9 @@
 #include "../DropWidgets/Plots/PlotWidget.h"
 #undef GetObject
 
-XmlExperimentReader::XmlExperimentReader(QObject *parent, MessengerClass* Messenger_): QObject(parent)
+XmlExperimentReader::XmlExperimentReader(QObject *parent, MessengerClass* Messenger_, UIDataManagementSetClass* Manage): QObject(parent)
 {
+ Manager = Manage;
  Messenger = Messenger_;
  connect(this, SIGNAL(LoadFormFromXML(QString,QString,bool)), this->parent()->parent(),SLOT(LoadFormFromXML(QString,QString,bool)));
 
@@ -313,7 +314,11 @@ void XmlExperimentReader::LoadDevice()
 
     if(Filename.size())
     {
-        LoadPlugin PluginLoader(this->parent(), Messenger);
+
+        Manager->LoadPlugin(Filename);
+    }
+
+        /*LoadPlugin PluginLoader(this->parent(), Messenger);
         QFile file(Filename);
         if(!file.open(QFile::ReadOnly | QFile::Text)){
             Messenger->ErrorWriter(this->parent()->objectName(),"Cannot read file: " + Filename + " Reason: " + file.errorString());
@@ -337,7 +342,7 @@ void XmlExperimentReader::LoadDevice()
     else
     {
         Messenger->ErrorWriter(this->parent()->objectName(), "Device File " + FilenameT + " not found!");
-    }
+    }*/
 
 }
 

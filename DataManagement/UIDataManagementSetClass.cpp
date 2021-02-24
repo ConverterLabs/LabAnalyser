@@ -39,6 +39,8 @@
 #include "../Export/exportinputs2xml.h"
 #include "../LoadSave/loadplugin.h"
 
+#include "../Export/export2highfive.h"
+
 
 
 #undef GetObject //Bug
@@ -95,7 +97,7 @@ bool UIDataManagementSetClass::LoadExperiment(QString Path)
      bool Error = false;
      LoadPath = Path;
 
-     XmlExperimentReader Reader(this, this->GetMessenger());
+     XmlExperimentReader Reader(this, this->GetMessenger(), this);
      if (!Reader.read(LoadPath))
      {
          Info("Parse error in file " + Reader.errorString());
@@ -125,6 +127,15 @@ bool UIDataManagementSetClass::Export2Mat(QString Path , QStringList ExportIds )
 {
     auto Exporter = MatExporter(this);
     auto Error = Exporter.Export2Mat(Path, ExportIds);
+    if(!Error)
+           GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
+    return Error;
+}
+
+bool UIDataManagementSetClass::Export2Hdf5(QString Path , QStringList ExportIds )
+{
+    auto Exporter = Export2HDF5(this);
+    auto Error = Exporter.Export(Path, ExportIds);
     if(!Error)
            GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
     return Error;

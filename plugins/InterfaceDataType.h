@@ -37,7 +37,17 @@
 #ifndef INTERFACEFATA_H
 #define INTERFACEFATA_H
 
-#define DataPair std::pair<boost::shared_ptr<std::vector<double>>, boost::shared_ptr<std::vector<double>>>
+struct DataPair
+{
+    DataPair(){};
+    DataPair(boost::shared_ptr<std::vector<double>> f, boost::shared_ptr<std::vector<double>> s, double t = 0.0 ) {first = f; second = s, third = t;};
+    bool operator==(const DataPair& x) const { return  first == x.first && second == x.second && third == x.third; };
+    boost::shared_ptr<std::vector<double>> first;
+    boost::shared_ptr<std::vector<double>> second;
+    double third = 0.0;
+};
+
+//#define DataPair std::pair<boost::shared_ptr<std::vector<double>>, boost::shared_ptr<std::vector<double>>>
 #define GuiSelection std::pair<QString, QStringList>
 #define DataTypes boost::blank, int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t, float, bool, QString, double,  QStringList, GuiSelection, DataPair
 

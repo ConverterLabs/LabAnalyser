@@ -36,9 +36,10 @@ class MatExporter
 public:
     MatExporter(DataManagementClass* Manager_);
     bool Export2Mat(QString Filename_,  QStringList Ids_);
-    void ExportChannel(QString ID);
 
 private:
+
+    void ExportChannel(QString ID);
     QString Filename;
     std::map<QString, InterfaceData> Data;
     DataManagementClass* Manager = nullptr;

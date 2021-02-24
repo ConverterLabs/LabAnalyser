@@ -45,6 +45,10 @@ TEMPLATE = app
 
 INCLUDEPATH += C:/libraries/boost_1_59_0
 INCLUDEPATH += C:/libraries/matOut-master
+INCLUDEPATH += C:/libraries/HighFive/include
+INCLUDEPATH += C:/libraries/CMake-hdf5-1.10.5/hdf5-1.10.5/include/
+
+
 
 SOURCES += main.cpp\
         DropWidgets/CreateID.cpp \
@@ -67,6 +71,7 @@ SOURCES += main.cpp\
         DropWidgets/QTSLed.cpp \
         Export/Export2Mat.cpp \
         DataManagement/UIDataManagementSetClass.cpp \
+        Export/export2highfive.cpp \
         Export/exportinputs2xml.cpp \
         Import/parameterloader.cpp \
         LoadSave/loadplugin.cpp \
@@ -111,6 +116,7 @@ HEADERS  += mainwindow.h\
             DropWidgets/QTSLed.h \
             Export/Export2Mat.h \
             DataManagement/UIDataManagementSetClass.h \
+            Export/export2highfive.h \
             Export/exportinputs2xml.h \
             Import/parameterloader.h \
             LoadSave/loadplugin.h \
@@ -139,7 +145,7 @@ QMAKE_CXXFLAGS -= -O1
 QMAKE_CXXFLAGS += -O3
 QMAKE_CXXFLAGS -= -O0
 
-
+LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5
 Release:DESTDIR         = C:/LabAnalyser
 
 #QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO

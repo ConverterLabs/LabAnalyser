@@ -21,13 +21,8 @@
 #pragma once
 
 #include <QMainWindow>
-//#include <boost\function.hpp>
-//#include <boost\bind.hpp>
-//#include <boost\shared_ptr.hpp>
-//#include "plot.h"
-
 #include "DataManagement/mapper.h"
-#include "../plugins/platforminterface.h"
+#include "plugins/platforminterface.h"
 #include "UIFunctions/SubPlotMainWindow.h"
 #include "RemoteControl/RemoteControlServer.h"
 #include "DataManagement/UIDataManagementSetClass.h"
@@ -79,16 +74,10 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     QStatusBar* GetStatusBar();
-
     UIDataManagementSetClass* GetLogic(void){return ExtendedDataManagement ; }
-
     bool ChangeForSaveDetected = false;
-
     SubPlotMainWindow* CreateSubPlotWindow(int rows, int cols);
-
     Ui::MainWindow* UI(){return ui;}
-
-
     QString StdSavePath;
     QString SavePath;
 
@@ -122,7 +111,6 @@ public slots:
 signals:
 
     void MessageSender(const QString &Command, const QString &ID, InterfaceData Data);          //Extra Klasse
-    void UpdatePlots();                                                                         //Extra Klasse
 
 private slots:
 
@@ -130,13 +118,12 @@ private slots:
     void AppendWidgetNames(QObjectList,QString);
     void ChangeMinMaxValue();
     void RemoveDevice();
-    void SetAlias(QString);                                                                         //Extra Klasse
-    void RemoveAlias(QString);                                                                      //Extra Klasse
+    void SetAlias(QString);
+    void RemoveAlias(QString);
 
     void contextMenuTreeWidget(QPoint);
     void contextMenuTreeWidgetData(QPoint);
     void contextMenuTreeWidgetState(QPoint);
-
     void on_actionLoad_Form_triggered();
     void on_actionBeenden_triggered();
     void on_actionCreatePlot_triggered();
@@ -152,18 +139,14 @@ private slots:
     void InfoWriter(const QString &ID, const QString Data);
     void NotificationWriter(const QString &ID, const QString Data);
     void on_actionLoad_Parameter_File_triggered();
-
     void on_ParameterTreeWidget_customContextMenuRequested(const QPoint &pos);
-
     void on_StateTreeWidget_customContextMenuRequested(const QPoint &pos);
-
     void on_actionSave_Parameter_Set_triggered();
-
     void on_actionAbout_LabAnalyzer_triggered();
-
     void on_actionAbout_triggered();
-
     void on_pushButton_clicked();
+
+    void on_actionExport_Data_h5_triggered();
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
@@ -172,11 +155,7 @@ private:
 
     void ParseInputArguments();
     Ui::MainWindow *ui;
-    Ui::About *uiabout;
-
     void RemoveElementFromWidget(QString ID);
-
-    //GUILogic* Logic;
     int SubPlotWindowCount = 0;
     RemoteControlServer *Remote = NULL;
     QSystemTrayIcon* icon;
