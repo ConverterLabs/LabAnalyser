@@ -147,11 +147,14 @@ bool UIDataManagementSetClass::LoadPlugin(QString FileName)
     class LoadPlugin PluginLoader(this, this->GetMessenger());
     QFile file(FileName);
     if(!file.open(QFile::ReadOnly | QFile::Text)){
-        GetMessenger()->SendInfo("Cannot read file " + FileName);
+        Error("Cannot read file " + FileName);
         return true;
     }
-    if (!PluginLoader.read(&file, FileName))
-        Info("Parse error in file " + FileName + ". Reason: " + PluginLoader.errorString());
+    if (PluginLoader.read(&file, FileName))
+    {
+        Error("Parse error in file " + FileName + ". Reason: " + PluginLoader.errorString());
+        return true;
+    }
     else
     {
         if(PluginLoader.GetNewDevice())
@@ -164,7 +167,11 @@ bool UIDataManagementSetClass::LoadPlugin(QString FileName)
             GetMessenger()->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
 
         }
+        else
+            return true;
+
     }
+    return false;
 }
 
 bool UIDataManagementSetClass::ImportFromXml(QString Path  )

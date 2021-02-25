@@ -42,7 +42,7 @@ bool LoadPlugin::read(QIODevice *device, QString devFileName)
         else
             reader.raiseError(QObject::tr("Not a LEDevice file"));
     }
-    return !reader.error();
+    return reader.error();
 }
 
 void LoadPlugin::readDevice()

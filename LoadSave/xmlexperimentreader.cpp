@@ -56,7 +56,7 @@ bool XmlExperimentReader::read(QString LoadPath_)
     }
     file.close();
 
-    return !reader.error();
+    return reader.error();
 }
 
 void XmlExperimentReader::readExperiment()
