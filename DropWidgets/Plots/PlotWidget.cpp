@@ -332,7 +332,7 @@ void PlotWidget::SetAsXAxis()
                 yAxis->setLabel(graph(i)->name());
                 SetXYPlot(true);
 
-                ResetZoom();
+                //ResetZoom();
             }
         }
     }
@@ -734,8 +734,8 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
         }
         graph()->setPen(graphPen);
     }
-    if(DP.first && DP.second)
-        this->ResetZoom();
+    //if(DP.first && DP.second)
+     //   this->ResetZoom();
 }
 
 void PlotWidget::dropEvent(QDropEvent *event)
@@ -1114,7 +1114,7 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
             XLabel = itt.second;
         else if(itt.first == "YLabel")
             YLabel = itt.second;
-        else if(itt.first == "IsXYPlot")
+        else if(itt.first == "XYPlot")
             IsXYPlot = itt.second.toInt();
         else if(itt.first == "XData")
             XData = itt.second;
@@ -1176,6 +1176,8 @@ bool PlotWidget::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes,
         else
             Attribut.second =  graph(0)->ID();
     }
+    Attributes.push_back(Attribut);
+
     Text = objectName();
     return true;
 

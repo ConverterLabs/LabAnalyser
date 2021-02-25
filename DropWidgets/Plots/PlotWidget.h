@@ -46,8 +46,12 @@ public:
     void AddCustomGraph(QString, bool skip_register = false);
     void ClearAllGraphs();
 
-    void SetXDataName(QString namein){ID_X = namein;}
-    QString  XDataName() const {return ID_X;}
+    void SetXDataName(QString namein){
+        ID_X = namein;
+    }
+    QString  XDataName() const {
+        return ID_X;
+    }
 
     void SetVariantData(ToFormMapper Data) override;
     void GetVariantData(ToFormMapper *Data) override;
