@@ -897,8 +897,9 @@ void MainWindow::on_actionLoadExperiment_triggered()
 
     QFileInfo fi = Path;
     this->StdSavePath = fi.absolutePath();
-    this->SavePath = Path;
-    ExtendedDataManagement->LoadExperiment(Path);
+    if(!ExtendedDataManagement->LoadExperiment(Path))
+        this->SavePath = Path;
+
 
 }
 
@@ -1419,8 +1420,9 @@ void MainWindow::ParseInputArguments()
                     CloseProject();
                     QFileInfo fi = Path;
                     this->StdSavePath = fi.absolutePath();
-                    this->SavePath = Path;
-                    ExtendedDataManagement->LoadExperiment(Path);
+                    if(!ExtendedDataManagement->LoadExperiment(Path))
+                        this->SavePath = Path;
+
 
                 }
             }
@@ -1437,8 +1439,9 @@ void MainWindow::ParseInputArguments()
                 CloseProject();
                 QFileInfo fi = Path;
                 this->StdSavePath = fi.absolutePath();
-                this->SavePath = Path;
-                ExtendedDataManagement->LoadExperiment(Path);
+                if(!ExtendedDataManagement->LoadExperiment(Path))
+                    this->SavePath = Path;
+
             }
             i++;
         }

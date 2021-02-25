@@ -98,9 +98,9 @@ bool UIDataManagementSetClass::LoadExperiment(QString Path)
      LoadPath = Path;
 
      XmlExperimentReader Reader(this, this->GetMessenger(), this);
-     if (!Reader.read(LoadPath))
+     if (Reader.read(LoadPath))
      {
-         Info("Parse error in file " + Reader.errorString());
+         Info("Parse error in file " + LoadPath);
          Error = true;
      }
      return Error;
