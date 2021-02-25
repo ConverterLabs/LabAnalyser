@@ -9,9 +9,6 @@
 Export2HDF5::Export2HDF5(DataManagementClass* Manager_)
 {
     Manager = Manager_;
-
-
-
 }
 
 bool Export2HDF5::Export(QString Filename_,  QStringList Ids_)
@@ -61,20 +58,6 @@ bool Export2HDF5::Export(QString Filename_,  QStringList Ids_)
             }
             IDcounter++;
         }
-
-        //ExportChannel(Ids[i]);
     }
-
-
 }
 
-
-void Export2HDF5::ExportChannel(QString ID)
-{
-    //HighFive::File *file = (HighFive::File*) m_file;
-
-
-
-    // m_file = (void*) file;
-
-}

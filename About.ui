@@ -16,6 +16,12 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>518</width>
+    <height>450</height>
+   </size>
+  </property>
   <property name="maximumSize">
    <size>
     <width>518</width>
@@ -90,7 +96,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Copyright (c) :&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/ConverterLabs/LabAnalyser/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#3333ff;&quot;&gt;LabAnalyser:&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (c) 2016-2021 Andreas Hoffmann&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;LabAnalyser uses code of:&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://github.com/EyNuel/matOut/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#000000;&quot;&gt;matOut:&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (c) 2011 Emanuel Ey (LGPLV3)&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#000000;&quot;&gt;QCustomPlot:&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (c) 2015 Emanuel Eichhammer (GPLV3)&lt;br/&gt;HighFive (c) 2017 (Boost Software License)&lt;br/&gt;HDF5 Software Library and Utilities (c) 2006 The HDF Group.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;LabAnalyser uses icons from:&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://remixicon.com/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#000000;&quot;&gt;Remix Icon &lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;(Apache License Version 2.0)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Copyright (c) :&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/ConverterLabs/LabAnalyser/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#3333ff;&quot;&gt;LabAnalyser:&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (c) 2016-2021 Andreas Hoffmann&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;LabAnalyser uses code of:&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://github.com/EyNuel/matOut/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#000000;&quot;&gt;matOut:&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (c) 2011 Emanuel Ey (LGPLV3)&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://www.qcustomplot.com/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#000000;&quot;&gt;QCustomPlot:&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (c) 2015 Emanuel Eichhammer (GPLV3)&lt;br/&gt;HighFive (c) 2017 (Boost Software License)&lt;br/&gt;HDF5 Software Library and Utilities (c) The HDF Group.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;LabAnalyser uses icons from:&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://remixicon.com/&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#000000;&quot;&gt;Remix Icon &lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;(Apache License Version 2.0)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
