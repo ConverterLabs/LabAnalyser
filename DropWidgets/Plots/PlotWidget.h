@@ -68,7 +68,7 @@ protected:
 
 public slots:
     void UpdataGraphs(QString ID = NULL);
-    void SetAsXAxis();
+    void SetAsXAxis(bool skip =false);
 
 private slots:
         void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *title);

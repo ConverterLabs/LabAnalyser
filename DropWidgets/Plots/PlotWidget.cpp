@@ -309,7 +309,7 @@ void PlotWidget::removeSelectedGraph()
   }
 }
 
-void PlotWidget::SetAsXAxis()
+void PlotWidget::SetAsXAxis(bool skip)
 {
     if (selectedGraphs().size() ==1)
     {
@@ -328,8 +328,11 @@ void PlotWidget::SetAsXAxis()
                 this->ID_X = selectedGraphs().at(0)->ID();
 
                 this->legend->setVisible(false);
-                xAxis->setLabel(selectedGraphs().at(0)->name());
-                yAxis->setLabel(graph(i)->name());
+                if(!skip)
+                {
+                    xAxis->setLabel(selectedGraphs().at(0)->name());
+                    yAxis->setLabel(graph(i)->name());
+                }
                 SetXYPlot(true);
 
                 //ResetZoom();
@@ -561,11 +564,24 @@ void PlotWidget::ResetZoom()
     boost::shared_ptr<std::vector<double>> y(graph(0)->GetYDataPointer());
     if(XYPlot())
     {
-        if(!graph(0)->visible())
+        if( graph(1)->ID() == XDataName())
         {
-           x = graph(1)->GetXDataPointer();
-           y = graph(1)->GetYDataPointer();
+            x = graph(0)->GetXDataPointer();
+            y = graph(0)->GetYDataPointer();
         }
+        else
+        {
+            x = graph(1)->GetXDataPointer();
+            y = graph(1)->GetYDataPointer();
+        }
+        volatile double xmin = *(std::min_element(x->begin(),x->end())); //(l.begin(), l.end(
+        volatile double xmax = *(std::max_element(x->begin(),x->end()));
+
+        volatile double ymin = *(std::min_element(y->begin(),y->end())); //(l.begin(), l.end(
+        volatile double ymax = *(std::max_element(y->begin(),y->end()));
+        xAxis->setRange(xmin-fabs(xmax-xmin)*0.05, xmax+fabs(xmax-xmin)*0.05);
+        yAxis->setRange(ymin-fabs(ymax-ymin)*0.05, ymax+fabs(ymax-ymin)*0.05);
+        return;
     }
 
     if(!x)
@@ -615,7 +631,7 @@ void PlotWidget::ResetZoom()
             yAxis->setRange(ymin-fabs(ymax)*0.1, ymax+fabs(ymax)*0.1);
     }
     else
-        yAxis->setRange(ymin-fabs(ymax+ymin)*0.05, ymax+fabs(ymax+ymin)*0.05);
+        yAxis->setRange(ymin-fabs(ymax-ymin)*0.05, ymax+fabs(ymax-ymin)*0.05);
 
     replot();
 }
@@ -1195,7 +1211,7 @@ void PlotWidget::ConnectToID(DataManagementSetClass* DM, QString ID)
                graph(0)->setSelected(true);
            if( graph(1)->ID() == XDataName())
                graph(1)->setSelected(true);
-           SetAsXAxis();
+           SetAsXAxis(true);
         }
     }
 }
