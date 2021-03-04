@@ -83,10 +83,12 @@ void DataManagementClass::RenamePlotPointer(QString IdOld, QString IdNew)
 
         if(itNumber != this->PlotObjectsNumber.end())
         {
-            auto number = this->PlotObjectsNumber[IdOld];
+            int number = this->PlotObjectsNumber[IdOld];
             this->PlotObjectsNumber.erase(itNumber);
             auto itNumber_vec = find (PlotObjectsNumbers.begin(), PlotObjectsNumbers.end(), number);
             this->PlotObjectsNumbers.erase(itNumber_vec);
+
+            number = IdNew.split("#").at(1).toInt()-1;
             AddPlotPointer(IdNew, data, number);
         }
         else

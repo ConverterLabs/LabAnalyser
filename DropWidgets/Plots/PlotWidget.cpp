@@ -109,6 +109,11 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
    connect(this, SIGNAL(mouseWheelDone()), this, SLOT(mouseWheelDone()));
 
    timer.start();
+   TimeSinceLastPlot.start();
+
+   UpdateTimer = new QTimer(this);
+   connect(UpdateTimer, SIGNAL(timeout()), this, SLOT(UpdataGraphs()));
+   UpdateTimer->start(25);
 
    update();
 
@@ -452,26 +457,33 @@ void PlotWidget::SaveToPdf(void)
 
 
 
-void PlotWidget::UpdataGraphs(QString ID)
+void PlotWidget::UpdataGraphs(QString ID, bool force)
 {
-    if(timer.elapsed()<=75)
+    if(!force)
     {
-        //timer.restart();
-        UpdateCounter = 0;
-        return;
-    }
-    UpdateCounter++;
-    if(XYPlot())
-    {
-        if(UpdateCounter < 2)
-            return;       
-    }
-    else
-    {
-        if(UpdateCounter < graphCount())
+        //Update 20ms after last ID arreved
+        if(ID.size())
+        {
+            timer.restart();
+            UpdateCounter++;
+        }
+
+        if(timer.elapsed()<=25)
+        {
             return;
+        }
+        if(TimeSinceLastPlot.elapsed() < 75)
+            return;
+
+        TimeSinceLastPlot.restart();
+
+        if(XYPlot())
+        {
+            if(UpdateCounter < 2)
+                return;
+        }
+        UpdateCounter=0;
     }
-    UpdateCounter=0;
 
     DataPair XYX;
     DataPair XYY;
@@ -621,8 +633,13 @@ void PlotWidget::ResetZoom()
 
     }
     else
-        xAxis->setRange(x->front()-Tmin,x->back()-Tmin);
+    {
+        qDebug() << Tmin;
+        qDebug() << x->front()-Tmin;
+        qDebug() << x->back()-Tmin;
 
+        xAxis->setRange(x->front()-Tmin,x->back()-Tmin);
+}
     if(ymin == ymax)
     {
         if(ymax==0)
@@ -719,11 +736,10 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
 
     DataPair DP = MW->GetLogic()->GetContainer(id)->GetPointerPair();
     if(DP.first && DP.second)
-        if(graphCount() == 0 &&  DP.first->size())
-        {
-             qDebug()  << DP.first->size();
-            Tmin = DP.first->at(0);
-        }
+    if(graphCount() == 0 &&  DP.first->size())
+    {
+        Tmin = DP.third;
+    }
 
     addGraph();
     graph()->setID(id);
@@ -750,8 +766,15 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
         }
         graph()->setPen(graphPen);
     }
-    //if(DP.first && DP.second)
-     //   this->ResetZoom();
+    replot();
+
+    if(DP.first && DP.second)
+    {
+        if(graphCount() == 1)
+            this->ResetZoom();
+    }
+
+
 }
 
 void PlotWidget::dropEvent(QDropEvent *event)
@@ -813,7 +836,7 @@ void PlotWidget::dropEvent(QDropEvent *event)
         number++;
     }
 
-UpdataGraphs();
+    UpdataGraphs("", true);
 
 }
 
@@ -1218,7 +1241,7 @@ void PlotWidget::ConnectToID(DataManagementSetClass* DM, QString ID)
 
 void PlotWidget::SetVariantData(ToFormMapper Data)
 {
-    UpdataGraphs();
+    UpdataGraphs("New Data");
 }
 void PlotWidget::GetVariantData(ToFormMapper *Data)
 {

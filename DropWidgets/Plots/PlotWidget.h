@@ -67,7 +67,7 @@ protected:
     void closeEvent ( QCloseEvent * event ) override;
 
 public slots:
-    void UpdataGraphs(QString ID = NULL);
+    void UpdataGraphs(QString ID = NULL, bool force = false);
     void SetAsXAxis(bool skip =false);
 
 private slots:
@@ -102,7 +102,11 @@ bool _touchDevice;
     QStatusBar* SB; //Pointer to the status bar of the main window
     QString ID_X;
     QElapsedTimer timer;
+    QElapsedTimer TimeSinceLastPlot;
+
     int UpdateCounter = 0;
     double Tmin = 0;
+    QTimer *UpdateTimer = nullptr;
+
 
 };

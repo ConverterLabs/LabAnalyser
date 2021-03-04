@@ -102,6 +102,7 @@ bool UIDataManagementSetClass::LoadExperiment(QString Path)
      {
          Info("Parse error in file " + LoadPath);
          Error = true;
+         GetMessenger()->MessageReceiver("CloseProject", "LoadExperiment", InterfaceData());
      }
      return Error;
 }
@@ -164,6 +165,7 @@ bool UIDataManagementSetClass::LoadPlugin(QString FileName)
             InterfaceData Data;
             Data.SetData(FileName);
             GetMessenger()->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
+            Data.SetData(LoadPath);
             GetMessenger()->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
 
         }
