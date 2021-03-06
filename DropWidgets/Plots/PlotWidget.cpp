@@ -340,7 +340,8 @@ void PlotWidget::SetAsXAxis(bool skip)
                 }
                 SetXYPlot(true);
 
-                //ResetZoom();
+                if(!skip)
+                    ResetZoom();
             }
         }
     }
@@ -574,8 +575,10 @@ void PlotWidget::ResetZoom()
 
     boost::shared_ptr<std::vector<double>> x(graph(0)->GetXDataPointer());
     boost::shared_ptr<std::vector<double>> y(graph(0)->GetYDataPointer());
-    if(XYPlot())
+    if(XYPlot() )
     {
+        if(graphCount() != 2)
+            return;
         if( graph(1)->ID() == XDataName())
         {
             x = graph(0)->GetXDataPointer();
@@ -770,7 +773,7 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
 
     if(DP.first && DP.second)
     {
-        if(graphCount() == 1)
+        if(graphCount() == 1 && !skip_register)
             this->ResetZoom();
     }
 

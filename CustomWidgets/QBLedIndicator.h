@@ -36,6 +36,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QElapsedTimer>
 
 
 class QBLedIndicator : public QAbstractButton
@@ -67,6 +68,8 @@ class QBLedIndicator : public QAbstractButton
          QColor  offColor;
          QPixmap ledBuffer;
          bool IsOn =0;
-        bool running = 0;
+         bool running = 0;
+         QTimer *UpdateTimer = nullptr;
+
 };
 

@@ -37,6 +37,11 @@ QBLedIndicator::QBLedIndicator(QWidget *parent) : QAbstractButton(parent)
 //    setCheckable(true);
     onColor =  QColor(255,0,0);
     offColor = QColor(128,0,0);
+
+     UpdateTimer = new QTimer(this);
+     connect(UpdateTimer, SIGNAL(timeout()), this, SLOT(TimeOut()));
+     UpdateTimer->start(500);
+
 }
 
 void QBLedIndicator::resizeEvent(QResizeEvent *event) {
@@ -89,10 +94,6 @@ void QBLedIndicator::paintEvent(QPaintEvent *event) {
 
 void QBLedIndicator::SetState(bool Input)
 {
-    if(!this->running)
-    {
-        QTimer::singleShot(500, this, SLOT(TimeOut()));
-    }
     running = Input;
     IsOn = Input;
 }
@@ -100,12 +101,13 @@ void QBLedIndicator::SetState(bool Input)
 
 void QBLedIndicator::TimeOut()
 {
-
     if(this->running == 1)
     {
-           QTimer::singleShot(500, this, SLOT(TimeOut()));
            IsOn = !IsOn;
     }
+    else
+        IsOn = 0;
+
     repaint();
 
 }

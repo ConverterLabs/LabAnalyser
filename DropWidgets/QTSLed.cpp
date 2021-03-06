@@ -82,6 +82,8 @@ void QTSLed::RemoveConnection()
 
     this->setToolTip("");
     this->setToolTipDuration(0);
+    this->SetState(0);
+
     MainWindow *MW = GetMainWindow();
     MW->GetLogic()->DeleteEntryOfObject(this);
 }
