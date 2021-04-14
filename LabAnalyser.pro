@@ -43,8 +43,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = LabAnalyser
 TEMPLATE = app
 
-INCLUDEPATH += C:/libraries/boost_1_59_0
-INCLUDEPATH += C:/libraries/matOut-master
+win32: INCLUDEPATH += C:/libraries/boost_1_59_0
+unix: INCLUDEPATH += /usr/include
+win32: INCLUDEPATH += C:/libraries/matOut-master
+unix: INCLUDEPATH += ./build/libs/matOut
+
 INCLUDEPATH += C:/libraries/HighFive/include
 INCLUDEPATH += C:/libraries/CMake-hdf5-1.10.5/hdf5-1.10.5/include/
 
