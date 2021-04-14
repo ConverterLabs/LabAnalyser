@@ -1,7 +1,7 @@
 # LabAnalyser
 A plugin based open source data modification and visualization tool
 
-## How to compile LabAnalyser
+## How to compile LabAnalyser (inclomplete)
 
 ### Prerequisites
 
