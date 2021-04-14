@@ -23,10 +23,10 @@
 
 #include <QMainWindow>
 #include "qcustomplot.h"
-#include <boost\any.hpp>
-#include <boost\function.hpp>
-#include <boost\bind.hpp>
-#include <boost\shared_ptr.hpp>
+#include <boost/any.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 #include "../DropWidget.h"
 #include "../../mainwindow.h"
 
