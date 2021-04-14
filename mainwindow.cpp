@@ -1569,7 +1569,7 @@ void MainWindow::on_actionAbout_triggered()
     Ui::About aboutUi;
     aboutUi.setupUi(about);
     about->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    about->setFixedSize(518,450);
+    about->setFixedSize(518,460);
     aboutUi.label_5->setText(QString("<html><head/><body><p><span style=\"  font-size:12pt; font-weight:600;\">LabAnalyser %1</span></p></body></html>").arg(GIT_VERSION));
 
     about->exec();

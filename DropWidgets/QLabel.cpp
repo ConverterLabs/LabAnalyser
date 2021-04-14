@@ -82,7 +82,7 @@ void QLabelD::dropEvent(QDropEvent *event)
     QString ID =  CreateID(event->source());
     this->setText(ID);
       auto MW = GetMainWindow();
-     MW->ChangeForSaveDetected = true;
+    MW->ChangeForSaveDetected = true;
 }
 
 void QLabelD::SetVariantData(ToFormMapper Data)
@@ -104,10 +104,7 @@ bool QLabelD::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attrib
             setText(Text);
         }
     }
-
-
     return true;
-
 }
 
 bool QLabelD::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text)

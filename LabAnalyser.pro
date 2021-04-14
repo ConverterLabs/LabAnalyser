@@ -145,6 +145,12 @@ QMAKE_CXXFLAGS -= -O1
 QMAKE_CXXFLAGS += -O3
 QMAKE_CXXFLAGS -= -O0
 
+#QMAKE_CXXFLAGS += -O0
+#QMAKE_CXXFLAGS -= -O1
+#QMAKE_CXXFLAGS -= -O2
+#QMAKE_CXXFLAGS -= -O3
+
+
 LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5
 Release:DESTDIR         = C:/LabAnalyser
 

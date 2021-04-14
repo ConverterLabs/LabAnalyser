@@ -130,7 +130,7 @@ void QComboBoxD::SetVariantData(ToFormMapper Data)
          {
              addItem(Sel.second[i]);
         }
-        setCurrentIndex(findText(Sel.first));
+         this->setCurrentText(Sel.first);
     }
 }
 

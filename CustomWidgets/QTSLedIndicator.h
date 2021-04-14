@@ -78,5 +78,6 @@ class QTSLedIndicator : public QAbstractButton
         QPixmap ledBuffer;
         int IsOn =0;
         QString Color = "Green";
+
 };
 
