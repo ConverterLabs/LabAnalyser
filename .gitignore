@@ -1,3 +1,5 @@
 /LabAnalyser.pro.user
 /Matlab/batman.LAparam
 /Matlab/CreateParameterFile.m
+*.o
+Makefile
