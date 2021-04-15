@@ -15,11 +15,14 @@ The following libraries are necessary:
 ### Steps  
 (tested on Arch Linux)
 
-1. install boost-libs
+1. install boost-libs 
+   - Arch Linux: `pacman -S boost-libs`
 2. create folder build/libs/
 3. `cd build/libs`
 4. `clone https://github.com/EyNuel/matOut.git` 
-5. cd ../../
-6. qmake
-7. make
+5. `cd matOut`
+6. `patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch`
+7. cd ../../../
+8. qmake
+9.  make
 
