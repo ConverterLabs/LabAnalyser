@@ -5,4 +5,6 @@
 Makefile
 
 ui_About.h
-ui.mainwindow.h
+ui_mainwindow.h
+build/**
+.qmake.stash
