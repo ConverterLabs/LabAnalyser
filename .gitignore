@@ -3,3 +3,6 @@
 /Matlab/CreateParameterFile.m
 *.o
 Makefile
+
+ui_About.h
+ui.mainwindow.h
