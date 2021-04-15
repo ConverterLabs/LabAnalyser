@@ -2,17 +2,5 @@
 /Matlab/batman.LAparam
 /Matlab/CreateParameterFile.m
 
-*.o
-Makefile
-ui_About.h
-ui_mainwindow.h
-moc_*.cpp
-moc_predefs.h
-qrc_resources.cpp
-
-LabAnalyser
-
 build/**
-.qmake.stash
-
 
