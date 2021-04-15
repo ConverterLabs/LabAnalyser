@@ -21,10 +21,10 @@
 
 #include "SubPlotMainWindow.h"
 #include "DropWidgets/Plots/qcustomplot.h"
-#include <boost\any.hpp>
-#include <boost\function.hpp>
-#include <boost\bind.hpp>
-#include <boost\shared_ptr.hpp>
+#include <boost/any.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "DropWidgets/Plots/PlotWidget.h"
 #include"mainwindow.h"
