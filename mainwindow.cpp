@@ -752,6 +752,10 @@ void MainWindow::on_actionLoadPlugin_triggered()
  void MainWindow::PublishFinished()
  {
      QTreeWidget *SelTreeWidget = NULL;
+     ui->ParameterTreeWidget->setUpdatesEnabled( true );
+     ui->DataTreeWidget->setUpdatesEnabled( true );
+     ui->StateTreeWidget->setUpdatesEnabled( true );
+
 
     SelTreeWidget = ui->ParameterTreeWidget;
     int Width = ui->ParameterDock->width();
@@ -776,9 +780,6 @@ void MainWindow::on_actionLoadPlugin_triggered()
     SelTreeWidget->setColumnWidth(2,Width*0.1);
     SelTreeWidget->sortByColumn(0, Qt::AscendingOrder);
 
-    ui->ParameterTreeWidget->setUpdatesEnabled( true );
-    ui->DataTreeWidget->setUpdatesEnabled( true );
-    ui->StateTreeWidget->setUpdatesEnabled( true );
 
 
  }

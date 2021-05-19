@@ -30,7 +30,11 @@ DataManagementSetClass::DataManagementSetClass(QObject *parent) : DataManagement
     Q_ASSERT(parent->objectName()== "LabAnalyser");
     MainWindow* MW = qobject_cast<MainWindow*>(this->parent());
     if(MW)
+    {
         Messenger = new MessengerClass(this, MW->GetStatusBar());
+        connect(Messenger, SIGNAL(PublishFinished()),MW,SLOT(PublishFinished()));
+        connect(Messenger, SIGNAL(PublishStart()),MW,SLOT(PublishStart()));
+    }
     else
         Messenger = new MessengerClass(this, nullptr);
 

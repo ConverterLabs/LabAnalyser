@@ -212,6 +212,9 @@
        <attribute name="headerDefaultSectionSize">
         <number>100</number>
        </attribute>
+       <attribute name="headerShowSortIndicator" stdset="0">
+        <bool>true</bool>
+       </attribute>
        <attribute name="headerStretchLastSection">
         <bool>true</bool>
        </attribute>
@@ -319,9 +322,12 @@
         <number>2</number>
        </property>
        <attribute name="headerVisible">
-        <bool>false</bool>
+        <bool>true</bool>
        </attribute>
        <attribute name="headerCascadingSectionResizes">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="headerShowSortIndicator" stdset="0">
         <bool>true</bool>
        </attribute>
        <column>
