@@ -32,7 +32,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "boost/variant.hpp"
-#include <boost\shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #ifndef INTERFACEFATA_H
 #define INTERFACEFATA_H
