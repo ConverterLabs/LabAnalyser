@@ -64,6 +64,7 @@ void QCheckBoxD::RemoveConnection()
     MainWindow *MW = GetMainWindow();
     MW->GetLogic()->DeleteEntryOfObject(this);
     this->setChecked(0);
+    setText("CheckBox");
 }
 
 void QCheckBoxD::dragMoveEvent(QDragMoveEvent *de)

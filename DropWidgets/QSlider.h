@@ -64,6 +64,8 @@ public slots:
 
 private:
      std::pair<double,double> MinMax;
+private:
+    QString ConnectedID;
 
 
 };

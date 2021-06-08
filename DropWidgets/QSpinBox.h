@@ -61,4 +61,7 @@ Q_SIGNALS:
 public slots:
     void contextMenu(QPoint);
     void RemoveConnection();
+
+private:
+    QString ConnectedID;
 };

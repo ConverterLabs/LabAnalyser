@@ -96,12 +96,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Set Parameter Dock Header
     ui->ParameterTreeWidget->headerItem()->setText(0, "Item");
-    ui->ParameterTreeWidget->headerItem()->setText(1, "Type");
-    ui->ParameterTreeWidget->headerItem()->setText(2, "Trigger");
+    ui->ParameterTreeWidget->headerItem()->setText(1, "Data Type");
 
 
     ui->DataTreeWidget->headerItem()->setText(0, "Item");
-    ui->DataTreeWidget->headerItem()->setText(1, "Type");
+    ui->DataTreeWidget->headerItem()->setText(1, "Data Type");
 
     //Parameter Widget should have Context Menu for Min/Max Value editing
     ui->ParameterTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);

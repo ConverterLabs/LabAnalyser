@@ -106,6 +106,7 @@ void QSpinBoxD::dropEvent(QDropEvent *event)
     MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
     MW->ChangeForSaveDetected = true;
     connect(this, SIGNAL(valueChanged(int)), MW->GetLogic(),SLOT(SendNewValue()) );
+    ConnectedID = ID;
     emit RequestUpdate();
 }
 
@@ -117,6 +118,19 @@ void QSpinBoxD::SetVariantData(ToFormMapper Data)
          setValue((int)Data.GetSignedData());
      else if(Data.IsUnsigedNumber())
          setValue((int)Data.GetUnsignedData());
+
+    auto MW = GetMainWindow();
+    QString Type = MW->GetLogic()->GetContainer(ConnectedID)->GetDataType();
+    std::pair<double,double> MinMax = MW->GetLogic()->MinMaxValue(ConnectedID);
+    int min = (int)MinMax.first;
+    int max = (int)MinMax.second;
+    if(this->minimum() != min || this->maximum() != max)
+    {
+        this->setMinimum(min);
+        this->setMaximum(max);
+    }
+
+
 }
 
 void QSpinBoxD::GetVariantData(ToFormMapper *Data)

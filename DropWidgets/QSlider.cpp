@@ -124,8 +124,10 @@ void QSliderD::dropEvent(QDropEvent *event)
                MinMax = MW->GetLogic()->MinMaxValue(ID);
                MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
                connect(this, SIGNAL(valueChanged(int)), MW->GetLogic(),SLOT(SendNewValue()) );
-                MW->ChangeForSaveDetected = true;
-                emit RequestUpdate();
+               MW->ChangeForSaveDetected = true;
+               ConnectedID = ID;
+               emit RequestUpdate();
+
 
 
 }
@@ -133,8 +135,14 @@ void QSliderD::dropEvent(QDropEvent *event)
 void QSliderD::SetVariantData(ToFormMapper Data)
 {
     //TODO Minmax übernehmen
+    //HIer weiter
     if(Data.IsEditable())
     {
+        auto MW = GetMainWindow();
+        if(ConnectedID.size())
+            if(MW->GetLogic()->ElementExists(ConnectedID))
+                MinMax = MW->GetLogic()->MinMaxValue(ConnectedID);
+
         double value;
         if(Data.IsFloatingPointNumber())
              value = (Data.GetFloatingPointData());
@@ -145,6 +153,9 @@ void QSliderD::SetVariantData(ToFormMapper Data)
         int valueC = (int) round((value - MinMax.first)/(MinMax.second-MinMax.first)*100.0);
         setValue((int)valueC );
     }
+
+
+
 }
 
 void QSliderD::GetVariantData(ToFormMapper *Data)
@@ -175,6 +186,7 @@ void QSliderD::ConnectToID(DataManagementSetClass* DM, QString ID)
     setToolTip(ID);
     auto MW = GetMainWindow();
     QLocale::setDefault(QLocale::c());
+    ConnectedID = ID;
     MinMax = MW->GetLogic()->MinMaxValue(ID);
     connect(this, SIGNAL(valueChanged(int)), DM, SLOT(SendNewValue()) );
     RequestUpdate();
