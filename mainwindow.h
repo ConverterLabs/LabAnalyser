@@ -161,6 +161,7 @@ private:
     QSystemTrayIcon* icon;
     QAction* restore;
     UIDataManagementSetClass *ExtendedDataManagement;
+    bool isloading = false;
 
 };
 

@@ -897,8 +897,11 @@ void MainWindow::on_actionLoadExperiment_triggered()
 
     QFileInfo fi = Path;
     this->StdSavePath = fi.absolutePath();
+    this->isloading = true;
     if(!ExtendedDataManagement->LoadExperiment(Path))
         this->SavePath = Path;
+    this->isloading = false;
+
 
 
 }
@@ -910,6 +913,13 @@ QStatusBar* MainWindow::GetStatusBar()
 
 void MainWindow::CloseProject(void)
 {
+    if(this->isloading)
+    {
+        QTimer::singleShot(100, this, SLOT(CloseProject()));
+        return;
+
+    }
+
       auto cti = (this->findChildren<SubPlotMainWindow*>());
       for(SubPlotMainWindow* itt : cti)
           itt->close();
@@ -1297,6 +1307,13 @@ void MainWindow::TrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::ErrorWriter(const QString &ID, const QString Data)
 {
+
+    if(this->isloading)
+    {
+        QTimer::singleShot(100, this, [=]() {ErrorWriter(ID, Data); });
+        return;
+    }
+
     QTime time = QTime::currentTime();
     QString line =time.toString("hh:mm:ss") % " " % ID % ":&nbsp;&nbsp;&nbsp; ";
     QString line2 =Data;
@@ -1331,6 +1348,7 @@ void MainWindow::ErrorWriter(const QString &ID, const QString Data)
 
 void MainWindow::InfoWriter(const QString &ID, const QString Data)
 {
+
     QTime time = QTime::currentTime();
     QString line =time.toString("hh:mm:ss") % " " % ID % ":&nbsp;&nbsp;&nbsp; ";
     QString line2 =Data;
@@ -1364,6 +1382,8 @@ void MainWindow::InfoWriter(const QString &ID, const QString Data)
 
 void MainWindow::NotificationWriter(const QString &ID, const QString Data)
 {
+
+
     QTime time = QTime::currentTime();
     QString line =time.toString("hh:mm:ss") % " " % ID % ":&nbsp;&nbsp;&nbsp; ";
     QString line2 =Data;
@@ -1420,8 +1440,11 @@ void MainWindow::ParseInputArguments()
                     CloseProject();
                     QFileInfo fi = Path;
                     this->StdSavePath = fi.absolutePath();
+                    this->isloading = true;
                     if(!ExtendedDataManagement->LoadExperiment(Path))
                         this->SavePath = Path;
+                    this->isloading = false;
+
 
 
                 }
@@ -1439,8 +1462,10 @@ void MainWindow::ParseInputArguments()
                 CloseProject();
                 QFileInfo fi = Path;
                 this->StdSavePath = fi.absolutePath();
+                this->isloading = true;
                 if(!ExtendedDataManagement->LoadExperiment(Path))
                     this->SavePath = Path;
+                this->isloading = false;
 
             }
             i++;

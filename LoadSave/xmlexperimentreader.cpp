@@ -69,11 +69,39 @@ void XmlExperimentReader::readExperiment()
        else if(reader.name() == "Widgets")
            readWidgets();
        else if(reader.name() == "State")
-           ReadState();
+       {
+           try
+           {
+               ReadState();
+           }
+           catch (...)
+           {
+
+           }
+       }
        else if(reader.name() == "FigureWindows")
-           CreateFigureWindows();
+       {
+           try
+           {
+               CreateFigureWindows();
+           }
+           catch (...)
+           {
+
+           }
+       }
+
        else if(reader.name() == "Connections")
-           CreateConnections();
+       {
+           try
+           {
+               CreateConnections();
+           }
+           catch (...)
+           {
+
+           }
+       }
        else
            reader.skipCurrentElement();
    }
@@ -227,6 +255,7 @@ void XmlExperimentReader::ReadState()
          MW->UI()->centralWidget->show();
     else
          MW->UI()->centralWidget->hide();
+
 }
 
 void XmlExperimentReader::readTab()
@@ -315,7 +344,8 @@ void XmlExperimentReader::LoadDevice()
     if(Filename.size())
     {
 
-        Manager->LoadPlugin(Filename);
+        if(Manager->LoadPlugin(Filename))
+           reader.raiseError("Plugin couldn't be loaded.");
     }
 
         /*LoadPlugin PluginLoader(this->parent(), Messenger);
