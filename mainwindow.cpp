@@ -30,6 +30,7 @@
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
+#include <QFileInfo>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -101,6 +102,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->DataTreeWidget->headerItem()->setText(0, "Item");
     ui->DataTreeWidget->headerItem()->setText(1, "Data Type");
+
+    ui->DataTreeWidget->setAlternatingRowColors(true);
+    ui->ParameterTreeWidget->setAlternatingRowColors(true);
+
+
 
     //Parameter Widget should have Context Menu for Min/Max Value editing
     ui->ParameterTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -542,7 +548,8 @@ void MainWindow::LoadFormFromXML(QString UiFileName, QString LastFormName, bool 
     auto FileNameS = FilePartsIII.at(FilePartsIII.size()-2);
 
     QWidget* tab = new QWidget();
-
+    QFileInfo fi(UiFileName);
+    QDir::setCurrent( fi.absoluteDir().absolutePath());
     //tab->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     DropWidgetsUiLoader loader(this);
     QFile file(UiFileName);
