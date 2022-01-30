@@ -152,7 +152,10 @@ void QListViewD::SetVariantData(ToFormMapper Data)
 
 void QListViewD::GetVariantData(ToFormMapper *Data)
 {
+    blockSignals(true);
     Data->SetData(model->stringList());
+    blockSignals(false);
+
 }
 
 

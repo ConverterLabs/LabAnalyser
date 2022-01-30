@@ -49,10 +49,10 @@ void DataManagementSetClass::SetData(const QString &ID)
     ToFormMapper Data = *(this->GetContainer(ID));
 
     //verhindern, dass das setzten von neuen Daten ein Signal auslöst
-    for(auto i = 0; i < this->GetContainer(ID)->Objects.size(); i++)
-    {
-            this->GetContainer(ID)->Objects[i].FormP->blockSignals(true);
-    }
+    //for(auto i = 0; i < this->GetContainer(ID)->Objects.size(); i++)
+    //{
+    //        this->GetContainer(ID)->Objects[i].FormP->blockSignals(true);
+    //}
     //Get The Container that contains the information about the qobject pointer
     ToFormMapper* Ele =  this->GetContainer(ID);
     //Go through all elements of the container
@@ -64,8 +64,8 @@ void DataManagementSetClass::SetData(const QString &ID)
 			DCObj->SetVariantData(Data);
         }
     }
-    for(auto i = 0; i < this->GetContainer(ID)->Objects.size(); i++)
-        this->GetContainer(ID)->Objects[i].FormP->blockSignals(false);
+    //for(auto i = 0; i < this->GetContainer(ID)->Objects.size(); i++)
+    //    this->GetContainer(ID)->Objects[i].FormP->blockSignals(false);
 }
 
 

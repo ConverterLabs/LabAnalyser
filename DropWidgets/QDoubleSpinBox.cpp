@@ -112,12 +112,15 @@ void QDoubleSpinBoxD::dropEvent(QDropEvent *event)
 
 void QDoubleSpinBoxD::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
       if(Data.IsFloatingPointNumber())
            setValue(Data.GetFloatingPointData());
       else if(Data.IsUnsigedNumber())
          setValue((double) Data.GetUnsignedData());
       else if (Data.IsSigedNumber() )
           setValue((double) Data.GetSignedData());
+      blockSignals(false);
+
 }
 
 void QDoubleSpinBoxD::GetVariantData(ToFormMapper *Data)

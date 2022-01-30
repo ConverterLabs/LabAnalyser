@@ -155,6 +155,14 @@ void xmlexperimentwriter::writeConnections()
         xmlWriter.writeAttribute("Min",QString::number(Manager->MinMaxValue(ContainerElement.first).first));
         xmlWriter.writeAttribute("Max",QString::number(Manager->MinMaxValue(ContainerElement.first).second));
         xmlWriter.writeAttribute("Alias",(Manager->GetAlias(ContainerElement.first)));
+
+        ToFormMapper* cont = Manager->GetContainer(ContainerElement.first);
+        if(cont)
+        {
+            xmlWriter.writeAttribute("Type", cont->GetType());
+            xmlWriter.writeAttribute("DataType", cont->GetDataType());
+        }
+
         xmlWriter.writeCharacters(ContainerElement.first);
         xmlWriter.writeEndElement();
 

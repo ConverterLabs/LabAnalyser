@@ -125,8 +125,9 @@ void QSpinBoxD::SetVariantData(ToFormMapper Data)
 
 void QSpinBoxD::GetVariantData(ToFormMapper *Data)
 {
+    blockSignals(true);
     Data->SetDataKeepType(value());
-
+    blockSignals(false);
 }
 
 bool QSpinBoxD::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text)

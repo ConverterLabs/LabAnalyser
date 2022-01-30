@@ -29,8 +29,7 @@ QCheckBoxD::QCheckBoxD(QWidget *parent):QCheckBox(parent)
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
     connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
-
-        return;
+    return;
 }
 
 
@@ -90,7 +89,10 @@ void QCheckBoxD::dragEnterEvent(QDragEnterEvent *event)
 
 void QCheckBoxD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
+    //this->disconnect();
+    disconnect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
+    disconnect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
     connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
 
@@ -125,16 +127,24 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
 
     MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
 
-    connect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()) );
     MW->ChangeForSaveDetected = true;
 }
 
 void QCheckBoxD::SetVariantData(ToFormMapper Data)
 {
     if(Data.IsBool())
+    {
         setChecked(Data.GetBool());
+    }
     else if(Data.IsUnsigedNumber())
+    {
+        auto MW = GetMainWindow();
+        disconnect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()));
         setChecked((bool) (Data.GetUnsignedData() & (1<<GetBit())));
+        clicked(Data.GetUnsignedData() & (1<<GetBit()));
+        connect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()) );
+
+    }
      repaint();
 
 }

@@ -121,6 +121,13 @@ void XmlExperimentReader::CreateConnection()
            double Min = reader.attributes().value("Min").toDouble();
            double Max = reader.attributes().value("Max").toDouble();
            QString Alias = reader.attributes().value("Alias").toString();
+           InterfaceData _DataBackup;
+
+           if(!(reader.attributes().value("Type").isEmpty()) && !(reader.attributes().value("DataType").isEmpty()))
+           {
+               _DataBackup.SetDataType(reader.attributes().value("DataType").toString());
+               _DataBackup.SetType(reader.attributes().value("Type").toString());
+           }
            ID = reader.readElementText().trimmed();
            //Because of threading the ID might not be there
            if(!DCObj->ElementExists(ID))
@@ -136,7 +143,17 @@ void XmlExperimentReader::CreateConnection()
                        {
                            DCObj->MessageSender("publish",ID,*IDS);
                        }
+                       else
+                        {
+                            if(!(_DataBackup.GetDataType().isEmpty()))
+                                DCObj->MessageSender("publish",ID,_DataBackup);
+                        }
+                   }else
+                   {
+                       if(!(_DataBackup.GetDataType().isEmpty()))
+                            DCObj->MessageSender("publish",ID,_DataBackup);
                    }
+
            }
            if((DCObj->ElementExists(ID)))
            {

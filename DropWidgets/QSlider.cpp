@@ -160,11 +160,14 @@ void QSliderD::SetVariantData(ToFormMapper Data)
 
 void QSliderD::GetVariantData(ToFormMapper *Data)
 {
+    blockSignals(true);
      int valuei = value();
      std::pair<double, double> MinMax = std::pair<double, double>(Data->MinValue,Data->MaxValue);
      double ValueScaled = ((double) valuei)/100.0 * (MinMax.second - MinMax.first) + MinMax.first;
 
      Data->SetDataKeepType(ValueScaled);
+     blockSignals(false);
+
 }
 
 

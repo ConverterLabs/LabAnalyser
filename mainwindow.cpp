@@ -105,6 +105,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->DataTreeWidget->setAlternatingRowColors(true);
     ui->ParameterTreeWidget->setAlternatingRowColors(true);
+    ui->StateTreeWidget->setAlternatingRowColors(true);
 
 
 
@@ -553,6 +554,7 @@ void MainWindow::LoadFormFromXML(QString UiFileName, QString LastFormName, bool 
     //tab->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     DropWidgetsUiLoader loader(this);
     QFile file(UiFileName);
+    loader.setWorkingDirectory(fi.absoluteDir().absolutePath());
     QWidget *formWidget = loader.load(&file, tab);
     file.close();
 

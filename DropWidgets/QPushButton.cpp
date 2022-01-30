@@ -143,7 +143,10 @@ void QPushButtonD::SetVariantData(ToFormMapper Data)
 
 void QPushButtonD::GetVariantData(ToFormMapper *Data)
 {
+    blockSignals(true);
     Data->SetDataKeepType(isDown());
+    blockSignals(false);
+
 }
 
 bool QPushButtonD::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text)

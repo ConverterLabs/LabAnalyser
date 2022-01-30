@@ -982,6 +982,47 @@ QString InterfaceData::GetString()
 void InterfaceData::SetDataType(QString DT)
 {
     this->DataType =  DT;
+
+    if(DataType.compare("QString") == 0)
+        m_Data = "empty";
+    else if(DataType.compare("int8_t") == 0)
+        m_Data = int8_t(0);
+    else if(DataType.compare("int16_t") == 0)
+        m_Data = int16_t(0);
+    else if(DataType.compare("int32_t") == 0)
+        m_Data = int32_t(0);
+    else if(DataType.compare("int64_t") == 0)
+        m_Data = int64_t(0);
+    else if(DataType.compare("uint8_t") == 0)
+        m_Data = uint8_t(0);
+    else if(DataType.compare("uint16_t") == 0)
+        m_Data = uint16_t(0);
+    else if(DataType.compare("uint32_t") == 0)
+        m_Data = uint32_t(0);
+    else if(DataType.compare("uint64_t") == 0)
+        m_Data = uint64_t(0);
+    else if(DataType.compare("bool") == 0)
+        m_Data = bool(0);
+    else if(DataType.compare("float") == 0)
+        m_Data = float(0);
+    else if(DataType.compare("double") == 0)
+        m_Data = double(0);
+    else if(DataType.compare("GuiSelection") == 0)
+    {
+        QStringList Selection;
+        Selection.push_back("empty");
+        m_Data = GuiSelection("empty",Selection);
+    }
+    else if(DataType.compare("QStringList") == 0)
+    {
+        QStringList Selection;
+        Selection.push_back("empty");
+        m_Data = Selection;
+    }
+    else if(DataType.compare("vector<double>") == 0)
+    {
+        m_Data = DataPair();
+    }
 }
 
 void InterfaceData::SetType(QString T)

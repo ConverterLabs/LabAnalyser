@@ -121,6 +121,7 @@ void QComboBoxD::dropEvent(QDropEvent *event)
 
 void QComboBoxD::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
     if(Data.IsEditable() && Data.IsGuiSelection())
     {
         while(count())
@@ -132,6 +133,8 @@ void QComboBoxD::SetVariantData(ToFormMapper Data)
         }
          this->setCurrentText(Sel.first);
     }
+    blockSignals(false);
+
 }
 
 void QComboBoxD::GetVariantData(ToFormMapper *Data)

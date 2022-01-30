@@ -83,6 +83,7 @@ void QLabelD::dropEvent(QDropEvent *event)
     this->setText(ID);
       auto MW = GetMainWindow();
     MW->ChangeForSaveDetected = true;
+
 }
 
 void QLabelD::SetVariantData(ToFormMapper Data)
