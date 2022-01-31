@@ -121,12 +121,14 @@ void QLCDNumberD::dropEvent(QDropEvent *event)
 
 void QLCDNumberD::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
     if(Data.IsFloatingPointNumber())
         display(Data.GetFloatingPointData());
     else if(Data.IsSigedNumber())
        display((double)Data.GetSignedData());
     else if(Data.IsUnsigedNumber())
        display((double)Data.GetUnsignedData());
+    blockSignals(false);
 }
 
 void QLCDNumberD::GetVariantData(ToFormMapper *Data)

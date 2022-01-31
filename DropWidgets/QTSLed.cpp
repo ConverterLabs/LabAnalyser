@@ -130,11 +130,15 @@ void QTSLed::dropEvent(QDropEvent *event)
 
 void QTSLed::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
+
     if(Data.IsBool())
         SetState(Data.GetBool());
     else if(Data.IsUnsigedNumber())
        SetState((bool) (Data.GetUnsignedData() & (1<<GetBit())));
      repaint();
+     blockSignals(false);
+
 }
 
 void QTSLed::GetVariantData(ToFormMapper *Data)

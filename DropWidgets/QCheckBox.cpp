@@ -132,25 +132,30 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
 
 void QCheckBoxD::SetVariantData(ToFormMapper Data)
 {
+    //DO NOT BLOCK SIGNALS !!!
+    auto MW = GetMainWindow();
+    disconnect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()));
     if(Data.IsBool())
     {
         setChecked(Data.GetBool());
+        clicked(Data.GetUnsignedData() & (1<<GetBit()));
+
     }
     else if(Data.IsUnsigedNumber())
     {
-        auto MW = GetMainWindow();
-        disconnect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()));
+
         setChecked((bool) (Data.GetUnsignedData() & (1<<GetBit())));
         clicked(Data.GetUnsignedData() & (1<<GetBit()));
-        connect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()) );
 
     }
      repaint();
+     connect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()) );
 
 }
 
 void QCheckBoxD::GetVariantData(ToFormMapper *Data)
 {
+
     if(Data->IsBool())
     {
         Data->SetDataKeepType(isChecked());

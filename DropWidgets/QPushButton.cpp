@@ -143,9 +143,7 @@ void QPushButtonD::SetVariantData(ToFormMapper Data)
 
 void QPushButtonD::GetVariantData(ToFormMapper *Data)
 {
-    blockSignals(true);
     Data->SetDataKeepType(isDown());
-    blockSignals(false);
 
 }
 

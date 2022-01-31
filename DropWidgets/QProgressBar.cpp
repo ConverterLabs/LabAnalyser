@@ -107,12 +107,16 @@ void QProgressBarD::dropEvent(QDropEvent *event)
 
 void QProgressBarD::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
+
     if(Data.IsFloatingPointNumber())
          setValue((int)Data.GetFloatingPointData());
     else if(Data.IsSigedNumber())
         setValue((int)Data.GetSignedData());
     else if(Data.IsUnsigedNumber())
         setValue((int)Data.GetUnsignedData());
+    blockSignals(false);
+
 }
 
 

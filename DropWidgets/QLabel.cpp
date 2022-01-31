@@ -133,11 +133,13 @@ void QLabelD::RemoveUserText()
 
 void QLabelD::setText(const QString &text)
 {
+    blockSignals(true);
     if(OrginialText.isEmpty())
     {
         OrginialText = this->text();
     }
     UserDefinedText = true;
     QLabel::setText(text);
+    blockSignals(false);
 
 }

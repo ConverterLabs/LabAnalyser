@@ -137,11 +137,14 @@ void QLed::contextMenu(QPoint pos)
 
 void QLed::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
     if(Data.IsBool())
         SetState(Data.GetBool());
     else if(Data.IsUnsigedNumber())
        SetState((bool) (Data.GetUnsignedData() & (1<<GetBit())));
      repaint();
+     blockSignals(false);
+
 }
 
 void QLed::GetVariantData(ToFormMapper *Data)

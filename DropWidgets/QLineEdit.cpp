@@ -145,15 +145,16 @@ void QLineEditD::dropEvent(QDropEvent *event)
 
 void QLineEditD::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
     setText(Data.GetString());
+    blockSignals(false);
+
 
 }
 
 void QLineEditD::GetVariantData(ToFormMapper *Data)
 {
-    blockSignals(true);
     Data->SetData(text());
-    blockSignals(false);
 }
 
 

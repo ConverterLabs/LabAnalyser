@@ -112,6 +112,8 @@ void QSpinBoxD::dropEvent(QDropEvent *event)
 
 void QSpinBoxD::SetVariantData(ToFormMapper Data)
 {
+    blockSignals(true);
+
     if(Data.IsFloatingPointNumber())
          setValue((int)Data.GetFloatingPointData());
      else if(Data.IsSigedNumber())
@@ -119,15 +121,14 @@ void QSpinBoxD::SetVariantData(ToFormMapper Data)
      else if(Data.IsUnsigedNumber())
          setValue((int)Data.GetUnsignedData());
 
+    blockSignals(false);
 
 
 }
 
 void QSpinBoxD::GetVariantData(ToFormMapper *Data)
 {
-    blockSignals(true);
     Data->SetDataKeepType(value());
-    blockSignals(false);
 }
 
 bool QSpinBoxD::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text)

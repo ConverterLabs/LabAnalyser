@@ -136,6 +136,8 @@ void QSliderD::SetVariantData(ToFormMapper Data)
 {
     //TODO Minmax übernehmen
     //HIer weiter
+    blockSignals(true);
+
     if(Data.IsEditable())
     {
         auto MW = GetMainWindow();
@@ -153,6 +155,8 @@ void QSliderD::SetVariantData(ToFormMapper Data)
         int valueC = (int) round((value - MinMax.first)/(MinMax.second-MinMax.first)*100.0);
         setValue((int)valueC );
     }
+    blockSignals(false);
+
 
 
 
@@ -160,13 +164,11 @@ void QSliderD::SetVariantData(ToFormMapper Data)
 
 void QSliderD::GetVariantData(ToFormMapper *Data)
 {
-    blockSignals(true);
      int valuei = value();
      std::pair<double, double> MinMax = std::pair<double, double>(Data->MinValue,Data->MaxValue);
      double ValueScaled = ((double) valuei)/100.0 * (MinMax.second - MinMax.first) + MinMax.first;
 
      Data->SetDataKeepType(ValueScaled);
-     blockSignals(false);
 
 }
 
