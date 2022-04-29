@@ -126,20 +126,34 @@ bool UIDataManagementSetClass::Export2Xml(QString Path, QStringList ExportIds)
 
 bool UIDataManagementSetClass::Export2Mat(QString Path , QStringList ExportIds )
 {
-    auto Exporter = MatExporter(this);
-    auto Error = Exporter.Export2Mat(Path, ExportIds);
-    if(!Error)
-           GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
-    return Error;
+    try {
+        auto Exporter = MatExporter(this);
+        auto Error = Exporter.Export2Mat(Path, ExportIds);
+        if(!Error)
+               GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
+        return Error;
+    } catch (const std::exception& e) {
+        Error("Export 2mat failed -> " + QString::fromStdString(e.what()));
+    }
+    return 1;
 }
 
 bool UIDataManagementSetClass::Export2Hdf5(QString Path , QStringList ExportIds )
 {
     auto Exporter = Export2HDF5(this);
+    try
+    {
     auto Error = Exporter.Export(Path, ExportIds);
     if(!Error)
            GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
-    return Error;
+         return Error;
+    }
+    catch (...)
+    {
+        Error("Export failed - please mind the HDF5 library does not support special characters in the path. Only UTF8!");
+    }
+
+    return 0;
 }
 
 bool UIDataManagementSetClass::LoadPlugin(QString FileName)

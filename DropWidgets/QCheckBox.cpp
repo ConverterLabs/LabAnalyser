@@ -138,7 +138,7 @@ void QCheckBoxD::SetVariantData(ToFormMapper Data)
     if(Data.IsBool())
     {
         setChecked(Data.GetBool());
-        clicked(Data.GetUnsignedData() & (1<<GetBit()));
+        clicked(Data.GetBool());
 
     }
     else if(Data.IsUnsigedNumber())

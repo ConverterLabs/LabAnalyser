@@ -5,11 +5,13 @@
 #include <highfive/H5Easy.hpp>
 #include <QTime>
 #include <QDate>
+#include <windows.h>
 
 Export2HDF5::Export2HDF5(DataManagementClass* Manager_)
 {
     Manager = Manager_;
 }
+
 
 bool Export2HDF5::Export(QString Filename_,  QStringList Ids_)
 {
@@ -17,6 +19,9 @@ bool Export2HDF5::Export(QString Filename_,  QStringList Ids_)
     Filename = Filename_;
     Ids = Ids_;
     //QString ID = "nsad";
+
+
+
 
     // we create a new hdf5 file
     HighFive::File file(Filename.toStdString(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);

@@ -30,7 +30,7 @@
 #include "toolsMisc.c"
 #include <QTime>
 #include <QDate>
-#include <qdebug.h>
+#include <QDebug.h>
 #include <qstring.h>
 
 
@@ -148,6 +148,11 @@ bool MatExporter::Export2Mat(QString Filename_, QStringList Ids_)
         return true;
     Filename = Filename_;
     Ids = Ids_;
+
+    qDebug() << "QString::fromStdString(Filename.toStdString())";
+    qDebug() << QString::fromStdString(Filename.toStdString());
+    qDebug() << QString::fromStdString(Filename.toStdString().c_str());
+
     matfile = matOpen(Filename.toStdString().c_str(), "w");
 
     WriteTimeStamp();
