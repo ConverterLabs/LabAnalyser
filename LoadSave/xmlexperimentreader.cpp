@@ -144,10 +144,10 @@ void XmlExperimentReader::CreateConnection()
                            DCObj->MessageSender("publish",ID,*IDS);
                        }
                        else
-                        {
-                            if(!(_DataBackup.GetDataType().isEmpty()))
-                                DCObj->MessageSender("publish",ID,_DataBackup);
-                        }
+                       {
+                           if(!(_DataBackup.GetDataType().isEmpty()))
+                              DCObj->MessageSender("publish",ID,_DataBackup);
+                       }
                    }else
                    {
                        if(!(_DataBackup.GetDataType().isEmpty()))

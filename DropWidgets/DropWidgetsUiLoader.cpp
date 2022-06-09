@@ -132,6 +132,13 @@ QWidget* DropWidgetsUiLoader::createWidget(const QString &className, QWidget *pa
      widget = new QBLed(parent);
      widget->setAcceptDrops(true);
   }
+  else if (className == "QTableWidget")
+  {
+     // replace any QBLed instances with instance of our
+     // own QBLed
+     widget = new QTableWidgeD(parent);
+     widget->setAcceptDrops(true);
+  }
   else if (className == "PlotWidget")
   {
      // replace any PlotWidget instances with instance of our

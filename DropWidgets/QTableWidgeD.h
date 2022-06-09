@@ -19,19 +19,55 @@
 ****************************************************************************
 ****************************************************************************/
 
-#include "QBLed.h"
-#include "QCheckBox.h"
-#include "QComboBox.h"
-#include "QDoubleSpinBox.h"
-#include "QLabel.h"
-#include "QLCDNumber.h"
-#include "QLed.h"
-#include "QLineEdit.h"
-#include "QListView.h"
-#include "QPushButton.h"
-#include "QProgressBar.h"
-#include "QSlider.h"
-#include "QSpinBox.h"
-#include "QTSLed.h"
-#include "QTableWidgeD.h"
+#pragma once
+
+#include "DropWidget.h"
+#include <QtCore/QVariant>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QProgressBar>
+#include <QtUiTools>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QTableWidget>
+
+#include "QTimer"
+
+
+//Create Spezial Widgets which have drag and drop functionality
+class QTableWidgeD : public QTableWidget, public VariantDropWidget
+{
+Q_OBJECT
+public:
+    QTableWidgeD(QWidget *parent=0);
+    virtual void dragEnterEvent(QDragEnterEvent *event);
+    virtual void dragMoveEvent(QDragMoveEvent *de);
+    virtual void dropEvent(QDropEvent *event);
+    void SetVariantData(ToFormMapper Data) override;
+    void GetVariantData(ToFormMapper *Data) override;
+
+    bool LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text) override;
+    bool SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text) override;
+    void ConnectToID(DataManagementSetClass* DM, QString ID) override;
+
+public slots:
+
+    void contextMenu(QPoint);
+    void RemoveConnection();
+
+Q_SIGNALS:
+    void RequestUpdate();
+
+private:
+    void CreateRow(QString ID0);
+};
 

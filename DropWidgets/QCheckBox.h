@@ -45,7 +45,7 @@ class QCheckBoxD : public QCheckBox, public VariantDropWidget
 {
 Q_OBJECT
 public:
-    QCheckBoxD(QWidget *parent=0);
+    QCheckBoxD(QWidget *parent=0, bool show_label = true);
     virtual void dragEnterEvent(QDragEnterEvent *event);
     virtual void dragMoveEvent(QDragMoveEvent *de);
     virtual void dropEvent(QDropEvent *event);
@@ -66,6 +66,7 @@ public slots:
 private:
     uint32_t bit = 0;
     static uint32_t bitcounter;
+    bool m_show_label = false;
 
 
 };

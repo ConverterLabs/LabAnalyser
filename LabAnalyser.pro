@@ -26,8 +26,8 @@ CONFIG += c++17
 #CONFIG += force_debug_info
 
 VERSION_MAJOR = 1
-VERSION_MINOR = 0
-VERSION_BUILD = 6
+VERSION_MINOR = 1
+VERSION_BUILD = 1
 
 DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR"\
        "VERSION_MINOR=$$VERSION_MINOR"\
@@ -73,6 +73,7 @@ SOURCES += main.cpp\
         DropWidgets/QSlider.cpp \
         DropWidgets/QSpinBox.cpp \
         DropWidgets/QTSLed.cpp \
+        DropWidgets/QTableWidgeD.cpp \
         Export/Export2Mat.cpp \
         DataManagement/UIDataManagementSetClass.cpp \
         Export/export2highfive.cpp \
@@ -118,6 +119,7 @@ HEADERS  += mainwindow.h\
             DropWidgets/QSlider.h \
             DropWidgets/QSpinBox.h \
             DropWidgets/QTSLed.h \
+            DropWidgets/QTableWidgeD.h \
             Export/Export2Mat.h \
             DataManagement/UIDataManagementSetClass.h \
             Export/export2highfive.h \

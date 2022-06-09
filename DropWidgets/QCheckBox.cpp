@@ -24,7 +24,7 @@
 #include "../mainwindow.h"
 
 uint32_t QCheckBoxD::bitcounter = 0;
-QCheckBoxD::QCheckBoxD(QWidget *parent):QCheckBox(parent)
+QCheckBoxD::QCheckBoxD(QWidget *parent, bool show_label):QCheckBox(parent), m_show_label(show_label)
 {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
@@ -123,6 +123,9 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
     QString label = sp.back();
     label += ":";
     label += QString::number(this->bit);
+    if(m_show_label == false)
+        label.clear();
+
     this->setText(label);
 
     MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
@@ -199,6 +202,8 @@ void QCheckBoxD::ConnectToID(DataManagementSetClass* DM, QString ID)
     QString label = sp.back();
     label += ":";
     label += QString::number(GetBit());
+    if(m_show_label == false)
+        label.clear();
     setText(label);
     connect(this, SIGNAL(clicked(bool)), DM, SLOT(SendNewValue()) );
     RequestUpdate();
