@@ -153,6 +153,10 @@ protected:
 
 private:
 
+    void SelectedItems(QStringList  &Ids, QList<QTreeWidgetItem*> selit);
+    void AddSelectedItems(QTreeWidgetItem* elemtent, QStringList& itt);
+
+
     void ParseInputArguments();
     Ui::MainWindow *ui;
     void RemoveElementFromWidget(QString ID);

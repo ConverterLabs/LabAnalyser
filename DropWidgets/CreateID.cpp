@@ -55,3 +55,37 @@ QString CreateID(QObject *Tree)
     return ToolTip;
 }
 
+QStringList CreateIDs(QObject *Tree)
+{
+    QStringList Ids;
+
+    QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(Tree);
+    QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
+
+    for(int k = 0; k < selectedItems.count(); k++)
+    {
+        if(selectedItems[k]->childCount())
+            selectedItems[k] = selectedItems[k]->child(0);
+    }
+
+
+    QString ToolTip;
+    for(auto si : selectedItems)
+    {
+        if(si->childCount() == 0)
+        {
+            auto sit = si;
+            while(sit)
+            {
+                ToolTip.insert(0,sit->text( 0 ));
+                sit = sit->parent();
+                if(sit)
+                    ToolTip.insert(0,"::");
+            }
+            Ids.push_back(ToolTip);
+            ToolTip.clear();
+        }
+    }
+    return Ids;
+}
+

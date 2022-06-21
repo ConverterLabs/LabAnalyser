@@ -63,11 +63,14 @@ public slots:
 
     void contextMenu(QPoint);
     void RemoveConnection();
+    void RemoveSelectedRows();
+    void customHeaderMenuRequested(QPoint pos);
+
 
 Q_SIGNALS:
     void RequestUpdate();
 
 private:
-    void CreateRow(QString ID0);
+    void CreateRow( QString ID0, QPoint Pos = QPoint(-1,-1));
 };
 

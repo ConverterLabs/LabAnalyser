@@ -29,3 +29,4 @@
 
 MainWindow* GetMainWindow();
 QString CreateID(QObject *Tree);
+QStringList CreateIDs(QObject *Tree);

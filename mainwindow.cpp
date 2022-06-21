@@ -984,60 +984,44 @@ void MainWindow::on_Close_Project_triggered()
     ChangeForSaveDetected = false;
 }
 
+void MainWindow::AddSelectedItems(QTreeWidgetItem* elemtent, QStringList &itt)
+{
+    for(int c = 0; c<elemtent->childCount(); c++)
+    {
+        AddSelectedItems(elemtent->child(c), itt);
+    }
+    QString ID;
+    auto sit = elemtent;
+    while(sit)
+    {
+        ID.insert(0,sit->text( 0 ));
+        sit = sit->parent();
+        if(sit)
+            ID.insert(0,"::");
+    }
+    if(this->GetLogic()->GetContainer(ID))
+    {
+        itt.push_back(ID);
+    }
+    ID.clear();
+    itt.removeDuplicates();
+}
+
+void MainWindow::SelectedItems(QStringList &Ids, QList<QTreeWidgetItem*> selit)
+{
+    QList<QTreeWidgetItem*> selectedItems = selit;
+   //Durch alle elemente duchitterieren bis ebende null und IDs speichern, wenn child = 0;
+    for(auto si : selectedItems)
+        AddSelectedItems(si, Ids);
+
+
+}
 //Todo: export umbauen
 void MainWindow::on_actionDaten_Exportieren_mat_triggered()
 {
     QStringList Ids;
-    {
-        QList<QTreeWidgetItem*> selectedItems = this->ui->ParameterTreeWidget->selectedItems();
-        QString ID;
-        std::map<QString, DataPair> Data;
-        int f = 0;
-        for(auto si : selectedItems)
-        {
-            if(si->childCount() == 0)
-            {
-                auto sit = si;
-                while(sit)
-                {
-                    ID.insert(0,sit->text( 0 ));
-                    sit = sit->parent();
-                    if(sit)
-                        ID.insert(0,"::");
-                }
-                if(this->GetLogic()->GetContainer(ID))
-                {
-                    Ids.push_back(ID);
-                }
-                ID.clear();
-            }
-        }
-    }
-    {
-        QList<QTreeWidgetItem*> selectedItems = this->ui->DataTreeWidget->selectedItems();
-        QString ID;
-        std::map<QString, DataPair> Data;
-        int f = 0;
-        for(auto si : selectedItems)
-        {
-            if(si->childCount() == 0)
-            {
-                auto sit = si;
-                while(sit)
-                {
-                    ID.insert(0,sit->text( 0 ));
-                    sit = sit->parent();
-                    if(sit)
-                        ID.insert(0,"::");
-                }
-                if(this->GetLogic()->GetContainer(ID))
-                {
-                    Ids.push_back(ID);
-                }
-                ID.clear();
-            }
-        }
-    }
+    SelectedItems(Ids, this->ui->ParameterTreeWidget->selectedItems());
+    SelectedItems(Ids, this->ui->DataTreeWidget->selectedItems());
 
     if(!Ids.size())
     {
@@ -1525,31 +1509,8 @@ void MainWindow::on_actionSave_Parameter_Set_triggered()
 {
 
     QStringList Ids;
-    {
-        QList<QTreeWidgetItem*> selectedItems = this->ui->ParameterTreeWidget->selectedItems();
-        QString ID;
-        std::map<QString, DataPair> Data;
-        int f = 0;
-        for(auto si : selectedItems)
-        {
-            if(si->childCount() == 0)
-            {
-                auto sit = si;
-                while(sit)
-                {
-                    ID.insert(0,sit->text( 0 ));
-                    sit = sit->parent();
-                    if(sit)
-                        ID.insert(0,"::");
-                }
-                if(this->GetLogic()->GetContainer(ID))
-                {
-                    Ids.push_back(ID);
-                }
-                ID.clear();
-            }
-        }
-    }
+    SelectedItems(Ids, this->ui->ParameterTreeWidget->selectedItems());
+
     if(!Ids.size())
     {
         Error("Please select the Parameter in the Explorer that shell be exported to xml.");
@@ -1618,56 +1579,9 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_actionExport_Data_h5_triggered()
 {
     QStringList Ids;
-    {
-        QList<QTreeWidgetItem*> selectedItems = this->ui->ParameterTreeWidget->selectedItems();
-        QString ID;
-        std::map<QString, DataPair> Data;
-        int f = 0;
-        for(auto si : selectedItems)
-        {
-            if(si->childCount() == 0)
-            {
-                auto sit = si;
-                while(sit)
-                {
-                    ID.insert(0,sit->text( 0 ));
-                    sit = sit->parent();
-                    if(sit)
-                        ID.insert(0,"::");
-                }
-                if(this->GetLogic()->GetContainer(ID))
-                {
-                    Ids.push_back(ID);
-                }
-                ID.clear();
-            }
-        }
-    }
-    {
-        QList<QTreeWidgetItem*> selectedItems = this->ui->DataTreeWidget->selectedItems();
-        QString ID;
-        std::map<QString, DataPair> Data;
-        int f = 0;
-        for(auto si : selectedItems)
-        {
-            if(si->childCount() == 0)
-            {
-                auto sit = si;
-                while(sit)
-                {
-                    ID.insert(0,sit->text( 0 ));
-                    sit = sit->parent();
-                    if(sit)
-                        ID.insert(0,"::");
-                }
-                if(this->GetLogic()->GetContainer(ID))
-                {
-                    Ids.push_back(ID);
-                }
-                ID.clear();
-            }
-        }
-    }
+    SelectedItems(Ids, this->ui->ParameterTreeWidget->selectedItems());
+    SelectedItems(Ids, this->ui->DataTreeWidget->selectedItems());
+
 
     if(!Ids.size())
     {

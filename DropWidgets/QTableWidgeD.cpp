@@ -32,10 +32,16 @@ QTableWidgeD::QTableWidgeD(QWidget *parent):QTableWidget(parent)
 {
     this->setAlternatingRowColors(true);
 
-
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
     connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+
+    this->verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->verticalHeader(),
+            SIGNAL(customContextMenuRequested(QPoint)),
+            SLOT(customHeaderMenuRequested(QPoint)));
+
+
     return;
 }
 
@@ -47,6 +53,44 @@ void QTableWidgeD::contextMenu(QPoint pos)
     menu->addSeparator();
     menu->addAction("Clear Table", this , SLOT(RemoveConnection()));
     menu->popup(this->mapToGlobal(pos));
+
+}
+
+void QTableWidgeD::RemoveSelectedRows()
+{
+    MainWindow *MW = GetMainWindow();
+
+    QItemSelectionModel *selections = this->selectionModel();
+    QModelIndexList selected = selections->selectedRows();
+
+    QList<int> DelRows;
+
+    for(int ii = selected.size()-1; ii >= 0 ;ii = ii-1)
+    {
+        int i = selected[ii].row();
+        DelRows.push_back(i);
+        for(auto j = 0; j < this->columnCount(); j++)
+        {
+            if(this->cellWidget(i,j))
+            {
+                auto widgetList = this->cellWidget(i,j)->children();
+                for(auto itt: widgetList)
+                {
+                        QObject* FoundObject = MW->findChild<QObject*>(itt->objectName());
+                        if(FoundObject)
+                            MW->GetLogic()->DeleteEntryOfObject(FoundObject);
+
+                }
+            }
+        }
+    }
+
+    qSort(DelRows);
+
+    for(int ii = DelRows.size()-1; ii >= 0 ;ii = ii-1)
+        this->removeRow(DelRows[ii]);
+
+
 
 }
 
@@ -90,13 +134,37 @@ void QTableWidgeD::dragEnterEvent(QDragEnterEvent *event)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
 
-    if (selectedItems[0]->childCount() == 0)
+
+    QStringList Ids = CreateIDs(event->source());
+    if(Ids.size()==0)
+        return;
+
+    bool accept = false;
+    for(auto itt : Ids)
     {
-        QString ID = CreateID(event->source());
-        QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
-        if(GetMainWindow()->GetLogic()->GetContainer(ID)->IsNumeric())
-                event->acceptProposedAction();
+        if(GetMainWindow()->GetLogic()->GetContainer(itt)->IsNumeric())
+            accept = true;
+        else
+            accept = false;
+
+        if(!accept)
+            break;
     }
+    if(accept)
+        event->acceptProposedAction();
+}
+
+void QTableWidgeD::customHeaderMenuRequested(QPoint pos)
+{
+        QItemSelectionModel *selections = this->selectionModel();
+        QModelIndexList selected = selections->selectedRows();
+        QMenu *menu=new QMenu(this);
+        if(selected.size())
+            menu->addAction("Delete Selected Rows", this, SLOT(RemoveSelectedRows()));
+
+        menu->addAction("Clear Table", this , SLOT(RemoveConnection()));
+        menu->popup(this->verticalHeader()->viewport()->mapToGlobal(pos));
+
 }
 
 void QTableWidgeD::dragMoveEvent(QDragMoveEvent *de)
@@ -104,7 +172,7 @@ void QTableWidgeD::dragMoveEvent(QDragMoveEvent *de)
     de->accept();
 }
 
-void QTableWidgeD::CreateRow(QString VText)
+void QTableWidgeD::CreateRow( QString VText, QPoint Pos)
 {
     auto MW = GetMainWindow();
 
@@ -124,12 +192,21 @@ void QTableWidgeD::CreateRow(QString VText)
         this->setColumnCount(columns);
     }
 
-    this->setRowCount( this->rowCount()+1);
+    int r = this->rowAt((Pos).y());
 
+
+    if(r == -1)
+    {
+        this->setRowCount( this->rowCount()+1);
+        r = this->rowCount()-1;       }
+    else
+    {
+        this->insertRow(r);
+    }
 
     QTableWidgetItem *newheader = new QTableWidgetItem();
     newheader->setText(VText);
-    this->setVerticalHeaderItem(this->rowCount()-1,newheader);
+    this->setVerticalHeaderItem(r,newheader);
 
     for(auto i = 0; i < this->columnCount(); i++)
     {
@@ -161,7 +238,7 @@ void QTableWidgeD::CreateRow(QString VText)
             pLayout->setAlignment(Qt::AlignCenter);
             pLayout->setContentsMargins(0,0,0,0);
             pWidget->setLayout(pLayout);
-            this->setCellWidget(this->rowCount()-1,counter-1,pWidget);
+            this->setCellWidget(r,counter-1,pWidget);
             tmp->setObjectName(this->objectName() + "r" + QString::number(this->rowCount()) + "c" + QString::number(counter));
             MW->GetLogic()->AddElementToContainerEntry(tmp->objectName(),tmpID,tmp->metaObject()->className(),tmp);
             tmp->ConnectToID(MW->GetLogic(), tmpID);
@@ -181,7 +258,7 @@ void QTableWidgeD::CreateRow(QString VText)
                 pLayout->setAlignment(Qt::AlignCenter);
                 pLayout->setContentsMargins(0,0,0,0);
                 pWidget->setLayout(pLayout);
-                this->setCellWidget(this->rowCount()-1,counter-1,pWidget);
+                this->setCellWidget(r,counter-1,pWidget);
                 tmp->setObjectName(this->objectName() + "r" + QString::number(this->rowCount()) + "c" + QString::number(counter));
                 MW->GetLogic()->AddElementToContainerEntry(tmp->objectName(),tmpID,tmp->metaObject()->className(),tmp);
                 tmp->ConnectToID(MW->GetLogic(), tmpID);
@@ -194,7 +271,7 @@ void QTableWidgeD::CreateRow(QString VText)
                 pLayout->setAlignment(Qt::AlignCenter);
                 pLayout->setContentsMargins(0,0,0,0);
                 pWidget->setLayout(pLayout);
-                this->setCellWidget(this->rowCount()-1,counter-1,pWidget);
+                this->setCellWidget(r,counter-1,pWidget);
                 tmp->setObjectName(this->objectName() + "r" + QString::number(this->rowCount()) + "c" + QString::number(counter));
                 MW->GetLogic()->AddElementToContainerEntry(tmp->objectName(),tmpID,tmp->metaObject()->className(),tmp);
                 tmp->ConnectToID(MW->GetLogic(), tmpID);
@@ -215,31 +292,35 @@ void QTableWidgeD::CreateRow(QString VText)
 void QTableWidgeD::dropEvent(QDropEvent *event)
 {
     auto MW = GetMainWindow();
-    QString ID =  CreateID(event->source());
-    auto IdParts = ID.split("::");
-    QString ID0;
-    for(auto i = 0; i< IdParts.size()-1; i++)
+
+
+    QStringList IDs =  CreateIDs(event->source());
+    for(auto ID : IDs)
     {
-        ID0 += IdParts[i];
-        ID0 += "::";
+        auto IdParts = ID.split("::");
+        QString ID0;
+        for(auto i = 0; i< IdParts.size()-1; i++)
+        {
+            ID0 += IdParts[i];
+            ID0 += "::";
+        }
+
+        size_t columns = 0;
+        QString tmpID = ID0 + QString::number(columns);
+        while( MW->GetLogic()->ElementExists(tmpID))
+        {
+             columns++;
+             tmpID = ID0 + QString::number(columns);
+        }
+        if(columns == 0)
+            return;
+
+        QString VText = ID0;
+        VText.remove(VText.size()-2,2);
+
+        CreateRow(VText, event->pos());
+
     }
-
-    size_t columns = 0;
-    QString tmpID = ID0 + QString::number(columns);
-    while( MW->GetLogic()->ElementExists(tmpID))
-    {
-         columns++;
-         tmpID = ID0 + QString::number(columns);
-    }
-    if(columns == 0)
-        return;
-
-    QString VText = ID0;
-    VText.remove(VText.size()-2,2);
-
-    CreateRow(VText);
-
-
 
 
 }
@@ -276,7 +357,7 @@ bool QTableWidgeD::LoadFromXML(const std::vector<std::pair<QString, QString>> &A
     for(auto i =0; i<Attributes.size(); i++)
         if(Attributes[i].first.contains("Connected_ID"))
         {
-            QTimer::singleShot(2000, this, std::bind(&QTableWidgeD::CreateRow, this, Attributes[i].second));
+            QTimer::singleShot(2000, this, std::bind(&QTableWidgeD::CreateRow, this, Attributes[i].second, QPoint(-1,-1)));
 
         }
 
