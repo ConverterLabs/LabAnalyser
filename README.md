@@ -4,9 +4,13 @@ A plugin based open source data modification and visualization tool
 ## How to compile LabAnalyser
 
 pacman -Syuu
+
 pacman -Syuu
+
 pacman -Syuu
+
 pacman -Sy mingw-w64-{i686,x86_64}-qt5
+
 pacman -S mingw-w64-x86_64-boost
 
 ### Prerequisites
