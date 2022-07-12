@@ -3,7 +3,11 @@ A plugin based open source data modification and visualization tool
 
 ## How to compile LabAnalyser
 
-http://master.qt.io/new_archive/qt/5.8/5.8.0/qt-opensource-windows-x86-mingw530-5.8.0.exe
+pacman -Syuu
+pacman -Syuu
+pacman -Syuu
+pacman -Sy mingw-w64-{i686,x86_64}-qt5
+pacman -S mingw-w64-x86_64-boost
 
 ### Prerequisites
 
