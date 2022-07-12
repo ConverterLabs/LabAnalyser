@@ -3,6 +3,8 @@ A plugin based open source data modification and visualization tool
 
 ## How to compile LabAnalyser
 
+http://master.qt.io/new_archive/qt/5.8/5.8.0/qt-opensource-windows-x86-mingw530-5.8.0.exe
+
 ### Prerequisites
 
 The following libraries are necessary:
@@ -18,6 +20,7 @@ The following libraries are necessary:
 
 1. install boost-libs 
    - Arch Linux: `pacman -S boost-libs`
+   - Windows: https://gist.github.com/sim642/29caef3cc8afaa273ce6
 2. install HighFive
    - Arch Linux: install from AUR `yay -S highfive` or `yaourt -S highfive`
 3. create build folder `mkdir build`
