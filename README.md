@@ -3,20 +3,19 @@ A plugin based open source data modification and visualization tool
 
 ## How to compile LabAnalyser
 
-pacman -Syuu
+1. pacman -Syuu
+2. pacman -Syuu
+3. pacman -Syuu
+4. mingw-w64-i686-qt
+5. mingw-w64-i686-qt-creator
+6. mingw-w64-x86_64-qt
+7. mingw-w64-x86_64-qt-creator
+8. pacman -S mingw-w64-x86_64-boost
+9. pacman -S mingw-w64-x86_64-highfive
+10. pacman -S git
 
-pacman -Syuu
+11. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
 
-pacman -Syuu
-Sie können diese MSYS2-Pakete mit pacman installieren:
-
-mingw-w64-i686-qt
-mingw-w64-i686-qt-creator
-mingw-w64-x86_64-qt
-mingw-w64-x86_64-qt-creator
-open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
-
-pacman -S mingw-w64-x86_64-boost
 
 ### Prerequisites
 
