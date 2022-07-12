@@ -19,7 +19,7 @@ A plugin based open source data modification and visualization tool
 
 ### Prerequisites
 
-The following libraries are necessary:
+The following libraries are necessary: 
 1. boost_1_59_0 (https://www.boost.org/)
 2. matOut (https://github.com/EyNuel/matOut/)
 	to use MatOut please use the git patch in folder build-patches:
