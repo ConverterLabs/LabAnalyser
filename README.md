@@ -1,7 +1,7 @@
 # LabAnalyser
 A plugin based open source data modification and visualization tool
 
-## How to compile LabAnalyser
+## How to compile LabAnalyser (using msys2)
 
 1. pacman -Syuu
 2. pacman -Syuu
@@ -32,7 +32,6 @@ The following libraries are necessary:
 
 1. install boost-libs 
    - Arch Linux: `pacman -S boost-libs`
-   - Windows: https://gist.github.com/sim642/29caef3cc8afaa273ce6
 2. install HighFive
    - Arch Linux: install from AUR `yay -S highfive` or `yaourt -S highfive`
 3. create build folder `mkdir build`
