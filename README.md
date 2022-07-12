@@ -8,8 +8,13 @@ pacman -Syuu
 pacman -Syuu
 
 pacman -Syuu
+Sie können diese MSYS2-Pakete mit pacman installieren:
 
-pacman -Sy mingw-w64-{i686,x86_64}-qt5
+mingw-w64-i686-qt
+mingw-w64-i686-qt-creator
+mingw-w64-x86_64-qt
+mingw-w64-x86_64-qt-creator
+open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
 
 pacman -S mingw-w64-x86_64-boost
 
