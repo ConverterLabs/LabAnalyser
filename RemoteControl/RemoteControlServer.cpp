@@ -76,7 +76,7 @@ void RemoteControlServer::HeaderReceived()
                 QString Command = QString::fromLatin1(Data.mid(4, 3 ));
                 uint32_t LengthID = *((uint32_t*)&DataArrayStart[4+3]);
                 uint32_t LengthofData = *((uint32_t*)&DataArrayStart[3+8]);
-                ReceivedID = QString::fromLatin1(Data.mid(15, LengthID ));
+                ReceivedID = QString::fromLatin1(Data.mid(15, LengthID-1 ));
 
                 if(Command.compare("set")==0)
                 {

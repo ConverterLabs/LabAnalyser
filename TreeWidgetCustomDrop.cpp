@@ -55,11 +55,12 @@ QMimeData *	TreeWidgetCustomDrop::mimeData(const QList<QTreeWidgetItem *> items)
         }
 
     }
-    mimeData->setText(Ids);
+    mimeData->setText(Ids.toUtf8());
     return mimeData;
 }
 
-void TreeWidgetCustomDrop::startDrag(Qt::DropActions supportedActions)
+/*void TreeWidgetCustomDrop::startDrag(Qt::DropActions supportedActions)
 {
     QTreeWidget::startDrag(Qt::CopyAction );
 }
+*/

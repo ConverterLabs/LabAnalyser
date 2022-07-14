@@ -40,7 +40,15 @@ protected:
                return qstrList;
            }
            QMimeData * mimeData( const QList<QTreeWidgetItem *> items ) const;
-           void startDrag(Qt::DropActions supportedActions) override;
+    protected:
+        void startDrag(Qt::DropActions supportedActions) override
+        {
+           // QTreeWidget::startDrag(Qt::CopyAction );
+            QDrag* drag = new QDrag(this);
+            drag->setMimeData(mimeData(selectedItems()));
+            drag->exec(supportedActions);
+        }
+
 
 private:
 
