@@ -32,7 +32,6 @@ class UIDataManagementSetClass : public DataManagementSetClass
     Q_OBJECT
 public:
     explicit UIDataManagementSetClass(QObject *parent = nullptr);
-    bool SaveExperiment(QString Path);
     bool LoadExperiment(QString Path);
 
     bool Export2Mat(QString Path, QStringList);
@@ -46,6 +45,10 @@ public:
     int  RegisterChange(){ ChangeDetected = true;}
 
     void LoadForms();
+
+public slots:
+    bool SaveExperiment(QString Path);
+
 
 signals:
     void LoadFormFromXML(QString UiFileName, QString LastFormName, bool skip);

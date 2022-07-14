@@ -150,7 +150,7 @@ bool QTSLed::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attribu
 {
     for(auto itt: Attributes)
     {
-        if(itt.first == "Bit")
+        if(itt.first ==  QString("Bit"))
             SetBit(itt.second.toUInt());
     }
     return true;

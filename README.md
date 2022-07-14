@@ -1,25 +1,11 @@
 # LabAnalyser
 A plugin based open source data modification and visualization tool
 
-## How to compile LabAnalyser (using msys2)
-
-1. pacman -Syuu
-2. pacman -Syuu
-3. pacman -Syuu
-4. mingw-w64-i686-qt
-5. mingw-w64-i686-qt-creator
-6. mingw-w64-x86_64-qt
-7. mingw-w64-x86_64-qt-creator
-8. pacman -S mingw-w64-x86_64-boost
-9. pacman -S mingw-w64-x86_64-highfive
-10. pacman -S git
-
-11. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
-
+## How to compile LabAnalyser
 
 ### Prerequisites
 
-The following libraries are necessary: 
+The following libraries are necessary:
 1. boost_1_59_0 (https://www.boost.org/)
 2. matOut (https://github.com/EyNuel/matOut/)
 	to use MatOut please use the git patch in folder build-patches:

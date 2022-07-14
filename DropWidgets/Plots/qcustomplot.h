@@ -2673,7 +2673,7 @@ Q_DECLARE_TYPEINFO(QCPCurveData, Q_MOVABLE_TYPE);
   \see QCPCurveData, QCPCurve::setData
 */
 
-typedef QMap<double, QCPCurveData> QCPCurveDataMap;
+typedef QMultiMap<double, QCPCurveData> QCPCurveDataMap;
 typedef QMapIterator<double, QCPCurveData> QCPCurveDataMapIterator;
 typedef QMutableMapIterator<double, QCPCurveData> QCPCurveDataMutableMapIterator;
 
@@ -2836,7 +2836,7 @@ Q_DECLARE_TYPEINFO(QCPBarData, Q_MOVABLE_TYPE);
   This is the container in which QCPBars holds its data.
   \see QCPBarData, QCPBars::setData
 */
-typedef QMap<double, QCPBarData> QCPBarDataMap;
+typedef QMultiMap<double, QCPBarData> QCPBarDataMap;
 typedef QMapIterator<double, QCPBarData> QCPBarDataMapIterator;
 typedef QMutableMapIterator<double, QCPBarData> QCPBarDataMutableMapIterator;
 
@@ -3158,7 +3158,7 @@ Q_DECLARE_TYPEINFO(QCPFinancialData, Q_MOVABLE_TYPE);
   This is the container in which QCPFinancial holds its data.
   \see QCPFinancial, QCPFinancial::setData
 */
-typedef QMap<double, QCPFinancialData> QCPFinancialDataMap;
+typedef  QMultiMap<double, QCPFinancialData> QCPFinancialDataMap;
 typedef QMapIterator<double, QCPFinancialData> QCPFinancialDataMapIterator;
 typedef QMutableMapIterator<double, QCPFinancialData> QCPFinancialDataMutableMapIterator;
 

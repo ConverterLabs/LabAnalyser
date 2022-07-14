@@ -44,7 +44,7 @@ bool ParameterLoader::Load(QString Path)
     reader.setDevice(&file);
 
     if (reader.readNextStartElement()) {
-        if (reader.name() == "ParameterSet")
+        if (reader.name() == QString("ParameterSet"))
             readParameterSets();
         else
         {
@@ -65,7 +65,7 @@ bool ParameterLoader::Load(QString Path)
 void ParameterLoader::readParameterSets()
 {
     while(reader.readNextStartElement()){
-       if(reader.name() == "entry")
+       if(reader.name() ==  QString("entry"))
             readEntry();
        else
            reader.skipCurrentElement();
@@ -77,11 +77,11 @@ void ParameterLoader::readEntry()
     QString Id;
     while(reader.readNextStartElement())
     {
-       if(reader.name() == "Parameter")
+       if(reader.name() ==  QString("Parameter"))
        {
            Id =  reader.readElementText().trimmed();
        }
-       else if(reader.name() == "Value")
+       else if(reader.name() ==  QString("Value"))
        {
            if(!Id.isEmpty())
            {

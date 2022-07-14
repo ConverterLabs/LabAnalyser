@@ -27,6 +27,8 @@
 #include "QLed.h"
 #include <QTimer>
 #include <functional>
+#include <algorithm>
+
 
 QTableWidgeD::QTableWidgeD(QWidget *parent):QTableWidget(parent)
 {
@@ -85,7 +87,7 @@ void QTableWidgeD::RemoveSelectedRows()
         }
     }
 
-    qSort(DelRows);
+    std::sort(DelRows.begin(), DelRows.end() );
 
     for(int ii = DelRows.size()-1; ii >= 0 ;ii = ii-1)
         this->removeRow(DelRows[ii]);
@@ -244,7 +246,7 @@ void QTableWidgeD::CreateRow( QString VText, QPoint Pos)
             tmp->ConnectToID(MW->GetLogic(), tmpID);
             QString text = "1234678.1234";
             QFontMetrics fm(tmp->font());
-            int pixelsWide = fm.width(text);
+            int pixelsWide = fm.horizontalAdvance(text);
             tmp->setFixedWidth(pixelsWide);
             tmp->adjustSize();
         }

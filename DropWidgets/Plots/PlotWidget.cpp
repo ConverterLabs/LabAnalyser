@@ -26,7 +26,6 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
     QCustomPlot(parent)
 {
 
-
     setAttribute(Qt::WA_AcceptTouchEvents);
       _release2touch = false;
       _touchDevice = false;
@@ -59,9 +58,12 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
        fontP.setPointSize(10);
 
    QFont NewFont = font();
-   NewFont.setPointSize(fontP.pointSize());
-  // NewFont.setFamily(fontP.family());
+   NewFont.setStyleStrategy(QFont::PreferAntialias);
 
+   NewFont.setPointSize(fontP.pointSize());
+
+
+  // NewFont.setFamily(fontP.family());
 
    xAxis->setTickLabelFont(NewFont);
    yAxis->setTickLabelFont(NewFont);
@@ -70,6 +72,8 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
    yAxis->setLabelFont(NewFont);
 
    QFont Highlight = xAxis->selectedLabelFont();
+   Highlight.setStyleStrategy(QFont::NoAntialias);
+
    Highlight.setPointSize(fontP.pointSize());
    xAxis->setSelectedLabelFont(Highlight);
    yAxis->setSelectedLabelFont(Highlight);
@@ -554,7 +558,7 @@ void PlotWidget::UpdataGraphs(QString ID, bool force)
 
         mmw = mmw->parentWidget();
     }
-    if(this->visibleRegion().rects().count() == 1 && !minimized)
+    if(this->visibleRegion().rectCount() == 1 && !minimized)
     {
         int samesize = 1;
         for(int i = 0; i < this->graphCount()-2;i++)
@@ -995,7 +999,7 @@ bool PlotWidget::event( QEvent *event ){
          QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
          QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
 
-         if(touchPoints.count() == 1 && touchEvent->touchPointStates().testFlag(Qt::TouchPointReleased))
+         if(touchPoints.count() == 1 && touchEvent->touchPointStates().testFlag(QEventPoint::State::Released))
              _release2touch = false;
 
          if (touchPoints.count() == 1 && !_release2touch)
@@ -1059,7 +1063,7 @@ bool PlotWidget::event( QEvent *event ){
                                               (touchPoint0.lastPos().y()+ touchPoint1.lastPos().y())/2);
 
 
-             if (touchEvent->touchPointStates().testFlag(Qt::TouchPointReleased))
+             if (touchEvent->touchPointStates().testFlag(QEventPoint::State::Released))
              {
                  currentScaleFactor = 1;
                  currentScaleFactorX = 1;
@@ -1101,7 +1105,7 @@ bool PlotWidget::event( QEvent *event ){
              double diffY = this->yAxis->pixelToCoord(lastCenterZoom.y())
                      - this->yAxis->pixelToCoord(centreZoom.y());
 
-             if(!touchEvent->touchPointStates().testFlag(Qt::TouchPointReleased)){
+             if(!touchEvent->touchPointStates().testFlag(QEventPoint::State::Released)){
 
 
                  if (xAxis->selectedParts().testFlag(QCPAxis::spAxis))
@@ -1144,21 +1148,21 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
 
     for(auto itt : Attributes)
     {
-        if(itt.first == "Xmin")
+        if(itt.first ==  QString("Xmin"))
             xmin = itt.second.toDouble();
-        else if(itt.first == "Xmax")
+        else if(itt.first ==  QString("Xmax"))
             xmax = itt.second.toDouble();
-        else if(itt.first == "Ymin")
+        else if(itt.first ==  QString("Ymin"))
             ymin = itt.second.toDouble();
-        else if(itt.first == "Ymax")
+        else if(itt.first ==  QString("Ymax"))
             ymax = itt.second.toDouble();
-        else if(itt.first == "XLabel")
+        else if(itt.first ==  QString("XLabel"))
             XLabel = itt.second;
-        else if(itt.first == "YLabel")
+        else if(itt.first ==  QString("YLabel"))
             YLabel = itt.second;
-        else if(itt.first == "XYPlot")
+        else if(itt.first ==  QString("XYPlot"))
             IsXYPlot = itt.second.toInt();
-        else if(itt.first == "XData")
+        else if(itt.first ==  QString("XData"))
             XData = itt.second;
     }
 

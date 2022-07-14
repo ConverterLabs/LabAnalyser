@@ -177,7 +177,7 @@ bool QCheckBoxD::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
 {
     for(auto itt: Attributes)
     {
-        if(itt.first == "Bit")
+        if(itt.first ==  QString("Bit"))
             SetBit(itt.second.toUInt());
     }
     return true;

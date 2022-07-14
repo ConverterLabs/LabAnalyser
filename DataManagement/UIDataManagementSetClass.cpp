@@ -48,7 +48,9 @@
 UIDataManagementSetClass::UIDataManagementSetClass(QObject *parent) : DataManagementSetClass(parent)
 {
     MainWindow* MW = qobject_cast<MainWindow*>(this->parent());
-    Q_ASSERT(MW->objectName() == "LabAnalyser");
+    Q_ASSERT(MW->objectName() ==  QString("LabAnalyser"));
+
+    connect(parent, SIGNAL(SaveExperiment(QString)),this, SLOT(SaveExperiment(QString)));
 
     connect(this->GetMessenger(), SIGNAL(CloseProject()),MW, SLOT(CloseProject()));
     connect(this->GetMessenger(), SIGNAL(PublishFinished()), MW, SLOT(PublishFinished()));
@@ -66,15 +68,18 @@ UIDataManagementSetClass::UIDataManagementSetClass(QObject *parent) : DataManage
 bool UIDataManagementSetClass::SaveExperiment(QString Path)
 {
 
+
     bool Error = false;
     //create a backup
+    xmlexperimentwriter *Writer = new xmlexperimentwriter(this, GetMessengerRef(), *this);
 
-    xmlexperimentwriter Writer(this, GetMessenger());
-    if (!Writer.write(Path))
+    if ((Writer->write(Path)))
     {
         Info("Error saving File ");
         Error = true;
     }
+    delete Writer;
+    Writer = nullptr;
 
     //Signal Plugins to save there properties as well
     QList<QString> Devices = this->GetDevices();

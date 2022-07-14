@@ -21,23 +21,23 @@
 
 #pragma once
 #include <QObject>
-#include <QFile>
 #include <QXmlStreamReader>
 #include "../DataManagement/DataManagementClass.h"
 #include "../DataManagement/DataMessengerClass.h"
 #include <QDir>
+#include <QFile>
+
 class xmlexperimentwriter: public QObject
 {
    Q_OBJECT
 public:
-    xmlexperimentwriter(QObject *parent = nullptr, MessengerClass* Messenger_ = nullptr );
+    xmlexperimentwriter(QObject *parent, MessengerClass& Messenger_, DataManagementClass& Manager_ );
     bool write(QString LoadPath_);
 private:
-    MessengerClass* Messenger = nullptr;
-    DataManagementClass* Manager = nullptr;
-    QXmlStreamWriter xmlWriter;
-    QDir T;
-    QString LoadPath;
+    MessengerClass& m_Messenger ;
+    DataManagementClass& m_Manager ;
+    QXmlStreamWriter m_xmlWriter;
+    QDir m_T;
 
     void writeExperiment();
     void writeTabs();

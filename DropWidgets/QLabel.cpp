@@ -100,7 +100,7 @@ bool QLabelD::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attrib
 {
     for(auto itt : Attributes)
     {
-        if(itt.first == "UserDefinedText" && itt.second.toInt())
+        if(itt.first ==  QString("UserDefinedText") && itt.second.toInt())
         {
             setText(Text);
         }

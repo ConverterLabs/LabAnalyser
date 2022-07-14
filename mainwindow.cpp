@@ -395,7 +395,7 @@ void MainWindow::on_actionLoad_Form_triggered()
 {
     auto UiFileName = QFileDialog::getOpenFileName(this,
              tr("Open UI File"), this->StdSavePath, tr("UI Files (*.ui)"));
-    QFileInfo fi = UiFileName;
+    QFileInfo fi(UiFileName);
     this->StdSavePath = fi.absolutePath();
 
     if(UiFileName.size())
@@ -608,7 +608,7 @@ void MainWindow::LoadFormFromXML(QString UiFileName, QString LastFormName, bool 
     gridLayout->setContentsMargins(0, 0, 0, 0);
     pageWidget->setLayout(gridLayout);
     pageWidget->layout()->addWidget(scrollArea);
-    QPalette pal2; pal2.setColor(QPalette::Background, Qt::white);
+    QPalette pal2; pal2.setColor(QPalette::Window, Qt::white);
     pageWidget->setPalette(pal2);
     pageWidget->setAutoFillBackground(true);
 
@@ -659,7 +659,7 @@ void MainWindow::on_actionLoadPlugin_triggered()
     QString FileName = QFileDialog::getOpenFileName(this, tr("Load Plugin/Device File"), this->StdSavePath, tr("Plugin/Device Files (*.LAdev)"));
     if(!FileName.size())
         return;
-    QFileInfo fi = FileName;
+    QFileInfo fi(FileName);
     this->StdSavePath = fi.absolutePath();
 
     GetLogic()->LoadPlugin(FileName);
@@ -859,14 +859,16 @@ void MainWindow::on_actionSave_Experiment_triggered()
     QString Path = QFileDialog::getSaveFileName(this,
              tr("Save Experiment"), this->StdSavePath, tr("Expermiment Files (*.LAexp)"));
 
-    QFileInfo fi = Path;
+    QFileInfo fi(Path);
     this->StdSavePath = fi.absolutePath();
-    if(Path.size())
-    {
-        ExtendedDataManagement->SaveExperiment(Path);
-        this->SavePath = Path;
-        ChangeForSaveDetected = false;
-    }
+
+    emit SaveExperiment(Path);
+
+    /*ExtendedDataManagement->SaveExperiment(Path);
+    this->SavePath = Path;
+    */
+    ChangeForSaveDetected = false;
+
 }
 
 void MainWindow::on_actionLoadExperiment_triggered()
@@ -882,7 +884,7 @@ void MainWindow::on_actionLoadExperiment_triggered()
         {
             auto UiFileName = QFileDialog::getSaveFileName(this,
                                                            tr("Save Experiment"), this->StdSavePath, tr("Expermiment Files (*.LAexp)"));
-            QFileInfo fi = UiFileName;
+            QFileInfo fi(UiFileName);
             this->StdSavePath = fi.absolutePath();
 
             GetLogic()->SaveExperiment(UiFileName);
@@ -904,7 +906,7 @@ void MainWindow::on_actionLoadExperiment_triggered()
 
     CloseProject();
 
-    QFileInfo fi = Path;
+    QFileInfo fi(Path);
     this->StdSavePath = fi.absolutePath();
     this->isloading = true;
     if(!ExtendedDataManagement->LoadExperiment(Path))
@@ -1031,7 +1033,7 @@ void MainWindow::on_actionDaten_Exportieren_mat_triggered()
 
     auto UiFileName = QFileDialog::getSaveFileName(this,
                                                    tr("Export Data to *.mat"), this->StdSavePath, tr("Mat Files (*.mat)"));
-    QFileInfo fi = UiFileName;
+    QFileInfo fi(UiFileName);
     this->StdSavePath = fi.absolutePath();
 
     if(UiFileName.size())
@@ -1431,7 +1433,7 @@ void MainWindow::ParseInputArguments()
                     if(!Path.size())
                         return;
                     CloseProject();
-                    QFileInfo fi = Path;
+                    QFileInfo fi(Path);
                     this->StdSavePath = fi.absolutePath();
                     this->isloading = true;
                     if(!ExtendedDataManagement->LoadExperiment(Path))
@@ -1453,7 +1455,7 @@ void MainWindow::ParseInputArguments()
                 if(!Path.size())
                     return;
                 CloseProject();
-                QFileInfo fi = Path;
+                QFileInfo fi(Path);
                 this->StdSavePath = fi.absolutePath();
                 this->isloading = true;
                 if(!ExtendedDataManagement->LoadExperiment(Path))
@@ -1494,7 +1496,7 @@ void MainWindow::on_actionLoad_Parameter_File_triggered()
     QString Filename;
     Filename = QFileDialog::getOpenFileName(this,
              tr("Load Parameter Set"), this->StdSavePath, tr("Parameter Files (*.LAparam)"));
-    QFileInfo fi = Filename;
+    QFileInfo fi(Filename);
     this->StdSavePath = fi.absolutePath();
 
     if(Filename.size())
@@ -1519,7 +1521,7 @@ void MainWindow::on_actionSave_Parameter_Set_triggered()
     QString Path = QFileDialog::getSaveFileName(this,
              tr("Export Parameter Set"), this->StdSavePath, tr("Parameter Files (*.LAparam)"));
 
-    QFileInfo fi = Path;
+    QFileInfo fi(Path);
     this->StdSavePath = fi.absolutePath();
     if(Path.size())
     {
@@ -1591,7 +1593,7 @@ void MainWindow::on_actionExport_Data_h5_triggered()
 
     auto UiFileName = QFileDialog::getSaveFileName(this,
                                                    tr("Export Data to *.h5"), this->StdSavePath, tr("HDF5 Files (*.h5)"));
-    QFileInfo fi = UiFileName;
+    QFileInfo fi(UiFileName);
     this->StdSavePath = fi.absolutePath();
 
     if(UiFileName.size())
@@ -1602,3 +1604,11 @@ void MainWindow::on_actionExport_Data_h5_triggered()
     return;
 
 }
+
+void MainWindow::on_actionRemote_Connection_Port_2_triggered()
+{
+    QMessageBox::information(this, tr("Remote Connection Port"),
+                                   QString("TCP Port: ") + QString::number(Remote->GetPort()),
+                                   QMessageBox::Ok );
+}
+

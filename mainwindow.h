@@ -27,7 +27,7 @@
 #include "RemoteControl/RemoteControlServer.h"
 #include "DataManagement/UIDataManagementSetClass.h"
 #include "ui_About.h"
-
+#include <QAction>
 
 
 class TreeWidgetItem : public QTreeWidgetItem {
@@ -111,6 +111,7 @@ public slots:
 signals:
 
     void MessageSender(const QString &Command, const QString &ID, InterfaceData Data);          //Extra Klasse
+    void SaveExperiment(QString Path);
 
 private slots:
 
@@ -147,6 +148,8 @@ private slots:
     void on_pushButton_clicked();
 
     void on_actionExport_Data_h5_triggered();
+
+    void on_actionRemote_Connection_Port_2_triggered();
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);

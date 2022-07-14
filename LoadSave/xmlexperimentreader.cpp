@@ -22,6 +22,7 @@
 
 #include "xmlexperimentreader.h"
 #include <QDebug>
+#include <QByteArray>
 #include "loadplugin.h"
 #include "../mainwindow.h"
 #include "../ui_mainwindow.h"
@@ -49,7 +50,7 @@ bool XmlExperimentReader::read(QString LoadPath_)
     reader.setDevice(&file);
 
     if (reader.readNextStartElement()) {
-        if (reader.name() == "Experiment")
+        if (reader.name() ==  QString("Experiment"))
             readExperiment();
         else
             reader.raiseError(QObject::tr("Not a Experiment file"));
@@ -62,13 +63,13 @@ bool XmlExperimentReader::read(QString LoadPath_)
 void XmlExperimentReader::readExperiment()
 {
     while(reader.readNextStartElement()){
-       if(reader.name() == "Tabs")
+       if(reader.name() ==  QString("Tabs"))
            readTab();
-       else if(reader.name() == "Devices")
+       else if(reader.name() ==  QString("Devices"))
            readDevices();
-       else if(reader.name() == "Widgets")
+       else if(reader.name() ==  QString("Widgets"))
            readWidgets();
-       else if(reader.name() == "State")
+       else if(reader.name() ==  QString("State"))
        {
            try
            {
@@ -79,7 +80,7 @@ void XmlExperimentReader::readExperiment()
 
            }
        }
-       else if(reader.name() == "FigureWindows")
+       else if(reader.name() ==  QString("FigureWindows"))
        {
            try
            {
@@ -91,7 +92,7 @@ void XmlExperimentReader::readExperiment()
            }
        }
 
-       else if(reader.name() == "Connections")
+       else if(reader.name() ==  QString("Connections"))
        {
            try
            {
@@ -113,10 +114,10 @@ void XmlExperimentReader::CreateConnection()
 {
     DataManagementSetClass* DCObj = dynamic_cast<DataManagementSetClass*>(this->parent());
     MainWindow* MW = qobject_cast<MainWindow*>(this->parent()->parent());
-    Q_ASSERT(MW->objectName() == "LabAnalyser");
+    Q_ASSERT(MW->objectName() ==  QString("LabAnalyser"));
     QString ID;
     while(reader.readNextStartElement()){
-       if(reader.name() == "ID")
+       if(reader.name() ==  QString("ID"))
        {
            double Min = reader.attributes().value("Min").toDouble();
            double Max = reader.attributes().value("Max").toDouble();
@@ -164,7 +165,7 @@ void XmlExperimentReader::CreateConnection()
            else
                qDebug() << ID;
        }
-       else if(reader.name() == "ObjectName")
+       else if(reader.name() ==  QString("ObjectName"))
         {
             QString ObjectName(reader.readElementText());
             QObject* FoundObject = MW->findChild<QObject*>(ObjectName);
@@ -190,7 +191,7 @@ void XmlExperimentReader::CreateConnection()
 void XmlExperimentReader::CreateConnections()
 {
     while(reader.readNextStartElement()){
-       if(reader.name() == "connect")
+       if(reader.name() ==  QString("connect"))
            CreateConnection();
        else
            reader.skipCurrentElement();
@@ -201,7 +202,7 @@ void XmlExperimentReader::CreateConnections()
 void XmlExperimentReader::CreateFigureWindows()
 {
     while(reader.readNextStartElement()){
-       if(reader.name() == "Window")
+       if(reader.name() ==  QString("Window"))
            CreateFigureWindow();
        else
            reader.skipCurrentElement();
@@ -232,7 +233,7 @@ void XmlExperimentReader::CreateFigureWindow()
        int itt_counter = 0;
        while(reader.readNextStartElement())
        {
-           if(reader.name() == "PlotWidgetName")
+           if(reader.name() ==  QString("PlotWidgetName"))
             {
                 auto NewName = reader.readElementText();
                 DCObj->RenamePlotPointer(PlotWidgetFound[itt_counter]->objectName(), NewName);
@@ -248,9 +249,9 @@ void XmlExperimentReader::CreateFigureWindow()
 void XmlExperimentReader::ReadState()
 {
     QByteArray State;
-    State.append(reader.readElementText());
+    State.append(reader.readElementText().toUtf8());
     MainWindow* MW = qobject_cast<MainWindow*>(this->parent()->parent());
-    Q_ASSERT(MW->objectName() == "LabAnalyser");
+    Q_ASSERT(MW->objectName() ==  QString("LabAnalyser"));
 
     MW->restoreState((QByteArray::fromBase64(State)));
     //Compensate Bug, redock all docked windows
@@ -278,7 +279,7 @@ void XmlExperimentReader::ReadState()
 void XmlExperimentReader::readTab()
 {
     while(reader.readNextStartElement()){
-       if(reader.name() == "Form")
+       if(reader.name() ==  QString("Form"))
            LoadForm(reader.attributes().value("Name").toString());
        else
            reader.skipCurrentElement();
@@ -291,7 +292,7 @@ void XmlExperimentReader::LoadForm(QString Name)
     QString Filename;
  QString FilenameT;
     while(reader.readNextStartElement()){
-       if(reader.name() == "AbsPath")
+       if(reader.name() ==  QString("AbsPath"))
        {
            FilenameT = reader.readElementText();
            QFile file(FilenameT);
@@ -300,7 +301,7 @@ void XmlExperimentReader::LoadForm(QString Name)
                Filename = QFileInfo(file).absoluteFilePath();
            }
        }
-       else if(reader.name() == "RelPath")
+       else if(reader.name() ==  QString("RelPath"))
        {
            FilenameT = QFileInfo(LoadPath).absolutePath() + "/" + reader.readElementText();
            QFile file(FilenameT);
@@ -324,7 +325,7 @@ void XmlExperimentReader::LoadForm(QString Name)
 void XmlExperimentReader::readDevices()
 {
     while(reader.readNextStartElement()){
-       if(reader.name() == "Device")
+       if(reader.name() ==  QString("Device"))
            LoadDevice();
        else
            reader.skipCurrentElement();
@@ -336,7 +337,7 @@ void XmlExperimentReader::LoadDevice()
     QString Filename;
     QString FilenameT;
     while(reader.readNextStartElement()){
-       if(reader.name() == "AbsPath")
+       if(reader.name() ==  QString("AbsPath"))
        {
            FilenameT = reader.readElementText();
            QFile file(FilenameT);
@@ -345,7 +346,7 @@ void XmlExperimentReader::LoadDevice()
                Filename = QFileInfo(file).absoluteFilePath();
            }
        }
-       else if(reader.name() == "RelPath")
+       else if(reader.name() ==  QString("RelPath"))
        {
            QString FilenameT = QFileInfo(LoadPath).absolutePath() + "/" + reader.readElementText();
            QFile file(FilenameT);
@@ -397,7 +398,7 @@ void XmlExperimentReader::LoadDevice()
 void XmlExperimentReader::readWidgets()
 {
     while(reader.readNextStartElement()){
-       if(reader.name() == "Widget")
+       if(reader.name() == QString("Widget"))
            readWidget();
        else
            reader.skipCurrentElement();
@@ -407,7 +408,7 @@ void XmlExperimentReader::readWidgets()
 void XmlExperimentReader::readWidget()
 {
     MainWindow* MW = qobject_cast<MainWindow*>(this->parent()->parent());
-    Q_ASSERT(MW->objectName() == "LabAnalyser");
+    Q_ASSERT(MW->objectName() ==  QString("LabAnalyser"));
 
     std::vector<std::pair<QString, QString>> Attributes;
     QString Text;
@@ -417,7 +418,7 @@ void XmlExperimentReader::readWidget()
         std::pair<QString, QString> Attribut;
         Attribut.first = reader.attributes().at(k).name().toString();
         Attribut.second = reader.attributes().at(k).value().toString();
-        if(Attribut.first == "Name")
+        if(Attribut.first ==  QString("Name"))
             Name = Attribut.second;
         Attributes.push_back(Attribut);
     }

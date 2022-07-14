@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1099</width>
+    <width>1115</width>
     <height>684</height>
    </rect>
   </property>
@@ -55,8 +55,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1099</width>
-     <height>21</height>
+     <width>1115</width>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -91,6 +91,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionRemote_Connection_Port_2"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menu"/>
@@ -102,7 +104,6 @@
    <property name="font">
     <font>
      <pointsize>9</pointsize>
-     <weight>50</weight>
      <bold>false</bold>
      <kerning>true</kerning>
     </font>
@@ -585,6 +586,16 @@ Parameter</string>
    <property name="iconText">
     <string>Export 
 (*.h5)</string>
+   </property>
+  </action>
+  <action name="actionRemote_Connection_Port">
+   <property name="text">
+    <string>Remote Connection Port</string>
+   </property>
+  </action>
+  <action name="actionRemote_Connection_Port_2">
+   <property name="text">
+    <string>Remote Connection Port</string>
    </property>
   </action>
  </widget>

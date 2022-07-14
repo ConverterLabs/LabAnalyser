@@ -22,7 +22,7 @@
 #pragma once
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
+#include <QAction>
 #include <QtWidgets/QApplication>
 
 #include"../mainwindow.h"

@@ -22,7 +22,7 @@
 QT       += core gui
 QT       += uitools
 QT       += network
-CONFIG += c++17
+#CONFIG += c++17
 #CONFIG += force_debug_info
 
 VERSION_MAJOR = 1
@@ -43,15 +43,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = LabAnalyser
 TEMPLATE = app
 
-win32: INCLUDEPATH += C:/libraries/boost_1_59_0
+
 unix: INCLUDEPATH += /usr/include
-win32: INCLUDEPATH += C:/libraries/matOut-master
-unix: INCLUDEPATH += ./build/libs/matOut
-win32: INCLUDEPATH += C:/libraries/HighFive/include
-unix: INCLUDEPATH += /usr/include/highfive/
-
-INCLUDEPATH += C:/libraries/CMake-hdf5-1.10.5/hdf5-1.10.5/include/
-
+win32: INCLUDEPATH += C:/cpp/libs/matOut
 
 
 SOURCES += main.cpp\
@@ -148,8 +142,11 @@ RESOURCES += \
 #QMAKE_CXXFLAGS_RELEASE += -O1
 QMAKE_CXXFLAGS -= -O2
 QMAKE_CXXFLAGS -= -O1
+QMAKE_CXXFLAGS -= -O3
 QMAKE_CXXFLAGS += -O3
-QMAKE_CXXFLAGS -= -O0
+#QMAKE_CXXFLAGS += -no-opengl
+
+
 
 #QMAKE_CXXFLAGS += -O0
 #QMAKE_CXXFLAGS -= -O1
@@ -158,7 +155,7 @@ QMAKE_CXXFLAGS -= -O0
 
 
 LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5
-Release:DESTDIR         = C:/LabAnalyser
+Release:DESTDIR         = C:/LA2
 
 #QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO
 #QMAKE_CFLAGS_RELEASE = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO

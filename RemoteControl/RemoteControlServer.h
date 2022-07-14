@@ -34,6 +34,7 @@ class RemoteControlServer : public QWidget
     Q_OBJECT
 public:
     explicit RemoteControlServer( std::map<QString, ToFormMapper*> *DataContainerI = 0);
+    int GetPort() {return m_port-1;};
 
 private slots:
     void acceptConnection();
@@ -61,6 +62,7 @@ private:
     QByteArray DataBuffer;
     QByteArray NextDataBuffer;
     int debugCounter = 0;
+    int m_port = 4080;
 
 
 };

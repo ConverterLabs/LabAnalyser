@@ -31,6 +31,7 @@ class DataManagementSetClass : public DataManagementClass
     Q_OBJECT
 public:
     explicit DataManagementSetClass(QObject *parent = nullptr);
+    MessengerClass& GetMessengerRef(){return *Messenger;};
     MessengerClass* GetMessenger(){return Messenger;};
 
 public slots:

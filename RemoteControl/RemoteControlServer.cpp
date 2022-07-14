@@ -28,7 +28,8 @@ RemoteControlServer::RemoteControlServer(std::map<QString, ToFormMapper*> *DataC
     connect(&tcpServer, SIGNAL(newConnection()),
            this, SLOT(acceptConnection()));
 
-    tcpServer.listen(QHostAddress::LocalHost, 4080);
+    m_port = 4080;
+    while(!(tcpServer.listen(QHostAddress::LocalHost, m_port++)));
 
 }
 
@@ -56,7 +57,7 @@ void RemoteControlServer::HeaderReceived()
         {
             return;
         }
-        while(DataBuffer.size() >= DataSize)
+        while(DataBuffer.size() && DataBuffer.size() >= DataSize)
         {
             if(DataBuffer.size() > DataSize)
             {
