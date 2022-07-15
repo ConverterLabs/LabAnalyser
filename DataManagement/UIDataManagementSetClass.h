@@ -42,7 +42,7 @@ public:
 
     bool LoadPlugin(QString Path);
 
-    int  RegisterChange(){ ChangeDetected = true;}
+    void  RegisterChange(){ ChangeDetected = true;}
 
     void LoadForms();
 

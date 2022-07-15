@@ -115,7 +115,7 @@ double InterfaceData::GetAsDouble()
         return static_cast<double>(boost::get<uint64_t>(m_Data));
     else if(type == typeid(bool))
         return static_cast<double>(boost::get<bool>(m_Data));
-
+    return 0.0;
 }
 
 
@@ -240,7 +240,7 @@ QString InterfaceData::GetTypeInfo()
         return QString("GuiSelection");
     else if(type == typeid(QStringList))
         return QString("QStringList");
-
+    return QString();
 }
 
 

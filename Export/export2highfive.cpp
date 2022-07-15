@@ -64,5 +64,9 @@ bool Export2HDF5::Export(QString Filename_,  QStringList Ids_)
             IDcounter++;
         }
     }
+
+    return false;
+
+
 }
 

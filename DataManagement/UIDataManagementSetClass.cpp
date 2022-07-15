@@ -71,15 +71,13 @@ bool UIDataManagementSetClass::SaveExperiment(QString Path)
 
     bool Error = false;
     //create a backup
-    xmlexperimentwriter *Writer = new xmlexperimentwriter(this, GetMessengerRef(), *this);
+    xmlexperimentwriter Writer(this, GetMessengerRef(), *this);
 
-    if ((Writer->write(Path)))
+    if ((Writer.write(Path)))
     {
         Info("Error saving File ");
         Error = true;
     }
-    delete Writer;
-    Writer = nullptr;
 
     //Signal Plugins to save there properties as well
     QList<QString> Devices = this->GetDevices();
@@ -120,11 +118,11 @@ UIDataManagementSetClass::~UIDataManagementSetClass()
 
 bool UIDataManagementSetClass::Export2Xml(QString Path, QStringList ExportIds)
 {
-        auto Exporter = ExportInputs2Xml(this);
+
+        ExportInputs2Xml Exporter(*this);
         auto Error = Exporter.Export2XML(Path, ExportIds);
         if(!Error)
             GetMessenger()->WriteStatusMessage("Exported Parameters to " + Path );
-
         return Error;
 
 }

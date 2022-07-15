@@ -22,13 +22,13 @@
 #pragma once
 #include "../plugins/InterfaceDataType.h"
 #include "../DataManagement/DataManagementSetClass.h"
-#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 class ExportInputs2Xml
 {
 public:
 
-    ExportInputs2Xml(DataManagementSetClass* Manager_);
+    ExportInputs2Xml(DataManagementSetClass& Manager_);
     bool Export2XML(QString Filename_,  QStringList Ids_);
     void WriteParameterSet();
     void WriteEntry();
@@ -41,10 +41,10 @@ public:
 private:
     QString Filename;
     std::map<QString, InterfaceData> Data;
-    DataManagementSetClass* Manager = nullptr;
+    DataManagementSetClass& m_Manager;
     int ExportCounter = 0;
 
-    QXmlStreamWriter xmlWriter;
+    QXmlStreamWriter m_xmlWriter;
 
 };
 

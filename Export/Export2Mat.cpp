@@ -161,9 +161,6 @@ bool MatExporter::Export2Mat(QString Filename_, QStringList Ids_)
     ExportChannels();
 
     matClose(matfile);
-
-
-
     return 0;
 }
 
