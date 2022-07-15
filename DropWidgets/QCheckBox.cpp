@@ -129,7 +129,7 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
     this->setText(label);
 
     MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-
+    connect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()) );
     MW->ChangeForSaveDetected = true;
 }
 
