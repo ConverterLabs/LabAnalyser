@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     a.setApplicationVersion (QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD));
     a.setApplicationName ("LabAnalyser");
 
+
     MainWindow w;
     return a.exec();
 }

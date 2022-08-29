@@ -92,20 +92,23 @@ void MatExporter::ExportChannel(QString ID)
         }
         else if(C->IsPairOfVectorOfDoubles())
         {
-            auto mxData = mxCreateDoubleMatrix(C->GetPointerPair().first->size(), 1, mxREAL);
-            double * DatenPrt;
-            DatenPrt = (&(C->GetPointerPair().first->at(0)));
-            double ** DatenPrtPtr;
-            DatenPrtPtr = &DatenPrt;
-            copyDoubleToMxArray2D(DatenPrtPtr, mxData, C->GetPointerPair().first->size(), 1);
-            mxSetFieldByNumber(mxStruct_, IDcounter, 1, mxData);
-            auto mxData2 = mxCreateDoubleMatrix(C->GetPointerPair().second->size(), 1, mxREAL);
-            double * DatenPrt2;
-            DatenPrt2 = (&(C->GetPointerPair().second->at(0)));
-            double ** DatenPrtPtr2;
-            DatenPrtPtr2 = &DatenPrt2;
-            copyDoubleToMxArray2D(DatenPrtPtr2, mxData2, C->GetPointerPair().second->size(), 1);
-            mxSetFieldByNumber(mxStruct_, IDcounter, 2, mxData2);
+           if(C->GetPointerPair().first != nullptr)
+           {
+                auto mxData = mxCreateDoubleMatrix(C->GetPointerPair().first->size(), 1, mxREAL);
+                double * DatenPrt;
+                DatenPrt = (&(C->GetPointerPair().first->at(0)));
+                double ** DatenPrtPtr;
+                DatenPrtPtr = &DatenPrt;
+                copyDoubleToMxArray2D(DatenPrtPtr, mxData, C->GetPointerPair().first->size(), 1);
+                mxSetFieldByNumber(mxStruct_, IDcounter, 1, mxData);
+                auto mxData2 = mxCreateDoubleMatrix(C->GetPointerPair().second->size(), 1, mxREAL);
+                double * DatenPrt2;
+                DatenPrt2 = (&(C->GetPointerPair().second->at(0)));
+                double ** DatenPrtPtr2;
+                DatenPrtPtr2 = &DatenPrt2;
+                copyDoubleToMxArray2D(DatenPrtPtr2, mxData2, C->GetPointerPair().second->size(), 1);
+                mxSetFieldByNumber(mxStruct_, IDcounter, 2, mxData2);
+            }
         }
         else if(C->IsString() || C->IsStringList() || C->IsGuiSelection())
         {

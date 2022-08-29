@@ -155,6 +155,8 @@ void RemoteControlServer::HeaderReceived()
                             }
                             else if(Data_.IsPairOfVectorOfDoubles())
                             {
+                                if(Data_.GetPointerPair().first != nullptr)
+                                {
                                 //Check for zero pointer
                                 std::vector<double> Time;
                                 std::vector<double> MeasuredDataOut;
@@ -174,6 +176,12 @@ void RemoteControlServer::HeaderReceived()
                                 DataOut.append((const char*)(&Elements),4);
                                 DataOut.append((const char*)(&Time[0]),8*Time.size());
                                 DataOut.append((const char*)(&MeasuredDataOut[0]),8*MeasuredDataOut.size());
+                                }
+                                else
+                                {
+                                    uint32_t Elements = 0;
+                                    DataOut.append((const char*)(&Elements),4);
+                                }
                             }
                              tcpServerConnection->write(DataOut);
                         }

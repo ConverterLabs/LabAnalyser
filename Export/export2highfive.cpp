@@ -52,10 +52,11 @@ bool Export2HDF5::Export(QString Filename_,  QStringList Ids_)
             }
             else if(C->IsPairOfVectorOfDoubles())
             {
-
-               H5Easy::dump(file, (ID.replace("::","/") + "/Time").toStdString(), *(C->GetPointerPair().first));
-               H5Easy::dump(file, (ID.replace("::","/") + "/Data").toStdString(), *(C->GetPointerPair().second));
-
+               if(C->GetPointerPair().first != nullptr)
+               {
+                    H5Easy::dump(file, (ID.replace("::","/") + "/Time").toStdString(), *(C->GetPointerPair().first));
+                    H5Easy::dump(file, (ID.replace("::","/") + "/Data").toStdString(), *(C->GetPointerPair().second));
+               }
             }
             else if(C->IsString() || C->IsStringList() || C->IsGuiSelection())
             {
