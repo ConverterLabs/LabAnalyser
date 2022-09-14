@@ -1,4 +1,12 @@
-# LabAnalyser
+# Table of content
+
+- [LabAnalyser](#labanalyser)
+  * [How to compile LabAnalyser](#how-to-compile-labanalyser)
+    + [For Windows](#for-windows)
+    + [For Linux (tested on Arch Linux)](#for-linux)
+  * [Known Bugs](#known-bugs)
+
+# Functionality of LabAnalyser
 A plugin based open source data modification and visualization tool
 
 ____________
@@ -56,8 +64,9 @@ Use msys2, install necessary packages as flollows:
 14. open LabAnalyser.pro
 
 
-### For Linux (tested on Arch Linux)
-
+### For Linux
+ (tested on Arch Linux)
+ 
 1. install boost-libs 
    - Arch Linux: `pacman -S boost-libs`
 2. install HighFive
@@ -72,5 +81,11 @@ Use msys2, install necessary packages as flollows:
 10. run qmake inside build: `qmake ../`
 11. run make: `make`
 12. if successful: execude LabAnalyser `./LabAnalyser`
+
+
+## Known Bugs
+
+If you change the monitor array or the system, LabAnalyser might crash to a bug in QMainWindow::restoreState in QT. To load the project open the corresponding .LAexp file and remove the line next to the last containing the window state `<State> ....  </State>`.
+`
 
 
