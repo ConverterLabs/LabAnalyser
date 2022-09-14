@@ -31,16 +31,16 @@ ____________
 ### For Windows 
 Use msys2, install necessary packages as flollows:
 
-1. pacman -Syuu
-2. pacman -Syuu
-3. pacman -Syuu
-4. mingw-w64-i686-qt
-5. mingw-w64-i686-qt-creator
-6. mingw-w64-x86_64-qt
-7. mingw-w64-x86_64-qt-creator
-8. pacman -S mingw-w64-x86_64-boost
-9. pacman -S mingw-w64-x86_64-highfive
-10. pacman -S git
+1. `pacman -Syuu`
+2. `pacman -Syuu`
+3. `pacman -Syuu`
+4. `pacman -S mingw-w64-i686-qt`
+5. `pacman -S mingw-w64-i686-qt-creator`
+6. `pacman -S mingw-w64-x86_64-qt`
+7. `pacman -S mingw-w64-x86_64-qt-creator`
+8. `pacman -S mingw-w64-x86_64-boost`
+9. `pacman -S mingw-w64-x86_64-highfive`
+10. `pacman -S git`
 11. clone https://github.com/EyNuel/matOut.git
 12. use patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch
 13. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
