@@ -85,7 +85,7 @@ Use msys2, install necessary packages as flollows:
 
 # Known Bugs
 
-If you change the monitor array or the system, LabAnalyser might crash to a bug in QMainWindow::restoreState in QT. To load the project open the corresponding .LAexp file and remove the line next to the last containing the window state `<State> ....  </State>`.
+If you change the monitor array or the system, LabAnalyser might crash due to a bug in QMainWindow::restoreState of QT. To load the project open the corresponding .LAexp file with a text-editor and remove the line next to the last containing the window state `<State> ....  </State>`.
 `
 
 
