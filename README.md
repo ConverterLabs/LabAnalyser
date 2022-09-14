@@ -1,7 +1,35 @@
 # LabAnalyser
 A plugin based open source data modification and visualization tool
 
-## How to compile LabAnalyser (using msys2)
+____________
+____________
+
+**Create editable variales (parameter) or data in a plugin (see https://github.com/ConverterLabs/PluginTemplate) and use the visualization of LabAnalyser.
+Create UserInterfaces with QTCreator and connect them with the variables via drag and drop.**
+![LabAnalyser](readme_pictures/show_variables.png)
+
+____________
+____________
+
+
+**Use the signal slot system of qt in QTCreator to create sophisticated userinterfaces.**
+
+![Stateflow visualisation](readme_pictures/UseQTCreator.png)
+
+____________
+____________
+
+
+**Load as many UserInterfaces as needed to LabAnalyser.**
+![Array of windows on four screens](readme_pictures/UndockAndCreate_MonitorArray.png)
+
+____________
+____________
+
+## How to compile LabAnalyser 
+
+### For Windows 
+Use msys2, install necessary packages as flollows:
 
 1. pacman -Syuu
 2. pacman -Syuu
@@ -13,22 +41,13 @@ A plugin based open source data modification and visualization tool
 8. pacman -S mingw-w64-x86_64-boost
 9. pacman -S mingw-w64-x86_64-highfive
 10. pacman -S git
-
-11. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
-![Screenshot](readme_pictures/show_variables.png)
-
-### Prerequisites
-
-The following libraries are necessary: 
-1. boost_1_59_0 (https://www.boost.org/)
-2. matOut (https://github.com/EyNuel/matOut/)
-	to use MatOut please use the git patch in folder build-patches:
-3. hdf5-1.10.5 (https://github.com/HDFGroup/hdf5/)
-4. HighFive (https://github.com/BlueBrain/HighFive/)
+11. clone https://github.com/EyNuel/matOut.git
+12. use patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch
+13. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
+14. open LabAnalyser.pro
 
 
-### Steps  
-(tested on Arch Linux)
+### For Linux (tested on Arch Linux)
 
 1. install boost-libs 
    - Arch Linux: `pacman -S boost-libs`
