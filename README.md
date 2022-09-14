@@ -1,6 +1,6 @@
-# Table of content
+**Table of content**
 
-- [LabAnalyser](#labanalyser)
+- [Functionality of LabAnalyser](#functionality-of-labanalyser)
   * [How to compile LabAnalyser](#how-to-compile-labanalyser)
     + [For Windows](#for-windows)
     + [For Linux (tested on Arch Linux)](#for-linux)
@@ -43,9 +43,9 @@ ____________
 ____________
 ____________
 
-## How to compile LabAnalyser 
+# How to compile LabAnalyser 
 
-### For Windows 
+## For Windows 
 Use msys2, install necessary packages as flollows:
 
 1. `pacman -Syuu`
@@ -64,7 +64,7 @@ Use msys2, install necessary packages as flollows:
 14. open LabAnalyser.pro
 
 
-### For Linux
+## For Linux
  (tested on Arch Linux)
  
 1. install boost-libs 
@@ -83,7 +83,7 @@ Use msys2, install necessary packages as flollows:
 12. if successful: execude LabAnalyser `./LabAnalyser`
 
 
-## Known Bugs
+# Known Bugs
 
 If you change the monitor array or the system, LabAnalyser might crash to a bug in QMainWindow::restoreState in QT. To load the project open the corresponding .LAexp file and remove the line next to the last containing the window state `<State> ....  </State>`.
 `
