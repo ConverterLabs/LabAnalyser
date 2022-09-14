@@ -23,7 +23,7 @@
 #include "parameterloader.h"
 #include <QFile>
 #include <QDir>
-
+#include <QThread>
 
 ParameterLoader::ParameterLoader( DataManagementSetClass* Manager_)
 {
@@ -91,6 +91,7 @@ void ParameterLoader::readEntry()
                     InterfaceData tmp = *(Manager->GetContainer(Id));
                     tmp.SetDataKeepType(reader.readElementText().trimmed());
                     Manager->GetMessenger()->MessageTransmitter("set", Id, tmp);
+                    QThread::msleep(10);
                 }
                 else
                 {

@@ -15,7 +15,7 @@ A plugin based open source data modification and visualization tool
 10. pacman -S git
 
 11. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
-
+![Screenshot](readme_pictures/show_variables.png)
 
 ### Prerequisites
 
