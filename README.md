@@ -20,7 +20,7 @@ ____________
 ____________
 
 
-**Use the signal slot system of qt in QTCreator to create sophisticated userinterfaces.**
+**Use the signal slot system of qt in QTCreator to create sophisticated user interfaces.**
 
 ![Stateflow visualisation](readme_pictures/UseQTCreator.png)
 
@@ -28,7 +28,7 @@ ____________
 ____________
 
 
-**Load as many UserInterfaces as needed to LabAnalyser. And visualize hundreds of thousands of data points in realtime**
+**Load as many user interfaces as needed to LabAnalyser. And visualize hundreds of thousands of data points in realtime.**
 ![Array of windows on four screens](readme_pictures/UndockAndCreate_MonitorArray.png)
 
 
