@@ -13,7 +13,7 @@ ____________
 ____________
 
 **Create editable variales (parameter) or data in a plugin (see https://github.com/ConverterLabs/PluginTemplate) and use the visualization of LabAnalyser.
-Create UserInterfaces with QTCreator and connect them with the variables via drag and drop.**
+Create UserInterfaces with QTCreator load them in LabAnalyser and connect the elements with variables via drag and drop.**
 ![LabAnalyser](readme_pictures/show_variables.png)
 
 ____________
