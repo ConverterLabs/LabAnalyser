@@ -37,7 +37,7 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
     this->ControlPressed = false;
     setAcceptDrops(true);
     rectZoom = new QCPItemRect(this);
-    this->addItem(rectZoom);
+    //this->addItem(rectZoom);
     rectZoom->setVisible(false);
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -45,6 +45,7 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
 
    setInteractions( QCP::iRangeDrag |QCP::iRangeZoom | QCP::iSelectAxes |
                                      QCP::iSelectLegend | QCP::iSelectPlottables);//
+   setInteraction(QCP::iSelectPlottables, true);
 
    xAxis->setRange(-10, 10);
    yAxis->setRange(-10, 10);
@@ -148,7 +149,7 @@ void PlotWidget::closeEvent ( QCloseEvent * event )
 }
 
 
-void PlotWidget::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
+void PlotWidget::titleDoubleClick(QMouseEvent* event, QCPTextElement * title)
 {
   Q_UNUSED(event)
   // Set the plot title by double clicking on it
@@ -252,7 +253,9 @@ void PlotWidget::selectionChanged()
     {
         if(item)
             item->setSelected(true);
-        graph->setSelected(true);
+
+         auto tmp = QCPDataSelection(QCPDataRange(0,graph->GetXDataPointer()->size()));
+        graph->setSelection(tmp);
     }
   }
 }
@@ -260,7 +263,26 @@ void PlotWidget::selectionChanged()
 
 void PlotWidget::addRandomGraph()
 {
-
+/*
+    // generate some data:
+    QVector<double> x(101), y(101); // initialize with entries 0..100
+    for (int i=0; i<101; ++i)
+    {
+      x[i] = i/50.0 - 1; // x goes from -1 to 1
+      y[i] = x[i]*x[i]; // let's plot a quadratic function
+    }
+    // create graph and assign data to it:
+    this->addGraph();
+    this->graph(0)->setData(x, y);
+    // give the axes some labels:
+    this->xAxis->setLabel("x");
+    this->yAxis->setLabel("y");
+    // set axes ranges, so we see all data:
+    this->xAxis->setRange(-1, 1);
+    this->yAxis->setRange(0, 1);
+    this->replot();
+    return;
+*/
      int n =50000; // number of points in graph
      double xScale = (rand()/(double)RAND_MAX + 0.5)*2;
      double yScale = (rand()/(double)RAND_MAX + 0.5)*2;
@@ -294,7 +316,8 @@ void PlotWidget::addRandomGraph()
     graph()->setPen(graphPen);
     ResetZoom();
 
-     //replot();
+     replot();
+
 }
 
 void PlotWidget::removeSelectedGraph()
@@ -358,7 +381,7 @@ void PlotWidget::ToggleMarker()
       for(int k = 0; k < selectedGraphs().size();k++)
       {
           if(selectedGraphs().at(k)->scatterStyle().isNone())
-              selectedGraphs().at(k)->setScatterStyle(QCPScatterStyle::ssCross);
+              selectedGraphs().at(k)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross,10));
           else
               selectedGraphs().at(k)->setScatterStyle(QCPScatterStyle::ssNone);
              // 1;
@@ -425,7 +448,7 @@ if (graphCount() > 0)
 
 
 }
- // menu->addAction("Add random graph", this, SLOT(addRandomGraph()));
+  //menu->addAction("Add random graph", this, SLOT(addRandomGraph()));
   menu->popup(mapToGlobal(pos));
 }
 
@@ -451,16 +474,12 @@ void PlotWidget::graphClicked(QCPAbstractPlottable *plottable)
     this->SB->showMessage(QString("Clicked on graph '%1'.").arg(plottable->name()), 1000);
 }
 
-
-
 void PlotWidget::SaveToPdf(void)
 {
  auto filename =  QFileDialog::getSaveFileName(this, "Save file", "plot.pdf", "*.pdf");
  if(filename.size())
    savePdf(filename);
 }
-
-
 
 void PlotWidget::UpdataGraphs(QString ID, bool force)
 {
@@ -831,10 +850,15 @@ void PlotWidget::dropEvent(QDropEvent *event)
                 MW->GetLogic()->GetContainer(id)->GetDataType().compare("vector<double>")==0))
             {
                 AddCustomGraph(id);
+                qDebug() << "QApplication::keyboardModifiers() " << (QApplication::keyboardModifiers() & Qt::ShiftModifier);
+                qDebug() << "this->graphCount() " <<this->graphCount();
+
                 if(QApplication::keyboardModifiers() & Qt::ShiftModifier && this->graphCount() == 2)
                 {
-                    graph(0)->setSelected(false);
-                    graph(1)->setSelected(true);
+                    auto SelG1 = QCPDataSelection(QCPDataRange(0,graph(1)->GetXDataPointer()->size()));
+                    auto Sel0 = QCPDataSelection(QCPDataRange(0,0));
+                    graph(0)->setSelection(Sel0);
+                    graph(1)->setSelection(SelG1);
                     SetAsXAxis();
                 }
             }
@@ -1235,12 +1259,17 @@ void PlotWidget::ConnectToID(DataManagementSetClass* DM, QString ID)
     {
         if(graphCount()==2)
         {
-            graph(0)->setSelected(false);
-            graph(1)->setSelected(false);
+            auto SelG0 = QCPDataSelection(QCPDataRange(0,graph(0)->GetXDataPointer()->size()));
+            auto SelG1 = QCPDataSelection(QCPDataRange(0,graph(1)->GetXDataPointer()->size()));
+
+            auto Sel0 = QCPDataSelection(QCPDataRange(0,0));
+
+            graph(0)->setSelection(Sel0);
+            graph(1)->setSelection(Sel0);
            if( graph(0)->ID() == XDataName())
-               graph(0)->setSelected(true);
+               graph(0)->setSelection(SelG0);
            if( graph(1)->ID() == XDataName())
-               graph(1)->setSelected(true);
+               graph(1)->setSelection(SelG1);
            SetAsXAxis(true);
         }
     }
