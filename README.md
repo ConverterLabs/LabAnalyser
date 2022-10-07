@@ -13,14 +13,14 @@ ____________
 ____________
 
 **Create editable variales (parameter) or data in a plugin (see https://github.com/ConverterLabs/PluginTemplate) and use the visualization of LabAnalyser.
-Create UserInterfaces with QTCreator and connect them with the variables via drag and drop.**
+Create UserInterfaces with QTCreator load them in LabAnalyser and connect the elements with variables via drag and drop.**
 ![LabAnalyser](readme_pictures/show_variables.png)
 
 ____________
 ____________
 
 
-**Use the signal slot system of qt in QTCreator to create sophisticated userinterfaces.**
+**Use the signal slot system of qt in QTCreator to create sophisticated user interfaces.**
 
 ![Stateflow visualisation](readme_pictures/UseQTCreator.png)
 
@@ -28,7 +28,7 @@ ____________
 ____________
 
 
-**Load as many UserInterfaces as needed to LabAnalyser. And visualize hundreds of thousands of data points in realtime**
+**Load as many user interfaces as needed to LabAnalyser. And visualize hundreds of thousands of data points in realtime.**
 ![Array of windows on four screens](readme_pictures/UndockAndCreate_MonitorArray.png)
 
 
