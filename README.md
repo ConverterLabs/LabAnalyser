@@ -52,7 +52,7 @@ Use msys2, install necessary packages as flollows:
 2. `pacman -Syuu`
 3. `pacman -Syuu`
 5. `pacman -S mingw-w64-x86_64-qt6`
-6. `pacman -S mingw-w64-x86_64-q6t-creator`
+6. `pacman -S mingw-w64-x86_64-qt-creator`
 7. `pacman -S mingw-w64-x86_64-boost`
 8. `pacman -S mingw-w64-x86_64-highfive`
 9. `pacman -S git`
