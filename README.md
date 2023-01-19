@@ -51,17 +51,15 @@ Use msys2, install necessary packages as flollows:
 1. `pacman -Syuu`
 2. `pacman -Syuu`
 3. `pacman -Syuu`
-4. `pacman -S mingw-w64-i686-qt`
-5. `pacman -S mingw-w64-i686-qt-creator`
-6. `pacman -S mingw-w64-x86_64-qt`
-7. `pacman -S mingw-w64-x86_64-qt-creator`
-8. `pacman -S mingw-w64-x86_64-boost`
-9. `pacman -S mingw-w64-x86_64-highfive`
-10. `pacman -S git`
-11. clone https://github.com/EyNuel/matOut.git
-12. use patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch
-13. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
-14. open LabAnalyser.pro
+5. `pacman -S mingw-w64-x86_64-qt6`
+6. `pacman -S mingw-w64-x86_64-q6t-creator`
+7. `pacman -S mingw-w64-x86_64-boost`
+8. `pacman -S mingw-w64-x86_64-highfive`
+9. `pacman -S git`
+10. clone https://github.com/EyNuel/matOut.git
+11. use patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch
+12. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
+13. open LabAnalyser.pro
 
 
 ## For Linux
