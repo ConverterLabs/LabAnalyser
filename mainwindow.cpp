@@ -33,27 +33,48 @@
 #include <QFileInfo>
 
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
-
-    //Set Object Name for Main Form
+    // Set the object name for the main form
     this->setObjectName("LabAnalyser");
 
-    //Create Tray Icon
+    // Create tray icon
     icon = new QSystemTrayIcon(QIcon(":/icons/sym.png"), this);
+
+    // Create menu for tray icon
     auto menu = new QMenu(this);
+
+    // Create restore action and disable it initially
     restore = new QAction("Restore",this);
     restore->setEnabled(false);
-    connect(restore,SIGNAL(triggered()),this,SLOT(showNormal()));
+
+    // Connect the restore action's triggered signal to the showNormal slot of the main form
+    connect(restore, SIGNAL(triggered()), this, SLOT(showNormal()));
+
+    // Add the restore action to the menu
     menu->addAction(restore);
+
+    // Add a separator to the menu
     menu->addSeparator();
-    auto  quitAction = new QAction(QIcon(":/icons/icons/Exit.png"), "Quit",this);
-    connect(quitAction,SIGNAL(triggered()),this,SLOT(close()));
-    menu->addAction(quitAction);    
+
+    // Create quit action
+    auto quitAction = new QAction(QIcon(":/icons/icons/Exit.png"), "Quit",this);
+
+    // Connect the quit action's triggered signal to the close slot of the main form
+    connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+
+    // Add the quit action to the menu
+    menu->addAction(quitAction);
+
+    // Set the tray icon's context menu to be the menu created above
     icon->setContextMenu(menu);
+
+    // Connect the tray icon's activated signal to the
+//
+
     connect(this->icon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(TrayIconActivated(QSystemTrayIcon::ActivationReason)));
     icon->show();
     //End Tray Icon
@@ -426,6 +447,13 @@ void MainWindow::on_actionCreatePlot_triggered()
       CreateSubPlotWindow(1,1);
 }
 
+void MainWindow::on_actionFFT_triggered()
+{
+    CreateFFTPlotWindow();
+}
+
+
+
 void MainWindow::DeleteFigure(SubPlotMainWindow* FigurePointer)
 {
     this->GetLogic()->DeletePlotWindow(FigurePointer->objectName());
@@ -466,7 +494,12 @@ void MainWindow::on_actionCreate_Subplot_triggered()
     }
 }
 
-SubPlotMainWindow* MainWindow::CreateSubPlotWindow(int rows, int cols)
+void MainWindow::CreateFFTPlotWindow()
+{
+    CreateSubPlotWindow(1,1, true);
+}
+
+SubPlotMainWindow* MainWindow::CreateSubPlotWindow(int rows, int cols, bool IsFFTPlot)
 {
     //Create New Window
     SubPlotMainWindow* MW = new SubPlotMainWindow(this,this);
@@ -481,7 +514,7 @@ SubPlotMainWindow* MainWindow::CreateSubPlotWindow(int rows, int cols)
     {
         for(int j = 0; j <  cols; j++ )
         {
-            PlotWidget *PW = new PlotWidget(this, NW, MW->GetStatusBar());
+            PlotWidget *PW = new PlotWidget(this, NW, MW->GetStatusBar(), IsFFTPlot);
             //Create unique name
             int Number = GetLogic()->GetUniquePlotNumber();
             QString PlotName;          
@@ -1612,4 +1645,5 @@ void MainWindow::on_actionRemote_Connection_Port_2_triggered()
                                    QString("TCP Port: ") + QString::number(Remote->GetPort()),
                                    QMessageBox::Ok );
 }
+
 

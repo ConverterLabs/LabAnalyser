@@ -156,7 +156,11 @@ void QListViewD::SetVariantData(ToFormMapper Data)
 
 void QListViewD::GetVariantData(ToFormMapper *Data)
 {
-    Data->SetData(model->stringList());
+    if(model->rowCount())
+        Data->SetData(model->stringList());
+    else
+         Data->SetData(QStringList(QString("")));
+
 
 }
 

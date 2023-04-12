@@ -91,14 +91,14 @@ void RemoteControlServer::HeaderReceived()
                                 else if(Data_.IsString())
                                 {
                                     int Size = DataSize-LengthID-15 ;
-                                    QString TS = QString::fromLatin1(Data.mid(15+LengthID, Size));
+                                    QString TS = QString::fromLatin1(Data.mid(15+LengthID, Size-1));
                                     Data_.SetData(TS);
                                 }
                                 else if(Data_.IsGuiSelection())
                                 {
                                     auto Sel =    Data_.GetGuiSelection();
                                     int Size = DataSize-LengthID-15 ;
-                                    QString TS = QString::fromLatin1(Data.mid(15+LengthID, Size));
+                                    QString TS = QString::fromLatin1(Data.mid(15+LengthID, Size-1));
                                     Sel.first = TS;
                                     if(Sel.second.contains(TS))
                                         Data_.SetData(Sel);

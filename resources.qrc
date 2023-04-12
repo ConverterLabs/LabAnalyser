@@ -15,5 +15,6 @@
         <file>icons/file-code-line (1).png</file>
         <file>icons/sym.png</file>
         <file>icons/sym_about.png</file>
+        <file>icons/fft.png</file>
     </qresource>
 </RCC>

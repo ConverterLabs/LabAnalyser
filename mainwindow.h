@@ -76,7 +76,8 @@ public:
     QStatusBar* GetStatusBar();
     UIDataManagementSetClass* GetLogic(void){return ExtendedDataManagement ; }
     bool ChangeForSaveDetected = false;
-    SubPlotMainWindow* CreateSubPlotWindow(int rows, int cols);
+    SubPlotMainWindow* CreateSubPlotWindow(int rows, int cols, bool IsFFT = false);
+    void CreateFFTPlotWindow();
     Ui::MainWindow* UI(){return ui;}
     QString StdSavePath;
     QString SavePath;
@@ -105,6 +106,8 @@ public slots:
     void PublishFinished();
     void PublishStart();
     void OutputTextMenu( QPoint );
+    void ErrorWriter(const QString &ID, const QString Data);
+    void InfoWriter(const QString &ID, const QString Data);
 
 
 
@@ -136,8 +139,6 @@ private slots:
     void on_Close_Project_triggered();
     void on_actionLoadPlugin_triggered();
     void on_actionMinimize_to_Tray_triggered();
-    void ErrorWriter(const QString &ID, const QString Data);
-    void InfoWriter(const QString &ID, const QString Data);
     void NotificationWriter(const QString &ID, const QString Data);
     void on_actionLoad_Parameter_File_triggered();
     void on_ParameterTreeWidget_customContextMenuRequested(const QPoint &pos);
@@ -150,6 +151,8 @@ private slots:
     void on_actionExport_Data_h5_triggered();
 
     void on_actionRemote_Connection_Port_2_triggered();
+
+    void on_actionFFT_triggered();
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);

@@ -41,18 +41,63 @@
 #include "../DataManagement/mapper.h"
 #include "../DataManagement/DataManagementSetClass.h"
 
+
+
+/*!
+ * \class VariantDropWidget
+ * \brief This class provides a widget for displaying and manipulating variant data.
+ *
+ * The VariantDropWidget class provides a widget for displaying and manipulating variant data. It has
+ * several pure virtual methods that must be implemented by subclasses.
+ */
 class VariantDropWidget
 {
 public:
+    /*!
+     * \brief Constructs a VariantDropWidget with the given parent.
+     * \param parent The parent widget.
+     */
     VariantDropWidget(QWidget *parent=0){};
+
+    /*!
+     * \brief Destructs the VariantDropWidget.
+     */
     virtual ~VariantDropWidget(){};
+
+    /*!
+     * \brief Sets the variant data for the widget.
+     * \param Data The data to set.
+     */
     virtual void SetVariantData(ToFormMapper Data) = 0;
+
+    /*!
+     * \brief Gets the variant data from the widget.
+     * \param Data Pointer to a ToFormMapper object to store the data.
+     */
     virtual void GetVariantData(ToFormMapper *Data) = 0;
 
+    /*!
+     * \brief Loads the widget's data from an XML file.
+     * \param Attributes The attributes of the XML element.
+     * \param Text The text content of the XML element.
+     * \returns true if the data was successfully loaded, false otherwise.
+     */
     virtual bool LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text) = 0;
-    virtual bool SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text) = 0;
-    virtual void ConnectToID(DataManagementSetClass* DM, QString ID) = 0;
 
+    /*!
+     * \brief Saves the widget's data to an XML file.
+     * \param Attributes The attributes of the XML element.
+     * \param Text The text content of the XML element.
+     * \returns true if the data was successfully saved, false otherwise.
+     */
+    virtual bool SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text) = 0;
+
+    /*!
+     * \brief Connects the widget to a DataManagementSetClass object with the given ID.
+     * \param DM Pointer to the DataManagementSetClass object.
+     * \param ID The ID of the object to connect to.
+     */
+    virtual void ConnectToID(DataManagementSetClass* DM, QString ID) = 0;
 
     //virtual void GetVariantData() = 0;
 

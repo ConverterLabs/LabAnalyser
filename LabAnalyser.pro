@@ -1,7 +1,7 @@
 #***************************************************************************
 #*                                                                        **
 #*  LabAnlyser, a plugin based data modification and visualization tool   **
-#*  Copyright (C) 2015-2021 Andreas Hoffmann                              **
+#*  Copyright (C) 2015-2023 Andreas Hoffmann                              **
 #*                                                                        **
 #*  LabAnlyser is free software: you can redistribute it and/or modify ´  **
 #*  it under the terms of the GNU General Public License as published by  **
@@ -51,6 +51,7 @@ win32: INCLUDEPATH += C:/cpp/libs/matOut
 SOURCES += main.cpp\
         DropWidgets/CreateID.cpp \
         DropWidgets/DropWidgetsUiLoader.cpp \
+        DropWidgets/Plots/FFTPlotWidget.cpp \
         DropWidgets/Plots/PlotWidget.cpp \
         DropWidgets/Plots/qcustomplot.cpp \
         DropWidgets/QBLed.cpp \
@@ -97,6 +98,7 @@ HEADERS  += mainwindow.h\
             DropWidgets/DropWidgets.h \
             DropWidgets/DropWidget.h \
             DropWidgets/DropWidgetsUiLoader.h \
+            DropWidgets/Plots/FFTPlotWidget.h \
             DropWidgets/Plots/PlotWidget.h \
             DropWidgets/Plots/qcustomplot.h \
             DropWidgets/QBLed.h \
@@ -139,12 +141,13 @@ RC_FILE = LabAnlyser.rc
 RESOURCES += \
     resources.qrc
 
-#QMAKE_CXXFLAGS_RELEASE += -O1
 QMAKE_CXXFLAGS -= -O2
 QMAKE_CXXFLAGS -= -O1
 QMAKE_CXXFLAGS -= -O3
-QMAKE_CXXFLAGS += -O3
+#QMAKE_CXXFLAGS += -O3
 QMAKE_CXXFLAGS += -Werror=return-type
+QMAKE_CXXFLAGS += -O3
+QMAKE_CXXFLAGS_RELEASE += -O3
 
 #QMAKE_CXXFLAGS += -no-opengl
 
@@ -156,8 +159,8 @@ QMAKE_CXXFLAGS += -Werror=return-type
 #QMAKE_CXXFLAGS -= -O3
 
 
-LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5
-Release:DESTDIR         = C:/LabAnalyser
+LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5 -lfftw3
+Release:DESTDIR         = C:\LabAnalyser
 
 #QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO
 #QMAKE_CFLAGS_RELEASE = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO

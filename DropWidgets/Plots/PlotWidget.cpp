@@ -21,14 +21,19 @@
 
 #include "PlotWidget.h"
 #include "mainwindow.h"
+#include <fftw3.h>
 
-PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
+#define UseFFTW
+
+PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI, bool isFFT) :
     QCustomPlot(parent)
 {
 
     setAttribute(Qt::WA_AcceptTouchEvents);
       _release2touch = false;
       _touchDevice = false;
+
+    __isFFT = isFFT;
 
 
     this->SB = SBI;
@@ -37,7 +42,7 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
     this->ControlPressed = false;
     setAcceptDrops(true);
     rectZoom = new QCPItemRect(this);
-    //this->addItem(rectZoom);
+    this->addItem(rectZoom);
     rectZoom->setVisible(false);
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -45,13 +50,25 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
 
    setInteractions( QCP::iRangeDrag |QCP::iRangeZoom | QCP::iSelectAxes |
                                      QCP::iSelectLegend | QCP::iSelectPlottables);//
-   setInteraction(QCP::iSelectPlottables, true);
 
-   xAxis->setRange(-10, 10);
-   yAxis->setRange(-10, 10);
-   axisRect()->setupFullAxesBox();
 
-   xAxis->setLabel("t [s]");
+
+if(__isFFT)
+{
+    xAxis->setLabel("f [Hz]");
+    yAxis->setLabel("Amp");
+    xAxis->setRange(0, 100);
+    yAxis->setRange(0, 10);
+    axisRect()->setupFullAxesBox();
+}
+else
+{
+     xAxis->setRange(-10, 10);
+     yAxis->setRange(-10, 10);
+    axisRect()->setupFullAxesBox();
+    xAxis->setLabel("t [s]");
+    yAxis->setLabel("Data");
+}
 
    QFont fontP  = parent->font();
 
@@ -62,9 +79,6 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
    NewFont.setStyleStrategy(QFont::PreferAntialias);
 
    NewFont.setPointSize(fontP.pointSize());
-
-
-  // NewFont.setFamily(fontP.family());
 
    xAxis->setTickLabelFont(NewFont);
    yAxis->setTickLabelFont(NewFont);
@@ -80,7 +94,6 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI) :
    yAxis->setSelectedLabelFont(Highlight);
 
 
-   yAxis->setLabel("Data");
    legend->setVisible(true);
    legend->setFont(NewFont);
    legend->setSelectedFont(NewFont);
@@ -132,7 +145,7 @@ void PlotWidget::ClearAllGraphs()
     for(int k = 0; k < graphCount();k++)
     {
          MW->GetLogic()->DeleteEntryOfObject(graph(k)->ID(),this);
-    }      
+    }
 }
 
 PlotWidget::~PlotWidget()
@@ -149,7 +162,7 @@ void PlotWidget::closeEvent ( QCloseEvent * event )
 }
 
 
-void PlotWidget::titleDoubleClick(QMouseEvent* event, QCPTextElement * title)
+void PlotWidget::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
 {
   Q_UNUSED(event)
   // Set the plot title by double clicking on it
@@ -173,7 +186,7 @@ void PlotWidget::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart par
   if (part == QCPAxis::spAxisLabel) // only react when the actual axis label is clicked, not tick label or axis backbone
   {
     bool ok;
-    QString newLabel = QInputDialog::getText(this, "QCustomPlot example", "New axis label:", QLineEdit::Normal, axis->label(), &ok);
+    QString newLabel = QInputDialog::getText(this, "Plot", "New axis label:", QLineEdit::Normal, axis->label(), &ok);
     if (ok)
     {
       axis->setLabel(newLabel);
@@ -197,8 +210,8 @@ void PlotWidget::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
     QString newName = QInputDialog::getText(this, "Set Alias", "New graph name:", QLineEdit::Normal, plItem->plottable()->name(), &ok);
     if (ok)
     {
-    MainWindow *MW = this->MainWindow_p;
-    MW->GetLogic()->SetAlias(plItem->plottable()->ID(), newName);
+        MainWindow *MW = this->MainWindow_p;
+        MW->GetLogic()->SetAlias(plItem->plottable()->ID(), newName);
 
       plItem->plottable()->setName(newName);
       auto SenderOC = QObject::sender();
@@ -253,9 +266,7 @@ void PlotWidget::selectionChanged()
     {
         if(item)
             item->setSelected(true);
-
-         auto tmp = QCPDataSelection(QCPDataRange(0,graph->GetXDataPointer()->size()));
-        graph->setSelection(tmp);
+        graph->setSelected(true);
     }
   }
 }
@@ -263,26 +274,7 @@ void PlotWidget::selectionChanged()
 
 void PlotWidget::addRandomGraph()
 {
-/*
-    // generate some data:
-    QVector<double> x(101), y(101); // initialize with entries 0..100
-    for (int i=0; i<101; ++i)
-    {
-      x[i] = i/50.0 - 1; // x goes from -1 to 1
-      y[i] = x[i]*x[i]; // let's plot a quadratic function
-    }
-    // create graph and assign data to it:
-    this->addGraph();
-    this->graph(0)->setData(x, y);
-    // give the axes some labels:
-    this->xAxis->setLabel("x");
-    this->yAxis->setLabel("y");
-    // set axes ranges, so we see all data:
-    this->xAxis->setRange(-1, 1);
-    this->yAxis->setRange(0, 1);
-    this->replot();
-    return;
-*/
+
      int n =50000; // number of points in graph
      double xScale = (rand()/(double)RAND_MAX + 0.5)*2;
      double yScale = (rand()/(double)RAND_MAX + 0.5)*2;
@@ -316,8 +308,7 @@ void PlotWidget::addRandomGraph()
     graph()->setPen(graphPen);
     ResetZoom();
 
-     replot();
-
+     //replot();
 }
 
 void PlotWidget::removeSelectedGraph()
@@ -326,7 +317,7 @@ void PlotWidget::removeSelectedGraph()
   {
       for(int k = 0; k < selectedGraphs().size();k++)
       {
-           this->MainWindow_p->GetLogic()->DeleteEntryOfObject(selectedGraphs().at(k)->ID(),this);
+          this->MainWindow_p->GetLogic()->DeleteEntryOfObject(selectedGraphs().at(k)->ID(),this);
           removeGraph(selectedGraphs().at(k));
       }
     replot();
@@ -335,11 +326,20 @@ void PlotWidget::removeSelectedGraph()
     {
       SetXYPlot(false);
       legend->setVisible(true);
-      xAxis->setLabel("t [s]");
-      yAxis->setLabel("Data");
+        if(__isFFT)
+        {
+            xAxis->setLabel("f [Hz]");
+            yAxis->setLabel("Amplitude");
+        }
+        else
+        {
+            xAxis->setLabel("t [s]");
+            yAxis->setLabel("Data");
+        }
       ID_X.clear();
   }
 }
+
 
 void PlotWidget::SetAsXAxis(bool skip)
 {
@@ -355,7 +355,7 @@ void PlotWidget::SetAsXAxis(bool skip)
                     if(Y != NULL)
                         if(X->size()==Y->size())
                             graph(i)->setData(X,Y, 0.0);
-                graph(i)->SetXYPlot(true);               
+                graph(i)->SetXYPlot(true);
                 selectedGraphs().at(0)->setVisible(false);
                 this->ID_X = selectedGraphs().at(0)->ID();
 
@@ -381,7 +381,7 @@ void PlotWidget::ToggleMarker()
       for(int k = 0; k < selectedGraphs().size();k++)
       {
           if(selectedGraphs().at(k)->scatterStyle().isNone())
-              selectedGraphs().at(k)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross,10));
+              selectedGraphs().at(k)->setScatterStyle(QCPScatterStyle::ssCross);
           else
               selectedGraphs().at(k)->setScatterStyle(QCPScatterStyle::ssNone);
              // 1;
@@ -403,8 +403,16 @@ void PlotWidget::removeAllGraphs()
   {
     SetXYPlot(false);
     legend->setVisible(true);
-    xAxis->setLabel("t [s]");
-    yAxis->setLabel("Data");
+    if(__isFFT)
+    {
+        xAxis->setLabel("f [Hz]");
+        yAxis->setLabel("Amplitude");
+    }
+    else
+    {
+        xAxis->setLabel("t [s]");
+        yAxis->setLabel("Data");
+    }
     ID_X.clear();
 
   }
@@ -430,26 +438,47 @@ if (graphCount() > 0)
   } else  // general context menu on graphs requested
   {
     if (selectedGraphs().size() > 0)
+    {
         menu->addAction("Toggle Marker", this, SLOT(ToggleMarker()));
-      menu->addSeparator();
-      menu->addAction("Remove selected graph", this, SLOT(removeSelectedGraph()));
+        menu->addSeparator();
+        QAction *Highlight = new QAction;
+        connect(Highlight, &QAction::triggered, [=]{
+            MainWindow_p->HighLightConnection(selectedGraphs().at(0)->ID());});
+        Highlight->setText("Highlight Connection");
+        menu->addAction(Highlight);
+
+        menu->addSeparator();
+        menu->addAction("Remove selected graph", this, SLOT(removeSelectedGraph()));
+    }
+    else
+        menu->addSeparator();
+
       menu->addAction("Remove all graphs", this, SLOT(removeAllGraphs()));
       menu->addSeparator();
       menu->addAction("Save to Pdf", this, SLOT(SaveToPdf()));
       menu->addSeparator();
-      if (graphCount() == 2)
+      if (graphCount() == 2 && !__isFFT)
       {
         menu->addAction("Set As X-Axis", this, SLOT(SetAsXAxis()));
         menu->addSeparator();
       }
+      if(!mXYPlot)
+      {
+        menu->addAction("Toggle Time/Frequency Domain", this, SLOT(ToggleTimeFreq()));
+        menu->addSeparator();
+      }
+
       menu->addAction("Update Data", this, SLOT(UpdataGraphs()));
       menu->addAction("Reset Zoom", this, SLOT(ResetZoom()));
     }
 
 
 }
-  //menu->addAction("Add random graph", this, SLOT(addRandomGraph()));
-  menu->popup(mapToGlobal(pos));
+ // menu->addAction("Add random graph", this, SLOT(addRandomGraph()));
+        menu->addSeparator();
+ menu->popup(mapToGlobal(pos));
+// menu->resize(menu->size().width(), menu->size().height()*1.1); //Bugfix QT6 and DPI Scaling
+
 }
 
 void PlotWidget::moveLegend()
@@ -474,15 +503,100 @@ void PlotWidget::graphClicked(QCPAbstractPlottable *plottable)
     this->SB->showMessage(QString("Clicked on graph '%1'.").arg(plottable->name()), 1000);
 }
 
+
+
 void PlotWidget::SaveToPdf(void)
 {
- auto filename =  QFileDialog::getSaveFileName(this, "Save file", "plot.pdf", "*.pdf");
- if(filename.size())
-   savePdf(filename);
+
+  // Open a file dialog for the user to choose a filename for the PDF
+
+
+    // The native dialog always causes a segfault. Dont know why so we use QFileDialog::DontUseNativeDialog
+  auto filename =  QFileDialog::getSaveFileName(MainWindow_p, "Save file", "plot.pdf", "*.pdf", 0,QFileDialog::DontUseNativeDialog);
+
+  // If the user selected a filename
+  if(filename.size())
+  {
+    // Create a QFile object for the selected filename
+    QFile file (filename);
+
+    // If the file already exists
+    if(file.exists())
+    {
+      // Attempt to remove the file
+      if(file.remove() == 0)
+      {
+          MainWindow_p->ErrorWriter("QCustomPlot PDF Writer", QString("Unable to remove file!"));
+          return;
+      }
+    }
+    // If the file was successfully removed, save the PDF with the selected filename
+    SetBlockUpdates();
+    savePdf(filename);
+    UnblockUpdates();
+  }
+
+}
+
+void PlotWidget::ToggleTimeFreq(void)
+{
+      QPen graphPen;
+
+       switch (graphCount()) //MatlabColors
+        {
+            case 1: graphPen.setColor( QColor(0  ,  114  ,  189)); break;
+            case 2: graphPen.setColor( QColor(217  ,  83  ,  25)); break;
+            case 3: graphPen.setColor( QColor(237  , 177   , 32)); break;
+            case 4: graphPen.setColor( QColor(126 ,   47  , 142)); break;
+            case 5: graphPen.setColor( QColor( 119 ,  172  ,  48)); break;
+            case 6: graphPen.setColor( QColor(77 ,  190 ,  238)); break;
+            case 7: graphPen.setColor(  QColor( 162 ,   20   , 47)); break;
+            default:  graphPen.setColor( QColor( 217  ,  83  ,  25)); break;;
+        }
+
+    if(__isFFT)
+    {
+        __isFFT = false;
+        xAxis->setLabel("t [s]");
+        yAxis->setLabel("Data");
+        // set pen for all graphs
+        for(int i=0; i<graphCount(); ++i)
+        {
+            graph(i)->setLineStyle(QCPGraph::lsLine);
+            constexpr qreal lineWidth{ 1 };
+            constexpr qreal plotScatterSize{ 5 };
+            graphPen.setWidthF(1);
+            graph(i)->setScatterStyle(
+                    QCPScatterStyle{ QCPScatterStyle::ssCircle, Qt::transparent, plotScatterSize });
+        }
+
+        replot();
+    }
+    else
+    {
+        __isFFT = true;
+        xAxis->setLabel("f [Hz]");
+        yAxis->setLabel("Amplitude");
+         // set pen for all graphs
+        for(int i=0; i<graphCount(); ++i)
+        {
+            graph(i)->setLineStyle(QCPGraph::lsImpulse);
+            constexpr qreal plotScatterSize{ 10 };
+            graphPen.setWidthF(5);
+            graph(i)->setScatterStyle(
+                    QCPScatterStyle{ QCPScatterStyle::ssCross, Qt::transparent, plotScatterSize });
+        }
+
+        replot();
+    }
+    graph()->setPen(graphPen);
+
 }
 
 void PlotWidget::UpdataGraphs(QString ID, bool force)
 {
+    if(IsUpdateBlocked())
+        return;
     if(!force)
     {
         //Update 20ms after last ID arreved
@@ -540,9 +654,13 @@ void PlotWidget::UpdataGraphs(QString ID, bool force)
     {
         ToFormMapper* Element = MainWindow_p->GetLogic()->GetContainer(graph(i)->ID());
         if(Element)
-        {           
+        {
             if(!XYPlot())
+            {
                 graph(i)->setData(Element->GetPointerPair().first,Element->GetPointerPair().second, Tmin);
+                if(__isFFT)
+                    CalculateFFT();
+            }
             else
             {
                 if(graph(i)->ID().compare(ID_X))
@@ -590,14 +708,114 @@ void PlotWidget::UpdataGraphs(QString ID, bool force)
     timer.restart();
 }
 
+void PlotWidget::CalculateFFT()
+{
+    boost::shared_ptr<std::vector<double>> x(graph(0)->GetXDataPointer());
+    boost::shared_ptr<std::vector<double>> y(graph(0)->GetYDataPointer());
+
+    if(!x || !y)
+        return;
+
+    if(x->size() != y->size())
+        return;
+
+    if(x->size() == 0)
+        return;
+
+    boost::shared_ptr<std::vector<double>> fft_x = boost::make_shared<std::vector<double>>();
+    boost::shared_ptr<std::vector<double>> fft_y = boost::make_shared<std::vector<double>>();
+
+
+
+#ifndef UseFFTW
+
+
+    for(int i = 0 ; i < __Nmax; i++)
+    {
+        std::vector<double> fft_y_s ;
+        std::vector<double> fft_y_c ;
+        //calculate sine vector
+        fft_x->push_back(i*__f1);
+        fft_x->push_back(i*__f1);
+        double t0 = x->at(0);
+        for(int j = 0; j < x->size(); j++)
+        {
+            //qDebug() << "x: " << x->at(j)-t0 << " y: " << y->at(j) << "2.0*M_PI*fft_x->back()" << 2.0*M_PI*fft_x->back()  ;
+            fft_y_s.push_back(sin(2.0*M_PI*fft_x->back()*(x->at(j)-t0))*y->at(j));
+            fft_y_c.push_back(cos(2.0*M_PI*fft_x->back()*(x->at(j)-t0))*y->at(j));
+        }
+        //calculate intergral of fft_y_s over time x using trapezoidal rule
+        double sum_s = 0.0;
+        double sum_c = 0.0;
+        for(int j = 0; j < x->size()-1; j++)
+        {
+           sum_s += (fft_y_s.at(j+1)+fft_y_s.at(j))/2.*(x->at(j+1)-x->at(j));
+           sum_c += (fft_y_c.at(j+1)+fft_y_c.at(j))/2.*(x->at(j+1)-x->at(j));
+        }
+        //window length
+        double WL = x->back()-x->front();
+        //Periodendauer
+        double T = 1.0/(i*__f1);
+        if(i>0)
+        {
+            fft_y->push_back(0);
+            fft_y->push_back(2*sqrt(sum_c*sum_c + sum_s*sum_s)/(WL));
+        }
+        else
+        {
+            fft_y->push_back(0);
+            fft_y->push_back(2*sqrt(sum_c*sum_c));
+        }
+
+    }
+#else
+
+    fftw_complex *in, *out;
+    fftw_plan p;
+    in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
+    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
+    for(int i = 0; i < x->size(); i++)
+    {
+        in[i][0] = y->at(i);
+        in[i][1] = 0;
+    }
+    p = fftw_plan_dft_1d(x->size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_execute(p); /* repeat as needed */
+    auto Ts = x->at(1)-x->at(0);
+    auto fsN = 1.0/Ts/x->size();
+    for(int i = 0; i < x->size()/2 +1; i++)
+    {        
+        fft_x->push_back(i*fsN);
+        fft_x->push_back(i*fsN);
+        fft_y->push_back(0);
+        if(i>0)
+            fft_y->push_back(2*sqrt(out[i][0]*out[i][0]+out[i][1]*out[i][1])/x->size());
+        else
+            fft_y->push_back(sqrt(out[i][0]*out[i][0]+out[i][1]*out[i][1])/x->size());
+    }
+    fftw_destroy_plan(p);
+    fftw_free(in); fftw_free(out);
+#endif
+    //set data
+    graph()->setFFTData(fft_x,fft_y);
+
+}
 
 void PlotWidget::ResetZoom()
 {
     if(!graphCount())
         return;
 
+
     boost::shared_ptr<std::vector<double>> x(graph(0)->GetXDataPointer());
     boost::shared_ptr<std::vector<double>> y(graph(0)->GetYDataPointer());
+
+    if(__isFFT)
+    {
+        x = graph(0)->GetXFFTPointer();
+        y = graph(0)->GetYFFTPointer();
+    }
+
     if(XYPlot() )
     {
         if(graphCount() != 2)
@@ -770,14 +988,45 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
     addGraph();
     graph()->setID(id);
     graph()->setName(MW->GetLogic()->GetAlias(id));
+    QPen graphPen;
+
+    if(__isFFT)
+    {
+        graph()->setLineStyle(QCPGraph::lsImpulse);
+        constexpr qreal lineWidth{ 3 };
+        constexpr qreal plotScatterSize{ 10 };
+        graph()->setPen(QPen{ QBrush{ Qt::black }, lineWidth });
+        graph()->setScatterStyle(
+                QCPScatterStyle{ QCPScatterStyle::ssCross, Qt::transparent, plotScatterSize });
+
+
+        graph()->keyAxis()->setTickLengthIn(0);
+        graph()->keyAxis()->setSubTickLengthIn(0);
+        graphPen.setWidthF(5);
+
+    }
+    else
+        graphPen.setWidthF(1);
 
 
     if(DP.first && DP.second)
+    {
         graph()->setData(DP.first,DP.second, Tmin);
+        if(__isFFT)
+        {
+            CalculateFFT();
+        }
+
+    }
+
+
+
+
+
+
+
    // if(DP.first->size())
     {
-        QPen graphPen;
-        graphPen.setWidthF(1);
 
         switch (graphCount()) //MatlabColors
         {
@@ -850,15 +1099,10 @@ void PlotWidget::dropEvent(QDropEvent *event)
                 MW->GetLogic()->GetContainer(id)->GetDataType().compare("vector<double>")==0))
             {
                 AddCustomGraph(id);
-                qDebug() << "QApplication::keyboardModifiers() " << (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-                qDebug() << "this->graphCount() " <<this->graphCount();
-
-                if(QApplication::keyboardModifiers() & Qt::ShiftModifier && this->graphCount() == 2)
+                if(QApplication::keyboardModifiers() & Qt::ShiftModifier && this->graphCount() == 2 &&  !__isFFT)
                 {
-                    auto SelG1 = QCPDataSelection(QCPDataRange(0,graph(1)->GetXDataPointer()->size()));
-                    auto Sel0 = QCPDataSelection(QCPDataRange(0,0));
-                    graph(0)->setSelection(Sel0);
-                    graph(1)->setSelection(SelG1);
+                    graph(0)->setSelected(false);
+                    graph(1)->setSelected(true);
                     SetAsXAxis();
                 }
             }
@@ -970,11 +1214,18 @@ void PlotWidget::mouseWheelDone()
         for(auto itt : PlotWidgetFound)
         {
             if(itt != this)
+            {
                 if(itt->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
                 {
                     itt->xAxis->setRange(this->xAxis->range());
                     itt->replot();
                 }
+                if(itt->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+                {
+                    itt->yAxis->setRange(this->yAxis->range());
+                    itt->replot();
+                }
+            }
         }
     }
 }
@@ -986,7 +1237,7 @@ void PlotWidget::mouseWheel()
 
   if (xAxis->selectedParts().testFlag(QCPAxis::spAxis))
   {
-   axisRect()->setRangeZoom(xAxis->orientation());   
+   axisRect()->setRangeZoom(xAxis->orientation());
    //this->MainWindow_p->
   }
   else if (yAxis->selectedParts().testFlag(QCPAxis::spAxis))
@@ -1188,6 +1439,9 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
             IsXYPlot = itt.second.toInt();
         else if(itt.first ==  QString("XData"))
             XData = itt.second;
+        else if(itt.first == QString("isFFT"))
+            __isFFT = itt.second.toInt();
+
     }
 
       //Doppelt, da die grenzen beim ersten setzen getauscht werden können
@@ -1238,6 +1492,12 @@ bool PlotWidget::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes,
     Attribut.second =  QString::number(XYPlot());
     Attributes.push_back(Attribut);
 
+    //save __isFFT
+    Attribut.first =  "isFFT";
+    Attribut.second =  QString::number(__isFFT);
+    Attributes.push_back(Attribut);
+
+
     Attribut.first =  "XData";
     if(XYPlot())
     {
@@ -1259,17 +1519,12 @@ void PlotWidget::ConnectToID(DataManagementSetClass* DM, QString ID)
     {
         if(graphCount()==2)
         {
-            auto SelG0 = QCPDataSelection(QCPDataRange(0,graph(0)->GetXDataPointer()->size()));
-            auto SelG1 = QCPDataSelection(QCPDataRange(0,graph(1)->GetXDataPointer()->size()));
-
-            auto Sel0 = QCPDataSelection(QCPDataRange(0,0));
-
-            graph(0)->setSelection(Sel0);
-            graph(1)->setSelection(Sel0);
+            graph(0)->setSelected(false);
+            graph(1)->setSelected(false);
            if( graph(0)->ID() == XDataName())
-               graph(0)->setSelection(SelG0);
+               graph(0)->setSelected(true);
            if( graph(1)->ID() == XDataName())
-               graph(1)->setSelection(SelG1);
+               graph(1)->setSelected(true);
            SetAsXAxis(true);
         }
     }
@@ -1283,3 +1538,4 @@ void PlotWidget::GetVariantData(ToFormMapper *Data)
 {
 
 }
+

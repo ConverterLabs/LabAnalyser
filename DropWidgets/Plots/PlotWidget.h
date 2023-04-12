@@ -37,7 +37,7 @@ class PlotWidget : public QCustomPlot, public VariantDropWidget
     Q_OBJECT
 
 public:
-    explicit PlotWidget(MainWindow *MW , QWidget *parent = 0, QStatusBar* SBI = 0);
+    explicit PlotWidget(MainWindow *MW , QWidget *parent = 0, QStatusBar* SBI = 0, bool isFFT = false);
 
     void keyPressEvent( QKeyEvent * event );
     void keyReleaseEvent(QKeyEvent * event );
@@ -71,7 +71,7 @@ public slots:
     void SetAsXAxis(bool skip =false);
 
 private slots:
-        void titleDoubleClick(QMouseEvent *event, QCPTextElement  *title);
+        void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *title);
         void axisLabelDoubleClick(QCPAxis* axis, QCPAxis::SelectablePart part);
         void legendDoubleClick(QCPLegend* legend, QCPAbstractLegendItem* item);
         void selectionChanged();
@@ -91,8 +91,11 @@ private slots:
         void ToggleMarker();
         void mouseWheelDone();
         bool event( QEvent *event );
+        void CalculateFFT();
+        void ToggleTimeFreq();
 
-private:  
+
+private:
     bool MiddlePressed;
     bool ControlPressed;
 bool _release2touch;
@@ -101,6 +104,8 @@ bool _touchDevice;
     MainWindow *MainWindow_p; //Pointer to the mainwindow gui
     QStatusBar* SB; //Pointer to the status bar of the main window
     QString ID_X;
+    bool __isFFT = false;
+
     QElapsedTimer timer;
     QElapsedTimer TimeSinceLastPlot;
 

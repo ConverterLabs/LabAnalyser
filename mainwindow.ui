@@ -56,7 +56,7 @@
      <x>0</x>
      <y>0</y>
      <width>1115</width>
-     <height>29</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -84,6 +84,7 @@
     <property name="title">
      <string>Plot</string>
     </property>
+    <addaction name="actionFFT"/>
     <addaction name="actionCreatePlot"/>
     <addaction name="actionCreate_Subplot"/>
    </widget>
@@ -138,6 +139,7 @@
    <addaction name="separator"/>
    <addaction name="actionCreatePlot"/>
    <addaction name="actionCreate_Subplot"/>
+   <addaction name="actionFFT"/>
    <addaction name="separator"/>
    <addaction name="actionLoadPlugin"/>
    <addaction name="actionLoad_Form"/>
@@ -596,6 +598,15 @@ Parameter</string>
   <action name="actionRemote_Connection_Port_2">
    <property name="text">
     <string>Remote Connection Port</string>
+   </property>
+  </action>
+  <action name="actionFFT">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/fft.png</normaloff>:/icons/icons/fft.png</iconset>
+   </property>
+   <property name="text">
+    <string>FFT</string>
    </property>
   </action>
  </widget>
