@@ -93,6 +93,8 @@ private slots:
         bool event( QEvent *event );
         void CalculateFFT();
         void ToggleTimeFreq();
+        void ShowQualityCriteria();
+        void CalculateQualityCriteria();
 
 
 private:
@@ -105,6 +107,10 @@ bool _touchDevice;
     QStatusBar* SB; //Pointer to the status bar of the main window
     QString ID_X;
     bool __isFFT = false;
+    bool __ShowQualityCriteria = false;
+    double WTHD = 0;
+    double THD = 0;
+    double RMS = 0;
 
     QElapsedTimer timer;
     QElapsedTimer TimeSinceLastPlot;

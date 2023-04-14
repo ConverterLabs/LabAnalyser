@@ -60,7 +60,11 @@ Use msys2, install necessary packages as flollows:
 11. clone https://github.com/EyNuel/matOut.git
 12. use patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch
 13. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
-14. open LabAnalyser.pro
+14. open LabAnalyser.pro#
+
+
+## Find all dependencies
+$ ldd ~/build64/*|grep -iv system32|grep -vi windows|grep -v :$  | cut -f2 -d\> | cut -f1 -d\( | tr \\ / |while read a; do ! [ -e "build64/`basename $a`" ] && cp -v "$a" ~/build64/; done
 
 
 ## For Linux

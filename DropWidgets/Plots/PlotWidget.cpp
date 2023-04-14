@@ -467,6 +467,11 @@ if (graphCount() > 0)
         menu->addAction("Toggle Time/Frequency Domain", this, SLOT(ToggleTimeFreq()));
         menu->addSeparator();
       }
+      if(__isFFT)
+      {
+        menu->addAction("Show Quality Criteria", this, SLOT(ShowQualityCriteria()));
+        menu->addSeparator();
+      }
 
       menu->addAction("Update Data", this, SLOT(UpdataGraphs()));
       menu->addAction("Reset Zoom", this, SLOT(ResetZoom()));
@@ -538,30 +543,44 @@ void PlotWidget::SaveToPdf(void)
 
 }
 
+void PlotWidget::ShowQualityCriteria(void)
+{
+    if(__ShowQualityCriteria)
+    {
+        __ShowQualityCriteria = false;
+    }
+    else
+    {
+        __ShowQualityCriteria = true;
+    }
+}
+
 void PlotWidget::ToggleTimeFreq(void)
 {
       QPen graphPen;
 
-       switch (graphCount()) //MatlabColors
-        {
-            case 1: graphPen.setColor( QColor(0  ,  114  ,  189)); break;
-            case 2: graphPen.setColor( QColor(217  ,  83  ,  25)); break;
-            case 3: graphPen.setColor( QColor(237  , 177   , 32)); break;
-            case 4: graphPen.setColor( QColor(126 ,   47  , 142)); break;
-            case 5: graphPen.setColor( QColor( 119 ,  172  ,  48)); break;
-            case 6: graphPen.setColor( QColor(77 ,  190 ,  238)); break;
-            case 7: graphPen.setColor(  QColor( 162 ,   20   , 47)); break;
-            default:  graphPen.setColor( QColor( 217  ,  83  ,  25)); break;;
-        }
+       
 
     if(__isFFT)
     {
+        __ShowQualityCriteria = false;
         __isFFT = false;
         xAxis->setLabel("t [s]");
         yAxis->setLabel("Data");
         // set pen for all graphs
         for(int i=0; i<graphCount(); ++i)
         {
+            switch (i) //MatlabColors
+            {
+                case 1: graphPen.setColor( QColor(0  ,  114  ,  189)); break;
+                case 2: graphPen.setColor( QColor(217  ,  83  ,  25)); break;
+                case 3: graphPen.setColor( QColor(237  , 177   , 32)); break;
+                case 4: graphPen.setColor( QColor(126 ,   47  , 142)); break;
+                case 5: graphPen.setColor( QColor( 119 ,  172  ,  48)); break;
+                case 6: graphPen.setColor( QColor(77 ,  190 ,  238)); break;
+                case 7: graphPen.setColor(  QColor( 162 ,   20   , 47)); break;
+                default:  graphPen.setColor( QColor( 217  ,  83  ,  25)); break;;
+            }
             graph(i)->setLineStyle(QCPGraph::lsLine);
             constexpr qreal lineWidth{ 1 };
             constexpr qreal plotScatterSize{ 5 };
@@ -575,21 +594,42 @@ void PlotWidget::ToggleTimeFreq(void)
     else
     {
         __isFFT = true;
+        CalculateFFT();
+
         xAxis->setLabel("f [Hz]");
         yAxis->setLabel("Amplitude");
          // set pen for all graphs
         for(int i=0; i<graphCount(); ++i)
         {
+            int occupancy = 255;
+            if(graphCount() > 1)
+            {
+                occupancy = 128;
+            }
+            switch (i) //MatlabColors
+            {
+                case 1: graphPen.setColor( QColor(0  ,  114  ,  189, occupancy)); break;
+                case 2: graphPen.setColor( QColor(217  ,  83  ,  25, occupancy)); break;
+                case 3: graphPen.setColor( QColor(237  , 177   , 32, occupancy)); break;
+                case 4: graphPen.setColor( QColor(126 ,   47  , 142, occupancy)); break;
+                case 5: graphPen.setColor( QColor( 119 ,  172  ,  48, occupancy)); break;
+                case 6: graphPen.setColor( QColor(77 ,  190 ,  238, occupancy)); break;
+                case 7: graphPen.setColor(  QColor( 162 ,   20   , 47, occupancy)); break;
+                default:  graphPen.setColor( QColor( 217  ,  83  ,  25, occupancy)); break;;
+            }
             graph(i)->setLineStyle(QCPGraph::lsImpulse);
             constexpr qreal plotScatterSize{ 10 };
             graphPen.setWidthF(5);
             graph(i)->setScatterStyle(
                     QCPScatterStyle{ QCPScatterStyle::ssCross, Qt::transparent, plotScatterSize });
+            graph(i)->setPen(graphPen);
+
         }
 
         replot();
     }
-    graph()->setPen(graphPen);
+
+    ResetZoom();
 
 }
 
@@ -705,11 +745,25 @@ void PlotWidget::UpdataGraphs(QString ID, bool force)
             if(samesize || XYPlot())
                 replot();
     }
+
+    if(__ShowQualityCriteria)
+    {
+
+    }
+
     timer.restart();
+}
+
+void PlotWidget::CalculateQualityCriteria()
+{
+
 }
 
 void PlotWidget::CalculateFFT()
 {
+
+
+#ifndef UseFFTW
     boost::shared_ptr<std::vector<double>> x(graph(0)->GetXDataPointer());
     boost::shared_ptr<std::vector<double>> y(graph(0)->GetYDataPointer());
 
@@ -725,9 +779,6 @@ void PlotWidget::CalculateFFT()
     boost::shared_ptr<std::vector<double>> fft_x = boost::make_shared<std::vector<double>>();
     boost::shared_ptr<std::vector<double>> fft_y = boost::make_shared<std::vector<double>>();
 
-
-
-#ifndef UseFFTW
 
 
     for(int i = 0 ; i < __Nmax; i++)
@@ -770,34 +821,64 @@ void PlotWidget::CalculateFFT()
     }
 #else
 
-    fftw_complex *in, *out;
-    fftw_plan p;
-    in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
-    for(int i = 0; i < x->size(); i++)
+    //for all graphs
+    //number of graphs
+    int N = graphCount();
+    for(int j = 0; j < graphCount(); j++)
     {
-        in[i][0] = y->at(i);
-        in[i][1] = 0;
+        boost::shared_ptr<std::vector<double>> x(graph(j)->GetXDataPointer());
+        boost::shared_ptr<std::vector<double>> y(graph(j)->GetYDataPointer());
+
+        if(!x || !y)
+            return;
+
+        if(x->size() != y->size())
+            return;
+
+        if(x->size() == 0)
+            return;
+
+        boost::shared_ptr<std::vector<double>> fft_x = boost::make_shared<std::vector<double>>();
+        boost::shared_ptr<std::vector<double>> fft_y = boost::make_shared<std::vector<double>>();
+
+
+        fftw_complex *in, *out;
+        fftw_plan p;
+        in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
+        out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
+        for(int i = 0; i < x->size(); i++)
+        {
+            in[i][0] = y->at(i);
+            in[i][1] = 0;
+        }
+        p = fftw_plan_dft_1d(x->size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+        fftw_execute(p); /* repeat as needed */
+
+        //Calculate Ts as mean of time difference
+        std::vector<double> dTs;
+        for(int i = 0; i < x->size()-1; i++)
+            dTs.push_back(x->at(i+1)-x->at(i));
+
+        double Ts = std::accumulate(dTs.begin(), dTs.end(), 0.0)/dTs.size();
+        auto fsN = 1.0/Ts/x->size();
+
+        for(int i = 0; i < x->size()/2 +1; i++)
+        {
+            fft_x->push_back(i*fsN);
+            fft_x->push_back(i*fsN);
+            fft_y->push_back(0);
+            if(i>0)
+                fft_y->push_back(2*sqrt(out[i][0]*out[i][0]+out[i][1]*out[i][1])/x->size());
+            else
+                fft_y->push_back(sqrt(out[i][0]*out[i][0]+out[i][1]*out[i][1])/x->size());
+        }
+        fftw_destroy_plan(p);
+        fftw_free(in); fftw_free(out);
+        //set data
+        graph(j)->setFFTData(fft_x,fft_y);
     }
-    p = fftw_plan_dft_1d(x->size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-    fftw_execute(p); /* repeat as needed */
-    auto Ts = x->at(1)-x->at(0);
-    auto fsN = 1.0/Ts/x->size();
-    for(int i = 0; i < x->size()/2 +1; i++)
-    {        
-        fft_x->push_back(i*fsN);
-        fft_x->push_back(i*fsN);
-        fft_y->push_back(0);
-        if(i>0)
-            fft_y->push_back(2*sqrt(out[i][0]*out[i][0]+out[i][1]*out[i][1])/x->size());
-        else
-            fft_y->push_back(sqrt(out[i][0]*out[i][0]+out[i][1]*out[i][1])/x->size());
-    }
-    fftw_destroy_plan(p);
-    fftw_free(in); fftw_free(out);
 #endif
-    //set data
-    graph()->setFFTData(fft_x,fft_y);
+
 
 }
 
