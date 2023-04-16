@@ -338,6 +338,11 @@ void PlotWidget::removeSelectedGraph()
         }
       ID_X.clear();
   }
+  if(graphCount() == 0)
+  {
+        QualityCriteriaText->deleteLater();
+        QualityCriteriaText = nullptr;
+  }
 }
 
 
@@ -399,6 +404,8 @@ void PlotWidget::removeAllGraphs()
          MW->GetLogic()->DeleteEntryOfObject(graph(k)->ID(),this);
     }
   clearGraphs();
+  QualityCriteriaText->deleteLater();
+  QualityCriteriaText = nullptr;
   if(!selectedGraphs().size())
   {
     SetXYPlot(false);
@@ -467,7 +474,6 @@ if (graphCount() > 0)
         menu->addAction("Toggle Time/Frequency Domain", this, SLOT(ToggleTimeFreq()));
         menu->addSeparator();
       }
-      if(__isFFT)
       {
         menu->addAction("Show Quality Criteria", this, SLOT(ShowQualityCriteria()));
         menu->addSeparator();
@@ -548,9 +554,19 @@ void PlotWidget::ShowQualityCriteria(void)
     if(__ShowQualityCriteria)
     {
         __ShowQualityCriteria = false;
+        QualityCriteriaText->deleteLater();
+        QualityCriteriaText = nullptr;
     }
     else
     {
+        // User Dialog to input fundamental frequency
+        bool ok;
+        double f0 = QInputDialog::getDouble(this, tr("Fundamental Frequency"),
+                                            tr("Fundamental Frequency [Hz]:"), f1, 0, 10000, 2, &ok);
+        if (!ok)
+            return;
+        
+        f1 = f0;
         __ShowQualityCriteria = true;
     }
 }
@@ -559,7 +575,7 @@ void PlotWidget::ToggleTimeFreq(void)
 {
       QPen graphPen;
 
-       
+
 
     if(__isFFT)
     {
@@ -748,7 +764,10 @@ void PlotWidget::UpdataGraphs(QString ID, bool force)
 
     if(__ShowQualityCriteria)
     {
+       if(!__isFFT)
+           CalculateFFT();
 
+       CalculateQualityCriteria();
     }
 
     timer.restart();
@@ -756,6 +775,94 @@ void PlotWidget::UpdataGraphs(QString ID, bool force)
 
 void PlotWidget::CalculateQualityCriteria()
 {
+
+    //Calculate THD and WTHD
+    //get the data
+    //iterate over all graphs
+    THD.clear();
+    WTHD.clear();
+    RMS.clear();
+
+    for(int i = 0; i < graphCount(); i++)
+    {
+        auto f = graph(i)->GetXFFTPointer();
+        auto a = graph(i)->GetYFFTPointer();
+        if(f && a)
+        {
+            //find nearest element in f to f1
+            auto f1_l =  std::distance(f->begin(), std::lower_bound(f->begin(), f->end(), f1-5));
+            auto f1_u =  std::distance(f->begin(), std::upper_bound(f->begin(), f->end(), f1+5));
+
+
+            double U1 = 0;
+            int f1m = std::round((f1_l+f1_u)/2);
+            int delta = std::round(f1_u-f1_l)/2;
+
+            for( int i = f1m-delta; i < f1m+delta; i++)
+            {
+                U1 += a->at(i);
+            }
+
+            auto U1sqare = U1*U1;
+
+            //calculate THD
+            double _THD = 0;
+            double _WTHD = 0;
+            double _RMS = 0;
+            //iterate over all
+            for( int i = 0; i < f->size(); i++)
+            {
+                _RMS += (a->at(i)*a->at(i));
+             }
+            int h = 2;
+            for( int i = 2*f1m; i < f->size(); i = i + f1m)
+            {
+                for(int j = i-delta; j < i+delta; j++)
+                {
+                    _THD += (a->at(i)*a->at(i))/U1sqare;
+                    _WTHD += a->at(i) * a->at(i)/(U1sqare*h*h) ;
+                }
+               
+
+                h++;
+            }
+
+            WTHD.push_back(sqrt(_WTHD)*100.0);
+            THD.push_back(sqrt(_THD)*100.0);
+            RMS.push_back(sqrt(1./2.*_RMS));
+            }
+
+    }
+
+    // add the text label at the top:
+    if(QualityCriteriaText == nullptr)
+    {
+        
+
+        QualityCriteriaText = new QCPItemText(this);
+        QualityCriteriaText->setPositionAlignment(Qt::AlignBottom|Qt::AlignRight);
+        QualityCriteriaText->position->setType(QCPItemPosition::ptAxisRectRatio);
+        QualityCriteriaText->position->setCoords(1, 1); // place position at center/top of axis rect
+        // incease padding
+        QualityCriteriaText->setPadding(QMargins(8, 0, 8, 0));
+        QualityCriteriaText->setFont(QFont(font().family(), 12)); // make font a bit larger
+        QualityCriteriaText->setPen(QPen(Qt::black)); // show black border around text
+        // set background color to white:
+        QualityCriteriaText->setBrush(QBrush(QColor(255, 255, 255, 200)));
+
+    }
+    //output WTHD   and THD of all graphs
+    QString text;
+    for(int i = 0; i < THD.size(); i++)
+    {
+        text += "RMS: " + QString::number(RMS[i], 'f', 2) + " WTHD: " + QString::number(WTHD[i], 'f', 2) + " % " + " THD: " + QString::number(THD[i], 'f', 2) + " %" ;
+        if(i < THD.size()-1)
+            text += "\n";
+    }
+    QualityCriteriaText->setText(text);
+
+
+
 
 }
 

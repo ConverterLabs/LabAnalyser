@@ -108,9 +108,11 @@ bool _touchDevice;
     QString ID_X;
     bool __isFFT = false;
     bool __ShowQualityCriteria = false;
-    double WTHD = 0;
-    double THD = 0;
-    double RMS = 0;
+    std::vector<double> WTHD;
+    std::vector<double> THD ;
+    std::vector<double> RMS ;
+    QCPItemText *QualityCriteriaText = nullptr;
+    double f1 = 50.;
 
     QElapsedTimer timer;
     QElapsedTimer TimeSinceLastPlot;
