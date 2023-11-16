@@ -603,6 +603,7 @@ void PlotWidget::ToggleTimeFreq(void)
             graphPen.setWidthF(1);
             graph(i)->setScatterStyle(
                     QCPScatterStyle{ QCPScatterStyle::ssCircle, Qt::transparent, plotScatterSize });
+            graph(i)->setPen(graphPen);
         }
 
         replot();
