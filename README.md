@@ -51,6 +51,7 @@ Use msys2, install necessary packages as flollows:
 1. `pacman -Syuu`
 2. `pacman -Syuu`
 3. `pacman -Syuu`
+4. pacman -S --needed base-devel mingw-w64-x86_64-toolchain
 5. `pacman -S mingw-w64-x86_64-qt6`
 6. `pacman -S mingw-w64-x86_64-qt-creator`
 7. `pacman -S mingw-w64-x86_64-boost`
