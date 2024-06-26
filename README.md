@@ -1,5 +1,3 @@
----
-
 **Table of Contents**
 
 - [Functionality of LabAnalyser](#functionality-of-labanalyser)
