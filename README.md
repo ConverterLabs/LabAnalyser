@@ -1,92 +1,83 @@
-**Table of content**
+---
+
+**Table of Contents**
 
 - [Functionality of LabAnalyser](#functionality-of-labanalyser)
-  * [How to compile LabAnalyser](#how-to-compile-labanalyser)
+  * [How to Compile LabAnalyser](#how-to-compile-labanalyser)
     + [For Windows](#for-windows)
-    + [For Linux (tested on Arch Linux)](#for-linux)
+    + [For Linux (Tested on Arch Linux)](#for-linux)
   * [Known Bugs](#known-bugs)
 
 # Functionality of LabAnalyser
-A plugin based open source data modification and visualization tool
 
-____________
-____________
+LabAnalyser is a plugin-based, open-source tool for data modification and visualization.
 
-**Create editable variales (parameter) or data in a plugin (see https://github.com/ConverterLabs/PluginTemplate) and use the visualization of LabAnalyser.
-Create UserInterfaces with QTCreator load them in LabAnalyser and connect the elements with variables via drag and drop.**
+---
+
+**Create editable variables (parameters) or data within a plugin (refer to https://github.com/ConverterLabs/PluginTemplate) and utilize LabAnalyser for visualization.
+Design user interfaces with QTCreator, load them into LabAnalyser, and link the UI elements to variables using a drag-and-drop mechanism.**
 ![LabAnalyser](readme_pictures/show_variables.png)
 
-____________
-____________
+---
 
+**Employ the signal-slot system of Qt in QTCreator to develop sophisticated user interfaces.**
 
-**Use the signal slot system of qt in QTCreator to create sophisticated user interfaces.**
+![Stateflow Visualization](readme_pictures/UseQTCreator.png)
 
-![Stateflow visualisation](readme_pictures/UseQTCreator.png)
+---
 
-____________
-____________
+**Load multiple user interfaces as required into LabAnalyser to visualize data points in real-time, scaling to hundreds of thousands.**
+![Array of Windows on Four Screens](readme_pictures/UndockAndCreate_MonitorArray.png)
 
+---
 
-**Load as many user interfaces as needed to LabAnalyser. And visualize hundreds of thousands of data points in realtime.**
-![Array of windows on four screens](readme_pictures/UndockAndCreate_MonitorArray.png)
+**Leverage features such as export to HDF5 or MATLAB files (*.mat) for data storage, or establish a direct connection to MATLAB via TCP/IP.**
+![Data Export Options](readme_pictures/export.png)
 
+---
 
-____________
-____________
+# How to Compile LabAnalyser
 
+## For Windows
 
-**Use features as export to HDF5 or Matlab-File (*.mat) so store the data. Or directly connect Matlab via TCP/IP.**
-![Array of windows on four screens](readme_pictures/export.png)
+Follow these steps using MSYS2, and install the necessary packages:
 
+1. `pacman -Syuu` (run three times to ensure all packages are updated)
+2. `pacman -S --needed base-devel mingw-w64-x86_64-toolchain`
+3. `pacman -S mingw-w64-x86_64-qt6`
+4. `pacman -S mingw-w64-x86_64-qt-creator`
+5. `pacman -S mingw-w64-x86_64-boost`
+6. `pacman -S mingw-w64-x86_64-highfive`
+7. `pacman -S mingw-w64-x86_64-fftw`
+8. `pacman -S git`
+9. Clone the repository: `git clone https://github.com/EyNuel/matOut.git`
+10. Apply the patch: `patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch`
+11. Open the MinGW-w64 32-Bit or 64-Bit Shell and launch `qtcreator`.
+12. Open `LabAnalyser.pro`
 
-____________
-____________
+### Finding All Dependencies
 
-# How to compile LabAnalyser 
+```bash
+ldd ~/build64/* | grep -iv system32 | grep -vi windows | grep -v :$ | cut -f2 -d\> | cut -f1 -d\( | tr \\ / | while read a; do ! [ -e "build64/`basename $a`" ] && cp -v "$a" ~/build64/; done
+```
 
-## For Windows 
-Use msys2, install necessary packages as flollows:
+## For Linux (Tested on Arch Linux)
 
-1. `pacman -Syuu`
-2. `pacman -Syuu`
-3. `pacman -Syuu`
-4. pacman -S --needed base-devel mingw-w64-x86_64-toolchain
-5. `pacman -S mingw-w64-x86_64-qt6`
-6. `pacman -S mingw-w64-x86_64-qt-creator`
-7. `pacman -S mingw-w64-x86_64-boost`
-8. `pacman -S mingw-w64-x86_64-highfive`
-9. `pacman -S mingw-w64-x86_64-fftw`
-10. `pacman -S git`
-11. clone https://github.com/EyNuel/matOut.git
-12. use patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch
-13. open MinGW-w64 32-Bit- or 64-Bit-Shell and call "qtcreator" 
-14. open LabAnalyser.pro#
-
-
-## Find all dependencies
-$ ldd ~/build64/*|grep -iv system32|grep -vi windows|grep -v :$  | cut -f2 -d\> | cut -f1 -d\( | tr \\ / |while read a; do ! [ -e "build64/`basename $a`" ] && cp -v "$a" ~/build64/; done
-
-
-## For Linux
- (tested on Arch Linux)
- 
-1. install boost-libs 
-   - Arch Linux: `pacman -S boost-libs`
-2. install HighFive
-   - Arch Linux: install from AUR `yay -S highfive` or `yaourt -S highfive`
-3. create build folder `mkdir build`
-4. create libs folder build/libs/ `mkdir build/libs/`
-5. `cd build/libs`
-6. `clone https://github.com/EyNuel/matOut.git` 
-7. `cd matOut`
-8. `patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch`
-9.  change folder to build: `cd ../../`
-10. run qmake inside build: `qmake ../`
-11. run make: `make`
-12. if successful: execude LabAnalyser `./LabAnalyser`
-
+1. Install Boost libraries:
+   - `pacman -S boost-libs`
+2. Install HighFive:
+   - From AUR: `yay -S highfive` or `yaourt -S highfive`
+3. Prepare the build environment:
+   - `mkdir build && mkdir build/libs/`
+   - `cd build/libs/`
+   - `git clone https://github.com/EyNuel/matOut.git`
+   - `cd matOut`
+   - `patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch`
+   - `cd ../../`
+   - `qmake ../`
+   - `make`
+   - If successful, execute: `./LabAnalyser`
 
 # Known Bugs
 
-If you change the monitor array or the system, LabAnalyser might crash due to a bug in QMainWindow::restoreState of QT. To load the project open the corresponding .LAexp file with a text-editor and remove the line next to the last containing the window state `<State> ....  </State>`.
+Changing the monitor array or the system configuration may cause LabAnalyser to crash due to a bug in `QMainWindow::restoreState` of Qt. To resolve this, open the corresponding .LAexp file with a text editor and remove the line just before the last one containing the window state `<State> .... </State>`.
