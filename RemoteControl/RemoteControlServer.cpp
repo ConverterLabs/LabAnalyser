@@ -94,6 +94,14 @@ void RemoteControlServer::HeaderReceived()
                                     QString TS = QString::fromLatin1(Data.mid(15+LengthID, Size-1));
                                     Data_.SetData(TS);
                                 }
+                                else if(Data_.IsStringList())
+                                {
+                                    int Size = DataSize-LengthID-15 ;
+                                    QString TS = QString::fromLatin1(Data.mid(15+LengthID, Size-1));
+                                    QStringList SL;
+                                    SL.append(TS);
+                                    Data_.SetData(SL);
+                                }
                                 else if(Data_.IsGuiSelection())
                                 {
                                     auto Sel =    Data_.GetGuiSelection();
@@ -102,6 +110,10 @@ void RemoteControlServer::HeaderReceived()
                                     Sel.first = TS;
                                     if(Sel.second.contains(TS))
                                         Data_.SetData(Sel);
+                                }
+                                else if(Data_.IsStringList())
+                                {
+
                                 }
                                 emit MessageSender(Command, ReceivedID,Data_);
                             }
@@ -126,7 +138,7 @@ void RemoteControlServer::HeaderReceived()
                                 double DataTmp = Data_.GetAsDouble();
                                 DataOut.append((const char*)(&DataTmp),8);
                             }
-                            else if(Data_.IsString())
+                            else if(Data_.IsString() || Data_.IsStringList())
                             {
                                 DataOut[0] = 1;
                                 uint32_t Elements = strlen(Data_.GetString().toStdString().c_str())+1;
@@ -138,7 +150,7 @@ void RemoteControlServer::HeaderReceived()
                                 for(int i = 0;i < Elements; i++)
                                     NDataOut[i] = Data_.GetString().toStdString()[i];
                                 DataOut.append((const char*)(&NDataOut[0]),NDataOut.size());
-                            }
+                            }                            
                             else if(Data_.IsGuiSelection())
                             {
                                 DataOut[0] = 1;

@@ -738,7 +738,7 @@ void InterfaceData::SetData(QString input)
     }
     else if(this->DataType.compare("QStringList") == 0)
     {
-       this->DataType = "QStringList";
+        this->DataType = "QStringList";
         if(m_Data.which() != 0)
         {
             QStringList tmp =  boost::get<QStringList>(m_Data);
