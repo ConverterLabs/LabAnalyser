@@ -379,6 +379,8 @@ void DataManagementClass::RemoveDevices(void)
         if(el.second)
             delete el.second;
     }
+    _Devices.clear();
+
 }
 
 void DataManagementClass::CloseDevice(QString dev)

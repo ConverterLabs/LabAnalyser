@@ -340,8 +340,11 @@ void PlotWidget::removeSelectedGraph()
   }
   if(graphCount() == 0)
   {
+      if(QualityCriteriaText)
+      {
         QualityCriteriaText->deleteLater();
         QualityCriteriaText = nullptr;
+      }
   }
 }
 
@@ -401,11 +404,11 @@ void PlotWidget::removeAllGraphs()
     MainWindow *MW = this->MainWindow_p;
     for(int k = 0; k < graphCount();k++)
     {
-         MW->GetLogic()->DeleteEntryOfObject(graph(k)->ID(),this);
+        MW->GetLogic()->DeleteEntryOfObject(graph(k)->ID(),this);
     }
+
   clearGraphs();
-  QualityCriteriaText->deleteLater();
-  QualityCriteriaText = nullptr;
+
   if(!selectedGraphs().size())
   {
     SetXYPlot(false);
@@ -423,7 +426,15 @@ void PlotWidget::removeAllGraphs()
     ID_X.clear();
 
   }
+  if(QualityCriteriaText)
+  {
+      QualityCriteriaText->deleteLater();
+      QualityCriteriaText = nullptr;
+  }
+
   replot();
+
+
 
 }
 

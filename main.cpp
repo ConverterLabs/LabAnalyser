@@ -24,11 +24,15 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    a.setApplicationVersion (QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD));
-    a.setApplicationName ("LabAnalyser");
+    QApplication app(argc, argv);
+    QApplication::setStyle(QStyleFactory::create("windowsvista"));
+   // QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+
+    app.setApplicationVersion (QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD));
+    app.setApplicationName ("LabAnalyser");
 
 
     MainWindow w;
-    return a.exec();
+    return app.exec();
 }
