@@ -40,13 +40,30 @@
 
 struct DataPair
 {
-    DataPair(){};
-    DataPair(boost::shared_ptr<std::vector<double>> f, boost::shared_ptr<std::vector<double>> s, double t = 0.0 ) {first = f; second = s, third = t;};
-    bool operator==(const DataPair& x) const { return  first == x.first && second == x.second && third == x.third; };
+    DataPair() {}
+
+    DataPair(boost::shared_ptr<std::vector<double>> time,
+             boost::shared_ptr<std::vector<double>> data,
+             double time_offset_for_plot = 0.0)
+        : first(time), second(data), third(boost::shared_ptr<double>(new double(time_offset_for_plot)))
+    {}
+
+    DataPair(boost::shared_ptr<std::vector<double>> time,
+             boost::shared_ptr<std::vector<double>> data,
+             boost::shared_ptr<double> time_offset_for_plot)
+        : first(time), second(data), third(time_offset_for_plot)
+    {}
+
+    bool operator==(const DataPair& x) const
+    {
+        return first == x.first && second == x.second && third == x.third;
+    }
+
     boost::shared_ptr<std::vector<double>> first;
     boost::shared_ptr<std::vector<double>> second;
-    double third = 0.0;
+    boost::shared_ptr<double> third;
 };
+
 
 //#define DataPair std::pair<boost::shared_ptr<std::vector<double>>, boost::shared_ptr<std::vector<double>>>
 #define GuiSelection std::pair<QString, QStringList>

@@ -67,7 +67,7 @@ protected:
     void closeEvent ( QCloseEvent * event ) override;
 
 public slots:
-    void UpdataGraphs(QString ID = NULL, bool force = false);
+    void UpdateGraphs(QString ID = NULL, bool force = false);
     void SetAsXAxis(bool skip =false);
 
 private slots:

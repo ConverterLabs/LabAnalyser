@@ -45,7 +45,7 @@ TEMPLATE = app
 
 
 unix: INCLUDEPATH += /usr/include
-win32: INCLUDEPATH += C:/cpp/libs/matOut
+win32: INCLUDEPATH += ../matOut
 
 
 SOURCES += main.cpp\
@@ -160,7 +160,7 @@ QMAKE_CXXFLAGS_RELEASE += -O3
 
 
 LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5 -lfftw3
-Release:DESTDIR         = C:\LabAnalyser
+
 
 #QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO
 #QMAKE_CFLAGS_RELEASE = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO

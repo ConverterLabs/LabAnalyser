@@ -130,7 +130,7 @@ else
    TimeSinceLastPlot.start();
 
    UpdateTimer = new QTimer(this);
-   connect(UpdateTimer, SIGNAL(timeout()), this, SLOT(UpdataGraphs()));
+   connect(UpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateGraphs()));
    UpdateTimer->start(25);
 
    update();
@@ -490,7 +490,7 @@ if (graphCount() > 0)
         menu->addSeparator();
       }
 
-      menu->addAction("Update Data", this, SLOT(UpdataGraphs()));
+      menu->addAction("Update Data", this, SLOT(UpdateGraphs()));
       menu->addAction("Reset Zoom", this, SLOT(ResetZoom()));
     }
 
@@ -660,130 +660,166 @@ void PlotWidget::ToggleTimeFreq(void)
     ResetZoom();
 
 }
-
-void PlotWidget::UpdataGraphs(QString ID, bool force)
+void PlotWidget::UpdateGraphs(QString ID, bool force)
 {
-    if(IsUpdateBlocked())
+    if (IsUpdateBlocked())
         return;
-    if(!force)
-    {
-        //Update 20ms after last ID arreved
-        if(ID.size())
-        {
-            timer.restart();
-            UpdateCounter++;
-        }
 
-        if(timer.elapsed()<=25)
-        {
+    DataPair XData, YData;
+    int yIndex = 0;
+
+    if (!force)
+    {
+        // Update 20 ms after the last ID arrived
+        if (!ID.isEmpty())
+            timer.restart();
+
+        if (timer.elapsed() <= 25)
             return;
-        }
-        if(TimeSinceLastPlot.elapsed() < 75)
+
+        if (TimeSinceLastPlot.elapsed() < 75)
             return;
 
         TimeSinceLastPlot.restart();
 
-        if(XYPlot())
+        if (XYPlot())
         {
-            if(UpdateCounter < 2)
-                return;
-        }
-        UpdateCounter=0;
-    }
+            // Retrieve pointers to X and Y data
+            uint32_t foundElements = 0;
+            for (int i = 0; i < graphCount(); ++i)
+            {
+                ToFormMapper* element = MainWindow_p->GetLogic()->GetContainer(graph(i)->ID());
+                if (!element)
+                    continue;
 
-    DataPair XYX;
-    DataPair XYY;
-    int Yindex = 0;
-
-    for(int i = 0; i < graphCount(); i++)
-    {
-        ToFormMapper* Element = MainWindow_p->GetLogic()->GetContainer(graph(i)->ID());
-        if(Element)
-        {
-            DataPair DP = Element->GetPointerPair();
-            if(DP.first && DP.second)
-            {
-                if(DP.first->size() && DP.second->size())
+                if (graph(i)->ID().compare(ID_X))
                 {
-                    if(i == 0)
-                    {
-                        Tmin = DP.third;
-                    }
-                    else
-                    {
-                        if(DP.third < Tmin)
-                            Tmin = DP.third;
-                    }
-                }
-            }
-        }
-    }
-    for(int i = 0; i < graphCount(); i++)
-    {
-        ToFormMapper* Element = MainWindow_p->GetLogic()->GetContainer(graph(i)->ID());
-        if(Element)
-        {
-            if(!XYPlot())
-            {
-                graph(i)->setData(Element->GetPointerPair().first,Element->GetPointerPair().second, Tmin);
-                if(__isFFT)
-                    CalculateFFT();
-            }
-            else
-            {
-                if(graph(i)->ID().compare(ID_X))
-                {
-                    XYY =Element->GetPointerPair();
-                    Yindex = i;
+                    YData = element->GetPointerPair();
+                    yIndex = i;
                 }
                 else
                 {
-                    XYX =Element->GetPointerPair();
+                    XData = element->GetPointerPair();
                 }
-                //if the name is equal it hast to be the
+            }
+
+            // Validate data consistency
+            if (!XData.second || !YData.second)
+                return;
+
+            if (XData.second->size() != YData.second->size())
+                return;
+
+            if (XData.first->size() != YData.first->size())
+                return;
+
+            // Check matching first and last elements
+            if (XData.first->at(0) != YData.first->at(0))
+                return;
+
+            if (XData.first->back() != YData.first->back())
+                return;
+
+            // Verify delta of first two elements
+            if (XData.first->size() > 2)
+            {
+                double deltaX = XData.first->at(1) - XData.first->at(0);
+                double deltaY = YData.first->at(1) - YData.first->at(0);
+                if (std::fabs(deltaX - deltaY) > 1e-9)
+                    return;
             }
         }
     }
-    if(XYPlot())
+
+    // Determine Tmin across all graphs
+    for (int i = 0; i < graphCount(); ++i)
     {
-        if(XYX.second != nullptr)
-            if(XYY.second != nullptr)
-                 if(XYX.second->size() == XYY.second->size())
-                    graph(Yindex)->setData(XYX.second,XYY.second, 0.0);
+        ToFormMapper* element = MainWindow_p->GetLogic()->GetContainer(graph(i)->ID());
+        if (!element)
+            continue;
+
+        DataPair dp = element->GetPointerPair();
+        if (!dp.first || !dp.second || dp.first->empty() || dp.second->empty())
+            continue;
+
+        if (i == 0)
+            Tmin = *(dp.third);
+        else if (*(dp.third) < Tmin)
+            Tmin = *(dp.third);
     }
 
-    auto mmw = this->parentWidget();
+    // Update data for each graph
+    for (int i = 0; i < graphCount(); ++i)
+    {
+        ToFormMapper* element = MainWindow_p->GetLogic()->GetContainer(graph(i)->ID());
+        if (!element)
+            continue;
+
+        if (!XYPlot())
+        {
+            graph(i)->setData(element->GetPointerPair().first, element->GetPointerPair().second, Tmin);
+            if (__isFFT)
+                CalculateFFT();
+        }
+        else
+        {
+            if (graph(i)->ID().compare(ID_X))
+            {
+                YData = element->GetPointerPair();
+                yIndex = i;
+            }
+            else
+            {
+                XData = element->GetPointerPair();
+            }
+        }
+    }
+
+    // XY plot update
+    if (XYPlot())
+    {
+        if (XData.second && YData.second && XData.second->size() == YData.second->size())
+            graph(yIndex)->setData(XData.second, YData.second, 0.0);
+    }
+
+    // Check if visible and not minimized before replotting
+    QWidget* parent = this->parentWidget();
     bool minimized = false;
-    while(mmw->parentWidget())
+    while (parent->parentWidget())
     {
-        if(mmw->isMinimized())
+        if (parent->isMinimized() || MainWindow_p->isMinimized())
             minimized = true;
-        if(this->MainWindow_p->isMinimized())
-            minimized = true;
-
-        mmw = mmw->parentWidget();
-    }
-    if(this->visibleRegion().rectCount() == 1 && !minimized)
-    {
-        int samesize = 1;
-        for(int i = 0; i < this->graphCount()-2;i++)
-            if(graph(i)->GetXDataPointer() && graph(i+1)->GetXDataPointer())
-                samesize &=  graph(i)->GetXDataPointer()->size() == graph(i+1)->GetXDataPointer()->size();
-
-            if(samesize || XYPlot())
-                replot();
+        parent = parent->parentWidget();
     }
 
-    if(__ShowQualityCriteria)
+    if (visibleRegion().rectCount() == 1 && !minimized)
     {
-       if(!__isFFT)
-           CalculateFFT();
+        bool sameSize = true;
+        for (int i = 0; i < graphCount() - 2; ++i)
+        {
+            if (graph(i)->GetXDataPointer() && graph(i + 1)->GetXDataPointer())
+            {
+                sameSize &= (graph(i)->GetXDataPointer()->size() ==
+                             graph(i + 1)->GetXDataPointer()->size());
+            }
+        }
 
-       CalculateQualityCriteria();
+        if (sameSize || XYPlot())
+            replot();
+    }
+
+    // Optional FFT and quality calculation
+    if (__ShowQualityCriteria)
+    {
+        if (!__isFFT)
+            CalculateFFT();
+
+        CalculateQualityCriteria();
     }
 
     timer.restart();
 }
+
 
 void PlotWidget::CalculateQualityCriteria()
 {
@@ -1182,7 +1218,7 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
     if(DP.first && DP.second)
     if(graphCount() == 0 &&  DP.first->size())
     {
-        Tmin = DP.third;
+        Tmin = *(DP.third);
     }
 
     addGraph();
@@ -1311,7 +1347,7 @@ void PlotWidget::dropEvent(QDropEvent *event)
         number++;
     }
 
-    UpdataGraphs("", true);
+    UpdateGraphs("", true);
 
 }
 
@@ -1732,7 +1768,7 @@ void PlotWidget::ConnectToID(DataManagementSetClass* DM, QString ID)
 
 void PlotWidget::SetVariantData(ToFormMapper Data)
 {
-    UpdataGraphs("New Data");
+    UpdateGraphs("New Data");
 }
 void PlotWidget::GetVariantData(ToFormMapper *Data)
 {
