@@ -168,9 +168,11 @@ void RemoteControlServer::HeaderReceived()
                                 if (pointerPair.first && pointerPair.second) {
                                     std::vector<double> Time;
                                     std::vector<double> MeasuredDataOut;
+                                    double Offset;
 
                                     auto TP = pointerPair.first;
                                     auto DP = pointerPair.second;
+                                    auto OP = pointerPair.third;
 
                                     if (TP && !TP->empty()) {
                                         Time.insert(Time.end(), TP->begin(), TP->end());
@@ -184,7 +186,13 @@ void RemoteControlServer::HeaderReceived()
                                         MeasuredDataOut.push_back(0.0);
                                     }
 
-                                    uint32_t Elements = Time.size() + MeasuredDataOut.size();
+                                    if (OP) {
+                                        Offset = *OP;
+                                    } else {
+                                        Offset = 0;
+                                    }
+
+                                    uint32_t Elements = Time.size() + MeasuredDataOut.size() + 1; // +1 for Offset
                                     DataOut.append(reinterpret_cast<const char*>(&Elements), 4);
 
                                     if (!Time.empty()) {
@@ -192,7 +200,8 @@ void RemoteControlServer::HeaderReceived()
                                     }
                                     if (!MeasuredDataOut.empty()) {
                                         DataOut.append(reinterpret_cast<const char*>(&MeasuredDataOut[0]), 8 * MeasuredDataOut.size());
-                                    }
+                                    }                                    
+                                    DataOut.append(reinterpret_cast<const char*>(&Offset), sizeof(Offset));
                                 }
                                 else
                                 {
