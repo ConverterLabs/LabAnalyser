@@ -90,7 +90,7 @@ void QLed::dropEvent(QDropEvent *event)
     {
        bool ok;
        int i = QInputDialog::getInt(this, tr("Index of Bit to be set"),
-                                      tr("Index of Bit to be set (zero based):"), bitcounter, 0, 61, 1, &ok);
+                                      tr("Index of Bit to be set (zero based):"), bitcounter, 0, 63, 1, &ok);
        bitcounter = i+1;
        if(bitcounter > 61)
            bitcounter =0;

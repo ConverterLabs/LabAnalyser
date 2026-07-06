@@ -117,7 +117,7 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
        if (ok)
             this->bit = i;
 
-       this->setChecked((bool) (MW->GetLogic()->GetContainer(ID)->GetUnsignedData() & (1<<this->bit)));
+       this->setChecked((bool) (MW->GetLogic()->GetContainer(ID)->GetUnsignedData() & (1ULL<<this->bit)));
     }
     QStringList sp = ID.split("::");
     QString label = sp.back();
@@ -147,8 +147,8 @@ void QCheckBoxD::SetVariantData(ToFormMapper Data)
     else if(Data.IsUnsigedNumber())
     {
 
-        setChecked((bool) (Data.GetUnsignedData() & (1<<GetBit())));
-        clicked(Data.GetUnsignedData() & (1<<GetBit()));
+        setChecked((bool) (Data.GetUnsignedData() & (1ULL<<GetBit())));
+        clicked(Data.GetUnsignedData() & (1ULL<<GetBit()));
 
     }
      repaint();
@@ -167,9 +167,9 @@ void QCheckBoxD::GetVariantData(ToFormMapper *Data)
     {
         uint64_t numbr =Data->GetUnsignedData();
         if(isChecked())
-           Data->SetDataKeepType( (numbr | 1<<GetBit()));
+           Data->SetDataKeepType( (numbr | 1ULL<<GetBit()));
         else
-         Data->SetDataKeepType( (numbr & ~(1<<GetBit())));
+         Data->SetDataKeepType( (numbr & ~(1ULL<<GetBit())));
     }
 }
 
