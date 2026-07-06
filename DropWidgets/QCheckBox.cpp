@@ -112,7 +112,7 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
        int i = QInputDialog::getInt(this, tr("Index of Bit to be set"),
                                       tr("Index of Bit to be set (zero based):"), bitcounter, 0, 63, 1, &ok);
        bitcounter = i+1;
-       if(bitcounter > 31)
+       if(bitcounter > 63)
            bitcounter =0;
        if (ok)
             this->bit = i;

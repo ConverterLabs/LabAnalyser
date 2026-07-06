@@ -112,7 +112,7 @@ void QTSLed::dropEvent(QDropEvent *event)
                                       tr("Index of Bit to be set (zero based):"), bitcounter, 0, 63, 1, &ok);
 
        bitcounter = i+1;
-       if(bitcounter > 61)
+       if(bitcounter > 63)
            bitcounter =0;
        if (ok)
             this->bit = i;
