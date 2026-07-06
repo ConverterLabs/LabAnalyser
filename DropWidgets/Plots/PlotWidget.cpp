@@ -490,7 +490,7 @@ if (graphCount() > 0)
         menu->addSeparator();
       }
 
-      menu->addAction("Update Data", this, [this]() { UpdataGraphs("", true); });
+      menu->addAction("Update Data", this, [this]() { UpdateGraphs("", true); });
       menu->addAction("Reset Zoom", this, SLOT(ResetZoom()));
     }
 

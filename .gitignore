@@ -5,3 +5,4 @@
 build/**
 
 /readme_pictures/Alles.png
+.vscode/launch.json

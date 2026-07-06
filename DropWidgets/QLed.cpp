@@ -90,14 +90,14 @@ void QLed::dropEvent(QDropEvent *event)
     {
        bool ok;
        int i = QInputDialog::getInt(this, tr("Index of Bit to be set"),
-                                      tr("Index of Bit to be set (zero based):"), bitcounter, 0, 63, 1, &ok);
+                                      tr("Index of Bit to be set (zero based):"), bitcounter, 0, 61, 1, &ok);
        bitcounter = i+1;
-       if(bitcounter > 31)
+       if(bitcounter > 61)
            bitcounter =0;
        if (ok)
             this->bit = i;
 
-       this->SetState((bool) (MW->GetLogic()->GetContainer(ID)->GetUnsignedData() & (1<<this->bit)));
+       this->SetState((bool) (MW->GetLogic()->GetContainer(ID)->GetUnsignedData() & (1ULL<<this->bit)));
     }
 
     this->setToolTip(ID + ":" + QString::number(this->bit));
@@ -141,7 +141,7 @@ void QLed::SetVariantData(ToFormMapper Data)
     if(Data.IsBool())
         SetState(Data.GetBool());
     else if(Data.IsUnsigedNumber())
-       SetState((bool) (Data.GetUnsignedData() & (1<<GetBit())));
+       SetState((bool) (Data.GetUnsignedData() & (1ULL<<GetBit())));
      repaint();
      blockSignals(false);
 
