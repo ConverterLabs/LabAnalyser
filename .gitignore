@@ -63,5 +63,3 @@ Desktop.ini
 /Matlab/batman.LAparam
 /Matlab/CreateParameterFile.m
 
-# Project-specific generated test executable
-/tests/PlotMeasurementsTests
