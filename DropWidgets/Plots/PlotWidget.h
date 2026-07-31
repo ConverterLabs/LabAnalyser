@@ -27,8 +27,19 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include <QHash>
+#include <QPoint>
+#include <vector>
 #include "../DropWidget.h"
 #include "../../mainwindow.h"
+
+class QButtonGroup;
+class QComboBox;
+class QFrame;
+class QLabel;
+class QResizeEvent;
+class QToolButton;
+class QTableWidget;
 
 //This is class is customized for the LabAnalyser GUI
 
@@ -65,6 +76,7 @@ public:
     ~PlotWidget();
 protected:
     void closeEvent ( QCloseEvent * event ) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 public slots:
     void UpdateGraphs(QString ID = NULL, bool force = false);
@@ -95,14 +107,95 @@ private slots:
         void ToggleTimeFreq();
         void ShowQualityCriteria();
         void CalculateQualityCriteria();
+        void ToggleCursors(bool visible);
+        void ClearScopeCursors();
+        void updateCursorItems();
+        void updateReadout();
+        void setTimeAxisUnit(int index);
+        void updateTimeAxisTickLabels();
 
 
 private:
+    enum class PlotToolMode
+    {
+        Navigate,
+        BoxZoom,
+        DoubleCursor
+    };
+
+    enum class TimeAxisUnit
+    {
+        Seconds,
+        Milliseconds,
+        Microseconds
+    };
+
+    struct ScopeCursor
+    {
+        bool active = false;
+        double x = 0.0;
+    };
+
+    struct GraphDisplayState
+    {
+        QPen pen;
+        QCPGraph::LineStyle lineStyle = QCPGraph::lsLine;
+        QCPScatterStyle scatterStyle;
+    };
+
+    void initializePlotTools();
+    void initializeMeasurementPanel();
+    void updateToolboxGeometry();
+    void updateMeasurementPanelGeometry();
+    void setToolMode(PlotToolMode mode);
+    void setCursorsVisible(bool visible);
+    void initializeCursorPositions();
+    bool cursorMeasurementVisible() const;
+    int measurementPanelHeight() const;
+    void beginBoxZoom(QMouseEvent *mouse);
+    void updateBoxZoomRectangle(const QPoint &position);
+    void placeOrMoveCursor(QMouseEvent *mouse);
+    QList<QCPGraph*> graphsForReadout() const;
+    bool graphData(QCPGraph *graph,
+                   boost::shared_ptr<std::vector<double>> &xData,
+                   boost::shared_ptr<std::vector<double>> &yData) const;
+    bool interpolateGraphValue(QCPGraph *graph, double x, double *y) const;
+    double displayXOffset() const;
+    QString scopeValueText(double value) const;
+    double timeAxisScaleFactor() const;
+    QString timeAxisUnitText() const;
+    void updateTimeAxisPresentation(bool updateLabel = false);
+    void saveTimeDomainGraphStyles();
+    void restoreTimeDomainGraphStyles();
+
     bool MiddlePressed;
     bool ControlPressed;
+    QPoint BoxZoomStartPosition;
+    Qt::Orientations BoxZoomAxes = Qt::Horizontal | Qt::Vertical;
 bool _release2touch;
 bool _touchDevice;
     QCPItemRect* rectZoom;
+    QCPItemLine *CursorLineA = nullptr;
+    QCPItemLine *CursorLineB = nullptr;
+    QFrame *PlotToolbox = nullptr;
+    QFrame *MeasurementPanel = nullptr;
+    QLabel *CursorSummaryLabel = nullptr;
+    QTableWidget *MeasurementTable = nullptr;
+    QButtonGroup *ScopeToolButtons = nullptr;
+    QToolButton *NavigateToolButton = nullptr;
+    QToolButton *BoxZoomToolButton = nullptr;
+    QToolButton *DoubleCursorToolButton = nullptr;
+    QToolButton *CursorsToolButton = nullptr;
+    QComboBox *TimeUnitComboBox = nullptr;
+    PlotToolMode CurrentToolMode = PlotToolMode::Navigate;
+    TimeAxisUnit CurrentTimeAxisUnit = TimeAxisUnit::Seconds;
+    ScopeCursor CursorA;
+    ScopeCursor CursorB;
+    int DraggedCursor = 0;
+    bool CursorsVisible = false;
+    QHash<QCPGraph*, GraphDisplayState> TimeDomainGraphStyles;
+    QCPRange TimeDomainXRange;
+    bool HasTimeDomainXRange = false;
     MainWindow *MainWindow_p; //Pointer to the mainwindow gui
     QStatusBar* SB; //Pointer to the status bar of the main window
     QString ID_X;

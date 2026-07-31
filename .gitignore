@@ -1,7 +1,67 @@
-/LabAnalyser.pro.user
+# Qt Creator user settings
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.autosave
+
+# Build directories and qmake output
+build/
+debug/
+release/
+Makefile
+Makefile.Debug
+Makefile.Release
+.qmake.stash
+object_script.*
+moc_*.cpp
+moc_*.h
+ui_*.h
+qrc_*.cpp
+*.rcc
+
+# CMake output
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# Compiler, linker, and coverage artefacts
+*.o
+*.obj
+*.d
+*.dep
+*.pch
+*.gch
+*.a
+*.lib
+*.dll
+*.exe
+*.exp
+*.ilk
+*.pdb
+*.idb
+*.gcda
+*.gcno
+*.gcov
+coverage/
+
+# IDE and operating-system files
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+
+# Local configuration and generated Matlab files
+.env
+.env.*
+!.env.example
 /Matlab/batman.LAparam
 /Matlab/CreateParameterFile.m
 
-build/**
-
-/readme_pictures/Alles.png
+# Project-specific generated test executable
+/tests/PlotMeasurementsTests

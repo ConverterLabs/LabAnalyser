@@ -32,6 +32,7 @@ VERSION_BUILD = 1
 DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR"\
        "VERSION_MINOR=$$VERSION_MINOR"\
        "VERSION_BUILD=$$VERSION_BUILD"
+DEFINES += LABANALYSER_USE_FFTW
 #Target version
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
@@ -52,6 +53,7 @@ SOURCES += main.cpp\
         DropWidgets/CreateID.cpp \
         DropWidgets/DropWidgetsUiLoader.cpp \
         DropWidgets/Plots/FFTPlotWidget.cpp \
+        DropWidgets/Plots/PlotMeasurements.cpp \
         DropWidgets/Plots/PlotWidget.cpp \
         DropWidgets/Plots/qcustomplot.cpp \
         DropWidgets/QBLed.cpp \
@@ -99,6 +101,7 @@ HEADERS  += mainwindow.h\
             DropWidgets/DropWidget.h \
             DropWidgets/DropWidgetsUiLoader.h \
             DropWidgets/Plots/FFTPlotWidget.h \
+            DropWidgets/Plots/PlotMeasurements.h \
             DropWidgets/Plots/PlotWidget.h \
             DropWidgets/Plots/qcustomplot.h \
             DropWidgets/QBLed.h \

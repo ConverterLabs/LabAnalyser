@@ -16,5 +16,11 @@
         <file>icons/sym.png</file>
         <file>icons/sym_about.png</file>
         <file>icons/fft.png</file>
+        <file>icons/Clear.png</file>
+        <file>icons/Cursors.png</file>
+        <file>icons/Pan.png</file>
+        <file>icons/Reset.png</file>
+        <file>icons/12.png</file>
+        <file>icons/Zoom.png</file>
     </qresource>
 </RCC>

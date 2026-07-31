@@ -20,8 +20,24 @@
 ****************************************************************************/
 
 #include "PlotWidget.h"
+#include "PlotMeasurements.h"
 #include "mainwindow.h"
 #include <fftw3.h>
+#include <QButtonGroup>
+#include <QComboBox>
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QIcon>
+#include <QLabel>
+#include <QPixmap>
+#include <QResizeEvent>
+#include <QTableWidget>
+#include <QToolButton>
+#include <QVBoxLayout>
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 #define UseFFTW
 
@@ -44,6 +60,9 @@ PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI, bool is
     rectZoom = new QCPItemRect(this);
     this->addItem(rectZoom);
     rectZoom->setVisible(false);
+    rectZoom->setSelectable(false);
+    rectZoom->setPen(QPen(QColor(30, 100, 180), 1, Qt::DashLine));
+    rectZoom->setBrush(QBrush(QColor(80, 150, 220, 35)));
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     this->setFocusPolicy(Qt::ClickFocus);
@@ -99,6 +118,8 @@ else
    legend->setSelectedFont(NewFont);
    legend->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
 
+   initializeMeasurementPanel();
+   initializePlotTools();
 
    connect(this, SIGNAL(mousePress(QMouseEvent*)), this, SLOT(mousePressEventII(QMouseEvent*)));
    connect(this, SIGNAL(mouseRelease(QMouseEvent*)), this, SLOT(mouseReleaseEventII(QMouseEvent*)));
@@ -125,6 +146,9 @@ else
    connect(this, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
 
    connect(this, SIGNAL(mouseWheelDone()), this, SLOT(mouseWheelDone()));
+   connect(this->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(updateReadout()));
+   connect(this->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(updateCursorItems()));
+   connect(this->xAxis, SIGNAL(ticksRequest()), this, SLOT(updateTimeAxisTickLabels()));
 
    timer.start();
    TimeSinceLastPlot.start();
@@ -135,6 +159,563 @@ else
 
    update();
 
+}
+
+void PlotWidget::initializeMeasurementPanel()
+{
+    MeasurementPanel = new QFrame(this);
+    MeasurementPanel->setObjectName("MeasurementPanel");
+    MeasurementPanel->setFrameShape(QFrame::StyledPanel);
+    MeasurementPanel->setStyleSheet(
+        "QFrame#MeasurementPanel { background: palette(base); border-top: 1px solid palette(mid); }"
+        "QTableWidget { border: 0; gridline-color: palette(midlight); }");
+
+    QVBoxLayout *panelLayout = new QVBoxLayout(MeasurementPanel);
+    panelLayout->setContentsMargins(3, 2, 3, 3);
+    panelLayout->setSpacing(1);
+
+    CursorSummaryLabel = new QLabel("Data", MeasurementPanel);
+    CursorSummaryLabel->setMinimumHeight(18);
+    panelLayout->addWidget(CursorSummaryLabel);
+
+    MeasurementTable = new QTableWidget(MeasurementPanel);
+    MeasurementTable->setColumnCount(12);
+    MeasurementTable->setHorizontalHeaderLabels({"Name", "Cursor 1", "Cursor 2", "Delta", "1/dT [Hz]", "Slope", "Min", "Max", "Mean", "RMS", "THD", ""});
+    MeasurementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    MeasurementTable->setSelectionMode(QAbstractItemView::NoSelection);
+    MeasurementTable->setFocusPolicy(Qt::NoFocus);
+    MeasurementTable->setAlternatingRowColors(true);
+    MeasurementTable->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    MeasurementTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    MeasurementTable->verticalHeader()->setVisible(false);
+    MeasurementTable->horizontalHeader()->setStretchLastSection(false);
+    MeasurementTable->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    for (int column = 0; column < MeasurementTable->columnCount() - 1; ++column)
+        MeasurementTable->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
+    MeasurementTable->horizontalHeader()->setSectionResizeMode(MeasurementTable->columnCount() - 1, QHeaderView::Stretch);
+
+    const int valueColumnWidth = 86;
+    MeasurementTable->setColumnWidth(0, 220);
+    for (int column = 1; column < MeasurementTable->columnCount() - 2; ++column)
+        MeasurementTable->setColumnWidth(column, valueColumnWidth);
+    MeasurementTable->setColumnWidth(MeasurementTable->columnCount() - 2, 76);
+    panelLayout->addWidget(MeasurementTable);
+
+    MeasurementPanel->hide();
+}
+
+void PlotWidget::initializePlotTools()
+{
+    CursorLineA = new QCPItemLine(this);
+    CursorLineB = new QCPItemLine(this);
+
+    CursorLineA->setPen(QPen(QColor(230, 185, 25), 1.5, Qt::DashLine));
+    CursorLineB->setPen(QPen(QColor(30, 190, 255), 1.5, Qt::DashLine));
+    for (QCPItemLine *cursorLine : { CursorLineA, CursorLineB })
+    {
+        cursorLine->setSelectable(false);
+        cursorLine->setVisible(false);
+        cursorLine->start->setType(QCPItemPosition::ptPlotCoords);
+        cursorLine->end->setType(QCPItemPosition::ptPlotCoords);
+        cursorLine->start->setAxes(xAxis, yAxis);
+        cursorLine->end->setAxes(xAxis, yAxis);
+    }
+
+    PlotToolbox = new QFrame(this);
+    PlotToolbox->setObjectName("PlotToolbox");
+    PlotToolbox->setFrameShape(QFrame::StyledPanel);
+    PlotToolbox->setStyleSheet(
+        "QFrame#PlotToolbox { background: palette(button); border: 0; border-bottom: 1px solid palette(mid); }"
+        "QToolButton { padding: 2px 5px; }"
+        "QToolButton:checked { background-color: rgba(65, 130, 190, 90); }");
+
+    QHBoxLayout *toolLayout = new QHBoxLayout(PlotToolbox);
+    toolLayout->setContentsMargins(3, 3, 3, 3);
+    toolLayout->setSpacing(2);
+    toolLayout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+    const auto makeToolButton = [this, toolLayout](const QString &iconPath, const QString &toolTip) {
+        QToolButton *button = new QToolButton(PlotToolbox);
+        button->setIcon(QIcon(iconPath));
+        button->setIconSize(QSize(16, 16));
+        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        button->setToolTip(toolTip);
+        button->setAutoRaise(true);
+        toolLayout->addWidget(button);
+        return button;
+    };
+
+    NavigateToolButton = makeToolButton(":/icons/icons/Pan.png", "Navigate: pan and wheel zoom");
+    BoxZoomToolButton = makeToolButton(":/icons/icons/Zoom.png", "Box zoom");
+    TimeUnitComboBox = new QComboBox(PlotToolbox);
+    TimeUnitComboBox->addItems({"s", "ms", "us"});
+    TimeUnitComboBox->setCurrentIndex(static_cast<int>(CurrentTimeAxisUnit));
+    TimeUnitComboBox->setFixedWidth(56);
+    TimeUnitComboBox->setToolTip("Time axis unit");
+    toolLayout->addWidget(TimeUnitComboBox);
+    DoubleCursorToolButton = makeToolButton(":/icons/icons/12.png", "Move the nearest cursor");
+    CursorsToolButton = makeToolButton(":/icons/icons/Cursors.png", "Show measurement cursors");
+    QToolButton *clearButton = makeToolButton(":/icons/icons/Clear.png", "Hide cursors");
+    QToolButton *resetButton = makeToolButton(":/icons/icons/Reset.png", "Reset zoom");
+
+    ScopeToolButtons = new QButtonGroup(this);
+    ScopeToolButtons->setExclusive(true);
+    for (QToolButton *button : { NavigateToolButton, BoxZoomToolButton, DoubleCursorToolButton })
+    {
+        button->setCheckable(true);
+        ScopeToolButtons->addButton(button);
+    }
+
+    CursorsToolButton->setCheckable(true);
+    CursorsToolButton->setChecked(CursorsVisible);
+
+    connect(NavigateToolButton, &QToolButton::clicked, this, [this] { setToolMode(PlotToolMode::Navigate); });
+    connect(BoxZoomToolButton, &QToolButton::clicked, this, [this] { setToolMode(PlotToolMode::BoxZoom); });
+    connect(DoubleCursorToolButton, &QToolButton::clicked, this, [this] { setToolMode(PlotToolMode::DoubleCursor); });
+    connect(TimeUnitComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &PlotWidget::setTimeAxisUnit);
+    connect(CursorsToolButton, &QToolButton::toggled, this, &PlotWidget::ToggleCursors);
+    connect(clearButton, &QToolButton::clicked, this, &PlotWidget::ClearScopeCursors);
+    connect(resetButton, &QToolButton::clicked, this, &PlotWidget::ResetZoom);
+    toolLayout->addStretch(1);
+
+    setToolMode(PlotToolMode::Navigate);
+    updateCursorItems();
+    updateReadout();
+    updateTimeAxisPresentation(true);
+    updateToolboxGeometry();
+}
+
+void PlotWidget::updateToolboxGeometry()
+{
+    if (!PlotToolbox)
+        return;
+
+    const int toolboxHeight = qMax(28, PlotToolbox->sizeHint().height() + 4);
+    PlotToolbox->setGeometry(0, 0, width(), toolboxHeight);
+    PlotToolbox->raise();
+}
+
+int PlotWidget::measurementPanelHeight() const
+{
+    return qBound(100, height() / 3, 230);
+}
+
+bool PlotWidget::cursorMeasurementVisible() const
+{
+    return CursorsVisible && !__isFFT && CursorA.active;
+}
+
+void PlotWidget::updateMeasurementPanelGeometry()
+{
+    if (!MeasurementPanel)
+        return;
+
+    const int toolboxHeight = PlotToolbox ? qMax(28, PlotToolbox->sizeHint().height() + 4) : 32;
+    if (!cursorMeasurementVisible())
+    {
+        MeasurementPanel->hide();
+        setViewport(QRect(0, toolboxHeight, width(), qMax(0, height() - toolboxHeight)));
+        updateToolboxGeometry();
+        return;
+    }
+
+    const int panelHeight = measurementPanelHeight();
+    const int plotHeight = qMax(0, height() - toolboxHeight - panelHeight);
+    setViewport(QRect(0, toolboxHeight, width(), plotHeight));
+    MeasurementPanel->setGeometry(0, toolboxHeight + plotHeight, width(), panelHeight);
+    MeasurementPanel->show();
+    MeasurementPanel->raise();
+    updateToolboxGeometry();
+}
+
+void PlotWidget::setToolMode(PlotToolMode mode)
+{
+    CurrentToolMode = mode;
+    MiddlePressed = false;
+    DraggedCursor = 0;
+    rectZoom->setVisible(false);
+
+    QCP::Interactions interactions = QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables;
+    if (CurrentToolMode == PlotToolMode::Navigate)
+        interactions |= QCP::iRangeDrag | QCP::iRangeZoom;
+    setInteractions(interactions);
+
+    QToolButton *selectedButton = NavigateToolButton;
+    if (CurrentToolMode == PlotToolMode::BoxZoom)
+        selectedButton = BoxZoomToolButton;
+    else if (CurrentToolMode == PlotToolMode::DoubleCursor)
+        selectedButton = DoubleCursorToolButton;
+
+    if (selectedButton)
+        selectedButton->setChecked(true);
+
+    if (CursorsVisible && CurrentToolMode == PlotToolMode::DoubleCursor && !CursorB.active)
+    {
+        if (!CursorA.active)
+            initializeCursorPositions();
+        else
+        {
+            const QCPRange range = xAxis->range();
+            CursorB.x = range.lower + 2.0 * range.size() / 3.0;
+            CursorB.active = true;
+        }
+    }
+
+    Qt::CursorShape cursorShape = Qt::ArrowCursor;
+    if (CurrentToolMode == PlotToolMode::BoxZoom)
+        cursorShape = Qt::CrossCursor;
+    else if (CurrentToolMode == PlotToolMode::DoubleCursor)
+        cursorShape = Qt::SizeHorCursor;
+    setCursor(cursorShape);
+    updateCursorItems();
+    updateReadout();
+}
+
+void PlotWidget::initializeCursorPositions()
+{
+    const QCPRange range = xAxis->range();
+    const double span = range.upper - range.lower;
+    CursorA.x = range.lower + span / 3.0;
+    CursorB.x = range.lower + 2.0 * span / 3.0;
+    CursorA.active = true;
+    CursorB.active = true;
+}
+
+void PlotWidget::setCursorsVisible(bool visible)
+{
+    if (visible && !CursorA.active)
+        initializeCursorPositions();
+    else if (visible && CurrentToolMode == PlotToolMode::DoubleCursor && !CursorB.active)
+    {
+        const QCPRange range = xAxis->range();
+        CursorB.x = range.lower + 2.0 * range.size() / 3.0;
+        CursorB.active = true;
+    }
+
+    CursorsVisible = visible;
+    if (CursorsToolButton && CursorsToolButton->isChecked() != CursorsVisible)
+    {
+        CursorsToolButton->blockSignals(true);
+        CursorsToolButton->setChecked(CursorsVisible);
+        CursorsToolButton->blockSignals(false);
+    }
+
+    updateCursorItems();
+    updateReadout();
+    replot(QCustomPlot::rpQueued);
+}
+
+void PlotWidget::ToggleCursors(bool visible)
+{
+    setCursorsVisible(visible);
+}
+
+void PlotWidget::beginBoxZoom(QMouseEvent *mouse)
+{
+    MiddlePressed = true;
+    BoxZoomStartPosition = mouse->pos();
+    BoxZoomAxes = Qt::Horizontal | Qt::Vertical;
+    updateBoxZoomRectangle(BoxZoomStartPosition);
+    rectZoom->setVisible(true);
+}
+
+void PlotWidget::updateBoxZoomRectangle(const QPoint &position)
+{
+    constexpr int axisOnlyTolerancePixels = 6;
+
+    const int deltaX = std::abs(position.x() - BoxZoomStartPosition.x());
+    const int deltaY = std::abs(position.y() - BoxZoomStartPosition.y());
+    if (deltaX <= axisOnlyTolerancePixels && deltaY > axisOnlyTolerancePixels)
+        BoxZoomAxes = Qt::Vertical;
+    else if (deltaY <= axisOnlyTolerancePixels && deltaX > axisOnlyTolerancePixels)
+        BoxZoomAxes = Qt::Horizontal;
+    else
+        BoxZoomAxes = Qt::Horizontal | Qt::Vertical;
+
+    const double startX = xAxis->pixelToCoord(BoxZoomStartPosition.x());
+    const double startY = yAxis->pixelToCoord(BoxZoomStartPosition.y());
+    const double endX = xAxis->pixelToCoord(position.x());
+    const double endY = yAxis->pixelToCoord(position.y());
+    const double selectedXLower = std::min(startX, endX);
+    const double selectedXUpper = std::max(startX, endX);
+    const double selectedYLower = std::min(startY, endY);
+    const double selectedYUpper = std::max(startY, endY);
+
+    if (BoxZoomAxes == Qt::Vertical)
+    {
+        rectZoom->topLeft->setCoords(xAxis->range().lower, selectedYUpper);
+        rectZoom->bottomRight->setCoords(xAxis->range().upper, selectedYLower);
+    }
+    else if (BoxZoomAxes == Qt::Horizontal)
+    {
+        rectZoom->topLeft->setCoords(selectedXLower, yAxis->range().upper);
+        rectZoom->bottomRight->setCoords(selectedXUpper, yAxis->range().lower);
+    }
+    else
+    {
+        rectZoom->topLeft->setCoords(selectedXLower, selectedYUpper);
+        rectZoom->bottomRight->setCoords(selectedXUpper, selectedYLower);
+    }
+}
+
+void PlotWidget::placeOrMoveCursor(QMouseEvent *mouse)
+{
+    if (!CursorsVisible || __isFFT)
+        return;
+
+    const double x = xAxis->pixelToCoord(mouse->pos().x());
+    if (CurrentToolMode == PlotToolMode::DoubleCursor)
+    {
+        if (std::fabs(x - CursorA.x) <= std::fabs(x - CursorB.x))
+        {
+            CursorA.x = x;
+            DraggedCursor = 1;
+        }
+        else
+        {
+            CursorB.x = x;
+            DraggedCursor = 2;
+        }
+    }
+
+    updateCursorItems();
+    updateReadout();
+}
+
+QList<QCPGraph*> PlotWidget::graphsForReadout() const
+{
+    QList<QCPGraph*> visibleGraphs;
+    for (int i = 0; i < graphCount(); ++i)
+    {
+        QCPGraph *plotGraph = graph(i);
+        if (plotGraph && plotGraph->visible())
+            visibleGraphs.append(plotGraph);
+    }
+    return visibleGraphs;
+}
+
+bool PlotWidget::graphData(QCPGraph *plotGraph,
+                           boost::shared_ptr<std::vector<double>> &xData,
+                           boost::shared_ptr<std::vector<double>> &yData) const
+{
+    if (!plotGraph)
+        return false;
+
+    xData = plotGraph->GetXDataPointer();
+    yData = plotGraph->GetYDataPointer();
+    return xData && yData && !xData->empty() && !yData->empty();
+}
+
+double PlotWidget::displayXOffset() const
+{
+    return (!mXYPlot) ? Tmin : 0.0;
+}
+
+double PlotWidget::timeAxisScaleFactor() const
+{
+    switch (CurrentTimeAxisUnit)
+    {
+        case TimeAxisUnit::Milliseconds:
+            return 1e3;
+        case TimeAxisUnit::Microseconds:
+            return 1e6;
+        case TimeAxisUnit::Seconds:
+        default:
+            return 1.0;
+    }
+}
+
+QString PlotWidget::timeAxisUnitText() const
+{
+    switch (CurrentTimeAxisUnit)
+    {
+        case TimeAxisUnit::Milliseconds:
+            return "ms";
+        case TimeAxisUnit::Microseconds:
+            return "us";
+        case TimeAxisUnit::Seconds:
+        default:
+            return "s";
+    }
+}
+
+void PlotWidget::updateTimeAxisPresentation(bool updateLabel)
+{
+    const bool isTimeDomain = !__isFFT && !mXYPlot;
+    if (TimeUnitComboBox)
+        TimeUnitComboBox->setEnabled(isTimeDomain);
+
+    xAxis->setAutoTickLabels(!isTimeDomain);
+    if (!isTimeDomain)
+        return;
+
+    if (updateLabel)
+        xAxis->setLabel(QString("t [%1]").arg(timeAxisUnitText()));
+    updateTimeAxisTickLabels();
+}
+
+void PlotWidget::setTimeAxisUnit(int index)
+{
+    if (index < static_cast<int>(TimeAxisUnit::Seconds) ||
+        index > static_cast<int>(TimeAxisUnit::Microseconds))
+        return;
+
+    CurrentTimeAxisUnit = static_cast<TimeAxisUnit>(index);
+    updateTimeAxisPresentation(true);
+    updateReadout();
+    replot(QCustomPlot::rpQueued);
+}
+
+void PlotWidget::updateTimeAxisTickLabels()
+{
+    if (__isFFT || mXYPlot)
+        return;
+
+    const QVector<double> ticks = xAxis->tickVector();
+    QVector<QString> labels;
+    labels.reserve(ticks.size());
+    const double scale = timeAxisScaleFactor();
+    for (double tick : ticks)
+        labels.append(scopeValueText(tick * scale));
+    xAxis->setTickVectorLabels(labels);
+}
+
+bool PlotWidget::interpolateGraphValue(QCPGraph *plotGraph, double x, double *y) const
+{
+    boost::shared_ptr<std::vector<double>> xData;
+    boost::shared_ptr<std::vector<double>> yData;
+    if (!graphData(plotGraph, xData, yData))
+        return false;
+
+    const std::vector<PlotMeasurements::Sample> samples = PlotMeasurements::normalizedSamples(*xData, *yData);
+    return PlotMeasurements::interpolate(samples, x + displayXOffset(), y);
+}
+
+QString PlotWidget::scopeValueText(double value) const
+{
+    if (!std::isfinite(value))
+        return "N/A";
+
+    constexpr int maximumSignificantDigits = 6;
+    constexpr int maximumCharacters = 11;
+    QString text = QString::number(value, 'g', maximumSignificantDigits);
+    if (text.size() > maximumCharacters)
+        text = QString::number(value, 'e', maximumSignificantDigits - 3);
+    return text;
+}
+
+void PlotWidget::updateCursorItems()
+{
+    const auto updateCursorLine = [this](QCPItemLine *line, const ScopeCursor &cursor) {
+        if (!line)
+            return;
+
+        line->setVisible(CursorsVisible && !__isFFT && cursor.active);
+        if (cursor.active)
+        {
+            line->start->setCoords(cursor.x, yAxis->range().lower);
+            line->end->setCoords(cursor.x, yAxis->range().upper);
+        }
+    };
+
+    updateCursorLine(CursorLineA, CursorA);
+    updateCursorLine(CursorLineB, CursorB);
+}
+
+void PlotWidget::updateReadout()
+{
+    if (!MeasurementPanel || !MeasurementTable || !CursorSummaryLabel)
+        return;
+
+    updateMeasurementPanelGeometry();
+    if (!cursorMeasurementVisible())
+    {
+        CursorSummaryLabel->setText("Data");
+        MeasurementTable->setRowCount(0);
+        return;
+    }
+
+    const bool hasSecondCursor = CursorB.active;
+    const double dx = hasSecondCursor ? CursorB.x - CursorA.x : std::numeric_limits<double>::quiet_NaN();
+    CursorSummaryLabel->setText("Data");
+
+    const QList<QCPGraph*> visibleGraphs = graphsForReadout();
+    MeasurementTable->setUpdatesEnabled(false);
+    MeasurementTable->clearContents();
+    MeasurementTable->setRowCount(visibleGraphs.size() + 1);
+    const double dataX1 = CursorA.x + displayXOffset();
+    const double dataX2 = CursorB.x + displayXOffset();
+    const double lowerDataX = std::min(dataX1, dataX2);
+    const double upperDataX = std::max(dataX1, dataX2);
+
+    const auto setValue = [this](int row, int column, double value, const QString &suffix) {
+        QTableWidgetItem *item = new QTableWidgetItem(scopeValueText(value) + suffix);
+        item->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        MeasurementTable->setItem(row, column, item);
+    };
+
+    const bool isTimeDomain = !__isFFT && !mXYPlot;
+    const double timeScale = isTimeDomain ? timeAxisScaleFactor() : 1.0;
+    QTableWidgetItem *timeName = new QTableWidgetItem(isTimeDomain
+                                                        ? QString("Time [%1]").arg(timeAxisUnitText())
+                                                        : QString("X"));
+    MeasurementTable->setItem(0, 0, timeName);
+    setValue(0, 1, CursorA.x * timeScale, QString());
+    setValue(0, 2, hasSecondCursor ? CursorB.x * timeScale : std::numeric_limits<double>::quiet_NaN(), QString());
+    setValue(0, 3, dx * timeScale, QString());
+    setValue(0, 4, !std::isfinite(dx) || dx == 0.0 ? std::numeric_limits<double>::quiet_NaN() : 1.0 / std::fabs(dx), QString());
+
+    for (int graphIndex = 0; graphIndex < visibleGraphs.size(); ++graphIndex)
+    {
+        const int row = graphIndex + 1;
+        QCPGraph *plotGraph = visibleGraphs.at(graphIndex);
+        const QString graphName = plotGraph->name().isEmpty() ? QString("Graph %1").arg(graphIndex + 1) : plotGraph->name();
+        QTableWidgetItem *nameItem = new QTableWidgetItem(graphName);
+        QPixmap colorReference(10, 10);
+        colorReference.fill(plotGraph->pen().color());
+        nameItem->setIcon(QIcon(colorReference));
+        MeasurementTable->setItem(row, 0, nameItem);
+
+        boost::shared_ptr<std::vector<double>> xData;
+        boost::shared_ptr<std::vector<double>> yData;
+        const bool hasData = graphData(plotGraph, xData, yData);
+        const std::vector<PlotMeasurements::Sample> samples = hasData
+                ? PlotMeasurements::normalizedSamples(*xData, *yData)
+                : std::vector<PlotMeasurements::Sample>();
+
+        double y1 = std::numeric_limits<double>::quiet_NaN();
+        double y2 = std::numeric_limits<double>::quiet_NaN();
+        const bool hasY1 = PlotMeasurements::interpolate(samples, dataX1, &y1);
+        const bool hasY2 = hasSecondCursor && PlotMeasurements::interpolate(samples, dataX2, &y2);
+        const double dy = hasY1 && hasY2 ? y2 - y1 : std::numeric_limits<double>::quiet_NaN();
+        const double slope = std::isfinite(dx) && dx != 0.0 && std::isfinite(dy) ? dy / dx : std::numeric_limits<double>::quiet_NaN();
+        const double statisticsLowerX = hasSecondCursor ? lowerDataX : xAxis->range().lower + displayXOffset();
+        const double statisticsUpperX = hasSecondCursor ? upperDataX : xAxis->range().upper + displayXOffset();
+        const PlotMeasurements::IntervalStatistics statistics = PlotMeasurements::calculateIntervalStatistics(samples, statisticsLowerX, statisticsUpperX);
+        const double thd = hasSecondCursor
+                ? PlotMeasurements::calculateThdPercent(samples, statisticsLowerX, statisticsUpperX)
+                : std::numeric_limits<double>::quiet_NaN();
+
+        setValue(row, 1, y1, QString());
+        setValue(row, 2, y2, QString());
+        setValue(row, 3, dy, QString());
+        setValue(row, 5, slope, QString());
+        setValue(row, 6, statistics.valid ? statistics.minimum : std::numeric_limits<double>::quiet_NaN(), QString());
+        setValue(row, 7, statistics.valid ? statistics.maximum : std::numeric_limits<double>::quiet_NaN(), QString());
+        setValue(row, 8, statistics.valid ? statistics.mean : std::numeric_limits<double>::quiet_NaN(), QString());
+        setValue(row, 9, statistics.valid ? statistics.rms : std::numeric_limits<double>::quiet_NaN(), QString());
+        setValue(row, 10, thd, std::isfinite(thd) ? QString(" %") : QString());
+    }
+
+    MeasurementTable->setUpdatesEnabled(true);
+    MeasurementTable->viewport()->update();
+}
+
+void PlotWidget::ClearScopeCursors()
+{
+    DraggedCursor = 0;
+    setCursorsVisible(false);
 }
 
 void PlotWidget::ClearAllGraphs()
@@ -159,6 +740,12 @@ void PlotWidget::closeEvent ( QCloseEvent * event )
    QWidget::closeEvent(event);
 
   //delete this;
+}
+
+void PlotWidget::resizeEvent(QResizeEvent *event)
+{
+    QCustomPlot::resizeEvent(event);
+    updateMeasurementPanelGeometry();
 }
 
 
@@ -269,6 +856,8 @@ void PlotWidget::selectionChanged()
         graph->setSelected(true);
     }
   }
+
+  updateReadout();
 }
 
 
@@ -317,8 +906,10 @@ void PlotWidget::removeSelectedGraph()
   {
       for(int k = 0; k < selectedGraphs().size();k++)
       {
-          this->MainWindow_p->GetLogic()->DeleteEntryOfObject(selectedGraphs().at(k)->ID(),this);
-          removeGraph(selectedGraphs().at(k));
+          QCPGraph *selectedGraph = selectedGraphs().at(k);
+          this->MainWindow_p->GetLogic()->DeleteEntryOfObject(selectedGraph->ID(),this);
+          TimeDomainGraphStyles.remove(selectedGraph);
+          removeGraph(selectedGraph);
       }
     replot();
   }
@@ -333,7 +924,7 @@ void PlotWidget::removeSelectedGraph()
         }
         else
         {
-            xAxis->setLabel("t [s]");
+            updateTimeAxisPresentation(true);
             yAxis->setLabel("Data");
         }
       ID_X.clear();
@@ -346,6 +937,9 @@ void PlotWidget::removeSelectedGraph()
         QualityCriteriaText = nullptr;
       }
   }
+
+  updateReadout();
+  replot(QCustomPlot::rpQueued);
 }
 
 
@@ -374,12 +968,16 @@ void PlotWidget::SetAsXAxis(bool skip)
                     yAxis->setLabel(graph(i)->name());
                 }
                 SetXYPlot(true);
+                updateTimeAxisPresentation();
 
                 if(!skip)
                     ResetZoom();
             }
         }
     }
+
+    updateReadout();
+    replot(QCustomPlot::rpQueued);
 }
 
 void PlotWidget::ToggleMarker()
@@ -408,6 +1006,7 @@ void PlotWidget::removeAllGraphs()
     }
 
   clearGraphs();
+  TimeDomainGraphStyles.clear();
 
   if(!selectedGraphs().size())
   {
@@ -420,7 +1019,7 @@ void PlotWidget::removeAllGraphs()
     }
     else
     {
-        xAxis->setLabel("t [s]");
+        updateTimeAxisPresentation(true);
         yAxis->setLabel("Data");
     }
     ID_X.clear();
@@ -432,6 +1031,7 @@ void PlotWidget::removeAllGraphs()
       QualityCriteriaText = nullptr;
   }
 
+  updateReadout();
   replot();
 
 
@@ -496,6 +1096,10 @@ if (graphCount() > 0)
 
 
 }
+ QAction *showCursorsAction = menu->addAction("Show Cursors");
+ showCursorsAction->setCheckable(true);
+ showCursorsAction->setChecked(CursorsVisible);
+ connect(showCursorsAction, &QAction::toggled, this, &PlotWidget::ToggleCursors);
  // menu->addAction("Add random graph", this, SLOT(addRandomGraph()));
         menu->addSeparator();
  menu->popup(mapToGlobal(pos));
@@ -582,83 +1186,77 @@ void PlotWidget::ShowQualityCriteria(void)
     }
 }
 
+void PlotWidget::saveTimeDomainGraphStyles()
+{
+    TimeDomainGraphStyles.clear();
+    for (int i = 0; i < graphCount(); ++i)
+    {
+        QCPGraph *plotGraph = graph(i);
+        if (!plotGraph)
+            continue;
+
+        GraphDisplayState state;
+        state.pen = plotGraph->pen();
+        state.lineStyle = plotGraph->lineStyle();
+        state.scatterStyle = plotGraph->scatterStyle();
+        TimeDomainGraphStyles.insert(plotGraph, state);
+    }
+}
+
+void PlotWidget::restoreTimeDomainGraphStyles()
+{
+    for (int i = 0; i < graphCount(); ++i)
+    {
+        QCPGraph *plotGraph = graph(i);
+        const QHash<QCPGraph*, GraphDisplayState>::const_iterator style = TimeDomainGraphStyles.constFind(plotGraph);
+        if (!plotGraph || style == TimeDomainGraphStyles.constEnd())
+            continue;
+
+        plotGraph->setPen(style->pen);
+        plotGraph->setLineStyle(style->lineStyle);
+        plotGraph->setScatterStyle(style->scatterStyle);
+    }
+    TimeDomainGraphStyles.clear();
+}
+
 void PlotWidget::ToggleTimeFreq(void)
 {
-      QPen graphPen;
-
-
-
-    if(__isFFT)
+    if (__isFFT)
     {
         __ShowQualityCriteria = false;
         __isFFT = false;
-        xAxis->setLabel("t [s]");
+        updateTimeAxisPresentation(true);
         yAxis->setLabel("Data");
-        // set pen for all graphs
-        for(int i=0; i<graphCount(); ++i)
-        {
-            switch (i) //MatlabColors
-            {
-                case 1: graphPen.setColor( QColor(0  ,  114  ,  189)); break;
-                case 2: graphPen.setColor( QColor(217  ,  83  ,  25)); break;
-                case 3: graphPen.setColor( QColor(237  , 177   , 32)); break;
-                case 4: graphPen.setColor( QColor(126 ,   47  , 142)); break;
-                case 5: graphPen.setColor( QColor( 119 ,  172  ,  48)); break;
-                case 6: graphPen.setColor( QColor(77 ,  190 ,  238)); break;
-                case 7: graphPen.setColor(  QColor( 162 ,   20   , 47)); break;
-                default:  graphPen.setColor( QColor( 217  ,  83  ,  25)); break;;
-            }
-            graph(i)->setLineStyle(QCPGraph::lsLine);
-            constexpr qreal lineWidth{ 1 };
-            constexpr qreal plotScatterSize{ 5 };
-            graphPen.setWidthF(1);
-            graph(i)->setScatterStyle(
-                    QCPScatterStyle{ QCPScatterStyle::ssCircle, Qt::transparent, plotScatterSize });
-            graph(i)->setPen(graphPen);
-        }
+        restoreTimeDomainGraphStyles();
 
-        replot();
+        ResetZoom();
+        if (HasTimeDomainXRange)
+            xAxis->setRange(TimeDomainXRange);
     }
     else
     {
-        __isFFT = true;
+        TimeDomainXRange = xAxis->range();
+        HasTimeDomainXRange = true;
+        saveTimeDomainGraphStyles();
         CalculateFFT();
-
+        __isFFT = true;
+        updateTimeAxisPresentation();
         xAxis->setLabel("f [Hz]");
         yAxis->setLabel("Amplitude");
-         // set pen for all graphs
-        for(int i=0; i<graphCount(); ++i)
-        {
-            int occupancy = 255;
-            if(graphCount() > 1)
-            {
-                occupancy = 128;
-            }
-            switch (i) //MatlabColors
-            {
-                case 1: graphPen.setColor( QColor(0  ,  114  ,  189, occupancy)); break;
-                case 2: graphPen.setColor( QColor(217  ,  83  ,  25, occupancy)); break;
-                case 3: graphPen.setColor( QColor(237  , 177   , 32, occupancy)); break;
-                case 4: graphPen.setColor( QColor(126 ,   47  , 142, occupancy)); break;
-                case 5: graphPen.setColor( QColor( 119 ,  172  ,  48, occupancy)); break;
-                case 6: graphPen.setColor( QColor(77 ,  190 ,  238, occupancy)); break;
-                case 7: graphPen.setColor(  QColor( 162 ,   20   , 47, occupancy)); break;
-                default:  graphPen.setColor( QColor( 217  ,  83  ,  25, occupancy)); break;;
-            }
-            graph(i)->setLineStyle(QCPGraph::lsImpulse);
-            constexpr qreal plotScatterSize{ 10 };
-            graphPen.setWidthF(5);
-            graph(i)->setScatterStyle(
-                    QCPScatterStyle{ QCPScatterStyle::ssCross, Qt::transparent, plotScatterSize });
-            graph(i)->setPen(graphPen);
 
+        for (int i = 0; i < graphCount(); ++i)
+        {
+            graph(i)->setLineStyle(QCPGraph::lsImpulse);
+            graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, Qt::transparent, 10));
         }
 
-        replot();
+        ResetZoom();
+        xAxis->setRange(0, 500);
     }
 
-    ResetZoom();
-
+    updateCursorItems();
+    updateReadout();
+    replot();
 }
 void PlotWidget::UpdateGraphs(QString ID, bool force)
 {
@@ -758,8 +1356,6 @@ void PlotWidget::UpdateGraphs(QString ID, bool force)
         if (!XYPlot())
         {
             graph(i)->setData(element->GetPointerPair().first, element->GetPointerPair().second, Tmin);
-            if (__isFFT)
-                CalculateFFT();
         }
         else
         {
@@ -781,6 +1377,12 @@ void PlotWidget::UpdateGraphs(QString ID, bool force)
         if (XData.second && YData.second && XData.second->size() == YData.second->size())
             graph(yIndex)->setData(XData.second, YData.second, 0.0);
     }
+    else if (__isFFT)
+    {
+        CalculateFFT();
+    }
+
+    updateReadout();
 
     // Check if visible and not minimized before replotting
     QWidget* parent = this->parentWidget();
@@ -792,7 +1394,7 @@ void PlotWidget::UpdateGraphs(QString ID, bool force)
         parent = parent->parentWidget();
     }
 
-    if (visibleRegion().rectCount() == 1 && !minimized)
+    if (!visibleRegion().isEmpty() && !minimized)
     {
         bool sameSize = true;
         for (int i = 0; i < graphCount() - 2; ++i)
@@ -1073,6 +1675,8 @@ void PlotWidget::ResetZoom()
         volatile double ymax = *(std::max_element(y->begin(),y->end()));
         xAxis->setRange(xmin-fabs(xmax-xmin)*0.05, xmax+fabs(xmax-xmin)*0.05);
         yAxis->setRange(ymin-fabs(ymax-ymin)*0.05, ymax+fabs(ymax-ymin)*0.05);
+        updateReadout();
+        replot();
         return;
     }
 
@@ -1090,7 +1694,9 @@ void PlotWidget::ResetZoom()
 
     for(int i = 1; i< graphCount();i++)
     {
-        boost::shared_ptr<std::vector<double>> y(graph(i)->GetYDataPointer());
+        boost::shared_ptr<std::vector<double>> y(__isFFT
+                                                  ? graph(i)->GetYFFTPointer()
+                                                  : graph(i)->GetYDataPointer());
 
         if(!y)
             break;
@@ -1114,11 +1720,8 @@ void PlotWidget::ResetZoom()
     }
     else
     {
-        qDebug() << Tmin;
-        qDebug() << x->front()-Tmin;
-        qDebug() << x->back()-Tmin;
-
-        xAxis->setRange(x->front()-Tmin,x->back()-Tmin);
+        const double xOffset = __isFFT ? 0.0 : Tmin;
+        xAxis->setRange(x->front() - xOffset, x->back() - xOffset);
 }
     if(ymin == ymax)
     {
@@ -1130,6 +1733,7 @@ void PlotWidget::ResetZoom()
     else
         yAxis->setRange(ymin-fabs(ymax-ymin)*0.05, ymax+fabs(ymax-ymin)*0.05);
 
+    updateReadout();
     replot();
 }
 
@@ -1277,6 +1881,7 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
         }
         graph()->setPen(graphPen);
     }
+    updateReadout();
     replot();
 
     if(DP.first && DP.second)
@@ -1354,42 +1959,60 @@ void PlotWidget::dropEvent(QDropEvent *event)
 
 void PlotWidget::mouseReleaseEventII(QMouseEvent *mouse)
 {
+    if (MiddlePressed)
+    {
+        MiddlePressed = false;
+        updateBoxZoomRectangle(mouse->pos());
+        rectZoom->setVisible(false);
+        const double x1 = rectZoom->topLeft->coords().x();
+        const double y1 = rectZoom->topLeft->coords().y();
+        const double x2 = rectZoom->bottomRight->coords().x();
+        const double y2 = rectZoom->bottomRight->coords().y();
 
-    Q_UNUSED(mouse);
+        if (BoxZoomAxes.testFlag(Qt::Horizontal) && x1 != x2)
+            xAxis->setRange(std::min(x1, x2), std::max(x1, x2));
+        if (BoxZoomAxes.testFlag(Qt::Vertical) && y1 != y2)
+            yAxis->setRange(std::min(y1, y2), std::max(y1, y2));
 
-    if(this->MiddlePressed){
-        this->MiddlePressed = 0;
-    rectZoom->setVisible(false);
-    auto x1 = rectZoom->topLeft->coords().x();
-    auto y1 = rectZoom->topLeft->coords().y();
-    auto x2 = rectZoom->bottomRight->coords().x();
-    auto y2 = rectZoom->bottomRight->coords().y();
-
-    xAxis->setRange(x1, x2);
-    yAxis->setRange(y1, y2);
-
-    rectZoom->topLeft->setCoords(0,0);
-    rectZoom->bottomRight->setCoords(0,0);
-
-    rectZoom->setVisible(false);
-
-    replot();
+        rectZoom->topLeft->setCoords(0, 0);
+        rectZoom->bottomRight->setCoords(0, 0);
+        updateReadout();
+        replot();
     }
 
+    DraggedCursor = 0;
 }
 
 
 void PlotWidget::mouseMoveEventII(QMouseEvent *mouse)
 {
-
-
-    this->SB->showMessage(QString("Coordinates: x = '%1', y = '%2'").arg(xAxis->pixelToCoord(mouse->pos().x())).arg(yAxis->pixelToCoord(mouse->pos().y())),10000);
-    if(this->ControlPressed && this->MiddlePressed)
+    if (SB)
     {
-        double X = xAxis->pixelToCoord(mouse->x());
-        double Y = yAxis->pixelToCoord(mouse->y());
-        rectZoom->bottomRight->setCoords(X, Y);
+        const double rawX = xAxis->pixelToCoord(mouse->pos().x());
+        const bool isTimeDomain = !__isFFT && !mXYPlot;
+        const double displayX = isTimeDomain ? rawX * timeAxisScaleFactor() : rawX;
+        const QString unit = isTimeDomain ? QString(" %1").arg(timeAxisUnitText()) : QString();
+        SB->showMessage(QString("Coordinates: x = '%1%2', y = '%3'")
+                            .arg(scopeValueText(displayX), unit, scopeValueText(yAxis->pixelToCoord(mouse->pos().y()))),
+                        10000);
+    }
+
+    if (MiddlePressed)
+    {
+        updateBoxZoomRectangle(mouse->pos());
         replot();
+    }
+    else if (DraggedCursor != 0 && mouse->buttons().testFlag(Qt::LeftButton))
+    {
+        const double x = xAxis->pixelToCoord(mouse->pos().x());
+        if (DraggedCursor == 1)
+            CursorA.x = x;
+        else if (DraggedCursor == 2)
+            CursorB.x = x;
+
+        updateCursorItems();
+        updateReadout();
+        replot(QCustomPlot::rpQueued);
     }
 }
 
@@ -1399,8 +2022,7 @@ void PlotWidget::keyPressEvent( QKeyEvent * event )
     if (event->key() == Qt::Key_Control)
     {
         this->ControlPressed = true;
-         setInteractions( QCP::iSelectAxes |
-                                  QCP::iSelectLegend | QCP::iSelectPlottables);
+        setInteractions(QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
     }
 }
 
@@ -1411,9 +2033,7 @@ void PlotWidget::keyReleaseEvent(QKeyEvent * event )
     {
         this->ControlPressed = false;
         this->MiddlePressed = false;
-        setInteractions( QCP::iRangeDrag |QCP::iRangeZoom | QCP::iSelectAxes |
-                                            QCP::iSelectLegend | QCP::iSelectPlottables);
-
+        setToolMode(CurrentToolMode);
     }
 }
 
@@ -1430,15 +2050,18 @@ void PlotWidget::mousePressEventII(QMouseEvent *mouse)
   else
     axisRect()->setRangeDrag(Qt::Horizontal|Qt::Vertical);
 
-  if(this->ControlPressed && mouse->button()==Qt::LeftButton)
- {
-      this->MiddlePressed = 1;
-     double X = xAxis->pixelToCoord(mouse->x());
-     double Y = yAxis->pixelToCoord(mouse->y());
-      rectZoom->topLeft->setCoords(X, Y);
-      rectZoom->setVisible(true);
-      rectZoom->bottomRight->setCoords(X, Y);
+  if (mouse->button() != Qt::LeftButton)
+      return;
+
+  if (ControlPressed || CurrentToolMode == PlotToolMode::BoxZoom)
+  {
+      beginBoxZoom(mouse);
       replot();
+  }
+  else if (CurrentToolMode == PlotToolMode::DoubleCursor)
+  {
+      placeOrMoveCursor(mouse);
+      replot(QCustomPlot::rpQueued);
   }
 }
 
@@ -1656,6 +2279,13 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
     QString YLabel;
     bool IsXYPlot = false;
     QString XData;
+    int timeAxisUnit = static_cast<int>(TimeAxisUnit::Seconds);
+    int scopeToolMode = static_cast<int>(PlotToolMode::Navigate);
+    bool showCursors = false;
+    bool cursorAActive = false;
+    bool cursorBActive = false;
+    double cursorAX = 0.0;
+    double cursorBX = 0.0;
 
     for(auto itt : Attributes)
     {
@@ -1677,6 +2307,22 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
             XData = itt.second;
         else if(itt.first == QString("isFFT"))
             __isFFT = itt.second.toInt();
+        else if(itt.first == QString("TimeAxisUnit"))
+            timeAxisUnit = itt.second.toInt();
+        else if(itt.first == QString("ScopeToolMode"))
+            scopeToolMode = itt.second.toInt();
+        else if(itt.first == QString("ShowCursors"))
+            showCursors = itt.second.toInt();
+        else if(itt.first == QString("ScopeReadoutVisible"))
+            showCursors = itt.second.toInt();
+        else if(itt.first == QString("ScopeCursorAActive"))
+            cursorAActive = itt.second.toInt();
+        else if(itt.first == QString("ScopeCursorBActive"))
+            cursorBActive = itt.second.toInt();
+        else if(itt.first == QString("ScopeCursorAX"))
+            cursorAX = itt.second.toDouble();
+        else if(itt.first == QString("ScopeCursorBX"))
+            cursorBX = itt.second.toDouble();
 
     }
 
@@ -1694,6 +2340,29 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
        yAxis->setLabel(YLabel);
        SetXDataName(XData);
        SetXYPlot(IsXYPlot);
+       if (timeAxisUnit >= static_cast<int>(TimeAxisUnit::Seconds) &&
+           timeAxisUnit <= static_cast<int>(TimeAxisUnit::Microseconds))
+           CurrentTimeAxisUnit = static_cast<TimeAxisUnit>(timeAxisUnit);
+       if (TimeUnitComboBox)
+       {
+           TimeUnitComboBox->blockSignals(true);
+           TimeUnitComboBox->setCurrentIndex(static_cast<int>(CurrentTimeAxisUnit));
+           TimeUnitComboBox->blockSignals(false);
+       }
+       updateTimeAxisPresentation();
+
+       CursorA.active = cursorAActive;
+       CursorA.x = cursorAX;
+       CursorB.active = cursorAActive && cursorBActive;
+       CursorB.x = cursorBX;
+       if (scopeToolMode == 3)
+           scopeToolMode = static_cast<int>(PlotToolMode::DoubleCursor);
+       if (scopeToolMode >= static_cast<int>(PlotToolMode::Navigate) &&
+           scopeToolMode <= static_cast<int>(PlotToolMode::DoubleCursor))
+           setToolMode(static_cast<PlotToolMode>(scopeToolMode));
+       else
+           setToolMode(PlotToolMode::Navigate);
+       setCursorsVisible(showCursors);
 
        return true;
 }
@@ -1733,9 +2402,38 @@ bool PlotWidget::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes,
     Attribut.second =  QString::number(__isFFT);
     Attributes.push_back(Attribut);
 
+    Attribut.first = "TimeAxisUnit";
+    Attribut.second = QString::number(static_cast<int>(CurrentTimeAxisUnit));
+    Attributes.push_back(Attribut);
+
+    Attribut.first = "ScopeToolMode";
+    Attribut.second = QString::number(static_cast<int>(CurrentToolMode));
+    Attributes.push_back(Attribut);
+
+    Attribut.first = "ShowCursors";
+    Attribut.second = QString::number(CursorsVisible);
+    Attributes.push_back(Attribut);
+
+    Attribut.first = "ScopeCursorAActive";
+    Attribut.second = QString::number(CursorA.active);
+    Attributes.push_back(Attribut);
+
+    Attribut.first = "ScopeCursorAX";
+    Attribut.second = QString::number(CursorA.x, 'g', 17);
+    Attributes.push_back(Attribut);
+
+    Attribut.first = "ScopeCursorBActive";
+    Attribut.second = QString::number(CursorB.active);
+    Attributes.push_back(Attribut);
+
+    Attribut.first = "ScopeCursorBX";
+    Attribut.second = QString::number(CursorB.x, 'g', 17);
+    Attributes.push_back(Attribut);
+
 
     Attribut.first =  "XData";
-    if(XYPlot())
+    Attribut.second.clear();
+    if(XYPlot() && graphCount() > 1)
     {
         if(graph(0)->visible())
             Attribut.second =  graph(1)->ID();
