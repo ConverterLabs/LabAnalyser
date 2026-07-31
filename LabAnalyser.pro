@@ -46,7 +46,7 @@ TEMPLATE = app
 
 
 unix: INCLUDEPATH += /usr/include
-win32: INCLUDEPATH += ../matOut
+LIBS += -lmatio
 
 
 SOURCES += main.cpp\
@@ -162,7 +162,8 @@ QMAKE_CXXFLAGS_RELEASE += -O3
 #QMAKE_CXXFLAGS -= -O3
 
 
-LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5 -lfftw3
+win32: LIBS += -LC:/libraries/CMake-hdf5-1.10.5/build/bin -lhdf5 -lfftw3
+unix: LIBS += -lhdf5 -lfftw3
 
 #QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO
 #QMAKE_CFLAGS_RELEASE = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO

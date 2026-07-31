@@ -10,7 +10,7 @@ Builds LabAnalyser.pro with the MSYS2 MINGW64 Qt toolchain.
 .\build-msys2.ps1 -Clean -Deploy
 
 .EXAMPLE
-.\build-msys2.ps1 -MatOutDir C:\path\to\matOut -Configuration debug
+.\build-msys2.ps1 -Configuration debug
 #>
 
 [CmdletBinding()]
@@ -21,7 +21,6 @@ param(
     [string]$Msys2Root = 'C:\msys64\mingw64',
     [string]$ProjectFile = '',
     [string]$BuildDir = '',
-    [string]$MatOutDir = '',
     [string]$Hdf5LibDir = '',
 
     [int]$Jobs = $env:NUMBER_OF_PROCESSORS,
@@ -93,59 +92,6 @@ function Assert-File {
     }
 }
 
-function Test-MatOutDirectory {
-    param([Parameter(Mandatory)][string]$Path)
-
-    $fullPath = Get-FullPath $Path
-    foreach ($file in @('matOut.h', 'toolsMatlab.c', 'toolsMisc.c')) {
-        if (-not (Test-Path -LiteralPath (Join-Path $fullPath $file) -PathType Leaf)) {
-            return $false
-        }
-    }
-
-    return $true
-}
-
-function Find-DefaultMatOutDir {
-    $candidates = New-Object System.Collections.Generic.List[string]
-    $candidates.Add((Join-Path $ScriptRootPath '..\matOut'))
-
-    $hintFiles = @(
-        (Join-Path $ScriptRootPath 'LabAnalyser.pro.user'),
-        (Join-Path $ScriptRootPath 'LabAnalyser\build\Desktop_Qt_6_9_2_shared_MinGW_w64_MINGW64_MSYS2-Release\Makefile.Release'),
-        (Join-Path $ScriptRootPath 'LabAnalyser\build\Desktop_Qt_6_9_2_shared_MinGW_w64_MINGW64_MSYS2-Release\Makefile.Debug')
-    )
-
-    foreach ($hintFile in $hintFiles) {
-        if (-not (Test-Path -LiteralPath $hintFile -PathType Leaf)) {
-            continue
-        }
-
-        $matches = Select-String -Path $hintFile -Pattern '(?i)[A-Z]:[/\\](?:[^\s/\\]+[/\\])*matOut(?=\s|$)' -AllMatches
-        foreach ($result in $matches) {
-            foreach ($match in $result.Matches) {
-                $candidates.Add($match.Value.Replace('/', '\'))
-            }
-        }
-    }
-
-    $seen = @{}
-    foreach ($candidate in $candidates) {
-        $fullPath = Get-FullPath $candidate
-        $key = $fullPath.ToLowerInvariant()
-        if ($seen.ContainsKey($key)) {
-            continue
-        }
-
-        $seen[$key] = $true
-        if (Test-MatOutDirectory -Path $fullPath) {
-            return $fullPath
-        }
-    }
-
-    return (Get-FullPath $candidates[0])
-}
-
 function Assert-CleanTargetIsSafe {
     param([Parameter(Mandatory)][string]$Path)
 
@@ -175,10 +121,6 @@ if ([string]::IsNullOrWhiteSpace($ProjectFile)) {
     $ProjectFile = Join-Path $ScriptRootPath 'LabAnalyser.pro'
 }
 $ProjectFile = Get-FullPath $ProjectFile
-if ([string]::IsNullOrWhiteSpace($MatOutDir)) {
-    $MatOutDir = Find-DefaultMatOutDir
-}
-$MatOutDir = Get-FullPath $MatOutDir
 if ([string]::IsNullOrWhiteSpace($BuildDir)) {
     $BuildDir = Join-Path $ScriptRootPath "build\msys2-mingw64-$Configuration"
 }
@@ -217,15 +159,11 @@ if ($Deploy) {
 }
 
 if (-not $SkipExternalChecks) {
-    Assert-Directory -Path $MatOutDir -Description 'matOut include directory'
-    foreach ($file in @('matOut.h', 'toolsMatlab.c', 'toolsMisc.c')) {
-        Assert-File -Path (Join-Path $MatOutDir $file) -Description "matOut file $file"
-    }
-
     Assert-Directory -Path $Hdf5LibDir -Description 'HDF5/FFTW library directory'
-    foreach ($file in @('libhdf5.dll.a', 'libfftw3.dll.a')) {
+    foreach ($file in @('libhdf5.dll.a', 'libfftw3.dll.a', 'libmatio.dll.a')) {
         Assert-File -Path (Join-Path $Hdf5LibDir $file) -Description "import library $file"
     }
+    Assert-File -Path (Join-Path $Msys2Root 'include\matio.h') -Description 'matio header'
 
     Assert-Directory -Path (Join-Path $Msys2Root 'include\highfive') -Description 'HighFive include directory'
 }
@@ -257,7 +195,6 @@ try {
         'win32-g++',
         "CONFIG+=$Configuration",
         "CONFIG-=$configToRemove",
-        "INCLUDEPATH+=$(Convert-ToQMakePath $MatOutDir)",
         "QMAKE_LIBDIR+=$(Convert-ToQMakePath $Hdf5LibDir)"
     )
 
@@ -277,7 +214,7 @@ try {
     if ($Deploy) {
         Invoke-Native -Exe $windeployqt -Arguments @("--$Configuration", '--compiler-runtime', (Convert-ToQMakePath $exePath))
 
-        foreach ($pattern in @('libhdf5*.dll', 'libfftw3*.dll')) {
+        foreach ($pattern in @('libhdf5*.dll', 'libfftw3*.dll', 'libmatio*.dll')) {
             Get-ChildItem -Path $mingwBin -Filter $pattern | ForEach-Object {
                 Copy-Item -LiteralPath $_.FullName -Destination $exeDir -Force
             }

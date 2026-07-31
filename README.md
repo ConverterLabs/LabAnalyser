@@ -40,7 +40,7 @@ Design user interfaces with QTCreator, load them into LabAnalyser, and link the 
 
 Follow these steps using MSYS2, and install the necessary packages:
 
-1. `pacman -Syuu` (run three times to ensure all packages are updated)
+1. `pacman -Syuu` (run as required to update MSYS2)
 2. `pacman -S --needed base-devel mingw-w64-x86_64-toolchain`
 3. `pacman -S mingw-w64-x86_64-qt6`
 4. `pacman -S mingw-w64-x86_64-qt-creator`
@@ -48,33 +48,57 @@ Follow these steps using MSYS2, and install the necessary packages:
 6. `pacman -S mingw-w64-x86_64-highfive`
 7. `pacman -S mingw-w64-x86_64-fftw`
 8. `pacman -S git`
-9. Clone the repository: `git clone https://github.com/EyNuel/matOut.git`
-10. Apply the patch: `patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch`
-11. Open the MinGW-w64 32-Bit or 64-Bit Shell and launch `qtcreator`.
-12. Open `LabAnalyser.pro`
+9. Install matio: `pacman -S mingw-w64-x86_64-matio`
+10. Open the MinGW-w64 64-Bit Shell and launch `qtcreator`.
+11. Open `LabAnalyser.pro`.
 
-### Finding All Dependencies
+The MATLAB MAT-file export uses [matio](https://github.com/tbeu/matio). The
+former `matOut` dependency is no longer required.
 
-```bash
-ldd ~/build64/* | grep -iv system32 | grep -vi windows | grep -v :$ | cut -f2 -d\> | cut -f1 -d\( | tr \\ / | while read a; do ! [ -e "build64/`basename $a`" ] && cp -v "$a" ~/build64/; done
+For a scripted build, run this from the repository root in PowerShell:
+
+```powershell
+.\build-msys2.ps1 -Configuration release -Clean -Deploy
 ```
+
+The executable and its runtime dependencies are placed in:
+
+```text
+build\msys2-mingw64-release\release
+```
+
+`-Deploy` uses `windeployqt` and copies the HDF5, FFTW, and matio runtime DLLs
+next to `LabAnalyser.exe`.
 
 ## For Linux (Tested on Arch Linux)
 
-1. Install Boost libraries:
-   - `pacman -S boost-libs`
-2. Install HighFive:
-   - From AUR: `yay -S highfive` or `yaourt -S highfive`
-3. Prepare the build environment:
-   - `mkdir build && mkdir build/libs/`
-   - `cd build/libs/`
-   - `git clone https://github.com/EyNuel/matOut.git`
-   - `cd matOut`
-   - `patch < ../../../build-patches/MatOut-0001-Changes-to-use-the-lib-in-LabAnalyser.patch`
-   - `cd ../../`
-   - `qmake ../`
-   - `make`
+1. Install the required development packages using the distribution package
+   manager:
+   - Qt 6, Boost, HighFive, matio, FFTW, and HDF5
+2. Prepare the build environment:
+   - `mkdir -p build/linux && cd build/linux`
+   - `qmake ../../LabAnalyser.pro`
+   - `make -j$(nproc)`
    - If successful, execute: `./LabAnalyser`
+
+## Jenkins build
+
+The Jenkins controller can run on Ubuntu. The build itself should run on a
+Windows Jenkins agent with the MSYS2 MINGW64 toolchain installed. This avoids
+maintaining a separate Linux-to-Windows cross-compilation toolchain.
+
+Configure the Windows agent with the label `windows-msys2` and make sure the
+repository is available there. The agent needs the same MSYS2 packages listed
+above, including `mingw-w64-x86_64-matio`.
+
+Create a Pipeline job using the repository's `Jenkinsfile`. The pipeline runs:
+
+```powershell
+.\build-msys2.ps1 -Configuration release -Clean -Deploy
+```
+
+The resulting archive contains `LabAnalyser.exe` and the required Qt, MinGW,
+HDF5, FFTW, and matio DLLs and is published as a Jenkins artifact.
 
 # Known Bugs
 

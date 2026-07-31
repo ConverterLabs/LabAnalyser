@@ -43,8 +43,7 @@ and can deploy the Qt runtime plus HDF5 and FFTW DLLs next to the executable.
 
 LabAnalyser additionally requires:
 
-- a `matOut` directory containing `matOut.h`, `toolsMatlab.c`, and
-  `toolsMisc.c`; pass it with `-MatOutDir` when it is not found automatically
+- the MSYS2 MINGW64 matio package (`matio.h` and `libmatio.dll.a`)
 - MSYS2 MINGW64 import libraries `libhdf5.dll.a` and `libfftw3.dll.a`
 - the HighFive headers below `C:\msys64\mingw64\include\highfive`
 
@@ -58,7 +57,6 @@ New-Item -ItemType Directory -Force build\msys2-mingw64-release | Out-Null
 Push-Location build\msys2-mingw64-release
 & C:\msys64\mingw64\bin\qmake6.exe ..\..\LabAnalyser.pro -spec win32-g++ `
     'CONFIG+=release' 'CONFIG-=debug' `
-    'INCLUDEPATH+=C:/Projekte/2025/LabAnalyser/matOut' `
     'QMAKE_LIBDIR+=C:/msys64/mingw64/lib'
 & C:\msys64\mingw64\bin\mingw32-make.exe -j$env:NUMBER_OF_PROCESSORS
 Pop-Location
