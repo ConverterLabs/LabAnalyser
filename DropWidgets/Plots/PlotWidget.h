@@ -111,6 +111,7 @@ private slots:
         void ClearScopeCursors();
         void updateCursorItems();
         void updateReadout();
+        void measurementCellDoubleClicked(int row, int column);
         void setTimeAxisUnit(int index);
         void updateTimeAxisTickLabels();
 
@@ -149,6 +150,9 @@ private:
     void updateMeasurementPanelGeometry();
     void setToolMode(PlotToolMode mode);
     void setCursorsVisible(bool visible);
+    void setCursorSyncEnabled(bool enabled);
+    void setCursorSpacingFromFrequency(double frequency);
+    void setCursorPosition(int cursor, double x);
     void initializeCursorPositions();
     bool cursorMeasurementVisible() const;
     int measurementPanelHeight() const;
@@ -186,6 +190,8 @@ bool _touchDevice;
     QToolButton *BoxZoomToolButton = nullptr;
     QToolButton *DoubleCursorToolButton = nullptr;
     QToolButton *CursorsToolButton = nullptr;
+    QToolButton *CursorSyncToolButton = nullptr;
+    QToolButton *SpectrumToolButton = nullptr;
     QComboBox *TimeUnitComboBox = nullptr;
     PlotToolMode CurrentToolMode = PlotToolMode::Navigate;
     TimeAxisUnit CurrentTimeAxisUnit = TimeAxisUnit::Seconds;
@@ -193,6 +199,7 @@ bool _touchDevice;
     ScopeCursor CursorB;
     int DraggedCursor = 0;
     bool CursorsVisible = false;
+    bool CursorSynced = false;
     QHash<QCPGraph*, GraphDisplayState> TimeDomainGraphStyles;
     QCPRange TimeDomainXRange;
     bool HasTimeDomainXRange = false;

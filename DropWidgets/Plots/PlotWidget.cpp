@@ -29,7 +29,13 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QIcon>
+#include <QInputDialog>
 #include <QLabel>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QDoubleValidator>
+#include <QFormLayout>
 #include <QPixmap>
 #include <QResizeEvent>
 #include <QTableWidget>
@@ -40,6 +46,48 @@
 #include <limits>
 
 #define UseFFTW
+
+namespace
+{
+
+class FlexibleDoubleSpinBox : public QDoubleSpinBox
+{
+public:
+    using QDoubleSpinBox::QDoubleSpinBox;
+
+protected:
+    double valueFromText(const QString &text) const override
+    {
+        bool ok = false;
+        QString normalized = text.trimmed();
+        normalized.replace(',', '.');
+        const double value = QLocale::c().toDouble(normalized, &ok);
+        return ok ? value : this->value();
+    }
+
+    QString textFromValue(double value) const override
+    {
+        QString text = QLocale::c().toString(value, 'f', decimals());
+        while (text.contains('.') && text.endsWith('0'))
+            text.chop(1);
+        if (text.endsWith('.'))
+            text.chop(1);
+        if (text == "-0")
+            text = "0";
+        return text;
+    }
+
+    QValidator::State validate(QString &text, int &position) const override
+    {
+        QString normalized = text;
+        normalized.replace(',', '.');
+        QDoubleValidator validator(minimum(), maximum(), decimals());
+        validator.setLocale(QLocale::c());
+        return validator.validate(normalized, position);
+    }
+};
+
+}
 
 PlotWidget::PlotWidget(MainWindow *MW, QWidget *parent, QStatusBar *SBI, bool isFFT) :
     QCustomPlot(parent)
@@ -201,6 +249,9 @@ void PlotWidget::initializeMeasurementPanel()
     MeasurementTable->setColumnWidth(MeasurementTable->columnCount() - 2, 76);
     panelLayout->addWidget(MeasurementTable);
 
+    connect(MeasurementTable, &QTableWidget::cellDoubleClicked,
+            this, &PlotWidget::measurementCellDoubleClicked);
+
     MeasurementPanel->hide();
 }
 
@@ -255,6 +306,11 @@ void PlotWidget::initializePlotTools()
     toolLayout->addWidget(TimeUnitComboBox);
     DoubleCursorToolButton = makeToolButton(":/icons/icons/12.png", "Move the nearest cursor");
     CursorsToolButton = makeToolButton(":/icons/icons/Cursors.png", "Show measurement cursors");
+    CursorSyncToolButton = makeToolButton(":/icons/icons/sync.png", "Keep the cursor distance synchronized");
+    CursorSyncToolButton->setCheckable(true);
+    SpectrumToolButton = makeToolButton(":/icons/icons/spectrum-line.png", "Toggle time/frequency domain");
+    SpectrumToolButton->setCheckable(true);
+    SpectrumToolButton->setChecked(__isFFT);
     QToolButton *clearButton = makeToolButton(":/icons/icons/Clear.png", "Hide cursors");
     QToolButton *resetButton = makeToolButton(":/icons/icons/Reset.png", "Reset zoom");
 
@@ -275,6 +331,8 @@ void PlotWidget::initializePlotTools()
     connect(TimeUnitComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &PlotWidget::setTimeAxisUnit);
     connect(CursorsToolButton, &QToolButton::toggled, this, &PlotWidget::ToggleCursors);
+    connect(CursorSyncToolButton, &QToolButton::toggled, this, &PlotWidget::setCursorSyncEnabled);
+    connect(SpectrumToolButton, &QToolButton::clicked, this, &PlotWidget::ToggleTimeFreq);
     connect(clearButton, &QToolButton::clicked, this, &PlotWidget::ClearScopeCursors);
     connect(resetButton, &QToolButton::clicked, this, &PlotWidget::ResetZoom);
     toolLayout->addStretch(1);
@@ -406,6 +464,185 @@ void PlotWidget::setCursorsVisible(bool visible)
     replot(QCustomPlot::rpQueued);
 }
 
+void PlotWidget::setCursorSyncEnabled(bool enabled)
+{
+    if (enabled && !CursorSynced)
+    {
+        if (!CursorA.active || !CursorB.active)
+            enabled = false;
+        else
+        {
+            const double currentDelta = std::fabs(CursorB.x - CursorA.x);
+            if (!std::isfinite(currentDelta) || currentDelta <= 0.0)
+                enabled = false;
+            else
+            {
+                const double scale = 1000.0;
+                QDialog dialog(this);
+                dialog.setWindowTitle("Synchronize cursors");
+                dialog.setMinimumWidth(280);
+
+                QFormLayout formLayout(&dialog);
+                FlexibleDoubleSpinBox deltaInput;
+                FlexibleDoubleSpinBox frequencyInput;
+                for (QDoubleSpinBox *input : {&deltaInput, &frequencyInput})
+                {
+                    input->setButtonSymbols(QAbstractSpinBox::NoButtons);
+                    input->setMinimumWidth(145);
+                    input->setAlignment(Qt::AlignLeft);
+                    input->setStyleSheet(
+                        "QDoubleSpinBox { padding: 5px 8px; border: 1px solid #9aa7b5; "
+                        "border-radius: 4px; background: palette(base); }"
+                        "QDoubleSpinBox:focus { border: 2px solid #3d8bfd; padding: 4px 7px; }");
+                }
+                deltaInput.setRange(std::numeric_limits<double>::min(),
+                                    std::numeric_limits<double>::max());
+                frequencyInput.setRange(std::numeric_limits<double>::min(),
+                                        std::numeric_limits<double>::max());
+                deltaInput.setDecimals(12);
+                frequencyInput.setDecimals(12);
+                const double currentDeltaMs = currentDelta * scale;
+                const double threeDecimalDeltaMs = std::floor(currentDeltaMs * 1000.0) / 1000.0;
+                const double initialDeltaMs = threeDecimalDeltaMs > 0.0
+                        ? threeDecimalDeltaMs
+                        : currentDeltaMs;
+                deltaInput.setValue(initialDeltaMs);
+                frequencyInput.setValue(1.0 / (initialDeltaMs / scale));
+                formLayout.addRow("Δt [ms]:", &deltaInput);
+                formLayout.addRow("f1 [Hz]:", &frequencyInput);
+
+                QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+                formLayout.addRow(&buttons);
+                connect(&buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+                connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+                connect(&deltaInput, qOverload<double>(&QDoubleSpinBox::valueChanged),
+                        [&frequencyInput, scale](double value) {
+                            if (value > 0.0)
+                            {
+                                frequencyInput.blockSignals(true);
+                                frequencyInput.setValue(1.0 / (value / scale));
+                                frequencyInput.blockSignals(false);
+                            }
+                        });
+                connect(&frequencyInput, qOverload<double>(&QDoubleSpinBox::valueChanged),
+                        [&deltaInput, scale](double value) {
+                            if (value > 0.0)
+                            {
+                                deltaInput.blockSignals(true);
+                                deltaInput.setValue(scale / value);
+                                deltaInput.blockSignals(false);
+                            }
+                        });
+
+                if (dialog.exec() != QDialog::Accepted || deltaInput.value() <= 0.0)
+                    enabled = false;
+                else
+                {
+                    CursorSynced = true;
+                    setCursorSpacingFromFrequency(1.0 / (deltaInput.value() / scale));
+                }
+            }
+        }
+    }
+
+    if (!enabled)
+        CursorSynced = false;
+    if (CursorSyncToolButton && CursorSyncToolButton->isChecked() != enabled)
+    {
+        CursorSyncToolButton->blockSignals(true);
+        CursorSyncToolButton->setChecked(enabled);
+        CursorSyncToolButton->blockSignals(false);
+    }
+    updateReadout();
+}
+
+void PlotWidget::setCursorPosition(int cursor, double x)
+{
+    if (!CursorSynced || !CursorA.active || !CursorB.active)
+    {
+        if (cursor == 1)
+            CursorA.x = x;
+        else if (cursor == 2)
+            CursorB.x = x;
+        return;
+    }
+
+    const double spacing = CursorB.x - CursorA.x;
+    const QCPRange range = xAxis->range();
+    double newA = cursor == 1 ? x : x - spacing;
+    double newB = cursor == 2 ? x : x + spacing;
+    const double requiredSpan = std::fabs(spacing);
+
+    if (requiredSpan >= range.size())
+    {
+        const double center = (newA + newB) / 2.0;
+        xAxis->setRange(center - requiredSpan * 0.55, center + requiredSpan * 0.55);
+    }
+    else
+    {
+        const double lowerCursor = std::min(newA, newB);
+        const double upperCursor = std::max(newA, newB);
+        if (lowerCursor < range.lower)
+        {
+            const double shift = range.lower - lowerCursor;
+            newA += shift;
+            newB += shift;
+        }
+        if (upperCursor > range.upper)
+        {
+            const double shift = range.upper - upperCursor;
+            newA += shift;
+            newB += shift;
+        }
+    }
+
+    CursorA.x = newA;
+    CursorB.x = newB;
+}
+
+void PlotWidget::setCursorSpacingFromFrequency(double frequency)
+{
+    if (!std::isfinite(frequency) || frequency <= 0.0 || !CursorA.active || !CursorB.active)
+        return;
+
+    const double spacing = 1.0 / frequency;
+    const double direction = CursorB.x >= CursorA.x ? 1.0 : -1.0;
+    const double center = (CursorA.x + CursorB.x) / 2.0;
+    CursorA.x = center - direction * spacing / 2.0;
+    CursorB.x = center + direction * spacing / 2.0;
+    setCursorPosition(1, CursorA.x);
+    updateCursorItems();
+    updateReadout();
+    replot(QCustomPlot::rpQueued);
+}
+
+void PlotWidget::measurementCellDoubleClicked(int row, int column)
+{
+    if (row != 0 || column != 4 || !CursorA.active || !CursorB.active)
+        return;
+
+    const double delta = std::fabs(CursorB.x - CursorA.x);
+    if (!std::isfinite(delta) || delta <= 0.0)
+        return;
+
+    bool accepted = false;
+    const double frequency = QInputDialog::getDouble(
+        this, "Set cursor frequency", "1/dT [Hz]:", 1.0 / delta,
+        std::numeric_limits<double>::min(), std::numeric_limits<double>::max(), 9,
+        &accepted);
+    if (accepted)
+    {
+        CursorSynced = true;
+        if (CursorSyncToolButton && !CursorSyncToolButton->isChecked())
+        {
+            CursorSyncToolButton->blockSignals(true);
+            CursorSyncToolButton->setChecked(true);
+            CursorSyncToolButton->blockSignals(false);
+        }
+        setCursorSpacingFromFrequency(frequency);
+    }
+}
+
 void PlotWidget::ToggleCursors(bool visible)
 {
     setCursorsVisible(visible);
@@ -469,12 +706,12 @@ void PlotWidget::placeOrMoveCursor(QMouseEvent *mouse)
     {
         if (std::fabs(x - CursorA.x) <= std::fabs(x - CursorB.x))
         {
-            CursorA.x = x;
+            setCursorPosition(1, x);
             DraggedCursor = 1;
         }
         else
         {
-            CursorB.x = x;
+            setCursorPosition(2, x);
             DraggedCursor = 2;
         }
     }
@@ -1085,23 +1322,17 @@ if (graphCount() > 0)
         menu->addAction("Toggle Time/Frequency Domain", this, SLOT(ToggleTimeFreq()));
         menu->addSeparator();
       }
-      {
-        menu->addAction("Show Quality Criteria", this, SLOT(ShowQualityCriteria()));
-        menu->addSeparator();
-      }
-
+      QAction *showCursorsAction = menu->addAction("Show Cursor Data");
+      showCursorsAction->setCheckable(true);
+      showCursorsAction->setChecked(CursorsVisible);
+      connect(showCursorsAction, &QAction::toggled, this, &PlotWidget::ToggleCursors);
+      menu->addSeparator();
       menu->addAction("Update Data", this, [this]() { UpdateGraphs("", true); });
       menu->addAction("Reset Zoom", this, SLOT(ResetZoom()));
     }
 
 
 }
- QAction *showCursorsAction = menu->addAction("Show Cursors");
- showCursorsAction->setCheckable(true);
- showCursorsAction->setChecked(CursorsVisible);
- connect(showCursorsAction, &QAction::toggled, this, &PlotWidget::ToggleCursors);
- // menu->addAction("Add random graph", this, SLOT(addRandomGraph()));
-        menu->addSeparator();
  menu->popup(mapToGlobal(pos));
 // menu->resize(menu->size().width(), menu->size().height()*1.1); //Bugfix QT6 and DPI Scaling
 
@@ -1256,6 +1487,12 @@ void PlotWidget::ToggleTimeFreq(void)
 
     updateCursorItems();
     updateReadout();
+    if (SpectrumToolButton && SpectrumToolButton->isChecked() != __isFFT)
+    {
+        SpectrumToolButton->blockSignals(true);
+        SpectrumToolButton->setChecked(__isFFT);
+        SpectrumToolButton->blockSignals(false);
+    }
     replot();
 }
 void PlotWidget::UpdateGraphs(QString ID, bool force)
@@ -2006,9 +2243,9 @@ void PlotWidget::mouseMoveEventII(QMouseEvent *mouse)
     {
         const double x = xAxis->pixelToCoord(mouse->pos().x());
         if (DraggedCursor == 1)
-            CursorA.x = x;
+            setCursorPosition(1, x);
         else if (DraggedCursor == 2)
-            CursorB.x = x;
+            setCursorPosition(2, x);
 
         updateCursorItems();
         updateReadout();

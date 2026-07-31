@@ -22,5 +22,7 @@
         <file>icons/Reset.png</file>
         <file>icons/12.png</file>
         <file>icons/Zoom.png</file>
+        <file>icons/sync.png</file>
+        <file>icons/spectrum-line.png</file>
     </qresource>
 </RCC>

@@ -4,9 +4,7 @@
 #include <cmath>
 #include <limits>
 
-#ifdef LABANALYSER_USE_FFTW
 #include <fftw3.h>
-#endif
 
 namespace
 {
@@ -205,7 +203,7 @@ double calculateThdPercent(const std::vector<Sample> &samples, double lowerX, do
     const int highestHarmonic = pointCount / 2;
     std::vector<double> magnitudes(highestHarmonic + 1, 0.0);
 
-#ifdef LABANALYSER_USE_FFTW
+
     fftw_complex *input = static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex) * pointCount));
     fftw_complex *output = static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex) * pointCount));
     if (!input || !output)
@@ -235,20 +233,7 @@ double calculateThdPercent(const std::vector<Sample> &samples, double lowerX, do
     fftw_destroy_plan(plan);
     fftw_free(input);
     fftw_free(output);
-#else
-    for (int harmonic = 1; harmonic <= highestHarmonic; ++harmonic)
-    {
-        double real = 0.0;
-        double imaginary = 0.0;
-        for (int sample = 0; sample < pointCount; ++sample)
-        {
-            const double angle = 2.0 * kPi * harmonic * sample / pointCount;
-            real += resampled[sample] * std::cos(angle);
-            imaginary -= resampled[sample] * std::sin(angle);
-        }
-        magnitudes[harmonic] = 2.0 * std::sqrt(real * real + imaginary * imaginary) / pointCount;
-    }
-#endif
+
 
     const double fundamentalRms = magnitudes[1] / std::sqrt(2.0);
     if (!isFinite(fundamentalRms) || fundamentalRms <= std::numeric_limits<double>::epsilon())
