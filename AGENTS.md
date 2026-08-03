@@ -38,8 +38,23 @@ The repository provides `build-msys2.ps1`. Run it from the repository root:
 ```
 
 The script creates an out-of-source build directory at
-`build\msys2-mingw64-<configuration>`. It validates the external dependencies
-and can deploy the Qt runtime plus HDF5 and FFTW DLLs next to the executable.
+`build\msys2-mingw64-<configuration>`. It validates the external dependencies.
+With `-Deploy`, it additionally creates a clean standalone directory at
+`dist\LabAnalyser-<configuration>`. That directory contains the executable,
+Qt runtime, compiler runtime, and the required HDF5, FFTW, matio, and native
+transitive dependency DLLs. Generated object files and qmake build files stay
+in the separate `build` directory and are not copied into the standalone
+directory.
+
+For a clean release package, use:
+
+```powershell
+.\build-msys2.ps1 -Configuration release -Clean -Deploy
+```
+
+The resulting standalone application is in
+`dist\LabAnalyser-release`. The deployment directory is removed and recreated
+on every `-Deploy` run.
 
 LabAnalyser additionally requires:
 

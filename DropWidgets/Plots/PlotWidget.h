@@ -38,6 +38,7 @@ class QComboBox;
 class QFrame;
 class QLabel;
 class QResizeEvent;
+class QScrollBar;
 class QToolButton;
 class QTableWidget;
 
@@ -147,6 +148,7 @@ private:
     void initializePlotTools();
     void initializeMeasurementPanel();
     void updateToolboxGeometry();
+    void updateLegendGeometry();
     void updateMeasurementPanelGeometry();
     void setToolMode(PlotToolMode mode);
     void setCursorsVisible(bool visible);
@@ -183,6 +185,7 @@ bool _touchDevice;
     QCPItemLine *CursorLineB = nullptr;
     QFrame *PlotToolbox = nullptr;
     QFrame *MeasurementPanel = nullptr;
+    QScrollBar *LegendScrollBar = nullptr;
     QLabel *CursorSummaryLabel = nullptr;
     QTableWidget *MeasurementTable = nullptr;
     QButtonGroup *ScopeToolButtons = nullptr;

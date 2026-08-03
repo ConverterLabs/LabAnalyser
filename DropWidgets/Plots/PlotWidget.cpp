@@ -38,6 +38,8 @@
 #include <QFormLayout>
 #include <QPixmap>
 #include <QResizeEvent>
+#include <QScrollBar>
+#include <QSignalBlocker>
 #include <QTableWidget>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -86,6 +88,129 @@ protected:
         return validator.validate(normalized, position);
     }
 };
+
+class ScrollableLegend final : public QCPLegend
+{
+public:
+    using QCPLegend::QCPLegend;
+
+    void setScrollBar(QScrollBar *scrollBar)
+    {
+        scrollBar_ = scrollBar;
+        connect(scrollBar_, &QScrollBar::valueChanged, this, [this](int) {
+            if (parentPlot())
+                parentPlot()->replot(QCustomPlot::rpQueued);
+        });
+    }
+
+    void updateLayout() override
+    {
+        QCPLayoutGrid::updateLayout();
+
+        if (!scrollBar_ || !visible() || itemCount() == 0)
+        {
+            if (scrollBar_)
+                scrollBar_->hide();
+            return;
+        }
+
+        QCPAbstractLegendItem *firstItem = item(0);
+        QCPAbstractLegendItem *lastItem = item(itemCount() - 1);
+        if (!firstItem || !lastItem)
+        {
+            scrollBar_->hide();
+            return;
+        }
+
+        const QRect firstBaseRect = firstItem->outerRect();
+        const QRect lastBaseRect = lastItem->outerRect();
+        const int viewportTop = firstBaseRect.top();
+        const int viewportBottom = lastBaseRect.bottom();
+        const int viewportHeight = qMax(0, viewportBottom - viewportTop + 1);
+
+        QVector<int> rowHeights;
+        rowHeights.reserve(itemCount());
+        int contentHeight = 0;
+        for (int index = 0; index < itemCount(); ++index)
+        {
+            const int rowHeight = qMax(1, item(index)->minimumSizeHint().height());
+            rowHeights.append(rowHeight);
+            contentHeight += rowHeight;
+        }
+        contentHeight += qMax(0, itemCount() - 1) * rowSpacing();
+
+        const int maximumScroll = qMax(0, contentHeight - viewportHeight);
+        {
+            const QSignalBlocker blocker(scrollBar_);
+            scrollBar_->setRange(0, maximumScroll);
+            scrollBar_->setPageStep(viewportHeight);
+            scrollBar_->setSingleStep(rowHeights.isEmpty() ? 1 : rowHeights.first() + rowSpacing());
+            if (scrollBar_->value() > maximumScroll)
+                scrollBar_->setValue(maximumScroll);
+        }
+
+        const QRect legendRect = outerRect();
+        const int scrollBarWidth = scrollBar_->sizeHint().width();
+        scrollBar_->setGeometry(legendRect.right() - scrollBarWidth + 1,
+                                legendRect.top(),
+                                scrollBarWidth,
+                                legendRect.height());
+        scrollBar_->setVisible(maximumScroll > 0);
+        scrollBar_->raise();
+
+        const int scrollOffset = scrollBar_->value();
+        int rowTop = viewportTop - scrollOffset;
+        for (int index = 0; index < itemCount(); ++index)
+        {
+            QCPAbstractLegendItem *legendItem = item(index);
+            if (!legendItem)
+                continue;
+
+            QRect itemRect = legendItem->outerRect();
+            itemRect.moveTop(rowTop);
+            itemRect.setHeight(rowHeights.at(index));
+            legendItem->setOuterRect(itemRect);
+
+            const bool fullyVisible = itemRect.top() >= viewportTop && itemRect.bottom() <= viewportBottom;
+            legendItem->setVisible(fullyVisible);
+            rowTop += rowHeights.at(index) + rowSpacing();
+        }
+    }
+
+private:
+    QScrollBar *scrollBar_ = nullptr;
+};
+
+QColor legendColorForIndex(int index)
+{
+    static const QList<QColor> colors = {
+        QColor(0, 114, 189),
+        QColor(217, 83, 25),
+        QColor(237, 177, 32),
+        QColor(126, 47, 142),
+        QColor(119, 172, 48),
+        QColor(77, 190, 238),
+        QColor(162, 20, 47),
+        QColor(0, 158, 115),
+        QColor(230, 159, 0),
+        QColor(86, 180, 233),
+        QColor(204, 121, 167),
+        QColor(0, 0, 0),
+        QColor(240, 228, 66),
+        QColor(213, 94, 0),
+        QColor(0, 114, 178),
+        QColor(117, 112, 179),
+        QColor(166, 206, 227),
+        QColor(255, 127, 0),
+        QColor(51, 160, 44),
+        QColor(227, 26, 28)
+    };
+
+    if (colors.isEmpty())
+        return Qt::black;
+    const int paletteIndex = ((index % colors.size()) + colors.size()) % colors.size();
+    return colors.at(paletteIndex);
+}
 
 }
 
@@ -159,6 +284,15 @@ else
    Highlight.setPointSize(fontP.pointSize());
    xAxis->setSelectedLabelFont(Highlight);
    yAxis->setSelectedLabelFont(Highlight);
+
+   axisRect()->insetLayout()->remove(legend);
+   auto *scrollableLegend = new ScrollableLegend;
+   legend = scrollableLegend;
+   axisRect()->insetLayout()->addElement(legend, Qt::AlignRight | Qt::AlignTop);
+   LegendScrollBar = new QScrollBar(Qt::Vertical, this);
+   LegendScrollBar->setObjectName("LegendScrollBar");
+   LegendScrollBar->setFocusPolicy(Qt::NoFocus);
+   scrollableLegend->setScrollBar(LegendScrollBar);
 
 
    legend->setVisible(true);
@@ -354,6 +488,17 @@ void PlotWidget::updateToolboxGeometry()
     PlotToolbox->raise();
 }
 
+void PlotWidget::updateLegendGeometry()
+{
+    if (!legend || !LegendScrollBar)
+        return;
+
+    const int maximumHeight = qMax(96, viewport().height() * 2 / 3);
+    legend->setMaximumSize(QWIDGETSIZE_MAX, maximumHeight);
+    if (!legend->visible())
+        LegendScrollBar->hide();
+}
+
 int PlotWidget::measurementPanelHeight() const
 {
     return qBound(100, height() / 3, 230);
@@ -375,6 +520,7 @@ void PlotWidget::updateMeasurementPanelGeometry()
         MeasurementPanel->hide();
         setViewport(QRect(0, toolboxHeight, width(), qMax(0, height() - toolboxHeight)));
         updateToolboxGeometry();
+        updateLegendGeometry();
         return;
     }
 
@@ -385,6 +531,7 @@ void PlotWidget::updateMeasurementPanelGeometry()
     MeasurementPanel->show();
     MeasurementPanel->raise();
     updateToolboxGeometry();
+    updateLegendGeometry();
 }
 
 void PlotWidget::setToolMode(PlotToolMode mode)
@@ -2114,7 +2261,7 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
             case 5: graphPen.setColor( QColor( 119 ,  172  ,  48)); break;
             case 6: graphPen.setColor( QColor(77 ,  190 ,  238)); break;
             case 7: graphPen.setColor(  QColor( 162 ,   20   , 47)); break;
-            default:  graphPen.setColor( QColor( 217  ,  83  ,  25)); break;;
+            default: graphPen.setColor(legendColorForIndex(graphCount() - 1)); break;
         }
         graph()->setPen(graphPen);
     }

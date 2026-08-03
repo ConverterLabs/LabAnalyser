@@ -61,14 +61,30 @@ For a scripted build, run this from the repository root in PowerShell:
 .\build-msys2.ps1 -Configuration release -Clean -Deploy
 ```
 
-The executable and its runtime dependencies are placed in:
+The compilation files are kept in the separate build directory:
 
 ```text
 build\msys2-mingw64-release\release
 ```
 
-`-Deploy` uses `windeployqt` and copies the HDF5, FFTW, and matio runtime DLLs
-next to `LabAnalyser.exe`.
+`-Deploy` creates a clean standalone directory at:
+
+```text
+dist\LabAnalyser-release
+```
+
+The deployment directory contains `LabAnalyser.exe`, the Qt runtime, the MinGW
+compiler runtime, the required HDF5, FFTW, and matio DLLs, and their native
+transitive dependencies. It does not contain qmake files, object files, or
+other build output. The directory is removed and recreated on every
+`-Deploy` run.
+
+If PowerShell blocks local scripts because of the execution policy, run the
+same build with a process-local policy override:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy
+```
 
 ## For Linux (Tested on Arch Linux)
 
@@ -97,8 +113,9 @@ Create a Pipeline job using the repository's `Jenkinsfile`. The pipeline runs:
 .\build-msys2.ps1 -Configuration release -Clean -Deploy
 ```
 
-The resulting archive contains `LabAnalyser.exe` and the required Qt, MinGW,
-HDF5, FFTW, and matio DLLs and is published as a Jenkins artifact.
+The resulting `dist\LabAnalyser-release` directory contains `LabAnalyser.exe`
+and the required Qt, MinGW, HDF5, FFTW, and matio DLLs and can be published as
+a Jenkins artifact.
 
 # Known Bugs
 
