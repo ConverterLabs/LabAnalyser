@@ -11,7 +11,7 @@ IDs and characterization vectors before modifying it.
 | Startup/UI | `main.cpp`; `mainwindow.*`; `About.ui`; `mainwindow.ui` | Application startup, Qt object names, menus/actions, docks, dynamic forms, project lifecycle. | — | mapped, unverified |
 | Data management | `DataManagementClass.*`, `DataManagementSetClass.*`, `DataMessengerClass.*`, `mapper.h` | ID/container registration, alias/min-max, plot/form/device registries, `SetData` and signal ordering. Pointer ownership and lifetime require characterization. | — | mapped, unverified |
 | Plugin API | `plugins/platforminterface.h`, `InterfaceDataType.*`, `LoadSave/loadplugin.*` | Binary plugin ABI, `EchoInterface_iid`, `GetInterface`, `GetSymbol`, messages, XML plugin path/error behavior. | — | mapped, unverified |
-| Experiment XML | `LoadSave/xmlexperimentreader.*`, `xmlexperimentwriter.*` | Read/write `Experiment` elements (Tabs, Devices, Widgets, State, FigureWindows, Connections), relative paths and Qt dock state. Reader/writer return conventions must be recorded before change. | — | mapped, unverified |
+| Experiment XML | `LoadSave/xmlexperimentreader.*`, `xmlexperimentwriter.*`; `UIDataManagementSetClass::{LoadExperiment,SaveExperiment}` | Read/write `Experiment` elements (Tabs, Devices, Widgets, State, FigureWindows, Connections), relative paths and Qt dock state. Reader/writer use `false` for success; unknown XML is skipped. `errorString()` is empty after parse errors; malformed figure widget counts risk unchecked indexing. | `contract/XmlExperimentContractTests::{XML_001..XML_008}` | baseline characterized; plugin-binary and historic-file corpus unverified |
 | Parameter XML | `Import/parameterloader.*`, `Export/exportinputs2xml.*` | Parameter import/export structure, malformed-file handling and data updates. | — | mapped, unverified |
 | MAT/HDF5 export | `Export/Export2Mat.*`, `export2highfive.*` | Names, types, dimensions, numerical data, empty/error behavior for libmatio and HDF5. | — | mapped, unverified |
 | TCP remote control | `RemoteControl/RemoteControlServer.*` | Loopback port selection; binary length/header framing; `set`/`get` request and response bytes; disconnect/error behavior. | — | mapped, unverified |
@@ -57,3 +57,11 @@ evidence of a characterized format yet.
 require the real MainWindow plus persistence/export/plugin boundaries. Full
 function-to-ID mapping, risk findings and per-file coverage appear in
 `DATAMANAGEMENT_3A.md`.
+
+## LoadSave/XML 3B characterization
+
+`contract/XmlExperimentContractTests` maps XML IDs `XML_001` through `XML_008`
+to all public XML reader/writer entry points and their UI manager callers. The
+test project uses the real application object hierarchy; it has no test-only
+seams, so it cannot affect production builds. Detailed mappings, fixture rules,
+defect candidates and exclusions are in `XML_CONTRACTS_3B.md`.

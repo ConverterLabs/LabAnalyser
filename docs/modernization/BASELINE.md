@@ -115,3 +115,22 @@ test projects: the existing PlotMeasurements suite and
 10 stable DataManagement test IDs). Separate per-file GCC/gcov evidence is in
 `DATAMANAGEMENT_3A.md`; it is not total-project coverage. UIDataManagement
 MainWindow/XML/plugin/export paths remain unverified.
+
+## LoadSave/XML characterization 3B
+
+The local runner now registers `contract/XmlExperimentContractTests`, which
+builds the unchanged application graph without `main.cpp` and exercises the
+real `MainWindow`/`UIDataManagementSetClass` hierarchy required by the XML
+reader and writer. XML fixtures are under `tests/fixtures/xml/`; they are small
+UTF-8 test vectors with no absolute paths, user data or plugin binaries.
+
+The phase records the legacy inverted boolean result convention (`false` is
+success), ignored unknown content, relative form resolution, malformed and
+missing-file failures, semantic write/read behavior, UI caller forwarding and
+subplot serialization. Release, Debug and the full three-project runner passed;
+the XML suite has 10 Qt Test checks and no failures. Per-production-file gcov
+evidence is in `XML_CONTRACTS_3B.md` (reader 71.90%, writer 94.64%, plugin
+loader 0.00%, XML caller 38.64% line coverage); these are not a project total
+or a quality gate. Permission-denied behavior and successful binary-plugin
+loads remain unverified because they are not deterministic or safely available
+in this repository.

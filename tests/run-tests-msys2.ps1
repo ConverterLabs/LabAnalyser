@@ -92,6 +92,11 @@ $testProjects = @(
         Id = 'component/DataManagementCharacterizationTests'
         ProjectFile = Join-Path $repositoryRoot 'tests\component\datamanagement\DataManagementCharacterizationTests.pro'
         ExecutableRelativePath = 'release\DataManagementCharacterizationTests.exe'
+    },
+    [PSCustomObject]@{
+        Id = 'contract/XmlExperimentContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\xml\XmlExperimentContractTests.pro'
+        ExecutableRelativePath = 'release\XmlExperimentContractTests.exe'
     }
 )
 
@@ -108,6 +113,7 @@ New-Item -ItemType Directory -Force -Path $BuildRoot | Out-Null
 $oldPath = $env:Path
 $oldMSYSTEM = $env:MSYSTEM
 $oldCHERE = $env:CHERE_INVOKING
+$oldQtQpaPlatform = $env:QT_QPA_PLATFORM
 try {
     $pathParts = @($mingwBin)
     if (Test-Path -LiteralPath $msysUsrBin -PathType Container) {
@@ -116,6 +122,9 @@ try {
     $env:Path = ($pathParts + $env:Path) -join ';'
     $env:MSYSTEM = 'MINGW64'
     $env:CHERE_INVOKING = '1'
+    # XML contract tests construct the real Qt Widgets application graph.
+    # Offscreen makes that documented local path independent of a desktop.
+    $env:QT_QPA_PLATFORM = 'offscreen'
 
     foreach ($testProject in $testProjects) {
         $testBuildDir = Join-Path $BuildRoot ($testProject.Id.Replace('/', '\\'))
@@ -138,6 +147,7 @@ finally {
     $env:Path = $oldPath
     $env:MSYSTEM = $oldMSYSTEM
     $env:CHERE_INVOKING = $oldCHERE
+    $env:QT_QPA_PLATFORM = $oldQtQpaPlatform
 }
 
 Write-Host "All $($testProjects.Count) registered test project(s) passed."

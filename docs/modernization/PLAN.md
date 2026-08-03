@@ -18,7 +18,12 @@ instrumentation was also built and run successfully as a source-level pilot.
 2. Test harness, CTest integration, fixtures, coverage, and CI — in progress.
    Milestone 2A (local qmake test flow) is complete; CTest, fixture content,
    aggregate coverage reporting, and CI remain pending.
-3. Characterize external contracts and critical paths — pending.
+3. Characterize external contracts and critical paths — in progress.
+   Milestone 3A characterized the DataManagement manager/set/messenger
+   subsystem. Phase 3B characterizes LoadSave experiment XML with real
+   MainWindow integration, deterministic fixtures and per-file coverage;
+   compatible plugin binaries, historic external experiment samples and
+   deterministic permission failures remain pending.
 4. Isolate pure/core logic from GUI and infrastructure — pending.
 5. Ownership/lifetime, undefined behavior, error handling, and security hardening — pending.
 6. Build-system and dependency modernization — pending.
@@ -41,3 +46,14 @@ set and messenger boundaries. Ten stable component test IDs cover normal,
 empty, repeat, signal, forwarding and ownership behavior. UIDataManagement
 integration remains pending real GUI/IO/plugin/export harnesses; no production
 refactoring or coverage gate was introduced.
+
+## Phase 3B completion
+
+LoadSave experiment XML is characterized by the real-application contract suite
+`XML_001` through `XML_008`. The suite is part of the documented qmake runner
+and covers small valid/legacy-shaped fixtures, semantic read/write behavior,
+UTF-8, unknown and optional content, malformed/missing files, UI caller return
+conventions and figure-window serialization. No production code was changed and
+no coverage threshold was enabled. Binary plugin success, a safe corpus of
+historic user files, deterministic permission denial, and malformed figure
+window widget-count handling remain explicit follow-up risks.

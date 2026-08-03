@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Experiment>
+  <Tabs>
+    <Form Name="Form Ω"><RelPath>embedded-form.ui</RelPath></Form>
+  </Tabs>
+  <Devices><FutureDevice ignored="true"/></Devices>
+  <FigureWindows/>
+  <Widgets><Widget Name="missing-widget" optional="leer"> Text wird ignoriert </Widget></Widgets>
+  <Connections>
+    <connect>
+      <ID Min="1.5" Max="9.5" Alias="Temperatur ä" Type="Parameter" DataType="double">legacy::temperature</ID>
+      <ObjectName>missing-widget</ObjectName>
+    </connect>
+  </Connections>
+  <State></State>
+  <FutureSection><Value>ignored</Value></FutureSection>
+</Experiment>

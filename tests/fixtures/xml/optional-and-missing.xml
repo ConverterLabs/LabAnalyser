@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Experiment>
+  <Tabs><Form Name="Missing"><RelPath>missing-form.ui</RelPath><Optional/></Form></Tabs>
+  <Devices><Device><RelPath>missing-plugin.LAdev</RelPath></Device></Devices>
+  <Widgets/>
+  <Connections/>
+  <State/>
+</Experiment>
