@@ -94,6 +94,21 @@ class ScrollableLegend final : public QCPLegend
 public:
     using QCPLegend::QCPLegend;
 
+    QSize minimumSizeHint() const override
+    {
+        QSize size = QCPLayoutGrid::minimumSizeHint();
+        if (!parentPlot())
+            return size;
+
+        const int viewportHeight = parentPlot()->viewport().height();
+        const int maximumLegendHeight = qMax(1, viewportHeight * 2 / 3);
+        const bool needsScrollBar = size.height() > maximumLegendHeight;
+        if (needsScrollBar && scrollBar_)
+            size.setWidth(size.width() + scrollBar_->sizeHint().width());
+        size.setHeight(qMin(size.height(), maximumLegendHeight));
+        return size;
+    }
+
     void setScrollBar(QScrollBar *scrollBar)
     {
         scrollBar_ = scrollBar;
@@ -114,19 +129,15 @@ public:
             return;
         }
 
-        QCPAbstractLegendItem *firstItem = item(0);
-        QCPAbstractLegendItem *lastItem = item(itemCount() - 1);
-        if (!firstItem || !lastItem)
+        const QRect viewportRect = rect();
+        const int viewportTop = viewportRect.top();
+        const int viewportBottom = viewportRect.bottom();
+        const int viewportHeight = qMax(0, viewportRect.height());
+        if (viewportHeight <= 0)
         {
             scrollBar_->hide();
             return;
         }
-
-        const QRect firstBaseRect = firstItem->outerRect();
-        const QRect lastBaseRect = lastItem->outerRect();
-        const int viewportTop = firstBaseRect.top();
-        const int viewportBottom = lastBaseRect.bottom();
-        const int viewportHeight = qMax(0, viewportBottom - viewportTop + 1);
 
         QVector<int> rowHeights;
         rowHeights.reserve(itemCount());
@@ -285,13 +296,50 @@ else
    xAxis->setSelectedLabelFont(Highlight);
    yAxis->setSelectedLabelFont(Highlight);
 
+   QCPLayer *legendLayer = legend->layer();
    axisRect()->insetLayout()->remove(legend);
    auto *scrollableLegend = new ScrollableLegend;
+   scrollableLegend->setBrush(QBrush(Qt::white));
+   scrollableLegend->setBorderPen(QPen(Qt::black));
    legend = scrollableLegend;
    axisRect()->insetLayout()->addElement(legend, Qt::AlignRight | Qt::AlignTop);
+   if (legendLayer)
+       scrollableLegend->setLayer(legendLayer);
+   else
+       scrollableLegend->setLayer("legend");
    LegendScrollBar = new QScrollBar(Qt::Vertical, this);
    LegendScrollBar->setObjectName("LegendScrollBar");
    LegendScrollBar->setFocusPolicy(Qt::NoFocus);
+   LegendScrollBar->setStyleSheet(
+       "QScrollBar#LegendScrollBar {"
+       "  background: rgba(30, 40, 50, 28);"
+       "  width: 10px;"
+       "  margin: 3px 2px 3px 2px;"
+       "  border: none;"
+       "  border-radius: 5px;"
+       "}"
+       "QScrollBar#LegendScrollBar::handle:vertical {"
+       "  background: rgb(125, 135, 145);"
+       "  min-height: 28px;"
+       "  border: 1px solid rgb(105, 115, 125);"
+       "  border-radius: 5px;"
+       "}"
+       "QScrollBar#LegendScrollBar::handle:vertical:hover {"
+       "  background: rgb(90, 105, 120);"
+       "}"
+       "QScrollBar#LegendScrollBar::handle:vertical:pressed {"
+       "  background: rgb(65, 80, 95);"
+       "}"
+       "QScrollBar#LegendScrollBar::add-line:vertical,"
+       "QScrollBar#LegendScrollBar::sub-line:vertical {"
+       "  height: 0px;"
+       "  border: none;"
+       "  background: transparent;"
+       "}"
+       "QScrollBar#LegendScrollBar::add-page:vertical,"
+       "QScrollBar#LegendScrollBar::sub-page:vertical {"
+       "  background: transparent;"
+       "}");
    scrollableLegend->setScrollBar(LegendScrollBar);
 
 
