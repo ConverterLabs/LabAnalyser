@@ -69,3 +69,49 @@ test harness exists.
   any safety change.
 - Plugin IID/API, XML format, Qt object names, and persistence/export behavior
   have no automated compatibility evidence yet.
+
+## Milestone 2A local test flow
+
+The existing `tests/PlotMeasurementsTests.cpp` is now reproducibly integrated
+into the local qmake test flow:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -Jobs 4
+```
+
+On 2026-08-03 this command configured, built, and ran all 1 registered test
+projects successfully (exit code 0).  The runner builds only its explicit test
+manifest in `build\tests-msys2-mingw64`, invokes each executable, and propagates
+configuration, build, and test failures as a non-zero process exit code.
+
+There is still no CTest registration, sanitizer, static-analysis configuration,
+or CI workflow.  The fixture directory structure and fixture rules now exist
+under `tests/fixtures/`, but no golden data has been created or inferred.
+
+## Coverage feasibility (MSYS2/GCC)
+
+The installed MINGW64 GCC/gcov 15.2 toolchain supports source instrumentation
+through `--coverage`.  A pilot built `PlotMeasurementsTests.pro` with qmake
+overrides `QMAKE_CXXFLAGS+=--coverage` and `QMAKE_LFLAGS+=--coverage`, ran the
+test, and generated a gcov report with:
+
+| Production source | Lines | Branches | Calls |
+| --- | ---: | ---: | ---: |
+| `DropWidgets/Plots/PlotMeasurements.cpp` | 92.73% (102/110) | 88.64% (156/176) executed | 72.41% (21/29) executed |
+
+`gcov.exe` is installed.  `gcovr` and `lcov` are not installed, although the
+MSYS2 package search exposes `mingw-w64-x86_64-lcov` as an available reporting
+tool.  The practical next step is a dedicated qmake coverage configuration that
+uses `--coverage`, runs the same test runner, filters project sources, and uses
+lcov (or an equivalent reviewed reporter) for aggregate HTML/JSON reports.
+No coverage gate is enabled: one testable source file cannot honestly establish
+a repository-wide threshold.
+
+## DataManagement characterization 3A
+
+On 2026-08-03 the normal local command built and passed both registered qmake
+test projects: the existing PlotMeasurements suite and
+`component/DataManagementCharacterizationTests` (12 Qt Test checks, 0 failures;
+10 stable DataManagement test IDs). Separate per-file GCC/gcov evidence is in
+`DATAMANAGEMENT_3A.md`; it is not total-project coverage. UIDataManagement
+MainWindow/XML/plugin/export paths remain unverified.

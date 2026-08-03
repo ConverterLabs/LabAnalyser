@@ -1,0 +1,453 @@
+#include <QtTest>
+#include <QPointer>
+#include <QSignalSpy>
+
+#include "DataManagement/DataManagementClass.h"
+#include "DataManagement/DataManagementSetClass.h"
+#include "DataManagement/DataMessengerClass.h"
+#include "DropWidgets/DropWidgets.h"
+
+Q_DECLARE_METATYPE(InterfaceData)
+
+namespace
+{
+class SignalOrderRecorder final : public QObject
+{
+    Q_OBJECT
+public:
+    QStringList events;
+
+public slots:
+    void added(const QString&, const QString&, const QString&, const QString&) { events << "added"; }
+    void set(const QString&, InterfaceData) { events << "set"; }
+    void widget(const QString&, InterfaceData) { events << "widget"; }
+    void received(const QString&) { events << "received"; }
+    void sent(const QString&, const QString&, InterfaceData) { events << "sent"; }
+};
+
+class ProbeDropWidget final : public QObject, public VariantDropWidget
+{
+    Q_OBJECT
+public:
+    int setCalls = 0;
+    int getCalls = 0;
+    ToFormMapper lastReceived{"", ""};
+    InterfaceData nextValue;
+
+    void SetVariantData(ToFormMapper data) override
+    {
+        ++setCalls;
+        lastReceived = data;
+    }
+
+    void GetVariantData(ToFormMapper* data) override
+    {
+        ++getCalls;
+        data->SetDataRaw(nextValue.GetData());
+    }
+
+    bool LoadFromXML(const std::vector<std::pair<QString, QString>>&, const QString&) override { return false; }
+    bool SaveToXML(std::vector<std::pair<QString, QString>>&, QString&) override { return false; }
+    void ConnectToID(DataManagementSetClass*, QString) override {}
+
+signals:
+    void changed();
+    void requestUpdate();
+};
+
+class DeviceProbe final : public QObject
+{
+    Q_OBJECT
+public:
+    int receivedCount = 0;
+    QString lastCommand;
+    QString lastId;
+
+public slots:
+    void MessageReceiver(const QString& command, const QString& id, InterfaceData)
+    {
+        ++receivedCount;
+        lastCommand = command;
+        lastId = id;
+    }
+
+signals:
+    void MessageSender(const QString& command, const QString& id, InterfaceData data);
+};
+
+class PlatformProbe final : public Platform_Interface
+{
+public:
+    explicit PlatformProbe(int* destroyed) : destroyed_(destroyed) {}
+    ~PlatformProbe() override { ++*destroyed_; }
+
+    InterfaceData* GetSymbol(const QString&) override { return nullptr; }
+    QObject* GetObject() override { return nullptr; }
+    void MessageReceiver(const QString&, const QString&, InterfaceData) override {}
+    void MessageSender(const QString&, const QString&, InterfaceData) override {}
+
+private:
+    int* destroyed_;
+};
+
+InterfaceData number(double value)
+{
+    InterfaceData data;
+    data.SetData(value);
+    return data;
+}
+}
+
+class DataManagementCharacterizationTests : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void initTestCase();
+    void DM_001_emptyStateAndSafeLookup();
+    void DM_002_plotAndFormRegistries();
+    void DM_003_containerValuesAliasesAndMappings();
+    void DM_004_repeatedMappingsAndCleanup();
+    void DM_005_deviceLifetimeAndProjectCleanup();
+    void DM_006_messengerPublishSignalOrderAndValues();
+    void DM_007_messengerForwardingAndSpecialCommands();
+    void DM_008_messengerDeviceRegistrationAndOwnership();
+    void DM_009_setDataWidgetPropagationAndRequests();
+    void DM_010_setOwnershipAndRepeatedDataFlow();
+};
+
+void DataManagementCharacterizationTests::initTestCase()
+{
+    qRegisterMetaType<InterfaceData>("InterfaceData");
+}
+
+void DataManagementCharacterizationTests::DM_001_emptyStateAndSafeLookup()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+
+    QCOMPARE(manager.PlotCount(), 0);
+    QCOMPARE(manager.GetUniquePlotNumber(), 0);
+    QCOMPARE(manager.GetPlotByName("missing"), nullptr);
+    QCOMPARE(manager.GetContainerCount(), 0);
+    QVERIFY(!manager.ElementExists("missing"));
+    QCOMPARE(manager.GetContainer("missing"), nullptr);
+    QCOMPARE(manager.GetContainerElementForms(0).first, QString());
+    QCOMPARE(manager.GetContainerElementForms(0).second.size(), size_t(0));
+    QCOMPARE(manager.GetAlias("missing"), QString("missing"));
+    QVERIFY(!manager.GetSkipFormFile("missing"));
+
+    QObject unknown;
+    unknown.setObjectName("unknown");
+    QCOMPARE(manager.GetContainerID(&unknown), QString());
+    QCOMPARE(manager.GetContainer(&unknown), nullptr);
+    // GetContainer(QObject*) routes through the QString overload, whose map
+    // operator inserts an empty mapping for an unknown object name.
+    QVERIFY(manager.IsObjectLinked(&unknown));
+    manager.SetData("missing", number(1.0));
+    manager.DeletePlotPointer("missing");
+    manager.DeletePlotWindow("missing");
+    manager.RemoveFormFile("missing");
+    manager.CloseDevice("missing");
+}
+
+void DataManagementCharacterizationTests::DM_002_plotAndFormRegistries()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject first;
+    QObject second;
+    first.setObjectName("visible-first");
+    second.setObjectName("visible-second");
+
+    manager.AddPlotPointer("first", &first, 0);
+    manager.AddPlotPointer("second", &second, 2);
+    QCOMPARE(manager.PlotCount(), 2);
+    QCOMPARE(manager.GetPlotByName("visible-first"), &first);
+    QCOMPARE(manager.GetUniquePlotNumber(), 1);
+    manager.DeletePlotPointer("first");
+    QCOMPARE(manager.GetUniquePlotNumber(), 0);
+    manager.RenamePlotPointer("second", "renamed#2");
+    QCOMPARE(manager.GetPlotByName("visible-second"), &second);
+    manager.DeletePlotPointer("renamed#2");
+    QCOMPARE(manager.PlotCount(), 0);
+
+    manager.AddPlotWindow("window-a", 2, 3, 0);
+    manager.AddPlotWindow("window-b", 4, 5, 2);
+    QCOMPARE(manager.GetPlotWindowRowsCols("window-a"), std::make_pair(2, 3));
+    QCOMPARE(manager.GetPlotWindowsIncrementer(), 1);
+    manager.DeletePlotWindow("window-a");
+    QCOMPARE(manager.GetPlotWindowsIncrementer(), 0);
+    manager.DeletePlotWindow("window-a");
+
+    manager.AddFormFile({"form-a", "a.ui"});
+    manager.AddFormFile({"form-b", "b.ui"});
+    QCOMPARE(manager.GetFormFileCount(), 2);
+    QCOMPARE(manager.GetFormFileEntry(1), std::make_pair(QString("form-b"), QString("b.ui")));
+    manager.AddSkipFormFile("form-a", true);
+    QVERIFY(manager.GetSkipFormFile("form-a"));
+    manager.AddSkipFormFile("form-a", false);
+    QVERIFY(!manager.GetSkipFormFile("form-a"));
+    manager.RemoveFormFile("form-a");
+    manager.RemoveFormFile("form-a");
+    QCOMPARE(manager.GetFormFileCount(), 1);
+}
+
+void DataManagementCharacterizationTests::DM_003_containerValuesAliasesAndMappings()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject widget;
+    widget.setObjectName("widget-a");
+
+    manager.AddContainerElement("parameter", "double", "Parameter", "state-a");
+    QVERIFY(manager.ElementExists("parameter"));
+    QCOMPARE(manager.GetContainer("parameter")->GetDataType(), QString());
+    QCOMPARE(manager.GetContainer("parameter")->GetType(), QString("Parameter"));
+    QCOMPARE(manager.GetContainer("parameter")->GetStateDependency(), QString("state-a"));
+    manager.SetMinMaxValue("parameter", -1.0, 2.0);
+    QCOMPARE(manager.MinMaxValue("parameter"), std::make_pair(-1.0, 2.0));
+    manager.SetAlias("parameter", "alias");
+    QCOMPARE(manager.GetAlias("parameter"), QString("alias"));
+
+    manager.AddElementToContainerEntry("widget-a", "parameter", "QWidget", &widget);
+    QVERIFY(manager.IsObjectLinked(&widget));
+    QCOMPARE(manager.GetContainerID("widget-a"), QString("parameter"));
+    QCOMPARE(manager.GetContainerID(&widget), QString("parameter"));
+    QCOMPARE(manager.GetObjectType(&widget), QString("QWidget"));
+
+    manager.SetData("parameter", number(12.5));
+    QCOMPARE(manager.GetContainer("parameter")->GetDataType(), QString("double"));
+    InterfaceData data = manager.GetInterfaceData(&widget);
+    QCOMPARE(data.GetDataType(), QString("double"));
+    QCOMPARE(data.GetType(), QString("Parameter"));
+    QCOMPARE(data.GetDouble(), 12.5);
+    const auto entry = manager.GetContainerElementForms(0);
+    QCOMPARE(entry.first, QString("parameter"));
+    QCOMPARE(entry.second, std::vector<QString>{"widget-a"});
+}
+
+void DataManagementCharacterizationTests::DM_004_repeatedMappingsAndCleanup()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject widget;
+    widget.setObjectName("widget");
+    manager.AddContainerElement("one", "double", "Parameter", "");
+    manager.AddContainerElement("two", "double", "Parameter", "");
+
+    manager.AddElementToContainerEntry("widget", "one", "QWidget", &widget);
+    manager.AddElementToContainerEntry("widget", "one", "QWidget", &widget);
+    QCOMPARE(manager.GetContainerElementForms(0).second.size(), size_t(1));
+
+    manager.AddElementToContainerEntry("widget", "two", "QWidget", &widget);
+    QCOMPARE(manager.GetContainerID(&widget), QString("two"));
+    QCOMPARE(manager.GetContainer("one")->Objects.size(), size_t(0));
+    QCOMPARE(manager.GetContainer("two")->Objects.size(), size_t(1));
+    manager.DeleteEntryOfObject(&widget);
+    QVERIFY(!manager.IsObjectLinked(&widget));
+    QCOMPARE(manager.GetContainer("two")->Objects.size(), size_t(0));
+
+    manager.GetContainerID("ghost");
+    QObject ghost;
+    ghost.setObjectName("ghost");
+    QVERIFY(manager.IsObjectLinked(&ghost));
+    QCOMPARE(manager.GetContainer(&ghost), nullptr);
+}
+
+void DataManagementCharacterizationTests::DM_005_deviceLifetimeAndProjectCleanup()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    int destroyed = 0;
+    manager.AddDevice("device", "device.xml", new PlatformProbe(&destroyed));
+    QVERIFY(manager.GetDevice("device") != nullptr);
+    QCOMPARE(manager.GetDevices(), QList<QString>{"device"});
+    QCOMPARE(manager.GetDevicePaths(), QList<QString>{"device.xml"});
+    manager.CloseDevice("device");
+    QCOMPARE(destroyed, 1);
+    QCOMPARE(manager.GetDevice("device"), nullptr);
+
+    manager.AddDevice("cleanup", "cleanup.xml", new PlatformProbe(&destroyed));
+    manager.AddContainerElement("cleanup-id", "double", "Parameter", "");
+    manager.AddPlotPointer("plot", &owner, 0);
+    manager.AddPlotWindow("window", 1, 1, 0);
+    manager.AddFormFile({"form", "form.ui"});
+    manager.CloseProjectLogic();
+    QCOMPARE(destroyed, 2);
+    QCOMPARE(manager.GetContainerCount(), 0);
+    QCOMPARE(manager.PlotCount(), 0);
+    QCOMPARE(manager.GetFormFileCount(), 0);
+    QCOMPARE(manager.GetDevices().size(), 0);
+    QCOMPARE(manager.GetPlotWindowsIncrementer(), 0);
+}
+
+void DataManagementCharacterizationTests::DM_006_messengerPublishSignalOrderAndValues()
+{
+    QObject owner;
+    owner.setObjectName("owner");
+    MessengerClass messenger(&owner);
+    QSignalSpy added(&messenger, &MessengerClass::AddContainerElement);
+    QSignalSpy set(&messenger, &MessengerClass::SetData);
+    QSignalSpy widget(&messenger, &MessengerClass::AddElementToWidget);
+    QSignalSpy received(&messenger, &MessengerClass::NewDataReceived);
+    SignalOrderRecorder recorder;
+    connect(&messenger, &MessengerClass::AddContainerElement, &recorder, &SignalOrderRecorder::added);
+    connect(&messenger, &MessengerClass::SetData, &recorder, &SignalOrderRecorder::set);
+    connect(&messenger, &MessengerClass::AddElementToWidget, &recorder, &SignalOrderRecorder::widget);
+    connect(&messenger, &MessengerClass::NewDataReceived, &recorder, &SignalOrderRecorder::received);
+
+    InterfaceData published = number(4.5);
+    published.SetType("Parameter");
+    published.SetStateDependency("state");
+    messenger.MessageReceiver("publish", "id", published);
+
+    QCOMPARE(added.count(), 1);
+    QCOMPARE(set.count(), 2);
+    QCOMPARE(widget.count(), 1);
+    QCOMPARE(received.count(), 1);
+    QCOMPARE(recorder.events, QStringList({"added", "set", "widget", "set", "received"}));
+    QCOMPARE(added.at(0).at(0).toString(), QString("id"));
+    QCOMPARE(added.at(0).at(1).toString(), QString("double"));
+    QCOMPARE(added.at(0).at(2).toString(), QString("Parameter"));
+    QCOMPARE(added.at(0).at(3).toString(), QString("state"));
+    QCOMPARE(set.at(0).at(0).toString(), QString("id"));
+    QCOMPARE(qvariant_cast<InterfaceData>(set.at(0).at(1)).GetDouble(), 4.5);
+}
+
+void DataManagementCharacterizationTests::DM_007_messengerForwardingAndSpecialCommands()
+{
+    QObject owner;
+    owner.setObjectName("owner");
+    MessengerClass messenger(&owner);
+    QSignalSpy set(&messenger, &MessengerClass::SetData);
+    QSignalSpy received(&messenger, &MessengerClass::NewDataReceived);
+    QSignalSpy sent(&messenger, &MessengerClass::MessageSender);
+    QSignalSpy errors(&messenger, &MessengerClass::ErrorWriter);
+    QSignalSpy infos(&messenger, &MessengerClass::InfoWriter);
+    QSignalSpy notifications(&messenger, &MessengerClass::NotificationWriter);
+    QSignalSpy start(&messenger, &MessengerClass::PublishStart);
+    QSignalSpy finished(&messenger, &MessengerClass::PublishFinished);
+    SignalOrderRecorder recorder;
+    connect(&messenger, &MessengerClass::SetData, &recorder, &SignalOrderRecorder::set);
+    connect(&messenger, &MessengerClass::NewDataReceived, &recorder, &SignalOrderRecorder::received);
+    connect(&messenger, &MessengerClass::MessageSender, &recorder, &SignalOrderRecorder::sent);
+
+    messenger.MessageTransmitter("set", "id", number(3.0));
+    QCOMPARE(recorder.events, QStringList({"set", "received", "sent"}));
+    QCOMPARE(set.count(), 1);
+    QCOMPARE(received.count(), 1);
+    QCOMPARE(sent.count(), 1);
+    QCOMPARE(sent.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(qvariant_cast<InterfaceData>(sent.at(0).at(2)).GetDouble(), 3.0);
+
+    InterfaceData text;
+    text.SetData(QString("message"));
+    messenger.MessageReceiver("error", "origin", text);
+    messenger.MessageReceiver("info", "origin", text);
+    messenger.MessageReceiver("notification", "origin", text);
+    messenger.MessageReceiver("publish_start", "", InterfaceData());
+    messenger.MessageReceiver("publish_finished", "", InterfaceData());
+    messenger.SendInfo("local-info");
+    messenger.SendError("local-error");
+    QCOMPARE(errors.count(), 2);
+    QCOMPARE(infos.count(), 2);
+    QCOMPARE(notifications.count(), 1);
+    QCOMPARE(start.count(), 1);
+    QCOMPARE(finished.count(), 1);
+    QCOMPARE(errors.at(0).at(0).toString(), QString("origin"));
+    QCOMPARE(errors.at(1).at(0).toString(), QString("owner"));
+    QCOMPARE(infos.at(1).at(1).toString(), QString("local-info"));
+    messenger.MessageReceiver("unknown", "id", InterfaceData());
+    QCOMPARE(sent.count(), 1);
+}
+
+void DataManagementCharacterizationTests::DM_008_messengerDeviceRegistrationAndOwnership()
+{
+    auto* owner = new QObject;
+    owner->setObjectName("owner");
+    auto* messenger = new MessengerClass(owner);
+    QPointer<MessengerClass> guard(messenger);
+    DeviceProbe device;
+    messenger->NewDeviceRegistration(&device);
+    emit device.MessageSender("set", "from-device", number(8.0));
+    QCOMPARE(device.receivedCount, 0);
+    QSignalSpy sent(messenger, &MessengerClass::MessageSender);
+    messenger->MessageTransmitter("get", "to-device", InterfaceData());
+    QCOMPARE(device.receivedCount, 1);
+    QCOMPARE(device.lastCommand, QString("get"));
+    QCOMPARE(device.lastId, QString("to-device"));
+    QCOMPARE(sent.count(), 1);
+
+    delete owner;
+    QVERIFY(guard.isNull());
+}
+
+void DataManagementCharacterizationTests::DM_009_setDataWidgetPropagationAndRequests()
+{
+    QObject owner;
+    owner.setObjectName("LabAnalyser");
+    DataManagementSetClass manager(&owner);
+    ProbeDropWidget widget;
+    widget.setObjectName("widget");
+    manager.AddContainerElement("parameter", "double", "Parameter", "");
+    manager.AddElementToContainerEntry("widget", "parameter", "ProbeDropWidget", &widget);
+    static_cast<DataManagementClass&>(manager).SetData("parameter", number(6.0));
+    manager.SetData(QString("parameter"));
+    QCOMPARE(widget.setCalls, 1);
+    QCOMPARE(widget.lastReceived.GetDouble(), 6.0);
+    manager.SetData(QString("missing"));
+    QCOMPARE(widget.setCalls, 1);
+
+    QSignalSpy requests(&manager, &DataManagementClass::MessageSender);
+    connect(&widget, &ProbeDropWidget::requestUpdate, &manager, qOverload<>(&DataManagementSetClass::UpdateRequest));
+    emit widget.requestUpdate();
+    QCOMPARE(requests.count(), 1);
+    QCOMPARE(requests.at(0).at(0).toString(), QString("get"));
+    QCOMPARE(requests.at(0).at(1).toString(), QString("parameter"));
+    manager.UpdateRequest(QString("explicit"));
+    QCOMPARE(requests.count(), 2);
+    QCOMPARE(requests.at(1).at(1).toString(), QString("explicit"));
+}
+
+void DataManagementCharacterizationTests::DM_010_setOwnershipAndRepeatedDataFlow()
+{
+    auto* owner = new QObject;
+    owner->setObjectName("LabAnalyser");
+    auto* manager = new DataManagementSetClass(owner);
+    QPointer<MessengerClass> messenger(manager->GetMessenger());
+    QVERIFY(messenger);
+    QVERIFY(messenger->parent() == manager);
+
+    ProbeDropWidget parameterWidget;
+    parameterWidget.setObjectName("parameter-widget");
+    parameterWidget.nextValue = number(9.0);
+    manager->AddContainerElement("parameter", "double", "Parameter", "");
+    manager->AddElementToContainerEntry("parameter-widget", "parameter", "ProbeDropWidget", &parameterWidget);
+    QSignalSpy messages(manager, &DataManagementClass::MessageSender);
+    connect(&parameterWidget, &ProbeDropWidget::changed, manager, &DataManagementSetClass::SendNewValue);
+    emit parameterWidget.changed();
+    emit parameterWidget.changed();
+    QCOMPARE(parameterWidget.getCalls, 2);
+    QCOMPARE(messages.count(), 2);
+    QCOMPARE(messages.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(qvariant_cast<InterfaceData>(messages.at(1).at(2)).GetDouble(), 9.0);
+
+    ProbeDropWidget dataWidget;
+    dataWidget.setObjectName("data-widget");
+    manager->AddContainerElement("data", "double", "Data", "");
+    manager->AddElementToContainerEntry("data-widget", "data", "ProbeDropWidget", &dataWidget);
+    connect(&dataWidget, &ProbeDropWidget::changed, manager, &DataManagementSetClass::SendNewValue);
+    emit dataWidget.changed();
+    QCOMPARE(dataWidget.getCalls, 0);
+    QCOMPARE(messages.count(), 3);
+    QCOMPARE(messages.at(2).at(0).toString(), QString("get"));
+    QCOMPARE(messages.at(2).at(1).toString(), QString("data"));
+
+    delete owner;
+    QVERIFY(messenger.isNull());
+}
+
+QTEST_MAIN(DataManagementCharacterizationTests)
+
+#include "DataManagementCharacterizationTests.moc"

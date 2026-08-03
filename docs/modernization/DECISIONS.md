@@ -26,3 +26,26 @@ pre/post export compatibility tests and recorded version evidence.
 Only the executed qmake builds and PlotMeasurements test are passing evidence.
 Plugin, XML, export, remote-control, parameter, and GUI workflows remain
 unverified until deterministic fixtures/harnesses are added.
+
+## ADR-004: Keep the local test entry point qmake-native during milestone 2A
+
+**Date:** 2026-08-03
+**Status:** accepted
+
+`tests/run-tests-msys2.ps1` is the single local test entry point.  It uses the
+existing MSYS2 qmake/mingw32-make toolchain and an explicit test-project
+manifest, rather than discovering `.pro` files or adding CTest/CMake.  Explicit
+registration makes the normal local command deterministic and prevents the
+application project from being mistaken for a test.
+
+## ADR-005: Use GCC gcov instrumentation as the first coverage mechanism
+
+**Date:** 2026-08-03
+**Status:** accepted for characterization
+
+The observed MINGW64 GCC supports `--coverage`, and the accompanying `gcov`
+generated line/branch/call results for the existing PlotMeasurements test.  Use
+qmake coverage-flag overrides and the same test executable as the initial
+mechanism.  Aggregate reporting requires installing/reviewing a reporter such
+as the available MSYS2 `mingw-w64-x86_64-lcov`; no coverage gate is permitted
+until broader behavior is characterized.

@@ -16,7 +16,7 @@ IDs and characterization vectors before modifying it.
 | MAT/HDF5 export | `Export/Export2Mat.*`, `export2highfive.*` | Names, types, dimensions, numerical data, empty/error behavior for libmatio and HDF5. | — | mapped, unverified |
 | TCP remote control | `RemoteControl/RemoteControlServer.*` | Loopback port selection; binary length/header framing; `set`/`get` request and response bytes; disconnect/error behavior. | — | mapped, unverified |
 | Plot widgets | `DropWidgets/Plots/PlotWidget.*`, `FFTPlotWidget.*` | Plot configuration, data mapping, legend/cursor/FFT presentation and event behavior. | — | mapped, unverified |
-| Plot measurements | `DropWidgets/Plots/PlotMeasurements.*` | Normalize sample order; interpolation; interval count/min/max/mean/RMS; THD and NaN invalid cases. | `PlotMeasurementsTests::{constantSignal,linearSignal,sineAndHarmonics,nonUniformSamples,invalidIntervals}` | baseline tested |
+| Plot measurements | `DropWidgets/Plots/PlotMeasurements.*` | Normalize sample order; interpolation; interval count/min/max/mean/RMS; THD and NaN invalid cases. | `unit/PlotMeasurementsTests::{constantSignal,linearSignal,sineAndHarmonics,nonUniformSamples,invalidIntervals}`; run by `tests/run-tests-msys2.ps1` | baseline tested; local runner integrated |
 | Drag/drop widgets | `DropWidgets/DropWidgetsUiLoader.*`, `DropWidget.h`, `QBLed/QCheckBox/QComboBox/QDoubleSpinBox/QLCDNumber/QLabel/QLed/QLineEdit/QListView/QProgressBar/QPushButton/QSlider/QSpinBox/QTSLed/QTableWidgeD.*`, `CreateID.*` | UI loading, widget-to-ID mapping, drag/drop acceptance, value conversion, XML save/load, signal/UI state. | — | mapped, unverified |
 | Indicators | `CustomWidgets/QBLedIndicator.*`, `QLedIndicator.*`, `QTSLedIndicator.*` | LED rendering/state input. | — | mapped, unverified |
 | Tree/subplots | `TreeWidgetCustomDrop.*`, `UIFunctions/SubPlotMainWindow.*` | Drop behavior, subplot grid/window identity and lifecycle. | — | mapped, unverified |
@@ -38,3 +38,22 @@ from the five named PlotMeasurements test slots, no current tests identify
 production functions.  Milestones 2 and 3 must add test IDs per public/protected
 function and fixtures for each persistence, plugin, export, network, and GUI
 contract before refactoring those functions.
+
+## Test-infrastructure status
+
+`tests/run-tests-msys2.ps1` contains the explicit current test manifest and
+returns a failing process exit code for qmake, make, or Qt Test failures.
+`tests/{unit,component,integration,contract}` establishes placement for future
+suites without moving the baseline test.  `tests/fixtures/` contains the
+approved empty category structure and rules only; none of its directories is
+evidence of a characterized format yet.
+
+## DataManagement 3A characterization
+
+`component/DataManagementCharacterizationTests` adds stable IDs `DM_001` through
+`DM_010` for `DataManagementClass`, `DataManagementSetClass`, and
+`MessengerClass`; it uses QSignalSpy for message counts, order and payloads.
+`UIDataManagementSetClass` remains unverified because its public operations
+require the real MainWindow plus persistence/export/plugin boundaries. Full
+function-to-ID mapping, risk findings and per-file coverage appear in
+`DATAMANAGEMENT_3A.md`.
