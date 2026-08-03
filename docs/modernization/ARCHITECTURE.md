@@ -1,0 +1,45 @@
+# Architecture inventory (current baseline)
+
+## Build and top-level flow
+
+`main.cpp` constructs `MainWindow` from `mainwindow.ui`.  `MainWindow` owns or
+coordinates the data manager, messenger, dynamic UI loader, project XML reader/
+writer, exports, plots, and local remote-control server.  `LabAnalyser.pro` is a
+single qmake application target; `tests/PlotMeasurementsTests.pro` is a separate
+qmake console target.  There is no CMake build or CI workflow.
+
+```text
+Qt UI / .ui forms --> MainWindow --> DataManagementSetClass --> Messenger <-- plugins
+                         |                  |                    |
+                         |                  +--> widget/id mappings +--> Qt signals
+                         +--> XML read/write, exports, plot windows, TCP server
+```
+
+## Subsystems and boundaries
+
+| Area | Files/classes | Current responsibility and contracts |
+| --- | --- | --- |
+| Presentation | `MainWindow`, `SubPlotMainWindow`, `TreeWidgetCustomDrop`, `About.ui`, `mainwindow.ui` | Actions, dock/widget state, dynamic forms, drag/drop, object names, plotting windows. |
+| Data/messaging | `DataManagementClass`, `DataManagementSetClass`, `MessengerClass`, `mapper.h`, `InterfaceData` | ID-to-data/widget mapping; aliases/min/max; plugin data dispatch; Qt signal/slot event flow. |
+| Plugins | `platforminterface.h`, `loadplugin.*` | Qt `QPluginLoader` loads XML-described plugins. ABI includes `Platform_Fabric`, `Platform_Interface`, `InterfaceData`, and IID `org.qt-project.Qt.Examples.EchoInterface`. |
+| Persistence/import | `xmlexperimentreader.*`, `xmlexperimentwriter.*`, `parameterloader.*`, `exportinputs2xml.*` | Experiment XML (`Experiment` with Tabs, Devices, Widgets, State, FigureWindows, Connections), parameter XML, absolute/relative paths, UI state. |
+| Export | `Export2Mat.*`, `export2highfive.*` | MATLAB MAT via libmatio and HDF5 via HighFive/HDF5. Output schema has not yet been fixture-characterized. |
+| Plot/numerics | `PlotWidget`, `FFTPlotWidget`, `PlotMeasurements`, vendored `qcustomplot` | Charts, FFT, interpolation, interval statistics, RMS and THD. `PlotMeasurements` is the only tested production module. |
+| Custom/drop widgets | `DropWidgets/*`, `CustomWidgets/*` | Widget-specific binding, data updates, XML save/load, and visual indicators. |
+| Network | `RemoteControlServer` | Loopback TCP server (initial port 4080, incremented until bound); binary `set`/`get` protocol. |
+
+## External formats and dependencies
+
+- Qt Designer `.ui` forms and `resources.qrc` are runtime/UI contracts.
+- Experiment and parameter XML are parsed/written with Qt XML streams.
+- Plugin descriptions are XML and plugins are runtime-loaded Qt binaries.
+- MAT export uses libmatio 1.5.28 in the observed environment; HDF5 uses HDF5
+  1.14.6 and HighFive 2.10.1.
+- FFT behavior is built with FFTW 3.3.10 (`LABANALYSER_USE_FFTW`).
+
+## Target direction (not implemented)
+
+Incrementally separate GUI presentation from core numerical/data logic, IO
+adapters, network transport/protocol, and plugin-loading adapter while retaining
+the existing qmake build until CMake parity is demonstrated.  No such refactoring
+is part of this audit.
