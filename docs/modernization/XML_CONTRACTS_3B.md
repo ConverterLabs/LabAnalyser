@@ -65,7 +65,7 @@ All commands below were run on 2026-08-03 with MSYS2 MINGW64, GCC 15.2 and Qt
 | Release application | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -BuildDir build\xml-3b-release -Jobs 4` | PASS |
 | Debug application | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration debug -BuildDir build\xml-3b-debug -Jobs 4` | PASS |
 | All local tests | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -Jobs 4` | PASS; 3 projects. XML suite: 10 Qt Test checks, 0 failures. |
-| XML coverage build/run | qmake `XmlExperimentContractTests.pro` with `QMAKE_CXXFLAGS+=--coverage QMAKE_LFLAGS+=--coverage`, then `mingw32-make -j1` and `XmlExperimentContractTests.exe -txt` | PASS; the first parallel build hit transient `uic.exe`/`rcc.exe` Windows error `-1073741511`, serial retries completed. |
+| XML coverage build/run | qmake `XmlExperimentContractTests.pro` with `QMAKE_CXXFLAGS+=--coverage QMAKE_LFLAGS+=--coverage`, then `mingw32-make -j1` and `XmlExperimentContractTests.exe -txt` | PASS. The earlier `uic.exe`/`rcc.exe` `-1073741511` event was later traced to a MiKTeX Qt DLL preceding MSYS2 on `PATH`, not a transient build failure. |
 
 ## Coverage by production file
 

@@ -97,6 +97,11 @@ $testProjects = @(
         Id = 'contract/XmlExperimentContractTests'
         ProjectFile = Join-Path $repositoryRoot 'tests\contract\xml\XmlExperimentContractTests.pro'
         ExecutableRelativePath = 'release\XmlExperimentContractTests.exe'
+    },
+    [PSCustomObject]@{
+        Id = 'contract/ParameterContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\parameters\ParameterContractTests.pro'
+        ExecutableRelativePath = 'release\ParameterContractTests.exe'
     }
 )
 

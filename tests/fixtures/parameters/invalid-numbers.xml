@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParameterSet>
+ <entry><Parameter>double</Parameter><Value>not-a-number</Value></entry>
+ <entry><Parameter>u8</Parameter><Value>999999</Value></entry>
+ <entry><Parameter>flag</Parameter><Value>2</Value></entry>
+</ParameterSet>

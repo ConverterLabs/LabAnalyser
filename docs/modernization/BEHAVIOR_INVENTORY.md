@@ -12,7 +12,7 @@ IDs and characterization vectors before modifying it.
 | Data management | `DataManagementClass.*`, `DataManagementSetClass.*`, `DataMessengerClass.*`, `mapper.h` | ID/container registration, alias/min-max, plot/form/device registries, `SetData` and signal ordering. Pointer ownership and lifetime require characterization. | — | mapped, unverified |
 | Plugin API | `plugins/platforminterface.h`, `InterfaceDataType.*`, `LoadSave/loadplugin.*` | Binary plugin ABI, `EchoInterface_iid`, `GetInterface`, `GetSymbol`, messages, XML plugin path/error behavior. | — | mapped, unverified |
 | Experiment XML | `LoadSave/xmlexperimentreader.*`, `xmlexperimentwriter.*`; `UIDataManagementSetClass::{LoadExperiment,SaveExperiment}` | Read/write `Experiment` elements (Tabs, Devices, Widgets, State, FigureWindows, Connections), relative paths and Qt dock state. Reader/writer use `false` for success; unknown XML is skipped. `errorString()` is empty after parse errors; malformed figure widget counts risk unchecked indexing. | `contract/XmlExperimentContractTests::{XML_001..XML_008}` | baseline characterized; plugin-binary and historic-file corpus unverified |
-| Parameter XML | `Import/parameterloader.*`, `Export/exportinputs2xml.*` | Parameter import/export structure, malformed-file handling and data updates. | — | mapped, unverified |
+| Parameter XML | `Import/parameterloader.*`, `Export/exportinputs2xml.*`; `UIDataManagementSetClass::{ImportFromXml,Export2Xml}` | Inverted error booleans; ID/value-only persistence; malformed-file, conversion, duplicate and repeated-load behavior; XML forwarding. | `contract/ParameterContractTests::{PARAM_001..PARAM_009}` | baseline characterized; metadata persistence absent; broader UI export paths unverified |
 | MAT/HDF5 export | `Export/Export2Mat.*`, `export2highfive.*` | Names, types, dimensions, numerical data, empty/error behavior for libmatio and HDF5. | — | mapped, unverified |
 | TCP remote control | `RemoteControl/RemoteControlServer.*` | Loopback port selection; binary length/header framing; `set`/`get` request and response bytes; disconnect/error behavior. | — | mapped, unverified |
 | Plot widgets | `DropWidgets/Plots/PlotWidget.*`, `FFTPlotWidget.*` | Plot configuration, data mapping, legend/cursor/FFT presentation and event behavior. | — | mapped, unverified |
@@ -65,3 +65,14 @@ to all public XML reader/writer entry points and their UI manager callers. The
 test project uses the real application object hierarchy; it has no test-only
 seams, so it cannot affect production builds. Detailed mappings, fixture rules,
 defect candidates and exclusions are in `XML_CONTRACTS_3B.md`.
+
+## Parameter XML 3C characterization
+
+`contract/ParameterContractTests` maps `PARAM_001` through `PARAM_009` to the
+public parameter loader/exporter surfaces and their UI callers. Private parser
+and writer helpers are covered through their only safe public entry points.
+Metadata persistence is intentionally unverified as a feature because source
+inspection and characterization show it is absent. See
+`PARAMETER_CONTRACTS_3C.md` for values, defects and fresh build/coverage
+evidence. The former Qt code-generator failure was isolated to an ambient DLL
+path conflict and does not block the documented runner.

@@ -57,3 +57,13 @@ conventions and figure-window serialization. No production code was changed and
 no coverage threshold was enabled. Binary plugin success, a safe corpus of
 historic user files, deterministic permission denial, and malformed figure
 window widget-count handling remain explicit follow-up risks.
+
+## Phase 3C status
+
+Parameter XML characterization tests `PARAM_001` through `PARAM_009` are
+implemented against unchanged production code. On 2026-08-03 the clean
+four-project runner, fresh Release build, and fresh Debug build all passed with
+MSYS2 runtime directories first on `PATH`. The former `uic.exe`/`rcc.exe`
+`-1073741511` issue was an ambient MiKTeX Qt-DLL path conflict and is no longer
+a blocker for the documented local workflow. Fresh file-level gcov evidence is
+recorded in `PARAMETER_CONTRACTS_3C.md`; no coverage threshold is enabled.

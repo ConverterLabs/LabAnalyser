@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParameterSet format="legacy">
+ <entry><Parameter>count</Parameter><Value>42</Value></entry>
+ <entry><Parameter>enabled</Parameter><Value>1</Value></entry>
+ <entry><Parameter>label</Parameter><Value>Größe Ω &amp; &lt;Test&gt;</Value></entry>
+</ParameterSet>

@@ -134,3 +134,17 @@ loader 0.00%, XML caller 38.64% line coverage); these are not a project total
 or a quality gate. Permission-denied behavior and successful binary-plugin
 loads remain unverified because they are not deterministic or safely available
 in this repository.
+
+## Parameter XML characterization 3C
+
+`ParameterContractTests` adds characterization for ParameterLoader,
+ExportInputs2Xml and their UI callers with UTF-8 fixtures. On 2026-08-03 the
+clean four-project runner passed (7 + 12 + 10 + 11 Qt Test checks, all with zero
+failures), and fresh Release and Debug production builds both succeeded. The
+earlier `uic.exe`/`rcc.exe` `-1073741511` condition was traced to an ambient
+MiKTeX Qt DLL preceding MSYS2 on `PATH`; the runner/build scripts prepend the
+MSYS2 runtime directories and now reproduce successfully. Per-file gcov
+evidence is: `parameterloader.cpp` 100.00% lines / 100.00% branches executed;
+`exportinputs2xml.cpp` 100.00% / 100.00%; and the broader UI caller file
+`UIDataManagementSetClass.cpp` 34.09% / 26.88%. These are not project-wide
+coverage values or a threshold.

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ParameterSet unknown="ignored">
+ <entry optional="ignored"><Parameter>repeat</Parameter><Value>first</Value><Future>ignored</Future><Value>second</Value></entry>
+ <entry><Parameter>empty</Parameter><Value/></entry>
+ <entry><Parameter>missing</Parameter><Value>ignored</Value></entry>
+ <FutureEntry><Value>ignored</Value></FutureEntry>
+</ParameterSet>
