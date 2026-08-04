@@ -203,3 +203,17 @@ the immediately following full run completed that cleaned tree. File-specific
 IID were unchanged; no generated plugin DLL, executable, build or coverage
 artifact is versioned. Remaining limits are documented in
 `PLUGIN_CONTRACTS_3G.md`.
+
+## DropWidget characterization 3H
+
+`DropWidgetAdapterTests` is registered in the normal qmake runner and runs
+offscreen with its caller environment restored afterward. The suite covers
+`DW_001` through `DW_013`, portable `.ui` fixtures and narrow test-only seams
+for the otherwise excluded MainWindow/PlotWidget graph. On 2026-08-04 the
+combined `-Clean` runner hit only the hard 300-second execution limit after
+clearing and rebuilding the test tree, without an observed compiler or test
+failure; the immediately following runner completed the same tree successfully
+(exit code 0). Fresh Release and Debug production builds and the instrumented
+DropWidget suite also passed. File-level gcov evidence for adapters, loader,
+tree source, table mapping and exercised DataManagement dependencies is in
+`DROPWIDGET_CONTRACTS_3H.md`; it is not project-wide coverage or a threshold.

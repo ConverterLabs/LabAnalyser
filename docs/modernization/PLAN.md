@@ -113,3 +113,28 @@ evidence used here. File-specific `loadplugin.cpp` coverage is 87.50% lines,
 90.62% branches executed, 50.00% branches taken and 76.79% calls. No coverage
 threshold was enabled. Test-only seam and remaining platform/ABI/error-path
 limits are recorded in `PLUGIN_CONTRACTS_3G.md`.
+
+## Phase 3H status
+
+**Isolierbarer DropWidget-/Indicator-Umfang abgeschlossen (2026-08-04).** `DW_001` through `DW_013` characterize the non-plot
+DropWidget adapters, portable UI-loader fixtures, tree MIME source, narrow
+manager/messenger forwarding and table-row binding. The normal qmake runner
+builds and runs the suite in temporary offscreen mode. The combined clean run
+was bounded solely by the 300-second execution limit after cleanup/rebuild;
+the immediate non-clean run completed that tree successfully, and fresh
+Release/Debug production builds plus file-specific gcov evidence passed. No
+production DropWidget source, MIME semantics or defect candidate was changed.
+The complete contracts, per-file coverage, function-level gaps, prioritized
+follow-up tests, test-only seams and remaining exclusions are documented in
+`DROPWIDGET_CONTRACTS_3H.md`.
+
+Phase 3H.5b subsequently closed the isolated nonvisual indicator, timer,
+adapter-signal, range, XML and list-mutation gaps with `DW_014` through
+`DW_017` (19/19 suite checks passing). The Indicator source files now have
+100% line coverage in this focused run; remaining coverage is intentionally
+limited to 3I manager/drag/MainWindow, 3J plot, pixel-only rendering and
+dangerous null/index paths. Die verbleibenden Manager-, Tree-Drag- und
+MainWindow-Pfade sind verbindlich Phase 3I zugeordnet; PlotWidget-/Plotpfade
+sind verbindlich Phase 3J zugeordnet. Null-/Indexpfade bleiben bis zu einem
+isolierten Defektnachweis ausdrücklich ausgeschlossen. Phase 3H ist damit für
+den isolierbaren Umfang abgeschlossen.

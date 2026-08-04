@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0"><class>UnsupportedFixture</class><widget class="QWidget" name="unsupportedFixture"><layout class="QVBoxLayout" name="layout"><item><widget class="NoSuchLabAnalyserWidget" name="unsupported"/></item></layout></widget><resources/><connections/></ui>

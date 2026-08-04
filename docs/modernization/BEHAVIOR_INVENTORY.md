@@ -102,3 +102,99 @@ target and does not prove complete GUI integration. Unverified limits include
 parser/missing-attribute paths, null Messenger or `GetInterface()` results,
 platform loader/permission faults and a third-party binary ABI matrix; see
 `PLUGIN_CONTRACTS_3G.md`.
+
+## DropWidget UI loader and tree drag source 3H.2 characterization
+
+The extended `contract/dropwidgets/DropWidgetAdapterTests` maps
+`DropWidgetsUiLoader::createWidget`, `TreeWidgetCustomDrop::mimeData` and the
+safe `ConnectToID`/table-row boundaries to `DW_006` through `DW_010`.
+`DW_006` verifies standard-widget replacement, names, parentage, properties
+and accept-drops state. `DW_007` verifies LabAnalyser-specific adapter mapping
+and nested UI hierarchy. `DW_008` characterizes missing, malformed and unknown
+UI input. `DW_009` verifies source-tree ID serialization and a rejected
+foreign drag event. `DW_010` verifies repeat `ConnectToID` update requests and
+table XML row serialization/removal.
+
+The `TreeWidgetCustomDrop` MIME contract is a defect candidate: it advertises
+`text/uri-list` but its `mimeData` stores only text, so the advertised format
+is absent. An unsupported widget class is warned about and omitted while the
+containing UI still loads; this partial-success behavior is also a defect
+candidate. Full external drop handling, PlotWidget, drag execution, context
+menus requiring interactive dialogs and real MainWindow/UI-loader workflows
+remain excluded. The test-only PlotWidget link
+seam is never invoked and only permits compilation of the real loader's
+otherwise out-of-scope PlotWidget branch.
+
+## DropWidget DataManagement bindings 3H.3 characterization
+
+The extended `contract/dropwidgets/DropWidgetAdapterTests` maps the safe
+manager/widget boundary to `DW_011` through `DW_013`. `DW_011` uses the real
+`DataManagementClass` and `MessengerClass` with a test-target-only narrow
+`DataManagementSetClass` forwarding seam: a `set` message updates a linked
+`QLineEditD`; real `ConnectToID` emits an ordered `get` request, then
+`editingFinished` returns `MessageSender("set", ID, InterfaceData)`. `DW_012`
+characterizes two direct connections of
+the same widget signal: each user update produces two manager messages; after
+the mapping is removed the remaining Qt connections emit no further manager
+message because the sender no longer resolves to an ID. This duplicate-connect
+behavior is a defect candidate.
+
+`DW_013` characterizes `QTableWidgeD::LoadFromXML`/private delayed `CreateRow`
+through two actual numeric containers. With an event-loop bounded `QTRY` it
+creates two rows/two columns, binds the generated `QLineEditD` cell to
+`DW13::0`, propagates a manager update, and clears the table through the real
+`Clear Table` `QAction` without modal interaction. A container with only a
+declared type but no typed `InterfaceData` value creates table geometry but no
+cell editor; the test therefore initializes the real typed values before
+characterizing the valid binding path. The 2-second internal `QTimer` delay is
+production behavior; the test does not sleep.
+
+The seam is compiled only into this DropWidget test target because the real
+`DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
+only the exercised `SetData` and `SendNewValue` forwarding paths and is not
+evidence for full UI integration. Directly constructed drag events cannot set
+Qt's private drag source; valid source-dependent widget `dropEvent` paths,
+missing-manager/null-ID crash paths, interactive context actions and complete
+MainWindow workflows remain excluded. The established MIME-format mismatch is
+unchanged and remains a defect candidate.
+
+## DropWidget adapters 3H.1 characterization
+
+`contract/dropwidgets/DropWidgetAdapterTests` maps the adapter constructors,
+`SetVariantData`, `GetVariantData`, `LoadFromXML`, `SaveToXML`, bit accessors
+and `CreateID`/`CreateIDs` to `DW_001` through `DW_005`. The data-driven suite
+covers the named non-plot adapters: `QBLed`, `QCheckBoxD`, `QComboBoxD`,
+`QDoubleSpinBoxD`, `QLCDNumberD`, `QLabelD`, `QLed`, `QLineEditD`,
+`QListViewD`, `QProgressBarD`, `QPushButtonD`, `QSliderD`, `QSpinBoxD`,
+`QTableWidgeD` and `QTSLed`. It verifies construction/parenting/defaults and
+ID composition (`DW_001`), supported scalar conversion, range behavior and
+signal blocking (`DW_002`), string/Unicode, selection and list transfer
+(`DW_003`), bit/XML behavior (`DW_004`), and current XML-stub/label/table
+special cases (`DW_005`).
+
+Drag/drop event handlers, context-menu editing, `ConnectToID`, real
+MainWindow/UI-loader workflows and table row creation are outside 3H.1. They
+remain mapped but unverified because they require the intentionally excluded
+full UI/drag-drop graph. The suite uses a documented test-only MainWindow host
+seam solely for constructor-time manager connections; it is not linked by the
+production target and does not validate that graph.
+
+The suite is registered in `tests/run-tests-msys2.ps1` and uses offscreen Qt
+only for the runner process. The 2026-08-04 split clean verification, follow-up
+full runner, fresh Release/Debug builds and instrumented suite passed. Detailed
+per-file gcov values, all fixtures and the test-only seam boundary are recorded
+in `DROPWIDGET_CONTRACTS_3H.md`; no production DropWidget source was changed.
+
+## DropWidget isolated closure 3H.5b
+
+`DW_014` through `DW_017` passed offscreen and extend the existing suite to 19
+checks. They map all currently safe standalone Indicator colors/state/render
+and timer ownership paths, LED XML bits, list deletion, adapter signal
+counts/payloads, clamping, repeat assignment, enabled/read-only and parenting.
+The `QBLedIndicator` timer is observed active and repeating through the Qt
+event loop and is safely destroyed with its owner; it has no public stop API.
+`QTSLedIndicator::SetColor("Yellow")` preserves the preceding color, whereas
+the separate `YellowColor()` slot selects yellow. This is characterized as
+legacy behavior, not repaired. The remaining DropWidget gaps are 3I
+manager/drag/MainWindow, 3J PlotWidget, visual-pixel, or unsafe null/index
+paths; see `DROPWIDGET_CONTRACTS_3H.md` for fresh per-file gcov comparison.

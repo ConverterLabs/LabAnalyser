@@ -117,6 +117,11 @@ $testProjects = @(
         Id = 'contract/RemoteControlContractTests'
         ProjectFile = Join-Path $repositoryRoot 'tests\contract\remotecontrol\RemoteControlContractTests.pro'
         ExecutableRelativePath = 'release\RemoteControlContractTests.exe'
+    },
+    [PSCustomObject]@{
+        Id = 'contract/dropwidgets/DropWidgetAdapterTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\dropwidgets\DropWidgetAdapterTests.pro'
+        ExecutableRelativePath = 'release\DropWidgetAdapterTests.exe'
     }
     ,[PSCustomObject]@{
         Id = 'contract/PluginLoaderContractTests'
