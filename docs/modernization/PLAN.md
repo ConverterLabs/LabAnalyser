@@ -182,3 +182,23 @@ in `PLOT_CONTRACTS_3J.md`. This is not authorization for a broad PlotWidget
 refactor: safe cursor, context-menu, history and quality-criteria paths remain
 uncovered, while rendering, gestures and dangerous FFT/index/error paths are
 explicit exclusions.
+
+## Milestone 3 characterization closure audit
+
+**Charakterisierung der identifizierten kritischen externen Verträge
+abgeschlossen; vollständiges Funktionsregister und Assurance-Gates offen.**
+Phases 3A through 3J have reproducible test evidence recorded in their
+respective contract documents and are summarized in
+`MILESTONE_3_CHARACTERIZATION_REPORT.md`. The one intentional production
+behavior change is the separately approved phase-3G incompatible-plugin safety
+fix; the other phase scopes did not change production behavior.
+
+This status does not clear the repository for broad refactoring. The
+function-level inventory remains incomplete for a number of public/protected
+surfaces, and documented safe-to-test plot cursor/context/history/quality
+criteria paths are still open. MainWindow native-desktop/CLI paths, third-party
+plugin ABI combinations, historic user-data corpus compatibility, OS-level
+permission/error injection, visual rendering and deliberately dangerous
+null/index/allocation paths require separate treatment. Aggregate coverage,
+coverage gates, CTest/CI, sanitizer/static-analysis and multi-platform
+verification also remain later milestones.

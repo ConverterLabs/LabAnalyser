@@ -529,3 +529,26 @@ evidence, defect candidates and exclusions are in `PLOT_CONTRACTS_3J.md`.
 PlotWidget remains unsuitable for broad refactoring: valid cursor,
 context-menu, history-limit and quality-criteria paths still need direct
 characterization; rendering, gesture and dangerous failure paths are excluded.
+
+## Milestone 3 completion audit
+
+The top-level table is the original milestone-1 source map. Its rows marked
+`mapped, unverified` are superseded where the phase sections below assign test
+IDs; they are retained as the historical inventory rather than rewritten to
+hide still-open function-level detail. The concrete milestone-3 mappings are:
+
+| Surface | Characterized evidence | Remaining function-level inventory gap or explicit exclusion |
+| --- | --- | --- |
+| `mainwindow.*` | `GUI_001..GUI_021` | `main.cpp` itself, CLI arguments, native dialogs, desktop tray and unsafe selection/index paths are not executed. These are explicit exclusions, not passing evidence. |
+| DataManagement and UI manager | `DM_001..DM_010`, plus XML, parameter, export, plugin and GUI boundary IDs named above | `LoadForms` has no repository definition. Sender-less, absent-entry and raw-pointer paths remain unsafe exclusions; the remaining UI-manager surfaces are not yet a complete per-function map. |
+| Plugin API and loader | `PLUGIN_001..PLUGIN_007`; `XML_002..XML_004` for the XML path boundary | Third-party ABI/configuration matrix, null Messenger/null plugin return and OS loader/permission faults remain explicit exclusions. |
+| DropWidget adapters, indicators and loader | `DW_001..DW_017`; real-form boundaries `GUI_006..GUI_008` | Source-backed `QDrag::exec()` drops, complete interactive context paths, visual pixel appearance and dangerous null/index paths remain excluded. |
+| Tree and subplot lifecycle | `DW_009`, `GUI_005`, `GUI_012`, `GUI_017` | Tree source-dependent drops, malformed selections and plot content semantics remain unexecuted. |
+| Plot/FFT | `PLOT_001..PLOT_006`, `FFT_001..FFT_008`; separate PlotMeasurements unit suite | `ClearAllGraphs`, X-axis mapping, valid cursor/context/history/quality criteria, rendering/gesture paths and FFT resource-failure paths are either unexecuted or explicitly unsafe. |
+
+Thus all inspected subsystem scopes have at least a test-ID mapping or an
+explicit exclusion, but the inventory is not yet a complete one-row-per-public
+or protected production-function register. That remains an open quality gate
+before broad refactoring. Milestone 3 therefore records the characterization
+of identified critical external contracts, not a claim that every production
+function has been tested or fully inventoried.
