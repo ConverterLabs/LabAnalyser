@@ -128,6 +128,11 @@ $testProjects = @(
         ProjectFile = Join-Path $repositoryRoot 'tests\contract\plugins\PluginLoaderContractTests.pro'
         ExecutableRelativePath = 'release\PluginLoaderContractTests.exe'
     }
+    ,[PSCustomObject]@{
+        Id = 'integration/mainwindow/MainWindowIntegrationTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\integration\mainwindow\MainWindowIntegrationTests.pro'
+        ExecutableRelativePath = 'release\MainWindowIntegrationTests.exe'
+    }
 )
 
 foreach ($testProject in $testProjects) {
@@ -152,9 +157,6 @@ try {
     $env:Path = ($pathParts + $env:Path) -join ';'
     $env:MSYSTEM = 'MINGW64'
     $env:CHERE_INVOKING = '1'
-    # XML contract tests construct the real Qt Widgets application graph.
-    # Offscreen makes that documented local path independent of a desktop.
-    $env:QT_QPA_PLATFORM = 'offscreen'
     $pluginBuildScript = Join-Path $repositoryRoot 'tests\fixtures\plugins\source\build-test-plugins.ps1'
     Assert-File -Path $pluginBuildScript -Description 'test plugin build script'
     $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
@@ -175,7 +177,22 @@ try {
             $testExecutable = Join-Path $testBuildDir $testProject.ExecutableRelativePath
             Assert-File -Path $testExecutable -Description "test executable '$($testProject.Id)'"
             $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
-            Invoke-Native -Exe $testExecutable -Arguments @('-txt')
+            # The real MainWindow target is the sole suite that requires an
+            # offscreen Qt platform. Keep the caller's setting for every other
+            # test and restore it immediately after this executable returns.
+            $suiteQtQpaPlatform = $env:QT_QPA_PLATFORM
+            $suiteRepositoryRoot = $env:LABANALYSER_TEST_REPOSITORY_ROOT
+            try {
+                if ($testProject.Id -eq 'integration/mainwindow/MainWindowIntegrationTests') {
+                    $env:QT_QPA_PLATFORM = 'offscreen'
+                    $env:LABANALYSER_TEST_REPOSITORY_ROOT = $repositoryRoot
+                }
+                Invoke-Native -Exe $testExecutable -Arguments @('-txt')
+            }
+            finally {
+                $env:QT_QPA_PLATFORM = $suiteQtQpaPlatform
+                $env:LABANALYSER_TEST_REPOSITORY_ROOT = $suiteRepositoryRoot
+            }
         }
         finally {
             Pop-Location

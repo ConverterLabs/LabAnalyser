@@ -217,3 +217,18 @@ failure; the immediately following runner completed the same tree successfully
 DropWidget suite also passed. File-level gcov evidence for adapters, loader,
 tree source, table mapping and exercised DataManagement dependencies is in
 `DROPWIDGET_CONTRACTS_3H.md`; it is not project-wide coverage or a threshold.
+
+## MainWindow characterization 3I
+
+`MainWindowIntegrationTests` is registered in `tests/run-tests-msys2.ps1` and
+executes the real production MainWindow graph offscreen. The runner applies
+`QT_QPA_PLATFORM=offscreen` and its portable repository-fixture root only to
+that executable and restores the process environment afterward. `GUI_001`
+through `GUI_021` passed (23 Qt Test entries including setup/cleanup) on
+2026-08-04. The first `-Clean -Jobs 4` runner reached only the hard 300-second
+command limit after cleaning/rebuilding, without an observed compiler or test
+error; one resumed run also reached that external limit while continuing the
+same tree. The next non-clean full runner completed all ten registered suites
+with exit code 0. Fresh Release and Debug production builds and a separate
+instrumented MainWindow suite also passed. Current per-file gcov evidence is
+in `MAINWINDOW_CONTRACTS_3I.md`; it is not project coverage or a threshold.

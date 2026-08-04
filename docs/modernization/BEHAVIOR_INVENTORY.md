@@ -198,3 +198,253 @@ the separate `YellowColor()` slot selects yellow. This is characterized as
 legacy behavior, not repaired. The remaining DropWidget gaps are 3I
 manager/drag/MainWindow, 3J PlotWidget, visual-pixel, or unsafe null/index
 paths; see `DROPWIDGET_CONTRACTS_3H.md` for fresh per-file gcov comparison.
+
+## MainWindow integration 3I.1 characterization
+
+`integration/mainwindow/MainWindowIntegrationTests` exercises the real
+`mainwindow.cpp`/`mainwindow.ui` target offscreen; it deliberately excludes
+only production `main.cpp` so the test-owned `QApplication` can isolate
+`QSettings` to a `QTemporaryDir`. `main.cpp` was inventoried: it constructs
+the application, assigns the WindowsVista style and application metadata,
+constructs `MainWindow`, then enters the event loop. The suite does not claim
+to execute that production entry point directly.
+
+`GUI_001` constructs and destroys the real `MainWindow` in a fresh temporary
+INI user scope, verifies the parent-owned logic object and empty form/data
+state, and leaves no top-level `MainWindow`. `GUI_002` maps the current title
+and hierarchy (`LabAnalyser`, `centralWidget`, `menuBarI`, status bar and
+toolbar), the File/Plot/Help menus, `ParameterDock`, `StateDock`, `DataDock`
+and `OutputDock`, plus all declared actions: `actionBeenden`,
+`actionLoad_Form`, `actionCreatePlot`, `actionCreate_Subplot`,
+`actionLoadPlugin`, `actionSave_Experiment`, `actionLoadExperiment`,
+`Close_Project`, `actionDaten_Exportieren_mat`, `actionSave`,
+`actionMinimize_to_Tray`, `actionAbout_LabAnalyzer`,
+`actionLoad_Parameter_File`, `actionSave_Parameter_Set`, `actionAbout`,
+`actionExport_Data_h5`, `actionRemote_Connection_Port`,
+`actionRemote_Connection_Port_2` and `actionFFT`. It records
+the current default enabled, unchecked, non-checkable action state and the
+right-dock movable/floatable/non-closable feature set. `GUI_003` verifies the
+safe no-form `Close_Project` reset and the connected minimize-to-tray/
+double-click restore action path. `GUI_004` characterizes repeated hide/show
+and floating transitions of a real dock. `GUI_005` exercises the currently
+direct `MainWindow::CreateSubPlotWindow` coupling: two 1x1 figure subwindows
+receive sequential object/window names and close cleanly. It is lifecycle
+coverage only, not PlotWidget semantics (3J).
+
+The real target necessarily links the immediate application graph declared by
+`LabAnalyser.pro`, including UIDataManagement, RemoteControl construction,
+SubPlotMainWindow, PlotWidget and vendored qcustomplot. No MainWindow seam,
+plugin, network action, user file, or real user settings is used. Modal file,
+plugin, import/export, parameter, remote-port and About actions remain
+inventoried only to prevent blocking interaction; dynamic user-form dock
+closure, unsaved-form close prompts and full drag/drop remain subsequent 3I
+work. No `QSettings`/`restoreState`/monitor-restoration implementation is
+present in `mainwindow.cpp`; dangerous monitor or state-restore inputs were
+therefore not manufactured in-process.
+
+Every construction emits the existing Qt auto-connect warning that
+`on_pushButton_clicked()` has no matching `pushButton` signal in the loaded
+UI. This is a defect candidate because it indicates a stale slot/UI mismatch.
+Offscreen additionally warns that the `QSystemTrayIcon` has no icon and that
+the platform does not support selected window-management operations; these are
+headless-platform observations, not evidence of a normal desktop regression.
+The direct plot-window dependency and dynamic dock removal code remain risk
+areas for later full GUI characterization.
+
+## MainWindow dynamic forms and bindings 3I.2 characterization
+
+`GUI_006` through `GUI_008` extend the same real offscreen MainWindow target
+with the portable `tests/fixtures/gui/mainwindow-bindings.ui` fixture and the
+existing standard, malformed and unsupported-widget UI fixtures. `GUI_006`
+calls the public `LoadFormFromXML(path, formName, skip)` directly, avoiding the
+modal file chooser. It characterizes repeated loading of one fixture under
+distinct XML form names and loading a second fixture: each creates a left-area,
+closable, delete-on-close dock named by `formName`, records the pair in
+`GetFormFileEntry`, retains a `QScrollArea`/tab/form ownership chain, and
+suffixes descendant DropWidget object names with `_<formName>`. Closing a dock
+removes that form-file entry; an equivalent later load creates a new dock.
+
+The same test proves that missing and malformed UI inputs do not create a dock
+or form-file entry and each report the existing `Corrupt Form File` Messenger
+error. An unknown widget class is instead reported by the Qt form builder and
+the containing form still loads as a dock without that child widget. This
+partial-load behavior remains a defect candidate. `LoadFormFromXML` also calls
+`QDir::setCurrent` to the form's directory and does not restore the previous
+process working directory; `GUI_006` records that global side effect as a
+defect candidate.
+
+`GUI_007` binds two actual `QLineEditD` instances from two loaded forms to the
+same real `UIDataManagementSetClass` container (`GUI7::sharedText`). Two
+ordered `get` `DataManagementClass::MessageSender` events arise during
+`ConnectToID`; a Messenger `set` updates both widgets, and an invoked
+`editingFinished` creates one ordered `set` event with the expected ID and
+string payload. The direct non-modal `CloseProject` path, with
+`ChangeForSaveDetected` set false, deletes both docks, clears form records and
+containers, and restores the central widget. Thus its safe stored-form path
+is mapped without entering the interactive unsaved-project question.
+
+`GUI_008` sends deterministic drag-enter/drop events to a loaded DropWidget.
+They have no Qt-private `QDrag` source and are safely rejected without creating
+a mapping. A valid production drop requires `event->source()` to be a selected
+`QTreeWidget`; Qt does not expose a setter for that source on a directly
+constructed event, and a real `QDrag::exec()` is intentionally excluded from
+this deterministic suite. Consequently, valid tree-source drop acceptance,
+the source-empty `selectedItems()[0]` crash risk, and multi-selection drop
+semantics remain unverified rather than being encoded as contracts.
+
+No external plugin, network action, real user file or user setting is used.
+Modal load/save/import/export/parameter/About and unsaved-form prompts remain
+excluded. The existing stale auto-connect warning and headless tray/platform
+warnings from 3I.1 remain observed but unchanged.
+
+## MainWindow modal action cancellation 3I.3 characterization
+
+`GUI_009` through `GUI_011` run the real QAction-to-slot connections with
+`Qt::AA_DontUseNativeDialogs` set before the test `QApplication`. A zero-delay
+event-loop `QTimer` observes `QApplication::activeModalWidget()` and rejects
+or clicks the requested `QMessageBox` button; no native dialog, fixed sleep or
+user interaction is used. The application working directory, settings and
+dialog-output root are temporary for the suite. Per-test cleanup restores the
+temporary working root and `main` restores the caller's original directory
+after `qExec`.
+
+`GUI_009` establishes one modal dialog per trigger for `actionLoad_Form`,
+`actionLoadExperiment`, `actionSave_Experiment`, `actionSave`,
+`actionLoadPlugin`, `actionLoad_Parameter_File`, MAT/HDF5 export and parameter
+export (with one real selected test parameter), `actionAbout`, and
+`actionRemote_Connection_Port_2`. All were deterministically aborted without
+creating a file in the dedicated temporary output directory or changing the
+process current directory. The same test confirms that `actionAbout` opens a
+real dialog and that the remote-port action opens a one-button message box.
+`actionAbout_LabAnalyzer` emits its QAction signal but opens no dialog because
+its current slot is empty.
+
+`GUI_010` records cancellation side effects rather than normalizing them:
+cancelled Save-as and Save both emit `MainWindow::SaveExperiment` once with an
+empty path, causing the observed downstream "No file name specified" warning;
+Save-as also clears `ChangeForSaveDetected`. Cancelled Save-as and parameter
+load replace an existing `StdSavePath` with an empty string. No output file or
+working-directory mutation resulted in the test. These are defect candidates:
+an abort does not preserve the selected path/dirty state and a save request is
+still sent to the manager with an empty filename.
+
+`GUI_011` covers the real unsaved `Close_Project` prompt with a loaded form.
+Cancel keeps the dock and form-file record but still clears
+`ChangeForSaveDetected`; a repeated prompt can be reached only after the test
+marks it dirty again. Discard closes and deletes the dock, removes form records
+and clears manager containers. The lost dirty state on Cancel is a defect
+candidate. The About dialog is allocated without a parent and survives its
+rejection until the test explicitly deletes it; this is a further ownership
+defect candidate. `About.ui::setupUi` overwrites the preceding
+`"About LabAnaylser"` title with its current `"Dialog"` title.
+
+Successful XML/plugin/export/TCP paths are intentionally not duplicated here.
+Uncovered modal work remains selecting a real file, accepting Save and
+overwriting a target, interacting with custom subplot controls, native-dialog
+platform behavior (explicitly disabled for determinism), and the unsafe
+selection-dependent context-menu paths.
+
+## MainWindow safe action, tree and recovery characterization 3I.4b
+
+`GUI_012` through `GUI_015` use the same real, offscreen MainWindow graph and
+temporary settings/working roots. The expanded suite passed all 17 Qt Test
+entries (15 GUI tests plus initialization and cleanup) with exit code 0.
+`GUI_012` maps `on_actionCreate_Subplot_triggered` to its real modal dialog:
+Cancel creates no figure, while valid 2x3 and 1x2 selections create and then
+cleanly close distinct `SubPlotMainWindow` instances across a repeat cycle.
+This is window-lifecycle coverage only; PlotWidget data, rendering and FFT
+semantics remain 3J work.
+
+`GUI_013` covers repeated `on_actionMinimize_to_Tray_triggered` cycles, the
+real Restore QAction and `TrayIconActivated(DoubleClick)`, together with
+`OutputTextMenu`, its Clear Output action, `ErrorWriter` long-text trimming
+and `InfoWriter`'s current 100-block document limit. The expected offscreen
+warnings about raising windows and keyboard grabbing do not establish desktop
+tray behavior.
+
+`GUI_014` publishes actual nested Parameter, Data and State values through
+the Messenger/manager and maps `AddElementToWidget` and
+`HighLightConnection`: category/group/leaf structure, IDs, typed values,
+manager-to-tree update, repeat-ID deduplication and valid-leaf selection are
+covered. Empty or missing selections/IDs remain excluded because they reach
+known unsafe index/null candidates.
+
+`GUI_015` maps `LoadFormFromXML` form/dock recovery through the portable
+`mainwindow-bindings.ui` fixture: load, record, close/removal and independent
+recreation with a new temporary form name. No distinct compiled `LoadForms`
+routine exists to test. Direct tree-source drag acceptance, context actions,
+notification/scroll timer behavior, command-line paths and real system-tray
+availability remain open or belong to later 3I/3J work; no production behavior
+was changed.
+
+## MainWindow context actions, plot routing and timers 3I.4c
+
+`GUI_016` through `GUI_018` keep the real MainWindow graph under the same
+offscreen and temporary-environment isolation. The rebuilt suite passed all 20
+Qt Test entries (`GUI_001`–`GUI_018`, initialization and cleanup) with exit
+code 0. `GUI_016` maps valid-leaf context behavior: Parameter exposes the
+enabled/visible `Change Min/Max Values` action; Data exposes `Set Alias`, whose
+controlled modal action commits `First Alias` to `Data::Device::First`, then
+also exposes `Remove Alias`; a valid two-leaf Data selection still exposes Set
+Alias. State exposes no leaf action because its production custom-context
+connection is commented out and its direct slot handles only a top-level item.
+Empty, invalid and top-level selections were not executed.
+
+`GUI_017` maps `actionCreatePlot` and `actionFFT` to three repeatable 1x1
+figure/plot registrations. `Figure#0`–`Figure#2` and `Plot#1`–`Plot#3` retain
+the observed pairing and parent/target relation, then close cleanly. This does
+not test PlotWidget samples, curves, FFT results or rendering, which remain
+3J contracts.
+
+`GUI_018` maps ordered notification signal payloads, current append-not-
+replace OutputText behavior, the one-second status-message expiry, conditional
+output autoscroll, and destruction while a status-message timer is pending.
+No use-after-free or crash was observed. The current multiple-Data-leaf alias
+branch concatenates IDs without a separator before routing; its actual commit
+is therefore a defect candidate and is not treated as a safe contract.
+Remaining risks include empty-selection/index paths, Parameter Min/Max commit,
+Remove Device, alias removal, notification-dock raise/loading delays, real
+system-tray availability and all PlotWidget semantics. No production behavior
+was changed.
+
+## MainWindow mutable context actions 3I.4d
+
+`GUI_019` through `GUI_021` characterize only valid, temporary selections in
+the real offscreen MainWindow graph. The suite passed all 23 Qt Test entries
+(`GUI_001`–`GUI_021`, initialization and cleanup) with exit code 0.
+`GUI_019` maps `ChangeMinMaxValue`: its first dialog displays a stored `1.25`
+minimum as `1.3` at the current dialog precision, but cancelling both dialogs
+preserves the stored `(1.25, 5.5)` pair. A valid `(-3, 9)` commit updates the
+manager and emits one `MessageSender("get", ID, InterfaceData())`; `(10, -2)`
+is also accepted and stored without range validation. The rounding and inverted
+range acceptance are defect candidates.
+
+`GUI_020` maps `SetAlias` and `RemoveAlias`: cancel preserves the ID, Unicode
+`Mäßwert Ω` is accepted, an accepted empty alias is ignored, and removal maps
+the alias back to the original ID without changing the displayed tree leaf.
+For two valid Data leaves, the real dialog receives the delimiter-free
+concatenation `GUI20Device::Data::FirstGUI20Device::Data::Second`; its alias is
+stored only under that synthetic key, not either individual ID. This confirms
+the multiple-selection alias defect candidate.
+
+`GUI_021` uses a temporary, public-interface-only test device to map
+`RemoveDevice`. Opening its valid root context menu has no effect; triggering
+the single `Remove Device` action immediately destroys the device and removes
+its roots/selections from all three trees. No confirmation or Cancel path is
+implemented, and no `MessageSender` event occurs. Its data container remains
+in the manager after removal, which is another defect candidate. Empty,
+invalid and unknown-selection paths remain excluded; no production behavior
+was changed.
+
+## MainWindow phase 3I completion
+
+All real MainWindow contracts `GUI_001` through `GUI_021` are now mapped in
+`MAINWINDOW_CONTRACTS_3I.md` and run through the normal qmake runner. The
+suite uses a real MainWindow without a production seam, a temporary settings
+and working environment, and a portable fixture root. It sets offscreen only
+for that suite. Current coverage and full function checklist are recorded in
+the contract document. The known unsafe empty/invalid selection, null sender
+and index paths remain deliberately excluded from in-process tests. Figure
+lifecycle/action routing is covered, but PlotWidget data, FFT calculations,
+curves, interaction and rendering are deferred to 3J. No production source was
+changed in phase 3I.

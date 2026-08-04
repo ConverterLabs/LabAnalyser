@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowBindingsFixture</class>
+ <widget class="QWidget" name="bindingsForm">
+  <layout class="QVBoxLayout" name="bindingsLayout">
+   <item><widget class="QLineEdit" name="primaryValue"><property name="text"><string>seed-one</string></property></widget></item>
+   <item><widget class="QLineEdit" name="secondaryValue"><property name="text"><string>seed-two</string></property></widget></item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

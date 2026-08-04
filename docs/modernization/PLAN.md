@@ -138,3 +138,36 @@ MainWindow-Pfade sind verbindlich Phase 3I zugeordnet; PlotWidget-/Plotpfade
 sind verbindlich Phase 3J zugeordnet. Null-/Indexpfade bleiben bis zu einem
 isolierten Defektnachweis ausdrücklich ausgeschlossen. Phase 3H ist damit für
 den isolierbaren Umfang abgeschlossen.
+
+## Phase 3I status
+
+**Technisch charakterisiert; Lückenanalyse ausgewertet (3I.4a, 2026-08-04).**
+The real offscreen MainWindow suite currently covers `GUI_001` through
+`GUI_011`, including construction, standard docks, dynamic UI forms,
+manager/messenger forwarding, deterministic modal cancellation, and the safe
+Close-Project discard path. Its instrumented per-file gcov evidence and the
+complete public/protected/Qt-slot checklist are in
+`MAINWINDOW_CONTRACTS_3I.md`; these are not project-wide coverage values.
+Subplot action routing, context/tree actions, CLI/tray variants, output menus,
+safe nested tree/dock behavior and all dangerous empty-selection/index paths
+remain deliberately open. Phase 3I is therefore not marked fully complete.
+
+## Phase 3I completion
+
+**Completed 2026-08-04.** `GUI_001` through `GUI_021` now cover real
+MainWindow construction/destruction, docks/forms and recovery,
+manager/messenger/tree forwarding, modal cancellation, close-project paths,
+subplot/standard/FFT action routing, tray/output/status behavior and safe
+valid-selection context actions. The suite is registered in the normal qmake
+runner, which sets offscreen and its portable fixture root only for this suite
+and restores the caller environment afterward. The combined `-Clean` command
+reached the fixed 300-second external limit after cleaning/rebuilding; a first
+resumed run also timed out while continuing that tree, and the next non-clean
+full runner completed all ten registered projects with exit code 0. Fresh
+Release/Debug builds and current per-file gcov evidence are in
+`MAINWINDOW_CONTRACTS_3I.md`; they are not project-wide metrics or a gate.
+
+No production source changed. Dangerous empty/invalid selection, null
+sender/index, CLI/native-dialog/real-tray and external-file paths stay
+documented exclusions. PlotWidget data, curves, FFT calculations, interaction
+and rendering are explicitly Phase 3J, not completion criteria for 3I.
