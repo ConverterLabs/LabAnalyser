@@ -89,3 +89,11 @@ return convention without entering the production build.  Unsafe null-pointer
 paths, deterministic permission/allocation faults and real UI construction
 remain follow-up limitations.  Phase 3E is complete; no production source,
 dependency, committed HDF5 output or binary fixture was added.
+
+## Phase 3F status
+
+Remote-control characterization is complete with loopback-only `TCP_001`–
+`TCP_007`, fresh Release/Debug builds and file-level gcov evidence. The split
+clean-runner result, unsafe malformed-frame exclusions and legacy behavior are
+documented in `REMOTE_CONTROL_CONTRACTS_3F.md`; no production protocol or
+dependency changed.

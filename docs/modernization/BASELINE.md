@@ -173,3 +173,13 @@ once; it is per-file evidence, not a project coverage threshold.  The focused
 test project has a documented test-only UI seam and is not part of the
 production qmake target.  Details, defect candidates and limitations are in
 `HDF5_CONTRACTS_3E.md`.
+
+## Remote-control characterization 3F
+
+`RemoteControlContractTests` characterizes `TCP_001`–`TCP_007` over loopback.
+The initial clean runner was stopped only by the 300-second tool limit after
+cleaning its build tree; the immediately following full runner completed that
+tree successfully. Fresh Release/Debug builds and the instrumented suite
+passed. `RemoteControlServer.cpp` gcov evidence is 87.41% lines, 87.30%
+executed branches, 52.38% taken branches and 76.30% calls. See
+`REMOTE_CONTROL_CONTRACTS_3F.md`.

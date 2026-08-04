@@ -112,6 +112,11 @@ $testProjects = @(
         Id = 'contract/Hdf5ExportContractTests'
         ProjectFile = Join-Path $repositoryRoot 'tests\contract\hdf5\Hdf5ExportContractTests.pro'
         ExecutableRelativePath = 'release\Hdf5ExportContractTests.exe'
+    },
+    [PSCustomObject]@{
+        Id = 'contract/RemoteControlContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\remotecontrol\RemoteControlContractTests.pro'
+        ExecutableRelativePath = 'release\RemoteControlContractTests.exe'
     }
 )
 
