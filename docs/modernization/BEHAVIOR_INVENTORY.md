@@ -86,3 +86,19 @@ the narrow `UIDataManagementSetClass::Export2Hdf5` catch-and-return convention
 and is neither included nor linked by `LabAnalyser.pro`.  Public HighFive reads
 validate output semantically.  Detailed file structure, coverage, unsafe-path
 exclusions and defect candidates are in `HDF5_CONTRACTS_3E.md`.
+
+## Plugin loading 3G characterization
+
+`contract/PluginLoaderContractTests` maps `LoadPlugin::readDevice()` and its
+narrow UI return convention to `PLUGIN_001` through `PLUGIN_007`. Runtime-built
+compatible, wrong-IID and QObject-only plugins characterize load, rejection,
+Messenger, registration, repeat and lifetime behavior. The only production
+change is the approved null-cast guard: incompatible loadable plugins are
+rejected without `GetInterface()` or registration. The public interface IID is
+unchanged: `org.qt-project.Qt.Examples.EchoInterface`.
+
+`DataManagementSetClassTestSeam` is compiled only into the plugin contract
+target and does not prove complete GUI integration. Unverified limits include
+parser/missing-attribute paths, null Messenger or `GetInterface()` results,
+platform loader/permission faults and a third-party binary ABI matrix; see
+`PLUGIN_CONTRACTS_3G.md`.

@@ -118,6 +118,11 @@ $testProjects = @(
         ProjectFile = Join-Path $repositoryRoot 'tests\contract\remotecontrol\RemoteControlContractTests.pro'
         ExecutableRelativePath = 'release\RemoteControlContractTests.exe'
     }
+    ,[PSCustomObject]@{
+        Id = 'contract/PluginLoaderContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\plugins\PluginLoaderContractTests.pro'
+        ExecutableRelativePath = 'release\PluginLoaderContractTests.exe'
+    }
 )
 
 foreach ($testProject in $testProjects) {
@@ -145,6 +150,11 @@ try {
     # XML contract tests construct the real Qt Widgets application graph.
     # Offscreen makes that documented local path independent of a desktop.
     $env:QT_QPA_PLATFORM = 'offscreen'
+    $pluginBuildScript = Join-Path $repositoryRoot 'tests\fixtures\plugins\source\build-test-plugins.ps1'
+    Assert-File -Path $pluginBuildScript -Description 'test plugin build script'
+    $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
+    Invoke-Native -Exe 'powershell.exe' -Arguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $pluginBuildScript, '-BuildRoot', (Join-Path $repositoryRoot 'build\test-plugins'))
+    $env:LABANALYSER_TEST_PLUGIN_ROOT = Join-Path $repositoryRoot 'build\test-plugins'
 
     foreach ($testProject in $testProjects) {
         $testBuildDir = Join-Path $BuildRoot ($testProject.Id.Replace('/', '\\'))

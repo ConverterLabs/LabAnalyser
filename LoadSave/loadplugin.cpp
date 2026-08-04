@@ -63,6 +63,11 @@ void LoadPlugin::readDevice()
                     if(Plugin)
                     {
                         Platform_Fabric *NewDevice = qobject_cast<Platform_Fabric *>(Plugin);
+                        if(!NewDevice)
+                        {
+                            Messenger->SendError("the xml-Device: " + filename + " is incompatible with Platform_Fabric.");
+                            return;
+                        }
                         Platform_Interface* PI = NewDevice->GetInterface(Messenger);
                         DCObj->AddDevice(Name, m_devFileName, PI);
                         NewDeviceReg = DCObj->GetDevice(Name);

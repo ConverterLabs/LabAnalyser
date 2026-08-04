@@ -49,3 +49,20 @@ qmake coverage-flag overrides and the same test executable as the initial
 mechanism.  Aggregate reporting requires installing/reviewing a reporter such
 as the available MSYS2 `mingw-w64-x86_64-lcov`; no coverage gate is permitted
 until broader behavior is characterized.
+
+## ADR-006: Reject incompatible loaded plugins safely
+
+**Date:** 2026-08-04
+**Status:** accepted security bugfix
+
+After a successful `QPluginLoader::instance()`, `LoadPlugin` must reject a
+null `qobject_cast<Platform_Fabric *>`, send a Messenger error and return
+without calling `GetInterface` or registering a device. This is an approved
+behavior change for the prior null-dereference defect; IID and ABI remain
+unchanged.
+
+The defect baseline was isolated in a separate process. Regression contracts
+`PLUGIN_001` through `PLUGIN_007` verify preserved compatible-plugin behavior
+and safe rejection of wrong-IID and QObject-only plugins. The source-level
+public header/IID comparison is unchanged; it is not a claim of binary
+compatibility for every independently built third-party plugin.

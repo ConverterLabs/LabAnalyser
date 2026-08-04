@@ -97,3 +97,19 @@ Remote-control characterization is complete with loopback-only `TCP_001`–
 clean-runner result, unsafe malformed-frame exclusions and legacy behavior are
 documented in `REMOTE_CONTROL_CONTRACTS_3F.md`; no production protocol or
 dependency changed.
+
+## Phase 3G status
+
+**Completed 2026-08-04.** The owner approved the minimal security behavior
+change for the deterministic incompatible-plugin null dereference.
+`LoadPlugin::readDevice` now rejects a null `Platform_Fabric` cast through the
+existing Messenger before `GetInterface()` or registration; valid plugin
+behavior, public plugin headers and IID `org.qt-project.Qt.Examples.EchoInterface`
+remain unchanged. Runtime fixture contracts `PLUGIN_001` through `PLUGIN_007`,
+the post-clean full runner and fresh Release/Debug builds passed. The combined
+`-Clean` invocation was bounded by the 300-second tool limit after cleanup;
+the immediately following run completed the same cleaned tree and is the
+evidence used here. File-specific `loadplugin.cpp` coverage is 87.50% lines,
+90.62% branches executed, 50.00% branches taken and 76.79% calls. No coverage
+threshold was enabled. Test-only seam and remaining platform/ABI/error-path
+limits are recorded in `PLUGIN_CONTRACTS_3G.md`.

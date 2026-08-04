@@ -183,3 +183,23 @@ tree successfully. Fresh Release/Debug builds and the instrumented suite
 passed. `RemoteControlServer.cpp` gcov evidence is 87.41% lines, 87.30%
 executed branches, 52.38% taken branches and 76.30% calls. See
 `REMOTE_CONTROL_CONTRACTS_3F.md`.
+
+## Plugin characterization 3G
+
+Phase 3G completed under an explicitly approved security behavior change. The
+unchanged code had a deterministic null-pointer crash for a successfully
+loaded incompatible plugin; the defect was demonstrated only in an isolated
+process. `LoadPlugin::readDevice()` now has the minimal null-cast guard,
+emitting an existing-Messenger error and returning before `GetInterface()` or
+registration. Compatible plugins retain the existing IID
+`org.qt-project.Qt.Examples.EchoInterface` and successful load/registration
+behavior. Runtime-built compatible, wrong-IID and QObject-only fixtures passed
+`PLUGIN_001` through `PLUGIN_007`; the complete post-clean runner and fresh
+Release/Debug builds passed. The combined `-Clean` command itself reached only
+the 300-second tool limit after cleaning, with no observed compiler/test error;
+the immediately following full run completed that cleaned tree. File-specific
+`loadplugin.cpp` gcov evidence is 87.50% lines, 90.62% branches executed,
+50.00% branches taken at least once and 76.79% calls. Public plugin headers and
+IID were unchanged; no generated plugin DLL, executable, build or coverage
+artifact is versioned. Remaining limits are documented in
+`PLUGIN_CONTRACTS_3G.md`.
