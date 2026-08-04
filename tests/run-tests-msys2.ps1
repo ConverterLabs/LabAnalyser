@@ -133,6 +133,11 @@ $testProjects = @(
         ProjectFile = Join-Path $repositoryRoot 'tests\integration\mainwindow\MainWindowIntegrationTests.pro'
         ExecutableRelativePath = 'release\MainWindowIntegrationTests.exe'
     }
+    ,[PSCustomObject]@{
+        Id = 'contract/plotwidget/PlotWidgetContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\plotwidget\PlotWidgetContractTests.pro'
+        ExecutableRelativePath = 'release\PlotWidgetContractTests.exe'
+    }
 )
 
 foreach ($testProject in $testProjects) {
@@ -177,13 +182,13 @@ try {
             $testExecutable = Join-Path $testBuildDir $testProject.ExecutableRelativePath
             Assert-File -Path $testExecutable -Description "test executable '$($testProject.Id)'"
             $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
-            # The real MainWindow target is the sole suite that requires an
+            # The real MainWindow and PlotWidget contract targets require an
             # offscreen Qt platform. Keep the caller's setting for every other
             # test and restore it immediately after this executable returns.
             $suiteQtQpaPlatform = $env:QT_QPA_PLATFORM
             $suiteRepositoryRoot = $env:LABANALYSER_TEST_REPOSITORY_ROOT
             try {
-                if ($testProject.Id -eq 'integration/mainwindow/MainWindowIntegrationTests') {
+                if ($testProject.Id -in @('integration/mainwindow/MainWindowIntegrationTests', 'contract/plotwidget/PlotWidgetContractTests')) {
                     $env:QT_QPA_PLATFORM = 'offscreen'
                     $env:LABANALYSER_TEST_REPOSITORY_ROOT = $repositoryRoot
                 }

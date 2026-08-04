@@ -16,7 +16,7 @@ IDs and characterization vectors before modifying it.
 | MAT export | `Export/Export2Mat.*`; `UIDataManagementSetClass::Export2Mat` | MAT v5 schema, scalar/vector double data, UTF-8 characters, overwrite/error behavior. | `contract/MatExportContractTests::{MAT_001..MAT_008}` | baseline characterized; allocation-failure, HDF5 and matrix/rank-3 sources unverified |
 | HDF5 export | `Export/export2highfive.*`; `UIDataManagementSetClass::Export2Hdf5` | HighFive file truncation; `Timestamp`; `::` to `/` paths; numeric/scalar, vector and string data; direct file errors throw while UI catches and returns `false`. Null manager/second vector pointer are unsafe paths. | `contract/Hdf5ExportContractTests::{HDF5_001..HDF5_006}` | baseline characterized; test-only UI return seam; permission/allocation faults and real UI construction unverified |
 | TCP remote control | `RemoteControl/RemoteControlServer.*` | Loopback port fallback; native binary framing; `set`/`get` bytes, signals, fragmentation, disconnect and current-socket behavior. | `contract/RemoteControlContractTests::{TCP_001..TCP_007}` | baseline characterized; unsafe short frames and platform faults unverified |
-| Plot widgets | `DropWidgets/Plots/PlotWidget.*`, `FFTPlotWidget.*` | Plot configuration, data mapping, legend/cursor/FFT presentation and event behavior. | — | mapped, unverified |
+| Plot widgets | `DropWidgets/Plots/PlotWidget.*`, `FFTPlotWidget.*` | Plot configuration, data mapping, legend/cursor/FFT presentation and event behavior. | `contract/plotwidget/PlotWidgetContractTests::{PLOT_001..PLOT_006, FFT_001..FFT_008}` | Time-domain and FFT data contracts characterized; rendering and unsafe paths remain unverified |
 | Plot measurements | `DropWidgets/Plots/PlotMeasurements.*` | Normalize sample order; interpolation; interval count/min/max/mean/RMS; THD and NaN invalid cases. | `unit/PlotMeasurementsTests::{constantSignal,linearSignal,sineAndHarmonics,nonUniformSamples,invalidIntervals}`; run by `tests/run-tests-msys2.ps1` | baseline tested; local runner integrated |
 | Drag/drop widgets | `DropWidgets/DropWidgetsUiLoader.*`, `DropWidget.h`, `QBLed/QCheckBox/QComboBox/QDoubleSpinBox/QLCDNumber/QLabel/QLed/QLineEdit/QListView/QProgressBar/QPushButton/QSlider/QSpinBox/QTSLed/QTableWidgeD.*`, `CreateID.*` | UI loading, widget-to-ID mapping, drag/drop acceptance, value conversion, XML save/load, signal/UI state. | — | mapped, unverified |
 | Indicators | `CustomWidgets/QBLedIndicator.*`, `QLedIndicator.*`, `QTSLedIndicator.*` | LED rendering/state input. | — | mapped, unverified |
@@ -448,3 +448,84 @@ and index paths remain deliberately excluded from in-process tests. Figure
 lifecycle/action routing is covered, but PlotWidget data, FFT calculations,
 curves, interaction and rendering are deferred to 3J. No production source was
 changed in phase 3I.
+
+## PlotWidget phase 3J.1 characterization
+
+`contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target
+which links the real qmake application graph, including the existing
+DataManagement/Messenger route and the vendored qcustomplot runtime source.
+It does not modify or unit-test qcustomplot. The smoke build and test run
+completed with exit code 0; `PLOT_001` through `PLOT_006` cover construction,
+data registration, graph state, the messenger `set` update route, axis/reset
+state, XML persistence, navigation interaction state and cleanup.
+
+| Production function | Test mapping / status |
+| --- | --- |
+| `PlotWidget::PlotWidget` | `PLOT_001` directly; `PLOT_002`–`PLOT_006` exercise real constructed instances. |
+| `~PlotWidget` | `PLOT_006` directly after graph/connection cleanup. |
+| `AddCustomGraph` | `PLOT_002`–`PLOT_004` directly, including multiple and repeated IDs. |
+| `ClearAllGraphs` | Not invoked: its observed pointer-registration-only behavior is not a safe graph-removal contract. The real `removeAllGraphs` slot is covered by `PLOT_003`/`PLOT_006`. |
+| `SetXDataName` / `XDataName` | Not yet directly exercised; XY mapping is deferred with plot interaction/data semantics to later 3J work. |
+| `SetVariantData` / `GetVariantData` | `SetVariantData` is indirectly covered by the UpdateGraphs route; form-mapper serialization is deferred to the existing UI/XML contract boundary. |
+| `LoadFromXML` / `SaveToXML` | `PLOT_005` directly for labels, ranges and state round-trip. |
+| `ConnectToID` | `PLOT_006` directly against a real manager and messenger update. |
+| `UpdateGraphs` | `PLOT_002`, `PLOT_004` and `PLOT_006` directly with forced deterministic updates. |
+| `SetAsXAxis` | Not executed: XY mode has unchecked empty-vector/index paths and is deferred; no unsafe path is invoked in-process. |
+| `keyPressEvent` / `keyReleaseEvent` | `PLOT_005` directly for control-navigation interaction removal/restoration. |
+| `dragEnterEvent` / `dropEvent` | Deferred: source-dependent drag routing belongs to the real tree/form workflow; synthetic missing-source paths are unsafe/ambiguous. |
+| protected `closeEvent` / `resizeEvent` | Not directly invoked; destruction is covered by `PLOT_006`, while visual geometry is intentionally excluded from the non-pixel contract. |
+
+Observed defect candidates: each `AddCustomGraph` call appends a graph even for
+an already-present data ID; callers must therefore avoid duplicate bindings.
+`ClearAllGraphs` removes manager registrations but does not itself remove the
+qcustomplot graphs, unlike the internal `removeAllGraphs` slot. The XY update
+route dereferences first/last elements after pointer/length checks without an
+empty-vector guard. These are documented observations, not repaired behavior.
+FFT calculation, plot rendering/pixels, mouse gesture geometry, source-backed
+drag/drop, selection/context menus, history limits and unsafe null/index paths
+remain excluded from 3J.1.
+
+## PlotWidget FFT phase 3J.2 characterization
+
+`FFT_001` directly covers the minimal `FFTPlotWidget` adapter: it is parented
+as supplied, sets `Qt::WA_AcceptTouchEvents`, contains no graphs initially and
+is safely destructible. The FFT calculation is not implemented by that adapter
+but by `PlotWidget::CalculateFFT`, reached only through the existing private
+`ToggleTimeFreq` Qt slot via `QMetaObject::invokeMethod`; no production access
+was widened.
+
+`FFT_002` and `FFT_003` use exactly eight samples at 8 Hz (`t=n/8`,
+`n=0..7`). The one-Hz sine has amplitude 2.0; the DC-plus-sine vector is
+`1.5 + 2*sin(2*pi*n/8)`. The stored vendored-graph FFT vectors contain ten
+entries (`2*(N/2+1)`), duplicate each frequency, report bin one at 1 Hz, DC
+at 1.5 and the one-sided sine amplitude at 2.0. All analytic amplitude
+assertions use an absolute tolerance of `1e-10`. The mode also changes labels
+to `f [Hz]`/`Amplitude`, impulse style and cross scatter markers.
+
+`FFT_004` verifies two independent graph vectors: a one-Hz amplitude-one
+signal and a two-Hz amplitude-three signal retain their distinct expected
+bins. `FFT_005` verifies the time-domain labels, original graph styles and a
+saved `[-2, 4]` time range are restored after the second toggle. `FFT_006`
+uses the real Messenger `set` route in FFT mode: amplitude one changes to two
+without a new graph. `FFT_007` characterizes existing nonuniform sampling as
+mean-delta-T behavior: `x={0,.1,.4,.6}`, mean delta `0.2`, `N=4`, therefore
+the stored bin spacing is `1.25 Hz` (tolerance `1e-12`).
+
+`FFT_008` covers only the existing safe early returns for empty and
+length-mismatched vectors: no stored FFT vectors are produced. Single-sample
+input (empty `dTs` division), FFTW allocation and plan creation failure, null
+graph pointers, nonfinite numerical behavior, rendering/pixels, gesture
+geometry and FFT quality/THD presentation remain deliberately unexecuted
+danger paths. `CalculateFFT` has no checks for failed `fftw_malloc` or a null
+FFTW plan before execution; these are defect candidates, not contracts.
+
+## PlotWidget phase 3J completion
+
+`PLOT_001` through `PLOT_006` and `FFT_001` through `FFT_008` are registered
+as `contract/plotwidget/PlotWidgetContractTests` in the normal qmake runner.
+The runner applies offscreen mode only while that executable runs and restores
+the caller environment. Detailed contracts, numeric tolerances, per-file gcov
+evidence, defect candidates and exclusions are in `PLOT_CONTRACTS_3J.md`.
+PlotWidget remains unsuitable for broad refactoring: valid cursor,
+context-menu, history-limit and quality-criteria paths still need direct
+characterization; rendering, gesture and dangerous failure paths are excluded.

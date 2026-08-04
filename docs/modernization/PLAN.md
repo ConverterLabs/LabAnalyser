@@ -171,3 +171,14 @@ No production source changed. Dangerous empty/invalid selection, null
 sender/index, CLI/native-dialog/real-tray and external-file paths stay
 documented exclusions. PlotWidget data, curves, FFT calculations, interaction
 and rendering are explicitly Phase 3J, not completion criteria for 3I.
+
+## Phase 3J completion
+
+**Completed 2026-08-04 for the characterized PlotWidget/FFT contract scope.**
+The normal qmake runner builds and runs offscreen `PlotWidgetContractTests` for
+`PLOT_001`â€“`PLOT_006` and `FFT_001`â€“`FFT_008`. The full runner and fresh
+Release/Debug builds passed; per-file coverage evidence and numerical gaps are
+in `PLOT_CONTRACTS_3J.md`. This is not authorization for a broad PlotWidget
+refactor: safe cursor, context-menu, history and quality-criteria paths remain
+uncovered, while rendering, gestures and dangerous FFT/index/error paths are
+explicit exclusions.

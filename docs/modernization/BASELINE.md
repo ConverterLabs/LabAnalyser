@@ -232,3 +232,14 @@ same tree. The next non-clean full runner completed all ten registered suites
 with exit code 0. Fresh Release and Debug production builds and a separate
 instrumented MainWindow suite also passed. Current per-file gcov evidence is
 in `MAINWINDOW_CONTRACTS_3I.md`; it is not project coverage or a threshold.
+
+## Plot and FFT characterization 3J
+
+`PlotWidgetContractTests` is registered in the local qmake runner and runs
+with offscreen mode scoped to that executable. `PLOT_001` through `PLOT_006`
+and `FFT_001` through `FFT_008` passed. The full runner and fresh Release/
+Debug builds passed on 2026-08-04. Existing file-level evidence is
+`PlotWidget.cpp` 42.89% lines and `FFTPlotWidget.cpp` 80.00% lines; the
+separate `PlotMeasurementsTests` unit suite remains authoritative for
+`PlotMeasurements.cpp`. These are not project-wide metrics or a threshold;
+details and remaining risks are in `PLOT_CONTRACTS_3J.md`.
