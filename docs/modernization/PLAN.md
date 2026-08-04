@@ -67,3 +67,12 @@ MSYS2 runtime directories first on `PATH`. The former `uic.exe`/`rcc.exe`
 `-1073741511` issue was an ambient MiKTeX Qt-DLL path conflict and is no longer
 a blocker for the documented local workflow. Fresh file-level gcov evidence is
 recorded in `PARAMETER_CONTRACTS_3C.md`; no coverage threshold is enabled.
+
+## Phase 3D status
+
+MAT export is characterized by `MAT_001` through `MAT_008` with public libmatio
+readback, all supported scalar variants, vectors, Unicode, error/overwrite
+paths and the real UI caller. The clean runner and fresh Release/Debug builds
+passed on 2026-08-04. Per-file coverage is in `MAT_CONTRACTS_3D.md`; no
+threshold is enabled. Phase 3D is complete; allocation-failure paths remain a
+documented fault-injection limitation. No production code or binary fixture was added.

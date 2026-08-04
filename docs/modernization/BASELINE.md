@@ -148,3 +148,13 @@ evidence is: `parameterloader.cpp` 100.00% lines / 100.00% branches executed;
 `exportinputs2xml.cpp` 100.00% / 100.00%; and the broader UI caller file
 `UIDataManagementSetClass.cpp` 34.09% / 26.88%. These are not project-wide
 coverage values or a threshold.
+
+## MAT export characterization 3D
+
+`MatExportContractTests` characterizes libmatio 1.5.28 MAT v5 export through
+public libmatio readback. It covers `MAT_001` through `MAT_008`; only temporary
+MAT files are used and no libmatio version or production source was changed.
+The 2026-08-04 clean five-project runner, fresh Release build, fresh Debug build
+and instrumented MAT contract test all passed. `Export/Export2Mat.cpp` gcov
+evidence is 98.44% lines and 97.50% executed branches; this is per-file evidence,
+not a project-wide metric or threshold.

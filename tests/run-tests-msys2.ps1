@@ -102,6 +102,11 @@ $testProjects = @(
         Id = 'contract/ParameterContractTests'
         ProjectFile = Join-Path $repositoryRoot 'tests\contract\parameters\ParameterContractTests.pro'
         ExecutableRelativePath = 'release\ParameterContractTests.exe'
+    },
+    [PSCustomObject]@{
+        Id = 'contract/MatExportContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\mat\MatExportContractTests.pro'
+        ExecutableRelativePath = 'release\MatExportContractTests.exe'
     }
 )
 
