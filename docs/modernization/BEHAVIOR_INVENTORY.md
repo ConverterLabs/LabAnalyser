@@ -14,6 +14,7 @@ IDs and characterization vectors before modifying it.
 | Experiment XML | `LoadSave/xmlexperimentreader.*`, `xmlexperimentwriter.*`; `UIDataManagementSetClass::{LoadExperiment,SaveExperiment}` | Read/write `Experiment` elements (Tabs, Devices, Widgets, State, FigureWindows, Connections), relative paths and Qt dock state. Reader/writer use `false` for success; unknown XML is skipped. `errorString()` is empty after parse errors; malformed figure widget counts risk unchecked indexing. | `contract/XmlExperimentContractTests::{XML_001..XML_008}` | baseline characterized; plugin-binary and historic-file corpus unverified |
 | Parameter XML | `Import/parameterloader.*`, `Export/exportinputs2xml.*`; `UIDataManagementSetClass::{ImportFromXml,Export2Xml}` | Inverted error booleans; ID/value-only persistence; malformed-file, conversion, duplicate and repeated-load behavior; XML forwarding. | `contract/ParameterContractTests::{PARAM_001..PARAM_009}` | baseline characterized; metadata persistence absent; broader UI export paths unverified |
 | MAT export | `Export/Export2Mat.*`; `UIDataManagementSetClass::Export2Mat` | MAT v5 schema, scalar/vector double data, UTF-8 characters, overwrite/error behavior. | `contract/MatExportContractTests::{MAT_001..MAT_008}` | baseline characterized; allocation-failure, HDF5 and matrix/rank-3 sources unverified |
+| HDF5 export | `Export/export2highfive.*`; `UIDataManagementSetClass::Export2Hdf5` | HighFive file truncation; `Timestamp`; `::` to `/` paths; numeric/scalar, vector and string data; direct file errors throw while UI catches and returns `false`. Null manager/second vector pointer are unsafe paths. | `contract/Hdf5ExportContractTests::{HDF5_001..HDF5_006}` | baseline characterized; test-only UI return seam; permission/allocation faults and real UI construction unverified |
 | TCP remote control | `RemoteControl/RemoteControlServer.*` | Loopback port selection; binary length/header framing; `set`/`get` request and response bytes; disconnect/error behavior. | — | mapped, unverified |
 | Plot widgets | `DropWidgets/Plots/PlotWidget.*`, `FFTPlotWidget.*` | Plot configuration, data mapping, legend/cursor/FFT presentation and event behavior. | — | mapped, unverified |
 | Plot measurements | `DropWidgets/Plots/PlotMeasurements.*` | Normalize sample order; interpolation; interval count/min/max/mean/RMS; THD and NaN invalid cases. | `unit/PlotMeasurementsTests::{constantSignal,linearSignal,sineAndHarmonics,nonUniformSamples,invalidIntervals}`; run by `tests/run-tests-msys2.ps1` | baseline tested; local runner integrated |
@@ -76,3 +77,12 @@ inspection and characterization show it is absent. See
 `PARAMETER_CONTRACTS_3C.md` for values, defects and fresh build/coverage
 evidence. The former Qt code-generator failure was isolated to an ambient DLL
 path conflict and does not block the documented runner.
+
+## HDF5 export 3E characterization
+
+`contract/Hdf5ExportContractTests` maps both public `Export2HDF5` members to
+`HDF5_001` through `HDF5_006`.  Its explicitly test-only UI seam represents
+the narrow `UIDataManagementSetClass::Export2Hdf5` catch-and-return convention
+and is neither included nor linked by `LabAnalyser.pro`.  Public HighFive reads
+validate output semantically.  Detailed file structure, coverage, unsafe-path
+exclusions and defect candidates are in `HDF5_CONTRACTS_3E.md`.

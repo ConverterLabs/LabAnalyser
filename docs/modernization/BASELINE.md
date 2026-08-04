@@ -158,3 +158,18 @@ The 2026-08-04 clean five-project runner, fresh Release build, fresh Debug build
 and instrumented MAT contract test all passed. `Export/Export2Mat.cpp` gcov
 evidence is 98.44% lines and 97.50% executed branches; this is per-file evidence,
 not a project-wide metric or threshold.
+
+## HDF5 export characterization 3E
+
+`Hdf5ExportContractTests` characterizes the unchanged HighFive/HDF5 export
+through public HighFive readback.  It covers `HDF5_001` through `HDF5_006` with
+temporary files only: timestamp, scalar and vector data, nested ID paths,
+string/empty data, overwrite/unknown-ID/invalid-path behavior, and the UI
+caller's observed catch-and-return convention.  On 2026-08-04 the clean
+six-project runner, fresh Release and Debug builds, and the instrumented HDF5
+test all passed (exit code 0).  `Export/export2highfive.cpp` gcov evidence is
+100.00% lines, 92.59% branches executed and 50.93% branches taken at least
+once; it is per-file evidence, not a project coverage threshold.  The focused
+test project has a documented test-only UI seam and is not part of the
+production qmake target.  Details, defect candidates and limitations are in
+`HDF5_CONTRACTS_3E.md`.

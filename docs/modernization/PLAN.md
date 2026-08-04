@@ -76,3 +76,16 @@ paths and the real UI caller. The clean runner and fresh Release/Debug builds
 passed on 2026-08-04. Per-file coverage is in `MAT_CONTRACTS_3D.md`; no
 threshold is enabled. Phase 3D is complete; allocation-failure paths remain a
 documented fault-injection limitation. No production code or binary fixture was added.
+
+## Phase 3E status
+
+HDF5 export is characterized by `HDF5_001` through `HDF5_006` using public
+HighFive readback and temporary files.  On 2026-08-04 the six-project clean
+runner, fresh Release build, fresh Debug build and instrumented HDF5 suite all
+passed.  `Export/export2highfive.cpp` has per-file gcov evidence of 100.00%
+lines, 92.59% branches executed and 50.93% branches taken at least once; no
+coverage gate was added.  The documented test-only seam mirrors the UI error
+return convention without entering the production build.  Unsafe null-pointer
+paths, deterministic permission/allocation faults and real UI construction
+remain follow-up limitations.  Phase 3E is complete; no production source,
+dependency, committed HDF5 output or binary fixture was added.

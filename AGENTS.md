@@ -212,3 +212,8 @@ The modernization is complete only when all of the following are delivered and v
 - a final `docs/modernization/COMPATIBILITY_REPORT.md` listing test evidence, coverage, benchmarks, intentional changes, remaining risks, and anything not verified.
 
 The phrase “same behavior before and after” means demonstrated equivalence of observable contracts on documented test vectors and environments. It is not an absolute mathematical proof for all possible inputs. Report that limitation honestly.
+
+
+## General
+
+Führe lang laufende Befehle im Vordergrund aus oder behalte ihre Prozess-Session. Bei einem Tool-Timeout pollst du dieselbe Session weiter. Gib laufende Prozesse nicht als Endergebnis an.

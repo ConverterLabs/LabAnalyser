@@ -107,6 +107,11 @@ $testProjects = @(
         Id = 'contract/MatExportContractTests'
         ProjectFile = Join-Path $repositoryRoot 'tests\contract\mat\MatExportContractTests.pro'
         ExecutableRelativePath = 'release\MatExportContractTests.exe'
+    },
+    [PSCustomObject]@{
+        Id = 'contract/Hdf5ExportContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\hdf5\Hdf5ExportContractTests.pro'
+        ExecutableRelativePath = 'release\Hdf5ExportContractTests.exe'
     }
 )
 
@@ -142,10 +147,14 @@ try {
 
         Push-Location $testBuildDir
         try {
+            # Reassert the runtime lookup order for every native process.
+            $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
             Invoke-Native -Exe $qmake -Arguments @($testProject.ProjectFile, '-spec', 'win32-g++', 'CONFIG+=release', 'CONFIG-=debug')
+            $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
             Invoke-Native -Exe $make -Arguments @("-j$Jobs")
             $testExecutable = Join-Path $testBuildDir $testProject.ExecutableRelativePath
             Assert-File -Path $testExecutable -Description "test executable '$($testProject.Id)'"
+            $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
             Invoke-Native -Exe $testExecutable -Arguments @('-txt')
         }
         finally {
