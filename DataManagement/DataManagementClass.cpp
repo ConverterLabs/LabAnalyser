@@ -22,6 +22,7 @@
 #include "DataManagementClass.h"
 #include "ContainerStore.h"
 #include "DataRegistry.h"
+#include "DeviceRegistry.h"
 #include "WidgetBindingRegistry.h"
 #include <QXmlStreamReader>
 #include <QFile>
@@ -31,7 +32,7 @@
 #include "../plugins/platforminterface.h"
 
 
-DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry), Containers(new ContainerStore), Bindings(new WidgetBindingRegistry)
+DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry), Containers(new ContainerStore), Bindings(new WidgetBindingRegistry), Devices(new DeviceRegistry)
 {
     connect(this, SIGNAL(CloseProject()),this->parent(),SLOT(CloseProject()));
 }
@@ -47,6 +48,11 @@ void DataManagementClass::ContainerStoreDeleter::operator()(ContainerStore* stor
 }
 
 void DataManagementClass::WidgetBindingRegistryDeleter::operator()(WidgetBindingRegistry* registry) const
+{
+    delete registry;
+}
+
+void DataManagementClass::DeviceRegistryDeleter::operator()(DeviceRegistry* registry) const
 {
     delete registry;
 }
@@ -249,54 +255,28 @@ std::pair<QString, QString> DataManagementClass::GetFormFileEntry(int i)
 
 Platform_Interface* DataManagementClass::GetDevice(QString Filename)
 {
-    auto itt = this->_Devices.find(Filename);
-    if(itt != this->_Devices.end())
-       return  this->_Devices[Filename];
-    else
-        return nullptr;
+    return Devices->Find(Filename);
 }
 
 QString DataManagementClass::GetDevicePath(QString Name)
 {
-    auto itt = this->_Devicepaths.find(Name);
-    if(itt != this->_Devicepaths.end())
-       return  this->_Devicepaths[Name];
-    else
-        return nullptr;
+    return Devices->Path(Name);
 }
 
 
 void DataManagementClass::AddDevice(QString Filename, QString Filepath, Platform_Interface* Device)
 {
-    if(!this->_Devices[Filename])
-    {
-        this->_Devices[Filename] = Device;
-        this->_Devicepaths[Filename] = Filepath;
-    }
+    Devices->Add(Filename, Filepath, Device);
 }
 
 void DataManagementClass::RemoveDevices(void)
 {
-    for(auto el : _Devices)
-    {
-        if(el.second)
-            delete el.second;
-    }
-    _Devices.clear();
-
+    Devices->RemoveDevices();
 }
 
 void DataManagementClass::CloseDevice(QString dev)
 {
-    auto itt = this->_Devices.find(dev);
-    if(itt != this->_Devices.end())
-    {
-        delete this->_Devices[dev];
-        this->_Devices.erase(itt);
-
-        auto itt = this->_Devicepaths.find(dev);
-        this->_Devicepaths.erase(itt);
-    }
+    Devices->Close(dev);
 }
 
 
@@ -305,11 +285,7 @@ void DataManagementClass::CloseProjectLogic(void)
     //Clean up
     Registry->Clear();
 
-    for(auto itt : _Devices)
-        if(itt.second)
-            delete itt.second;
-    _Devices.clear();
-    _Devicepaths.clear();
+    Devices->ClearProjectDevices();
 
     Containers->Clear();
 
@@ -319,18 +295,12 @@ void DataManagementClass::CloseProjectLogic(void)
 
 QList<QString> DataManagementClass::GetDevices()
 {
-    QList<QString> Liste;
-    for(auto itt: this->_Devicepaths)
-        Liste.push_back(itt.first);
-    return Liste;
+    return Devices->Names();
 }
 
 QList<QString> DataManagementClass::GetDevicePaths()
 {
-    QList<QString> Liste;
-    for(auto itt: this->_Devicepaths)
-        Liste.push_back(itt.second);
-    return Liste;
+    return Devices->Paths();
 }
 
 std::pair<int,int>  DataManagementClass::GetPlotWindowRowsCols(QString Name)

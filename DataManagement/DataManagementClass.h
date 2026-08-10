@@ -31,6 +31,7 @@ class Platform_Interface;
 class DataRegistry;
 class ContainerStore;
 class WidgetBindingRegistry;
+class DeviceRegistry;
 
 /** This Class contains all data that is necessary to mirror the complete data State of LabAnalyser, including the plugin handling.
  *
@@ -294,6 +295,9 @@ private:
     struct WidgetBindingRegistryDeleter {
         void operator()(WidgetBindingRegistry* registry) const;
     };
+    struct DeviceRegistryDeleter {
+        void operator()(DeviceRegistry* registry) const;
+    };
 
     /** Internal RAII-owned registry for form, alias and plot/window value state. */
     std::unique_ptr<DataRegistry, DataRegistryDeleter> Registry;
@@ -301,11 +305,8 @@ private:
     std::unique_ptr<ContainerStore, ContainerStoreDeleter> Containers;
     /** Name-keyed, non-owning widget binding state. */
     std::unique_ptr<WidgetBindingRegistry, WidgetBindingRegistryDeleter> Bindings;
-
-    /** Map that contains the information of the loaded plugin paths and the corresponding Interface Pointers*/
-    std::map<QString, Platform_Interface*> _Devices;
-    /** Map that contains the path that belongs to the device name*/
-    std::map<QString, QString> _Devicepaths;
+    /** Internal legacy-compatible owner for device pointers and path values. */
+    std::unique_ptr<DeviceRegistry, DeviceRegistryDeleter> Devices;
 
     QString GetDevicePath(QString Name);
 

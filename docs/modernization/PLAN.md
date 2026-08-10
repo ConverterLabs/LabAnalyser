@@ -374,3 +374,22 @@ native non-zero exit-code failures while allowing expected HDF5 negative-vector
 stderr diagnostics to remain nonfatal.
 The next potential 4F.2 slice is limited to a private `DeviceRegistry` that
 must retain these vectors before separately approved ownership hardening.
+
+## Phase 4F.2 DataManagement DeviceRegistry extraction
+
+**Completed 2026-08-10.** `DeviceRegistry` extracted only the private legacy
+device-pointer and path maps behind the unchanged `DataManagementClass` facade.
+The unchanged `DM_DEV_001..DM_DEV_004` tests preserve first registration,
+lexical order, duplicate rejection, close/removal/re-registration and project
+cleanup semantics, including deliberately retained paths after `RemoveDevices`.
+The registry has no QObject/QPluginLoader ownership and does not change raw
+pointer lifetime at manager destruction.
+
+Focused DataManagement (35 checks), Plugin contracts (9 checks), and the full
+11-target central runner passed. Fresh Release and Debug application builds,
+the scoped GCC warning build (161 diagnostics; none in `DeviceRegistry.cpp`)
+and file-specific coverage are recorded in the inventory and refactoring plan.
+Public method/signature, Qt signal/slot, plugin IID and `InterfaceData` header
+checks are unchanged; the only `DataManagementClass.h` diff is private storage
+delegation. The remaining raw-pointer destruction boundary is explicitly
+deferred to a separate approved ownership-hardening slice.

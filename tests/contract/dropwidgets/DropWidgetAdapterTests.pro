@@ -9,6 +9,7 @@ SOURCES += DropWidgetAdapterTests.cpp TestMainWindowSeam.cpp PlotWidgetLinkSeam.
     $$REPOSITORY_ROOT/plugins/InterfaceDataType.cpp \
     $$REPOSITORY_ROOT/DataManagement/ContainerStore.cpp \
     $$REPOSITORY_ROOT/DataManagement/DataRegistry.cpp \
+    $$REPOSITORY_ROOT/DataManagement/DeviceRegistry.cpp \
     $$REPOSITORY_ROOT/DataManagement/WidgetBindingRegistry.cpp \
     $$REPOSITORY_ROOT/DataManagement/MessageDispatchPolicy.cpp \
     $$REPOSITORY_ROOT/DataManagement/DataManagementClass.cpp \
@@ -31,6 +32,7 @@ HEADERS += $$REPOSITORY_ROOT/mainwindow.h \
     $$REPOSITORY_ROOT/DataManagement/DataManagementClass.h \
     $$REPOSITORY_ROOT/DataManagement/ContainerStore.h \
     $$REPOSITORY_ROOT/DataManagement/DataRegistry.h \
+    $$REPOSITORY_ROOT/DataManagement/DeviceRegistry.h \
     $$REPOSITORY_ROOT/DataManagement/WidgetBindingRegistry.h \
     $$REPOSITORY_ROOT/DataManagement/MessageDispatchPolicy.h \
     $$REPOSITORY_ROOT/DataManagement/DataMessengerClass.h \

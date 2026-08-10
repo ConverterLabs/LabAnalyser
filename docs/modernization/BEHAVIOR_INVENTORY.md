@@ -810,3 +810,19 @@ raw device pointers and unclear plugin-loader lifetime remain refactoring risks
 for a later, compatibility-preserving DeviceRegistry slice. The focused suite
 passed 35 checks, the plugin suite passed 9, and the 11-target central runner
 completed with exit code 0.
+
+## DataManagement DeviceRegistry extraction 4F.2
+
+`DeviceRegistry` is covered indirectly by the unchanged public-facade
+`DM_DEV_001..DM_DEV_004` vectors. It retains first pointer/path wins, lexical
+map order, the rejected-duplicate caller cleanup boundary, stable raw lookup,
+known/unknown/repeated close, stale paths after `RemoveDevices`, re-registration
+and lexical `CloseProjectLogic` deletion order. The registry owns no QObject or
+QPluginLoader and does not extend a pointer returned by `GetDevice`.
+
+Its registry-object RAII does not alter the old raw plugin-interface destruction
+boundary: only the existing explicit cleanup operations delete an accepted
+interface. Focused file metrics are `DataManagementClass.cpp` 94.44% lines,
+96.47% executed branches, 55.29% taken branches and 86.56% calls; and
+`DeviceRegistry.cpp` 93.55% lines, 83.33% executed branches, 75.00% taken
+branches and 100.00% calls. They are not project coverage.

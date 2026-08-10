@@ -10,6 +10,7 @@ SOURCES += \
     DataManagementCharacterizationTests.cpp \
     ../../../DataManagement/ContainerStore.cpp \
     ../../../DataManagement/DataRegistry.cpp \
+    ../../../DataManagement/DeviceRegistry.cpp \
     ../../../DataManagement/WidgetBindingRegistry.cpp \
     ../../../DataManagement/MessageDispatchPolicy.cpp \
     ../../../DataManagement/DataManagementClass.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     ../../../DataManagement/DataManagementClass.h \
     ../../../DataManagement/ContainerStore.h \
     ../../../DataManagement/DataRegistry.h \
+    ../../../DataManagement/DeviceRegistry.h \
     ../../../DataManagement/WidgetBindingRegistry.h \
     ../../../DataManagement/MessageDispatchPolicy.h \
     ../../../DataManagement/DataManagementSetClass.h \

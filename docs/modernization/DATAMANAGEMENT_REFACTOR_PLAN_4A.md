@@ -433,3 +433,32 @@ expected library diagnostics on stderr.
 The next implementation slice may introduce only a private `DeviceRegistry`
 behind the unchanged facade, preserving both the raw-pointer and stale-path
 semantics above before any separately approved ownership hardening.
+
+## Phase 4F.2 DeviceRegistry extraction
+
+**Completed 2026-08-10.** `DataManagement/DeviceRegistry.h/.cpp` now holds
+only the legacy ordered device-pointer and device-path maps. The private
+`DataManagementClass` deleter owns the registry object, while the registry
+retains the existing explicit raw-interface cleanup policy: it deletes accepted
+interfaces in `Close`, `RemoveDevices` and `ClearProjectDevices`, but its own
+implicit destruction does not introduce a new plugin-interface sweep.
+
+The unchanged `DM_DEV_001..DM_DEV_004` vectors verify first pointer/path wins,
+lexical lists, duplicate rejection without adoption, raw lookup identity,
+unknown/repeated close, the intentionally stale path map after bulk removal,
+re-registration, lexical project cleanup, non-owning `GetObject()` QObjects and
+instance isolation. There is no QObject, QPluginLoader, Messenger, XML, GUI or
+network dependency.
+
+Focused gcov is file-specific, not project coverage: `DataManagementClass.cpp`
+is 94.44% lines (153/162), 96.47% executed branches (164/170), 55.29% branches
+taken (94/170), and 86.56% calls (161/186); `DeviceRegistry.cpp` is 93.55%
+lines (29/31), 83.33% executed branches (20/24), 75.00% branches taken (18/24),
+and 100.00% calls (10/10). The scoped GCC baseline remains 161 diagnostics
+with none in `DeviceRegistry.cpp`.
+
+Rollback remains local: restore the two private maps and their facade bodies,
+then remove the helper from qmake targets. No persistence, public API, signal,
+slot, plugin IID or `InterfaceData` ABI migration is involved. The raw-pointer
+and manager-destruction lifetime boundary remains a later ownership-hardening
+decision, not a side effect of this extraction.

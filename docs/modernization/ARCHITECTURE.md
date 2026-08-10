@@ -124,3 +124,20 @@ distinct notification intent so its parent-parent-derived identifier remains a
 Messenger concern. Unknown, empty and legacy no-op `remove` commands classify
 to no intents. `MessageTransmitter` still invokes receiver processing before
 exactly one `MessageSender` emission.
+
+## Phase 4F.2 DeviceRegistry extraction
+
+`DeviceRegistry` is a private normal-C++ helper owned as a registry object by
+`DataManagementClass` through its existing private-deleter/`unique_ptr` pattern.
+It holds only the two legacy ordered maps: device name to raw
+`Platform_Interface*`, and device name to path. The public facade delegates
+device registration, lookup, listing and cleanup unchanged.
+
+The helper deliberately preserves the old cleanup policy rather than
+strengthening it: accepted interfaces are deleted on `CloseDevice`,
+`RemoveDevices` or `CloseProjectLogic`; duplicate-name pointers are not
+adopted; `RemoveDevices` leaves the path map intact; and implicit registry
+destruction adds no new sweep of raw plugin interfaces. It owns neither a
+QObject returned from `Platform_Interface::GetObject()` nor a `QPluginLoader`.
+Plugin loading, Messenger, XML, GUI and interface/IID headers remain outside
+this slice.
