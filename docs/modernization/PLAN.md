@@ -170,11 +170,11 @@ dependency changed.
 raw complete-frame versus remainder splitting to the private, QObject-free
 `RemoteControlFrameSplitter`. `RemoteControlServer` remains the public
 transport facade and retains all byte decoding, map access, socket writes and
-Messenger emission. `TCP_001`–`TCP_007` remain unchanged; a focused partial
-remainder vector supplements the existing fragmentation/coalescing evidence.
-No command, encoding, string/list, Qt-connection, socket-lifetime or public
-API behavior was changed. Later 4H protocol decoding and connection-state
-slices remain planned in `REMOTE_CONTROL_REFACTOR_PLAN_4H.md`.
+Messenger emission. `TCP_001`–`TCP_008` preserve the prior vectors and add
+safe byte-exact request/reply category and coalesced-`get` evidence. No
+command, encoding, string/list, Qt-connection, socket-lifetime or public API
+behavior was changed. Later 4H protocol decoding and connection-state slices
+remain planned in `REMOTE_CONTROL_REFACTOR_PLAN_4H.md`.
 
 ## Phase 3G status
 

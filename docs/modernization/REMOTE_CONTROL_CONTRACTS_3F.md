@@ -18,6 +18,21 @@ or `elements*8` string bytes; no line ending is used.
 | TCP_005 | fragmentation, coalesced frames, signal order |
 | TCP_006 | null map, unknown command, bounded no reply |
 | TCP_007 | mid-frame disconnect, repeated/multiple clients |
+| TCP_008 | safe request-size/length boundaries, NUL payload behavior, coalesced `get` reply order and all current reply categories |
+
+`TCP_008` uses only complete, internally consistent native frames. It records a
+minimal empty-ID `get` (`totalSize=16`, `idLength=1`, `payloadLength=0`) and a
+minimal numeric `set` (`24`, `1`, `8`), plus a 4096-byte Latin-1 ID as the
+largest bounded deterministic test vector; this is not a protocol maximum.
+It checks byte-exact replies for every current numeric `InterfaceData`
+alternative (signed/unsigned 8/16/32/64-bit values, float, double and bool),
+QString, QStringList-first-element, GUI-selection value and paired double
+vectors. String replies retain the observed type-1, element-count and
+eight-byte-per-element padding. An embedded NUL in a string `set` payload is
+preserved in the emitted value while the trailing NUL is excluded by the
+existing `Size - 1` behavior. Coalesced `get` requests return their byte-exact
+replies in request order; an unknown three-byte command with consistent fields
+still has neither a signal nor a reply in the bounded interval.
 
 The initial clean runner was stopped only by the hard 300-second tool limit
 after cleaning its tree. The immediately following full runner completed that

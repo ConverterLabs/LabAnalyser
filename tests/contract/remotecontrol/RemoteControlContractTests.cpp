@@ -5,6 +5,7 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <cstring>
+#include <cstdint>
 
 #include "RemoteControl/RemoteControlServer.h"
 #include "RemoteControl/RemoteControlFrameSplitter.h"
@@ -50,6 +51,8 @@ QByteArray readReply(QTcpSocket* client, int expected) {
 }
 
 ToFormMapper* numeric(double value) { auto* result = new ToFormMapper("double", "Parameter"); result->SetData(value); return result; }
+template <typename T>
+ToFormMapper* scalar(T value) { auto* result = new ToFormMapper("scalar", "Parameter"); result->SetData(value); return result; }
 ToFormMapper* text(const QString& value, const QString& type = "string") { auto* result = new ToFormMapper(type, "Parameter"); result->SetData(value); return result; }
 ToFormMapper* list(const QStringList& value) { auto* result = new ToFormMapper("QStringList", "Parameter"); result->SetData(value); return result; }
 ToFormMapper* selection(const QString& current, const QStringList& choices) { auto* result = new ToFormMapper("GuiSelection", "Parameter"); result->SetData(GuiSelection(current, choices)); return result; }
@@ -59,6 +62,24 @@ ToFormMapper* vectors(const std::vector<double>& time, const std::vector<double>
     return result;
 }
 void clear(std::map<QString, ToFormMapper*>& data) { for (auto pair : data) delete pair.second; data.clear(); }
+
+QByteArray numericReply(double value) { return QByteArray(1, '\0') + u32(1) + f64(value); }
+QByteArray paddedStringReply(const QString& value) {
+    const QByteArray bytes = value.toStdString().c_str();
+    const uint32_t elements = uint32_t(bytes.size() + 1);
+    QByteArray result(1, '\1');
+    result += u32(elements);
+    result += bytes;
+    result += QByteArray(int(elements * 8 - bytes.size()), '\0');
+    return result;
+}
+QByteArray vectorReply(const std::vector<double>& time, const std::vector<double>& data) {
+    QByteArray result(1, '\0');
+    result += u32(uint32_t(time.size() + data.size()));
+    for (double value : time) result += f64(value);
+    for (double value : data) result += f64(value);
+    return result;
+}
 }
 
 class RemoteControlContractTests : public QObject {
@@ -72,6 +93,7 @@ private slots:
     void TCP_005_fragmentationAndCoalescedFrames();
     void TCP_006_unknownCommandNullDataAndNoTimeoutReply();
     void TCP_007_disconnectRepeatedAndMultipleConnections();
+    void TCP_008_protocolByteBoundariesAndReplies();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -148,6 +170,82 @@ void RemoteControlContractTests::TCP_007_disconnectRepeatedAndMultipleConnection
     QTcpSocket* second = connectClient(server, this); second->write(frame("set", "value", f64(10.0))); QVERIFY(second->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 10.0); QCOMPARE(data["value"]->GetAsDouble(), 7.0);
     QTcpSocket* third = connectClient(server, this); third->write(frame("get", "value")); QVERIFY(third->waitForBytesWritten(1000)); const QByteArray reply = readReply(third, 13); QCOMPARE(readF64(reply, 5), 7.0);
     second->disconnectFromHost(); third->disconnectFromHost(); QTRY_COMPARE(second->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(third->state(), QAbstractSocket::UnconnectedState); clear(data);
+}
+
+void RemoteControlContractTests::TCP_008_protocolByteBoundariesAndReplies() {
+    std::map<QString, ToFormMapper*> data;
+    data[""] = numeric(7.0);
+    data["i8"] = scalar(int8_t(-8)); data["i16"] = scalar(int16_t(-160));
+    data["i32"] = scalar(int32_t(-32000)); data["i64"] = scalar(int64_t(-6400000));
+    data["u8"] = scalar(uint8_t(8)); data["u16"] = scalar(uint16_t(160));
+    data["u32"] = scalar(uint32_t(32000)); data["u64"] = scalar(uint64_t(6400000));
+    data["float"] = scalar(1.25f); data["double"] = scalar(-2.5); data["bool"] = scalar(true);
+    data["text"] = text("text"); data["list"] = list({"list-first", "list-second"});
+    data["choice"] = selection("selected", {"selected", "other"});
+    data["vector"] = vectors({1.0, 2.0}, {3.0, 4.0});
+
+    const QByteArray longestSafeTestId(4096, 'x');
+    const QString longestSafeTestKey = QString::fromLatin1(longestSafeTestId);
+    data[longestSafeTestKey] = numeric(42.0);
+
+    RemoteControlServer server(&data);
+    QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* client = connectClient(server, this);
+
+    const QByteArray minimalGet = frame("get", QByteArray());
+    QCOMPARE(minimalGet.size(), 16); QCOMPARE(readU32(minimalGet, 0), uint32_t(16));
+    QCOMPARE(minimalGet.mid(4, 3), QByteArray("get")); QCOMPARE(readU32(minimalGet, 7), uint32_t(1));
+    QCOMPARE(readU32(minimalGet, 11), uint32_t(0)); QCOMPARE(minimalGet.mid(15), QByteArray("\0", 1));
+    QCOMPARE(client->write(minimalGet), qint64(minimalGet.size())); QVERIFY(client->waitForBytesWritten(1000));
+    QCOMPARE(readReply(client, 13), numericReply(7.0));
+
+    const QByteArray minimalSet = frame("set", QByteArray(), f64(-3.5));
+    QCOMPARE(minimalSet.size(), 24); QCOMPARE(readU32(minimalSet, 0), uint32_t(24));
+    QCOMPARE(minimalSet.mid(4, 3), QByteArray("set")); QCOMPARE(readU32(minimalSet, 7), uint32_t(1));
+    QCOMPARE(readU32(minimalSet, 11), uint32_t(8)); QCOMPARE(minimalSet.mid(15, 1), QByteArray("\0", 1));
+    QCOMPARE(minimalSet.mid(16), f64(-3.5));
+    QCOMPARE(client->write(minimalSet), qint64(minimalSet.size())); QVERIFY(client->waitForBytesWritten(1000));
+    QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(1).toString(), QString());
+    QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), -3.5); QCOMPARE(data[""]->GetAsDouble(), 7.0);
+
+    const QByteArray embeddedNulPayload("A\0B\0", 4);
+    const QByteArray embeddedNulSet = frame("set", "text", embeddedNulPayload);
+    QCOMPARE(readU32(embeddedNulSet, 0), uint32_t(15 + 5 + 4));
+    QCOMPARE(readU32(embeddedNulSet, 7), uint32_t(5)); QCOMPARE(readU32(embeddedNulSet, 11), uint32_t(4));
+    QCOMPARE(embeddedNulSet.mid(20), embeddedNulPayload);
+    QCOMPARE(client->write(embeddedNulSet), qint64(embeddedNulSet.size())); QVERIFY(client->waitForBytesWritten(1000));
+    QTRY_COMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(2).value<InterfaceData>().GetString(), QString::fromLatin1("A\0B", 3));
+    QCOMPARE(data["text"]->GetString(), QString("text"));
+
+    const QByteArray longGet = frame("get", longestSafeTestId);
+    QCOMPARE(readU32(longGet, 0), uint32_t(15 + longestSafeTestId.size() + 1));
+    QCOMPARE(readU32(longGet, 7), uint32_t(longestSafeTestId.size() + 1)); QCOMPARE(readU32(longGet, 11), uint32_t(0));
+
+    struct ReplyCase { QByteArray id; QByteArray expected; };
+    const std::vector<ReplyCase> cases = {
+        {"i8", numericReply(-8.0)}, {"i16", numericReply(-160.0)}, {"i32", numericReply(-32000.0)}, {"i64", numericReply(-6400000.0)},
+        {"u8", numericReply(8.0)}, {"u16", numericReply(160.0)}, {"u32", numericReply(32000.0)}, {"u64", numericReply(6400000.0)},
+        {"float", numericReply(1.25)}, {"double", numericReply(-2.5)}, {"bool", numericReply(1.0)},
+        {"text", paddedStringReply("text")}, {"list", paddedStringReply("list-first")}, {"choice", paddedStringReply("selected")},
+        {"vector", vectorReply({1.0, 2.0}, {3.0, 4.0})}, {longestSafeTestId, numericReply(42.0)}
+    };
+    QByteArray coalescedGets;
+    qsizetype expectedBytes = 0;
+    for (const ReplyCase& replyCase : cases) { coalescedGets += frame("get", replyCase.id); expectedBytes += replyCase.expected.size(); }
+    QCOMPARE(client->write(coalescedGets), qint64(coalescedGets.size())); QVERIFY(client->waitForBytesWritten(1000));
+    const QByteArray replies = readReply(client, int(expectedBytes)); QCOMPARE(replies.size(), expectedBytes);
+    qsizetype offset = 0;
+    for (const ReplyCase& replyCase : cases) { QCOMPARE(replies.mid(offset, replyCase.expected.size()), replyCase.expected); offset += replyCase.expected.size(); }
+
+    const QByteArray unknown = frame("xyz", "unknown", QByteArray("x\0", 2));
+    QCOMPARE(readU32(unknown, 0), uint32_t(15 + 8 + 2)); QCOMPARE(unknown.mid(4, 3), QByteArray("xyz"));
+    QCOMPARE(readU32(unknown, 7), uint32_t(8)); QCOMPARE(readU32(unknown, 11), uint32_t(2));
+    QCOMPARE(client->write(unknown), qint64(unknown.size())); QVERIFY(client->waitForBytesWritten(1000));
+    QVERIFY(!client->waitForReadyRead(150)); QCOMPARE(spy.count(), 2);
+
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
 }
 
 void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {

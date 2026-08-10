@@ -106,6 +106,7 @@ grammar.
 | `TCP_005` | A four-byte header fragment emits nothing; later completion emits once; coalesced frames retain order. | Buffering and complete-frame ordering. |
 | `TCP_006` | Null map has empty `get` reply; unknown command has neither signal nor tested reply. | Null-map and unknown-command behavior. |
 | `TCP_007` | Mid-frame disconnect followed by repeated and overlapping clients leaves the later complete request usable in the tested scenario. | Connection replacement/reuse baseline. |
+| `TCP_008` | Safe length boundaries, bounded long ID, NUL payload behavior, coalesced `get` order and all current response categories are byte-exact. | Protocol decode/encode extraction. |
 
 The file-level 3F evidence is 87.41% lines, 87.30% executed branches, 52.38%
 branches taken at least once and 76.30% calls for
@@ -243,3 +244,10 @@ The focused remote-control target and the incremental Release compile check
 passed. The server's public constructor, `GetPort`, `MessageSender` signal and
 private Qt slots were not changed. No string/list conversion, socket error
 connection, encoding, dispatch or ownership behavior was changed.
+
+`TCP_008` subsequently adds safe byte-level vectors before the planned 4H.2
+decode/encode extraction. Its 4096-byte ID is the largest bounded deterministic
+vector in this suite, not a claimed wire-format limit. It preserves the
+documented trailing-NUL truncation for string/list `set`, container
+non-mutation, one-byte selection behavior and the invalid Qt-6 error-signal
+connection as unresolved defect candidates.
