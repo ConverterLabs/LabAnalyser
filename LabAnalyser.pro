@@ -81,6 +81,7 @@ SOURCES += main.cpp\
         LoadSave/xmlexperimentwriter.cpp \
         mainwindow.cpp\
         plugins/InterfaceDataType.cpp \
+        DataManagement/ContainerStore.cpp \
         DataManagement/DataRegistry.cpp \
         DataManagement/DataManagementClass.cpp \
         DataManagement/DataManagementSetClass.cpp \
@@ -131,6 +132,7 @@ HEADERS  += mainwindow.h\
             DataManagement/mapper.h \
             plugins/platforminterface.h\
             plugins/InterfaceDataType.h\
+            DataManagement/ContainerStore.h \
             DataManagement/DataRegistry.h \
             DataManagement/DataManagementClass.h \
             DataManagement/DataManagementSetClass.h \

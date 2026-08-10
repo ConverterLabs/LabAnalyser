@@ -8,6 +8,7 @@ INCLUDEPATH += . ../../..
 
 SOURCES += \
     DataManagementCharacterizationTests.cpp \
+    ../../../DataManagement/ContainerStore.cpp \
     ../../../DataManagement/DataRegistry.cpp \
     ../../../DataManagement/DataManagementClass.cpp \
     ../../../DataManagement/DataManagementSetClass.cpp \
@@ -19,6 +20,7 @@ HEADERS += \
     DropWidgets/DropWidgets.h \
     DropWidgets/Plots/PlotWidget.h \
     ../../../DataManagement/DataManagementClass.h \
+    ../../../DataManagement/ContainerStore.h \
     ../../../DataManagement/DataRegistry.h \
     ../../../DataManagement/DataManagementSetClass.h \
     ../../../DataManagement/DataMessengerClass.h \

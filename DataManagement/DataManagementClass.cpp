@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "DataManagementClass.h"
+#include "ContainerStore.h"
 #include "DataRegistry.h"
 #include <QXmlStreamReader>
 #include <QFile>
@@ -29,7 +30,7 @@
 #include "../plugins/platforminterface.h"
 
 
-DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry)
+DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry), Containers(new ContainerStore)
 {
     connect(this, SIGNAL(CloseProject()),this->parent(),SLOT(CloseProject()));
 }
@@ -37,6 +38,11 @@ DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Regi
 void DataManagementClass::DataRegistryDeleter::operator()(DataRegistry* registry) const
 {
     delete registry;
+}
+
+void DataManagementClass::ContainerStoreDeleter::operator()(ContainerStore* store) const
+{
+    delete store;
 }
 
 int DataManagementClass::PlotCount()
@@ -119,10 +125,10 @@ void DataManagementClass::RemoveFormFile(QString Filename )
 bool DataManagementClass::ElementExists(QString ElementName)
 {
     //Check if map element exists
-    auto itt = this->Container.find(ElementName);
-    if(itt != this->Container.end())
+    auto itt = Containers->Map().find(ElementName);
+    if(itt != Containers->Map().end())
     {
-        if(this->Container[ElementName] != NULL)
+        if(Containers->LookupOrInsert(ElementName) != NULL)
             return true;
     }
     return false;
@@ -149,7 +155,7 @@ void DataManagementClass::AddElementToContainerEntry(QString ElementName, QStrin
     }
     //Add connection between ElementName (widget name) and unique data id ContainerID
     this->ElementsToContainerID[ElementName] = ContainerID;
-    ToFormMapper* Element = this->Container[ContainerID];
+    ToFormMapper* Element = Containers->LookupOrInsert(ContainerID);
     //Add widget unique data id
     Element->Objects.push_back(ObjectStruct(ElementName,object,ClassName));
 }
@@ -171,23 +177,17 @@ QString DataManagementClass::GetContainerID(QObject* Object)
 
 ToFormMapper* DataManagementClass::GetContainer(QObject* Object)
 {
-    return this->Container[GetContainerID(Object->objectName())];
+    return Containers->LookupOrInsert(GetContainerID(Object->objectName()));
 }
 
 ToFormMapper* DataManagementClass::GetContainer(QString ContainerID)
 {
-    //Check if map element exists
-    if(!this->Container.size())
-        return nullptr;
-    auto itt = this->Container.find(ContainerID);
-    if( itt  == this->Container.end())
-        return nullptr;
-    return this->Container[ContainerID];
+    return Containers->Find(ContainerID);
 }
 
 InterfaceData DataManagementClass::GetInterfaceData(QObject* Object)
 {
-    ToFormMapper* Element = Container[GetContainerID(Object->objectName())];
+    ToFormMapper* Element = Containers->LookupOrInsert(GetContainerID(Object->objectName()));
     InterfaceData Data(Element->GetDataType(),Element->GetType());
     Data.SetDataRaw(Element->GetData());
 
@@ -196,7 +196,7 @@ InterfaceData DataManagementClass::GetInterfaceData(QObject* Object)
 
 QString DataManagementClass::GetObjectType(QObject* Object)
 {
-    ToFormMapper* Element = Container[GetContainerID(Object->objectName())];
+    ToFormMapper* Element = Containers->LookupOrInsert(GetContainerID(Object->objectName()));
     QString FormType;
     for(int i = 0; i <Element->Objects.size();i++)
     {
@@ -208,7 +208,7 @@ QString DataManagementClass::GetObjectType(QObject* Object)
 
 void DataManagementClass::DeleteEntryOfObject(QString id, QObject* Object)
 {
-    ToFormMapper* DataC = Container[id];
+    ToFormMapper* DataC = Containers->LookupOrInsert(id);
     if(DataC)
     {
         for(int i = 0; i < DataC->Objects.size();i++)
@@ -235,22 +235,7 @@ void DataManagementClass::DeleteEntryOfObject(QObject* Object)
 
 void DataManagementClass::AddContainerElement(QString ID,QString DataType, QString Type,QString StateDependency )
 {
-    if(!this->GetContainer(ID))
-    {
-        this->Container[ID] = new ToFormMapper(DataType,Type);
-        ((ToFormMapper*) this->Container[ID])->SetStateDependency(StateDependency);
-    }
-    else
-    {
-
-        ToFormMapper *P =  this->Container[ID];
-        this->Container[ID] = new ToFormMapper(DataType,Type);
-        ((ToFormMapper*) this->Container[ID])->SetStateDependency(StateDependency);
-        this->Container[ID]->Objects = P->Objects;
-        this->Container[ID]->MaxValue = P->MaxValue;
-        this->Container[ID]->MinValue =  P->MinValue;
-        delete P;
-    }
+    Containers->AddOrReplace(ID, DataType, Type, StateDependency);
 }
 
 int DataManagementClass::GetFormFileCount(void)
@@ -327,10 +312,7 @@ void DataManagementClass::CloseProjectLogic(void)
     _Devices.clear();
     _Devicepaths.clear();
 
-    for(auto itt : Container)
-        if(itt.second)
-            delete itt.second;
-    Container.clear();
+    Containers->Clear();
 
     this->ElementsToContainerID.clear();
 }
@@ -359,7 +341,7 @@ std::pair<int,int>  DataManagementClass::GetPlotWindowRowsCols(QString Name)
 
 int DataManagementClass::GetContainerCount(void)
 {
-    return (int) Container.size();
+    return Containers->Count();
 }
 
 std::pair<QString, std::vector<QString>> DataManagementClass::GetContainerElementForms(int i)
@@ -367,7 +349,7 @@ std::pair<QString, std::vector<QString>> DataManagementClass::GetContainerElemen
     int r = 0;
     std::vector<QString> Elements;
     //itterate ober all elements
-    for(auto itt :this->Container)
+    for(auto itt : Containers->Map())
     {
         //return the i-th itterator
         if(r == i)
@@ -382,6 +364,11 @@ std::pair<QString, std::vector<QString>> DataManagementClass::GetContainerElemen
         r++;
     }
     return std::pair<QString, std::vector<QString>>();
+}
+
+std::map<QString, ToFormMapper*>* DataManagementClass::GetContainerPointer()
+{
+    return Containers->MapAddress();
 }
 
 int DataManagementClass::GetPlotWindowsIncrementer()

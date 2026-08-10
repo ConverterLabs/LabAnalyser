@@ -635,3 +635,28 @@ These released mapper pointers are explicitly invalid after replacement,
 project cleanup or manager destruction; no desired raw-pointer lifetime beyond
 those boundaries is asserted. `ElementsToContainerID` remains unmodified for
 the later widget-binding slice.
+
+## DataManagement container ownership extraction 4C.2
+
+The unchanged facade contracts `DM_CONT_001..DM_CONT_005` now exercise the
+private RAII-owned `ContainerStore`. `GetContainerPointer()` still returns the
+actual stable address of the same raw `std::map<QString, ToFormMapper*>` for a
+manager lifetime. Missing string IDs still do not insert; missing QObject
+lookups still insert the empty key with a null mapper; lexical key traversal,
+replacement metadata/form-binding preservation, mapper invalidation after
+replacement/cleanup, foreign-QObject survival, and instance isolation are
+unchanged.
+
+The Store deletes only its currently mapped `ToFormMapper*` values once on
+replacement, cleanup, and destruction. It never owns mapper-bound QObjects.
+Because `GetContainerPointer()` exposes a mutable raw map, external mutation
+can bypass Store ownership accounting; this is a retained public API/ownership
+limit, not a new guarantee. `ElementsToContainerID` remains in the facade and
+is explicitly deferred to the widget-binding slice.
+
+Focused gcov is file-specific: `DataManagementClass.cpp` 91.53% lines
+(162/177), 92.71% branches executed (178/192), 56.77% branches taken at least
+once (109/192), 85.80% calls (151/176); `ContainerStore.cpp` 94.12% lines
+(32/34), 100.00% branches executed (16/16), 93.75% branches taken (15/16),
+100.00% calls (13/13). These are not project coverage and are not directly
+denominator-comparable to the prior facade-only 87.50% line figure.

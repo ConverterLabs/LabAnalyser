@@ -283,7 +283,16 @@ and are never dereferenced by tests.
 
 ## Phase 4C.2 DataManagement container-owner extraction
 
-**Planned.** Extract only the `Container` owner behind `DataManagementClass`.
-Public raw-pointer and map-address behavior, lookup side effects and cleanup
-order must remain equivalent under `DM_CONT_001..DM_CONT_005`; widget ID mapping,
-devices, Messenger and GUI/IO remain out of scope.
+**Completed 2026-08-10.** `ContainerStore` now privately owns the existing raw
+mapper map behind the unchanged `DataManagementClass` facade. `DM_CONT_001..005`
+passed unchanged (22/22 focused DataManagement checks); the central runner's 11
+registered targets, fresh Release/Debug builds, and scoped static-analysis
+build passed. The actual exposed map address remains stable, and legacy lookup,
+replacement, cleanup and foreign-QObject behavior remains preserved.
+
+The mutable raw map returned by `GetContainerPointer()` remains an explicit
+ownership/API boundary. No parallel smart-pointer map or copy is introduced;
+the Store deletes only mappers and never form QObjects. File-specific coverage
+is recorded in `BEHAVIOR_INVENTORY.md` and is not a project gate. Widget ID
+mapping (`ElementsToContainerID`), devices, Messenger and GUI/IO remain out of
+scope for the next slice.

@@ -56,7 +56,7 @@ then separately treat container/binding ownership, messenger dispatch, devices
 and GUI/IO orchestration. `InterfaceData`, plugin headers, Qt signals/slots and
 the existing qmake target remain compatibility boundaries.
 
-## Phase 4B.1 DataRegistry extraction
+## Phase 4B.2 DataRegistry extraction
 
 The first compatible DataManagement slice is implemented. `DataRegistry` is an
 internal normal C++ type owned exclusively by `DataManagementClass` through a
@@ -74,3 +74,20 @@ number history, and insertion-capable unknown window-geometry lookup. No
 public signal, slot, method signature, plugin header or `InterfaceData` ABI was
 changed. This private boundary can be rolled back by restoring the former
 fields/delegation without a data-format migration.
+
+## Phase 4C.2 ContainerStore extraction
+
+`ContainerStore` is a second, private normal-C++ helper owned exclusively by
+`DataManagementClass` through RAII. It owns exactly the existing
+`std::map<QString, ToFormMapper*>` entries and destroys each mapper once on
+replacement, project cleanup, or manager destruction. It never owns or deletes
+the `QObject*` form bindings stored in a mapper's `Objects` list.
+
+`DataManagementClass` remains the public facade and returns the address of the
+Store's actual map through the unchanged `GetContainerPointer()` API; that
+address is stable for the manager lifetime. The raw mutable map remains an
+intentional legacy API/ownership boundary: callers can mutate mapper pointers
+outside Store mediation, so the Store cannot make stronger ownership guarantees
+than the former facade. No parallel `unique_ptr` map or compatibility copy was
+introduced. `ElementsToContainerID` and all widget-ID mapping remain in
+`DataManagementClass` for the later widget-binding slice.

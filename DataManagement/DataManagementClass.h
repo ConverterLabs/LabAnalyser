@@ -29,6 +29,7 @@
 
 class Platform_Interface;
 class DataRegistry;
+class ContainerStore;
 
 /** This Class contains all data that is necessary to mirror the complete data State of LabAnalyser, including the plugin handling.
  *
@@ -250,7 +251,7 @@ public:
     std::pair<double, double> MinMaxValue(QString ID);
 
 
-    std::map<QString, ToFormMapper*> *GetContainerPointer(){ return &Container;}
+    std::map<QString, ToFormMapper*> *GetContainerPointer();
 
 public slots:
 
@@ -286,9 +287,14 @@ private:
     struct DataRegistryDeleter {
         void operator()(DataRegistry* registry) const;
     };
+    struct ContainerStoreDeleter {
+        void operator()(ContainerStore* store) const;
+    };
 
     /** Internal RAII-owned registry for form, alias and plot/window value state. */
     std::unique_ptr<DataRegistry, DataRegistryDeleter> Registry;
+    /** Owns mapper pointers while preserving the externally exposed raw map. */
+    std::unique_ptr<ContainerStore, ContainerStoreDeleter> Containers;
 
     /** Map that contains the information of the loaded plugin paths and the corresponding Interface Pointers*/
     std::map<QString, Platform_Interface*> _Devices;
@@ -300,7 +306,5 @@ private:
 
     /** Map that contains the connection between the objectname of an widget and the connected unique data identifier*/
     std::map<QString, QString> ElementsToContainerID;
-    /** Map that contains the connection between the connected unique data identifier and its ToFormMapper Object */
-    std::map<QString, ToFormMapper*> Container;
 };
 #endif // GUIDataInterface_H

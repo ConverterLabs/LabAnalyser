@@ -140,7 +140,8 @@ types.
 
 | Proposed internal file/class | Single responsibility | Compatibility boundary |
 | --- | --- | --- |
-| `DataManagement/DataRegistry.h/.cpp` | Container, alias, form/skip-form and plot/window registry operations; preserves lookup/order/number behavior. | Used privately by `DataManagementClass`; all existing `DataManagementClass` methods remain forwarding facade methods. |
+| `DataManagement/DataRegistry.h/.cpp` | Alias, form/skip-form and plot/window registry operations; preserves lookup/order/number behavior. | Used privately by `DataManagementClass`; all existing `DataManagementClass` methods remain forwarding facade methods. |
+| `DataManagement/ContainerStore.h/.cpp` | Own the existing raw mapper map, replacement, lookup, count and cleanup without owning mapper-bound QObjects. | Used privately by `DataManagementClass`; `GetContainerPointer()` continues to expose the actual stable map address. |
 | `DataManagement/WidgetBindingRegistry.h/.cpp` | Map widget object names to IDs and maintain non-owning `ObjectStruct` binding lists. | Private helper only; `AddElementToContainerEntry`, lookup and deletion methods keep existing signatures and behavior. |
 | `DataManagement/DeviceRegistry.h/.cpp` | Device/path registration and explicit device cleanup policy. | Deferred until plugin loader/object lifetime is re-characterized; facade keeps raw `Platform_Interface*` API. |
 | `DataManagement/MessageDispatchPolicy.h/.cpp` | Pure classification of messenger command strings and ordered dispatch intents. | Deferred; `MessengerClass` remains the sole QObject signal emitter and status-bar adapter. |
@@ -274,9 +275,35 @@ parented bound QObjects survive. Destroying a manager likewise leaves such
 foreign QObjects intact; separate manager instances keep independent container
 state. These are the required before/after vectors for Phase 4C.2.
 
-## Phase 4C.2 planned container-owner extraction
+## Phase 4C.2 container-owner extraction
 
-Move only `Container` storage behind a private RAII owner while preserving raw
-non-owning facade pointers, public map address, replacement behavior, lookup
-insertion side effects and cleanup order documented by `DM_CONT_001..DM_CONT_005`.
-Do not move `ElementsToContainerID`, device ownership or widget-binding logic.
+**Completed 2026-08-10.** `ContainerStore.h/.cpp` now owns only the existing
+`std::map<QString, ToFormMapper*>` behind the unchanged `DataManagementClass`
+facade. Its RAII cleanup deletes each currently owned mapper exactly once on
+replacement, `CloseProjectLogic`, and destruction; mapper-bound `QObject*`
+form objects remain non-owning and are never deleted by the Store.
+
+The same `DM_CONT_001..DM_CONT_005` vectors passed unchanged (22/22 focused
+DataManagement checks) before and after delegation: map address stability,
+missing string lookup without insertion, empty-ID QObject lookup insertion,
+lexical key order, replacement with Min/Max and form-binding preservation, and
+foreign-QObject survival remain observable contracts. The Store retains the
+actual exposed raw map rather than a parallel smart-pointer map or a copy. Its
+public mutability therefore remains a documented ownership/API boundary: an
+external caller can still mutate map entries outside Store mediation.
+
+Fresh Release and Debug application builds, the 11-target central runner and
+the scoped static-analysis build all passed. Focused gcov is file-specific:
+`DataManagementClass.cpp` is 91.53% lines (162/177), 92.71% executed branches
+(178/192), 56.77% branches taken (109/192), and 85.80% calls (151/176);
+`ContainerStore.cpp` is 94.12% lines (32/34), 100.00% executed branches
+(16/16), 93.75% branches taken (15/16), and 100.00% calls (13/13). The former
+facade-only 87.50% line figure has a different denominator after delegation;
+these figures are not project coverage. The scoped warning build retained 162
+filtered existing diagnostics and produced none in `ContainerStore.cpp`.
+
+No public API, Qt signal/slot, `InterfaceData` ABI or plugin IID changed.
+`ElementsToContainerID`, device ownership, Messenger and GUI/IO remain out of
+scope; the next slice must not absorb them opportunistically. Rollback is
+local: restore the former private map/delegation without persistence or API
+migration.
