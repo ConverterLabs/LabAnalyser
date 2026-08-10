@@ -519,3 +519,31 @@ Legacy fixture hashes matched the manifest before/after. Rollback is local:
 restore the direct writer construction in `SaveExperiment()` and remove
 `WriteExperiment()`; no public API, Qt metaobject member, plugin IID or
 InterfaceData ABI changed.
+
+## ProjectIoCoordinator subsystem checkpoint
+
+**Completed 2026-08-10.** The planned ProjectIoCoordinator extraction is
+complete for all implemented adapter operations: parameter import/export,
+MAT/HDF5 export, experiment read/write and plugin descriptor loading. The
+coordinator remains private, non-QObject and non-owning. The public
+`UIDataManagementSetClass` remains intentionally responsible for mutable path
+and change state, return conversion, signals/status/errors, Messenger follow
+ups and MainWindow/UI orchestration. `LoadForms()` remains blocked because the
+repository declares it without an implementation; no semantics were invented.
+
+The subsystem checkpoint passed: the non-clean central runner completed all 12
+registered targets (including XML/legacy, UIIO, parameter, MAT, HDF5 and
+plugin contracts); fresh Release and Debug builds passed; and scoped warning
+analysis completed with the established 161 own-production diagnostics, none
+in `ProjectIoCoordinator.cpp`. Combined test measurements are
+`UIDataManagementSetClass.cpp`: 90.67% lines (68/75), 81.71% executed branches
+(134/164), 46.34% taken branches (76/164), 75.00% calls (93/124), 100.00%
+functions (10/10); `ProjectIoCoordinator.cpp`: 97.22% lines (35/36), 100.00%
+executed branches (24/24), 62.50% taken branches (15/24), 69.05% calls
+(29/42), 100.00% functions (8/8). These are file-level combined-test results,
+not project coverage. Public API/Qt-metaobject/IID checks, scoped diff and
+artifact checks are the remaining documentation-commit validation below.
+
+Legacy XML compatibility stays mandatory: committed fixture hashes must remain
+unchanged, fixtures must never be overwritten, and legacy read/write/read
+contracts continue to write only temporary targets.

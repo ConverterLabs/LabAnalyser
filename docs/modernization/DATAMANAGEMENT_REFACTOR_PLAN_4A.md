@@ -559,3 +559,30 @@ semantics.
 
 The XML suite (15 checks) and central 12-project runner passed on 2026-08-10
 after adding this evidence; no coordinator or production behavior changed.
+
+## ProjectIoCoordinator subsystem checkpoint
+
+**Completed 2026-08-10.** All implemented `UIDataManagementSetClass` adapter
+operations now delegate adapter construction/execution to the private
+`ProjectIoCoordinator`: parameter import/export, MAT/HDF5 export, experiment
+read/write and plugin descriptor loading. The public facade retains all
+stateful/UI responsibilities: `LoadPath`, `StdSavePath`, `ChangeDetected`, Qt
+signals and status/error messages, legacy boolean conversion, Messenger follow
+ups and MainWindow routing. No adapter implementation, plugin interface/IID,
+XML format or persistence policy moved.
+
+The checkpoint's central runner passed all 12 registered targets, including
+XML/legacy, UIIO, parameter, MAT, HDF5 and plugin contracts. Fresh Release and
+Debug builds passed; the scoped warning baseline remains 161 diagnostics with
+none in `ProjectIoCoordinator.cpp`. Combined test coverage is
+`UIDataManagementSetClass.cpp` 90.67% lines (68/75), 81.71% executed branches
+(134/164), 46.34% taken branches (76/164), 75.00% calls (93/124), 100.00%
+functions (10/10); `ProjectIoCoordinator.cpp` 97.22% lines (35/36), 100.00%
+executed branches (24/24), 62.50% taken branches (15/24), 69.05% calls
+(29/42), 100.00% functions (8/8). These are combined registered-test
+measurements, not project coverage.
+
+`LoadForms()` remains blocked because it is declared but has no repository
+definition. It must not be implemented or delegated without prior
+characterization and an approved contract. Legacy XML fixture hashes remain a
+mandatory checkpoint condition; no fixture migration or overwrite is allowed.

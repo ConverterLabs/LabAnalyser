@@ -192,3 +192,21 @@ state boundaries. The writer itself is unchanged, so its UTF-8 XML output,
 section/attribute order, paths, formatting and overwrite/invalid-path behavior
 remain governed by the existing XML contracts. Legacy fixtures are read only;
 round trips write exclusively to temporary paths.
+
+## ProjectIoCoordinator subsystem checkpoint
+
+The ProjectIoCoordinator extraction is complete for every implemented adapter
+operation of `UIDataManagementSetClass`: parameter import/export, MAT export,
+HDF5 export, experiment read/write and plugin descriptor loading. The helper
+remains a private, non-QObject, non-owning operation coordinator. It creates
+the existing adapters with their historic manager, Messenger and QObject-parent
+arguments; it does not absorb adapter implementation, plugin interfaces,
+format policy or persistent UI state.
+
+The public UI facade deliberately still owns `LoadPath`, `StdSavePath`,
+`ChangeDetected`, all Qt signal/status/error routing, post-save plugin messages,
+post-load/device routing and MainWindow-facing UI orchestration. `LoadForms()`
+is declared but has no repository implementation, so it remains a blocked
+boundary rather than a coordinator operation. XML legacy compatibility remains
+mandatory: fixtures are read-only inputs and read/write/read vectors use only
+temporary destinations.

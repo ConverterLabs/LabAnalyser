@@ -898,3 +898,20 @@ Messenger reference and QObject parent. The facade retains its inverted return
 value, exact status/error handling and post-write plugin `save` messages;
 writer traversal preserves sections, attributes, UTF-8, paths and formatting.
 Legacy files remain inputs only and are never overwritten by these vectors.
+
+## ProjectIoCoordinator checkpoint
+
+`ProjectIoCoordinator` now covers every implemented adapter operation exposed
+by `UIDataManagementSetClass`: `ImportFromXml`, `Export2Xml`, `Export2Mat`,
+`Export2Hdf5`, `LoadExperiment`, `SaveExperiment` and `LoadPlugin`. The public
+facade remains the behavior boundary for all exposed bool conventions,
+Messenger/status/error signal order, `LoadPath`/`StdSavePath`/`ChangeDetected`
+state and MainWindow/UI routing. Contract mapping remains unchanged:
+`UIIO_001..UIIO_006`, `XML_001..XML_008`, `XML_LEGACY_001..XML_LEGACY_005`,
+`PARAM_001..PARAM_009`, `MAT_001..MAT_008`, `HDF5_001..HDF5_006` and
+`PLUGIN_001..PLUGIN_007`.
+
+`LoadForms()` has no implementation and is a documented blocker, not an
+untested coordinator path. XML writer/reader, loader and plugin-interface
+implementations remain their existing compatibility boundaries; legacy fixture
+integrity and temporary-only round-trip targets remain required evidence.
