@@ -115,25 +115,22 @@ project coverage.
 
 ## Proposed internal `RemoteControlProtocol` boundary
 
-The first extraction target is a private, QObject-free value class, for
-example `RemoteControl/RemoteControlProtocol.h/.cpp`.  It must have no
+The second extraction target is the private, QObject-free value class
+`RemoteControl/RemoteControlProtocol.h/.cpp`. It has no
 `QTcpSocket`, `QTcpServer`, `QWidget`, `MessengerClass`, manager, mapper
 ownership, plugin, or GUI dependency.  Its narrow responsibilities are:
 
-* retain incomplete raw bytes and split them into complete **safe** frames;
-* decode the existing request header into a typed request value without changing
+* decode an already complete existing request header into a typed request value without changing
   its native-format interpretation;
 * encode the existing `get` reply byte arrays from already supplied typed
   values; and
 * classify only the existing three-byte command bytes (`set`, `get`, or
   unknown) without emitting a signal or changing data.
 
-The protocol helper must return values such as `NeedMoreBytes`, `CompleteFrame`
-and `UnknownCommand`; it must not prescribe new malformed-frame recovery.  In
-particular, retaining a remainder and preserving parse order is more important
-than making its API broad.  Mapper lookup and `InterfaceData` conversion can
-remain in the server in the first slice, which keeps the boundary value-only
-and rollbackable.
+The already-extracted `RemoteControlFrameSplitter` retains incomplete bytes and
+preserves complete-frame order. `RemoteControlProtocol` does not prescribe new
+malformed-frame recovery. Mapper lookup and `InterfaceData` conversion remain
+in the server, which keeps the boundary value-only and rollbackable.
 
 `RemoteControlServer` must remain the QObject/Qt transport adapter: port
 selection/listening, accepting clients, socket signal connections, the current
@@ -251,3 +248,19 @@ vector in this suite, not a claimed wire-format limit. It preserves the
 documented trailing-NUL truncation for string/list `set`, container
 non-mutation, one-byte selection behavior and the invalid Qt-6 error-signal
 connection as unresolved defect candidates.
+
+## 4H.2 implementation record
+
+**Completed 2026-08-10.** `RemoteControlProtocol` is a private value-only
+codec over complete safe `QByteArray` frames. It classifies the existing
+three-byte command, decodes native header/ID/payload fields and encodes empty,
+numeric, string-padded and vector `get` replies. It owns no QObject, socket,
+Messenger, mapper or GUI reference.
+
+`RemoteControlServer` retains socket/client state, mapper lookup,
+`InterfaceData` mutation, `MessageSender` emission and all socket writes.
+`TCP_001`–`TCP_008` passed unchanged, including Latin-1, NUL, native length,
+padding and coalesced-reply vectors. No network byte order, UTF-8 conversion,
+format normalization or new dangerous-frame validation was introduced. The
+string/StringList trailing-byte loss, container non-mutation, one-byte
+selection behavior and invalid Qt-6 error-signal connection remain unchanged.

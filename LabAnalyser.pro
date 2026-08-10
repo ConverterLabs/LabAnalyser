@@ -91,6 +91,7 @@ SOURCES += main.cpp\
         DataManagement/DataManagementSetClass.cpp \
         DataManagement/DataMessengerClass.cpp \
         RemoteControl/RemoteControlFrameSplitter.cpp \
+        RemoteControl/RemoteControlProtocol.cpp \
         RemoteControl/RemoteControlServer.cpp \
         UIFunctions/SubPlotMainWindow.cpp \
         TreeWidgetCustomDrop.cpp\
@@ -147,6 +148,7 @@ HEADERS  += mainwindow.h\
             DataManagement/DataManagementSetClass.h \
             DataManagement/DataMessengerClass.h \
             RemoteControl/RemoteControlFrameSplitter.h \
+            RemoteControl/RemoteControlProtocol.h \
             RemoteControl/RemoteControlServer.h \
             UIFunctions/SubPlotMainWindow.h \
             TreeWidgetCustomDrop.h
