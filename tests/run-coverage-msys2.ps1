@@ -216,7 +216,17 @@ if ($Jobs -lt 1) {
 
 $mingwBin = Join-Path $Msys2Root 'bin'
 $msysUsrBin = Join-Path (Split-Path -Parent $Msys2Root) 'usr\bin'
+# Resolve gcov: prefer the unversioned 'gcov.exe'; fall back to 'gcov-N.exe'
+# produced by MSYS2 when it ships only the versioned binary for a given GCC release.
 $gcov = Join-Path $mingwBin 'gcov.exe'
+if (-not (Test-Path -LiteralPath $gcov -PathType Leaf)) {
+    $versioned = @(Get-ChildItem -LiteralPath $mingwBin -File -Filter 'gcov-*.exe' |
+        Sort-Object -Property Name -Descending | Select-Object -First 1)
+    if ($versioned.Count -eq 1) {
+        $gcov = $versioned[0].FullName
+        Write-Host "gcov.exe not found; using versioned binary: $gcov"
+    }
+}
 $testRunner = Join-Path $PSScriptRoot 'run-tests-msys2.ps1'
 Assert-File -Path $gcov -Description 'gcov'
 Assert-File -Path $testRunner -Description 'test runner'
