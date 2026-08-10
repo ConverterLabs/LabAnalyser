@@ -366,3 +366,20 @@ Registry stores no QObject pointer, makes no destroyed connection and never
 deletes a QObject. It intentionally preserves name collisions, empty-name keys,
 non-migrating renames and stale mapper-pointer behavior. Rollback is local:
 restore the private map/delegation without persistence or consumer migration.
+
+## Phase 4E.1 Messenger dispatch characterization
+
+**Completed 2026-08-10.** Before introducing any internal dispatch policy,
+`DM_MSG_001..DM_MSG_003` establish the public
+`MessengerClass::MessageReceiver`/`MessageTransmitter` command matrix: every
+implemented command, exact synchronous signal order, IDs and `InterfaceData`
+payloads, repeated calls, safe empty/unknown inputs, the
+publish/container/update/widget/set chain, and CloseProject's valid
+parent-parent identifier. `MessageTransmitter` dispatches first and emits one
+`MessageSender` afterward.
+
+Null-parent, null-sender and destroyed-QObject paths remain unsafe exclusions,
+not contracts. A later 4E.2 may introduce a private, non-QObject
+`MessageDispatchPolicy` only behind the unchanged Messenger facade and only if
+all `DM_MSG_*` vectors remain unchanged; it must not absorb TCP, plugin, XML,
+UI or device logic.

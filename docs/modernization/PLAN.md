@@ -332,3 +332,13 @@ QObject non-ownership remain the characterized legacy behavior. File-specific
 coverage is documented in `BEHAVIOR_INVENTORY.md`, not as a project gate. The
 next slice must not absorb ContainerStore, DataRegistry, Messenger, device or
 GUI/IO responsibilities.
+
+## Phase 4E.1 Messenger command-dispatch characterization
+
+**Completed 2026-08-10.** `DM_MSG_001..DM_MSG_003` characterize all known
+`MessengerClass::MessageReceiver` commands and the `MessageTransmitter`
+forwarding boundary without production changes: signal order/counts,
+IDs/payloads, manager container effects, repeats, safe empty/unknown input and
+the valid parent/parent-parent CloseProject path. The next possible slice is a
+private `MessageDispatchPolicy`; it must retain these vectors exactly and may
+not absorb transport, plugins, XML, UI or device logic.

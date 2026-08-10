@@ -737,3 +737,29 @@ lines (159/174), 93.55% branches executed (174/186), 56.99% branches taken
 (106/186), 86.59% calls (155/179); `WidgetBindingRegistry.cpp` 100.00% lines
 (18/18), 100.00% branches executed (10/10), 70.00% branches taken (7/10), and
 100.00% calls (5/5). These are not project coverage.
+
+## DataManagement Messenger dispatch characterization 4E.1
+
+`DM_MSG_001..DM_MSG_003` characterize the public `MessengerClass` boundary
+before any dispatch-policy extraction. `DM_MSG_001` drives each known
+`MessageReceiver` command twice through a live
+`MessengerClass -> DataManagementSetClass -> LabAnalyser` QObject hierarchy:
+`publish`, `set`, `get`, `error`, `info`, `notification`, `CloseProject`,
+`publish_start`, and `publish_finished`. It records exact signal sequences,
+counts, IDs and payloads. `publish` emits `AddContainerElement`, `SetData`,
+`AddElementToWidget`, then the recursive `set` sequence (`SetData`,
+`NewDataReceived`). `CloseProject` emits parent-parent ID `LabAnalyser` with
+`Closing forced by: <ID>`, then `CloseProject`.
+
+`DM_MSG_002` records that `MessageTransmitter` executes the identical receiver
+path and emits exactly one `MessageSender` afterward, even for `get` and other
+receiver-no-op paths; repeats preserve this sequence and `QString` Unicode
+payload. `DM_MSG_003` covers safe empty/unknown commands and IDs, then a mixed
+publish/set/get/CloseProject sequence. Empty and unknown receiver commands emit
+nothing; an empty-ID publish creates an empty-ID container that later set
+updates. These are observed legacy semantics, not policy rules.
+
+Null parent, null sender and destroyed-QObject paths are deliberately excluded:
+`CloseProject` dereferences `parent()->parent()`. TCP, plugin and XML suites
+retain their transport, plugin and persistence contracts; this slice maps only
+their shared Messenger command boundary.

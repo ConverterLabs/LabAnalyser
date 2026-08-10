@@ -23,6 +23,12 @@ public slots:
     void widget(const QString&, InterfaceData) { events << "widget"; }
     void received(const QString&) { events << "received"; }
     void sent(const QString&, const QString&, InterfaceData) { events << "sent"; }
+    void error(const QString&, const QString&) { events << "error"; }
+    void info(const QString&, const QString&) { events << "info"; }
+    void notification(const QString&, const QString&) { events << "notification"; }
+    void closeProject() { events << "close"; }
+    void publishStart() { events << "start"; }
+    void publishFinished() { events << "finished"; }
 };
 
 class ProbeDropWidget final : public QObject, public VariantDropWidget
@@ -130,6 +136,9 @@ private slots:
     void DM_BIND_004_boundWidgetsRouteMessagesAndExposePlotDuplicatePropagation();
     void DM_BIND_005_bindingStateAndForeignQObjectOwnershipAreInstanceLocal();
     void DM_BIND_006_nameCollisionsRenamesEmptyNamesAndRoutingUseCurrentName();
+    void DM_MSG_001_messageReceiver_commandMatrix();
+    void DM_MSG_002_messageTransmitter_commandMatrix();
+    void DM_MSG_003_parentHierarchy_emptyInputs_and_mixedSequence();
 };
 
 void DataManagementCharacterizationTests::initTestCase()
@@ -962,6 +971,210 @@ void DataManagementCharacterizationTests::DM_BIND_006_nameCollisionsRenamesEmpty
     QCOMPARE(isolated.GetContainer(&first), nullptr);
     QVERIFY(isolated.IsObjectLinked(&first));
     QCOMPARE(isolated.GetContainerPointer()->at(QString()), nullptr);
+}
+
+void DataManagementCharacterizationTests::DM_MSG_001_messageReceiver_commandMatrix()
+{
+    struct CommandCase {
+        QString command;
+        QStringList events;
+        bool createsContainer = false;
+        bool requiresExistingContainer = false;
+    };
+    const std::vector<CommandCase> cases = {
+        {"publish", {"added", "set", "widget", "set", "received"}, true, false},
+        {"set", {"set", "received"}, false, true},
+        {"get", {}, false, false},
+        {"error", {"error"}, false, false},
+        {"info", {"info"}, false, false},
+        {"notification", {"notification"}, false, false},
+        {"CloseProject", {"notification", "close"}, false, false},
+        {"publish_start", {"start"}, false, false},
+        {"publish_finished", {"finished"}, false, false},
+    };
+
+    for (const CommandCase& commandCase : cases) {
+        QObject application;
+        application.setObjectName("LabAnalyser");
+        DataManagementSetClass manager(&application);
+        MessengerClass* messenger = manager.GetMessenger();
+        QVERIFY(messenger);
+        QCOMPARE(messenger->parent(), static_cast<QObject*>(&manager));
+        QCOMPARE(manager.parent(), &application);
+
+        const QString id = QString("message::%1").arg(commandCase.command);
+        InterfaceData payload = number(4.5);
+        payload.SetType("Parameter");
+        payload.SetStateDependency("state");
+
+        if (commandCase.requiresExistingContainer)
+            manager.AddContainerElement(id, "double", "Parameter", "state");
+
+        QSignalSpy added(messenger, &MessengerClass::AddContainerElement);
+        QSignalSpy set(messenger, &MessengerClass::SetData);
+        QSignalSpy widget(messenger, &MessengerClass::AddElementToWidget);
+        QSignalSpy received(messenger, &MessengerClass::NewDataReceived);
+        QSignalSpy errors(messenger, &MessengerClass::ErrorWriter);
+        QSignalSpy infos(messenger, &MessengerClass::InfoWriter);
+        QSignalSpy notifications(messenger, &MessengerClass::NotificationWriter);
+        QSignalSpy closed(messenger, &MessengerClass::CloseProject);
+        QSignalSpy started(messenger, &MessengerClass::PublishStart);
+        QSignalSpy finished(messenger, &MessengerClass::PublishFinished);
+        SignalOrderRecorder recorder;
+        connect(messenger, &MessengerClass::AddContainerElement, &recorder, &SignalOrderRecorder::added);
+        connect(messenger, &MessengerClass::SetData, &recorder, &SignalOrderRecorder::set);
+        connect(messenger, &MessengerClass::AddElementToWidget, &recorder, &SignalOrderRecorder::widget);
+        connect(messenger, &MessengerClass::NewDataReceived, &recorder, &SignalOrderRecorder::received);
+        connect(messenger, &MessengerClass::ErrorWriter, &recorder, &SignalOrderRecorder::error);
+        connect(messenger, &MessengerClass::InfoWriter, &recorder, &SignalOrderRecorder::info);
+        connect(messenger, &MessengerClass::NotificationWriter, &recorder, &SignalOrderRecorder::notification);
+        connect(messenger, &MessengerClass::CloseProject, &recorder, &SignalOrderRecorder::closeProject);
+        connect(messenger, &MessengerClass::PublishStart, &recorder, &SignalOrderRecorder::publishStart);
+        connect(messenger, &MessengerClass::PublishFinished, &recorder, &SignalOrderRecorder::publishFinished);
+
+        messenger->MessageReceiver(commandCase.command, id, payload);
+        QCOMPARE(recorder.events, commandCase.events);
+
+        QCOMPARE(added.count(), commandCase.events.count("added"));
+        QCOMPARE(set.count(), commandCase.events.count("set"));
+        QCOMPARE(widget.count(), commandCase.events.count("widget"));
+        QCOMPARE(received.count(), commandCase.events.count("received"));
+        QCOMPARE(errors.count(), commandCase.events.count("error"));
+        QCOMPARE(infos.count(), commandCase.events.count("info"));
+        QCOMPARE(notifications.count(), commandCase.events.count("notification"));
+        QCOMPARE(closed.count(), commandCase.events.count("close"));
+        QCOMPARE(started.count(), commandCase.events.count("start"));
+        QCOMPARE(finished.count(), commandCase.events.count("finished"));
+
+        if (commandCase.command == "publish") {
+            QCOMPARE(added.at(0).at(0).toString(), id);
+            QCOMPARE(added.at(0).at(1).toString(), QString("double"));
+            QCOMPARE(added.at(0).at(2).toString(), QString("Parameter"));
+            QCOMPARE(added.at(0).at(3).toString(), QString("state"));
+            QCOMPARE(qvariant_cast<InterfaceData>(set.at(0).at(1)).GetDouble(), 4.5);
+            QCOMPARE(manager.GetContainer(id)->GetDouble(), 4.5);
+        } else if (commandCase.command == "set") {
+            QCOMPARE(set.at(0).at(0).toString(), id);
+            QCOMPARE(qvariant_cast<InterfaceData>(set.at(0).at(1)).GetDouble(), 4.5);
+            QCOMPARE(manager.GetContainer(id)->GetDouble(), 4.5);
+        } else if (commandCase.command == "error" || commandCase.command == "info") {
+            const QList<QVariant> signal = commandCase.command == "error" ? errors.at(0) : infos.at(0);
+            QCOMPARE(signal.at(0).toString(), id);
+            QCOMPARE(signal.at(1).toString(), QString("4.5"));
+        } else if (commandCase.command == "notification") {
+            QCOMPARE(notifications.at(0).at(0).toString(), id);
+            QCOMPARE(notifications.at(0).at(1).toString(), QString("4.5"));
+        } else if (commandCase.command == "CloseProject") {
+            QCOMPARE(notifications.at(0).at(0).toString(), QString("LabAnalyser"));
+            QCOMPARE(notifications.at(0).at(1).toString(), QString("Closing forced by: %1").arg(id));
+        } else {
+            QVERIFY(!manager.ElementExists(id));
+        }
+
+        messenger->MessageReceiver(commandCase.command, id, payload);
+        QCOMPARE(recorder.events, commandCase.events + commandCase.events);
+    }
+}
+
+void DataManagementCharacterizationTests::DM_MSG_002_messageTransmitter_commandMatrix()
+{
+    struct CommandCase { QString command; QStringList receiverEvents; };
+    const std::vector<CommandCase> cases = {
+        {"publish", {"added", "set", "widget", "set", "received"}},
+        {"set", {"set", "received"}}, {"get", {}}, {"error", {"error"}},
+        {"info", {"info"}}, {"notification", {"notification"}},
+        {"CloseProject", {"notification", "close"}}, {"publish_start", {"start"}},
+        {"publish_finished", {"finished"}},
+    };
+
+    for (const CommandCase& commandCase : cases) {
+        QObject application;
+        application.setObjectName("LabAnalyser");
+        DataManagementSetClass manager(&application);
+        MessengerClass* messenger = manager.GetMessenger();
+        const QString id = QString("transmit::%1").arg(commandCase.command);
+        InterfaceData payload;
+        payload.SetData(QString("payload \\u03bc"));
+        if (commandCase.command == "set")
+            manager.AddContainerElement(id, "String", "Parameter", "");
+
+        QSignalSpy sent(messenger, &MessengerClass::MessageSender);
+        SignalOrderRecorder recorder;
+        connect(messenger, &MessengerClass::AddContainerElement, &recorder, &SignalOrderRecorder::added);
+        connect(messenger, &MessengerClass::SetData, &recorder, &SignalOrderRecorder::set);
+        connect(messenger, &MessengerClass::AddElementToWidget, &recorder, &SignalOrderRecorder::widget);
+        connect(messenger, &MessengerClass::NewDataReceived, &recorder, &SignalOrderRecorder::received);
+        connect(messenger, &MessengerClass::ErrorWriter, &recorder, &SignalOrderRecorder::error);
+        connect(messenger, &MessengerClass::InfoWriter, &recorder, &SignalOrderRecorder::info);
+        connect(messenger, &MessengerClass::NotificationWriter, &recorder, &SignalOrderRecorder::notification);
+        connect(messenger, &MessengerClass::CloseProject, &recorder, &SignalOrderRecorder::closeProject);
+        connect(messenger, &MessengerClass::PublishStart, &recorder, &SignalOrderRecorder::publishStart);
+        connect(messenger, &MessengerClass::PublishFinished, &recorder, &SignalOrderRecorder::publishFinished);
+        connect(messenger, &MessengerClass::MessageSender, &recorder, &SignalOrderRecorder::sent);
+
+        messenger->MessageTransmitter(commandCase.command, id, payload);
+        QStringList expected = commandCase.receiverEvents;
+        expected << "sent";
+        QCOMPARE(recorder.events, expected);
+        QCOMPARE(sent.count(), 1);
+        QCOMPARE(sent.at(0).at(0).toString(), commandCase.command);
+        QCOMPARE(sent.at(0).at(1).toString(), id);
+        QCOMPARE(qvariant_cast<InterfaceData>(sent.at(0).at(2)).GetDataType(), QString("QString"));
+        QCOMPARE(qvariant_cast<InterfaceData>(sent.at(0).at(2)).GetString(), QString("payload \\u03bc"));
+
+        messenger->MessageTransmitter(commandCase.command, id, payload);
+        QCOMPARE(sent.count(), 2);
+        QCOMPARE(recorder.events, expected + expected);
+    }
+}
+
+void DataManagementCharacterizationTests::DM_MSG_003_parentHierarchy_emptyInputs_and_mixedSequence()
+{
+    QObject application;
+    application.setObjectName("LabAnalyser");
+    DataManagementSetClass manager(&application);
+    MessengerClass* messenger = manager.GetMessenger();
+    QVERIFY(messenger);
+    QCOMPARE(messenger->parent()->parent(), static_cast<QObject*>(&application));
+
+    QSignalSpy added(messenger, &MessengerClass::AddContainerElement);
+    QSignalSpy set(messenger, &MessengerClass::SetData);
+    QSignalSpy sent(messenger, &MessengerClass::MessageSender);
+    QSignalSpy notifications(messenger, &MessengerClass::NotificationWriter);
+    SignalOrderRecorder recorder;
+    connect(messenger, &MessengerClass::AddContainerElement, &recorder, &SignalOrderRecorder::added);
+    connect(messenger, &MessengerClass::SetData, &recorder, &SignalOrderRecorder::set);
+    connect(messenger, &MessengerClass::MessageSender, &recorder, &SignalOrderRecorder::sent);
+    connect(messenger, &MessengerClass::NotificationWriter, &recorder, &SignalOrderRecorder::notification);
+
+    InterfaceData emptyPayload;
+    messenger->MessageReceiver("", "", emptyPayload);
+    messenger->MessageReceiver("unknown", "", emptyPayload);
+    QCOMPARE(recorder.events, QStringList());
+    QCOMPARE(manager.GetContainerCount(), 0);
+
+    InterfaceData text;
+    text.SetData(QString("safe text"));
+    messenger->MessageReceiver("publish", "", text);
+    messenger->MessageReceiver("set", "", number(9.0));
+    messenger->MessageTransmitter("get", "", emptyPayload);
+    InterfaceData textList;
+    textList.SetData(QStringList({"first", "\u03bc"}));
+    messenger->MessageTransmitter("notification", "list", textList);
+    messenger->MessageReceiver("CloseProject", "manual", emptyPayload);
+
+    QCOMPARE(recorder.events, QStringList({"added", "set", "set", "set", "sent", "notification", "sent", "notification"}));
+    QCOMPARE(added.count(), 1);
+    QCOMPARE(set.count(), 3);
+    QCOMPARE(sent.count(), 2);
+    QCOMPARE(notifications.count(), 2);
+    QVERIFY(manager.ElementExists(QString()));
+    QCOMPARE(manager.GetContainer(QString())->GetDouble(), 9.0);
+    QCOMPARE(notifications.at(0).at(0).toString(), QString("list"));
+    QCOMPARE(qvariant_cast<InterfaceData>(sent.at(1).at(2)).GetDataType(), QString("QStringList"));
+    QCOMPARE(qvariant_cast<InterfaceData>(sent.at(1).at(2)).GetStringList(), QStringList({"first", "\u03bc"}));
+    QCOMPARE(notifications.at(1).at(0).toString(), QString("LabAnalyser"));
+    QCOMPARE(notifications.at(1).at(1).toString(), QString("Closing forced by: manual"));
 }
 
 QTEST_MAIN(DataManagementCharacterizationTests)
