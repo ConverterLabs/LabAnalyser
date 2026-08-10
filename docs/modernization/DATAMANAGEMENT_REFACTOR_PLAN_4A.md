@@ -311,24 +311,30 @@ migration.
 ## Phase 4D.1 widget-binding characterization
 
 **Completed 2026-08-10.** The unchanged public facade is now characterized by
-`DM_BIND_001..DM_BIND_005` before any `WidgetBindingRegistry` exists. The
+`DM_BIND_001..DM_BIND_006` before any `WidgetBindingRegistry` exists. The
 vectors cover valid and unknown lookups, ordinary repeated bind/rebind/remove,
 the `PlotWidget` duplicate-entry exception, project cleanup, destroyed bound
 QObjects, foreign QObject ownership, `SendNewValue` Messenger feedback, and
-manager-instance isolation.
+manager-instance isolation. `DM_BIND_006` additionally records duplicate live
+object names, name changes, the empty-name key, return to the original name,
+current-name sender routing and their per-manager isolation.
 
 The binding map is name-keyed, so QObject pointer identity is preserved only in
-the mapper `Objects` list, not as the lookup key. A destroyed bound QObject is
-not removed automatically; no stale pointer is dereferenced by the tests.
-`CloseProjectLogic` clears bindings completely. The direct ID-specific removal
-does not erase the name map, whereas the QObject overload does. There is no
-safe public single-container-removal method; raw-map mutation through
+the mapper `Objects` list, not as the lookup key. Two live QObjects with the
+same name are therefore indistinguishable to lookup, and renaming never
+migrates the old map key or mapper entry. Sender routing likewise follows only
+the current name. A destroyed bound QObject is not removed automatically; no
+stale pointer is dereferenced by the tests. `CloseProjectLogic` clears bindings
+completely. The direct ID-specific removal does not erase the name map, whereas
+the QObject overload does. There is no safe public single-container-removal
+method; raw-map mutation through
 `GetContainerPointer()` is deliberately excluded as the documented ownership
 boundary.
 
 The next implementation slice may introduce a private
 `WidgetBindingRegistry` only for `ElementsToContainerID` and mapper binding-list
-mutation. It must preserve name-keyed lookup, empty-ID insertion behavior,
-ordinary detach/rebind semantics, PlotWidget duplicate behavior, cleanup order,
-and non-ownership of QObjects under the unchanged `DM_BIND_*` vectors. It must
+mutation. It must preserve name-keyed lookup, name collision/rename behavior,
+empty-ID insertion behavior, ordinary detach/rebind semantics, PlotWidget
+duplicate behavior, cleanup order, and non-ownership of QObjects under the
+unchanged `DM_BIND_*` vectors. It must
 not move ContainerStore, DataRegistry, device, Messenger, GUI or IO logic.

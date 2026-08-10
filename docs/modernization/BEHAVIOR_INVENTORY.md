@@ -701,3 +701,18 @@ registration stores two mapper entries and a manager update invokes
 message. This signal/data-flow asymmetry is a second defect candidate. Senderless
 `SendNewValue`, null objects, direct stale-pointer use and raw-map mutation are
 dangerous exclusions, not contracts.
+
+`DM_BIND_006` adds the name-identity boundary: two distinct live QObjects with
+the same `objectName` share one binding key. Binding the second replaces the
+name mapping and removes the first mapper entry by its stored name, so both
+objects subsequently resolve to the second ID while the mapper stores only the
+second pointer. Renaming that object does not migrate the old map key or its
+stored `ObjectStruct`; its current name is unlinked until
+`GetContainer(QObject*)` inserts an empty-ID/null-container entry. Deleting via
+that renamed object removes only this newly inserted empty name mapping; after
+renaming back, deletion removes the original binding. Empty object names are
+ordinary keys and bind/lookup/remove normally. Sender routing also uses the
+current name: a renamed bound widget emits no message; restoring its original
+name restores the existing `set` route. These name-collision and rename states
+remain instance-local. This strengthens the name-keyed/stale-binding defect
+candidate; no pointer-keyed or automatic-cleanup behavior is implied.

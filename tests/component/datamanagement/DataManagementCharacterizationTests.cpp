@@ -129,6 +129,7 @@ private slots:
     void DM_BIND_003_destroyedBoundQObjectIsNotAutoCleanedButProjectCleanupIs();
     void DM_BIND_004_boundWidgetsRouteMessagesAndExposePlotDuplicatePropagation();
     void DM_BIND_005_bindingStateAndForeignQObjectOwnershipAreInstanceLocal();
+    void DM_BIND_006_nameCollisionsRenamesEmptyNamesAndRoutingUseCurrentName();
 };
 
 void DataManagementCharacterizationTests::initTestCase()
@@ -867,6 +868,100 @@ void DataManagementCharacterizationTests::DM_BIND_005_bindingStateAndForeignQObj
     second.AddContainerElement("id", "double", "Parameter", "");
     second.AddElementToContainerEntry("foreign-binding", "id", "QWidget", foreign);
     QVERIFY(second.IsObjectLinked(foreign));
+}
+
+void DataManagementCharacterizationTests::DM_BIND_006_nameCollisionsRenamesEmptyNamesAndRoutingUseCurrentName()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject first;
+    QObject second;
+    QObject emptyName;
+    first.setObjectName("shared-name");
+    second.setObjectName("shared-name");
+
+    manager.AddContainerElement("first-id", "double", "Parameter", "");
+    manager.AddContainerElement("second-id", "double", "Parameter", "");
+    manager.AddContainerElement("empty-id", "double", "Parameter", "");
+    manager.AddElementToContainerEntry("shared-name", "first-id", "QWidget", &first);
+    QCOMPARE(manager.GetContainer("first-id")->Objects.size(), size_t(1));
+    QCOMPARE(manager.GetContainer("first-id")->Objects.at(0).FormP, &first);
+
+    // A second live QObject with the same name replaces the name binding and
+    // removes the first mapper entry by matching its stored FormName.
+    manager.AddElementToContainerEntry("shared-name", "second-id", "QWidget", &second);
+    QCOMPARE(manager.GetContainer("first-id")->Objects.size(), size_t(0));
+    QCOMPARE(manager.GetContainer("second-id")->Objects.size(), size_t(1));
+    QCOMPARE(manager.GetContainer("second-id")->Objects.at(0).FormP, &second);
+    QCOMPARE(manager.GetContainerID(&first), QString("second-id"));
+    QCOMPARE(manager.GetContainerID(&second), QString("second-id"));
+    QCOMPARE(manager.GetContainer(&first), manager.GetContainer("second-id"));
+
+    second.setObjectName("renamed");
+    QVERIFY(!manager.IsObjectLinked(&second));
+    QCOMPARE(manager.GetContainerID(&second), QString());
+    QCOMPARE(manager.GetContainer(&second), nullptr);
+    QVERIFY(manager.IsObjectLinked(&second));
+    QCOMPARE(manager.GetContainerPointer()->at(QString()), nullptr);
+    // The old mapping remains addressable by another QObject with its old name.
+    QCOMPARE(manager.GetContainerID(&first), QString("second-id"));
+    QCOMPARE(manager.GetContainer("second-id")->Objects.at(0).FormP, &second);
+
+    // The newly inserted renamed-name mapping is empty, so removal deletes it
+    // only; it cannot remove the mapper object stored under the old name.
+    manager.DeleteEntryOfObject(&second);
+    QVERIFY(!manager.IsObjectLinked(&second));
+    QCOMPARE(manager.GetContainer("second-id")->Objects.size(), size_t(1));
+    second.setObjectName("shared-name");
+    QVERIFY(manager.IsObjectLinked(&second));
+    QCOMPARE(manager.GetContainerID(&second), QString("second-id"));
+    manager.DeleteEntryOfObject(&second);
+    QVERIFY(!manager.IsObjectLinked(&second));
+    QCOMPARE(manager.GetContainer("second-id")->Objects.size(), size_t(0));
+
+    // Empty object names are legitimate map keys and have the same ordinary
+    // bind/lookup/remove behavior as non-empty names.
+    QVERIFY(emptyName.objectName().isEmpty());
+    manager.AddElementToContainerEntry(QString(), "empty-id", "QWidget", &emptyName);
+    QVERIFY(manager.IsObjectLinked(&emptyName));
+    QCOMPARE(manager.GetContainerID(&emptyName), QString("empty-id"));
+    QCOMPARE(manager.GetContainer(&emptyName), manager.GetContainer("empty-id"));
+    QCOMPARE(manager.GetContainer("empty-id")->Objects.at(0).FormP, &emptyName);
+    manager.DeleteEntryOfObject(&emptyName);
+    QVERIFY(!manager.IsObjectLinked(&emptyName));
+    QCOMPARE(manager.GetContainer("empty-id")->Objects.size(), size_t(0));
+
+    QObject routeOwner;
+    routeOwner.setObjectName("LabAnalyser");
+    DataManagementSetClass routeManager(&routeOwner);
+    ProbeDropWidget routeWidget;
+    routeWidget.setObjectName("route-original");
+    routeWidget.nextValue = number(8.0);
+    routeManager.AddContainerElement("route-id", "double", "Parameter", "");
+    routeManager.AddElementToContainerEntry("route-original", "route-id", "ProbeDropWidget", &routeWidget);
+    QSignalSpy routed(&routeManager, &DataManagementClass::MessageSender);
+    connect(&routeWidget, &ProbeDropWidget::changed, &routeManager, &DataManagementSetClass::SendNewValue);
+
+    routeWidget.setObjectName("route-renamed");
+    QVERIFY(!routeManager.IsObjectLinked(&routeWidget));
+    emit routeWidget.changed();
+    QCOMPARE(routeWidget.getCalls, 0);
+    QCOMPARE(routed.count(), 0);
+    routeWidget.setObjectName("route-original");
+    QVERIFY(routeManager.IsObjectLinked(&routeWidget));
+    emit routeWidget.changed();
+    QCOMPARE(routeWidget.getCalls, 1);
+    QCOMPARE(routed.count(), 1);
+    QCOMPARE(routed.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(routed.at(0).at(1).toString(), QString("route-id"));
+
+    // Name-collision and rename state do not leak across manager instances.
+    DataManagementClass isolated(&owner);
+    QCOMPARE(isolated.GetContainerID(&first), QString());
+    QVERIFY(!isolated.IsObjectLinked(&first));
+    QCOMPARE(isolated.GetContainer(&first), nullptr);
+    QVERIFY(isolated.IsObjectLinked(&first));
+    QCOMPARE(isolated.GetContainerPointer()->at(QString()), nullptr);
 }
 
 QTEST_MAIN(DataManagementCharacterizationTests)

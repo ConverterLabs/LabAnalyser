@@ -299,12 +299,13 @@ scope for the next slice.
 
 ## Phase 4D.1 DataManagement widget-binding characterization
 
-**Completed 2026-08-10.** `DM_BIND_001..DM_BIND_005` record the current public
+**Completed 2026-08-10.** `DM_BIND_001..DM_BIND_006` record the current public
 facade behavior of `ElementsToContainerID` and bound mapper-object lists before
 any extraction. They cover valid/unknown lookup insertion, ordinary repeat and
 rebind behavior, both removal overloads, project cleanup, QObject lifetime and
 non-ownership, Messenger feedback from a bound widget, the PlotWidget duplicate
-registration exception, and instance isolation.
+registration exception, two live QObjects with the same name, renaming and
+return-to-name routing, empty object names, and instance isolation.
 
 The resulting risks are explicit: bindings are keyed by object name rather than
 QObject identity; QObject destruction leaves a stale mapper pointer/name
