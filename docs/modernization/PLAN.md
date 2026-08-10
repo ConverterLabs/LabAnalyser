@@ -9,6 +9,14 @@ and offscreen Qt GUI tests. A separate fresh-environment job publishes the
 combined local coverage report and step summary with no coverage gate. It adds
 neither production code nor a coverage gate.
 
+## Sanitizer pilot status
+
+**Blocked by the installed MSYS2 MINGW64 sanitizer runtime.** GCC 15.2.0
+accepts `-fsanitize=address,undefined`, but the linker cannot resolve `-lasan`
+or `-lubsan`. The focused pilot script fails explicitly before building an
+uninstrumented fallback. No project sanitizer result is claimed, no package was
+installed or updated, and no sanitizer CI gate is enabled. See `SANITIZERS.md`.
+
 ## Milestone 2B record
 
 **Milestone 2B — combined local qmake coverage reporting:** completed on 2026-08-10.
