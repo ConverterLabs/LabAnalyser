@@ -107,6 +107,26 @@ lcov (or an equivalent reviewed reporter) for aggregate HTML/JSON reports.
 No coverage gate is enabled: one testable source file cannot honestly establish
 a repository-wide threshold.
 
+## Combined coverage baseline (Milestone 2B)
+
+On 2026-08-10, the existing instrumented build tree was aggregated successfully
+with `tests/run-coverage-msys2.ps1 -CollectOnly -Jobs 4` (exit code 0); the
+already completed instrumented build and its 11 registered green tests were not
+repeated. The reproducible full command is
+`powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-coverage-msys2.ps1 -Jobs 4`.
+Its report is generated under
+`build/coverage-msys2-mingw64/report/coverage-summary.{md,json}`.
+
+For the 38 non-vendored production `.cpp` files compiled by registered
+instrumented tests, the honest baseline is 41.32% lines (2419/5854), 36.44%
+branches executed (3855/10579), 20.40% branches taken at least once
+(2158/10579), 32.98% calls (2406/7295), and 61.23% functions (338/552).
+These are not repository-wide figures: `main.cpp` has no coverage data and is
+listed separately. Vendored qcustomplot, generated Qt/build sources and test
+sources are excluded by documented rules. Non-fatal gcov header diagnostics do
+not hide a non-zero gcov exit or a missing production report. No coverage gate
+is enabled.
+
 ## DataManagement characterization 3A
 
 On 2026-08-03 the normal local command built and passed both registered qmake

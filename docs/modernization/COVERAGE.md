@@ -35,3 +35,36 @@ file, not an overall project metric.
    80% milestone targets do not apply to the present one-module test baseline.
 
 Coverage complements behavioral assertions; it does not establish compatibility.
+
+## Combined baseline (Milestone 2B, 2026-08-10)
+
+The reproducible local command is:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-coverage-msys2.ps1 -Jobs 4
+```
+
+It creates a dedicated `build/coverage-msys2-mingw64` tree, builds and runs the
+registered qmake tests with `--coverage`, and writes the merged report to
+`build/coverage-msys2-mingw64/report/coverage-summary.md` and
+`coverage-summary.json`.  The aggregation command can be repeated without
+rebuilding when that tree still contains matching `.gcda` and `.gcno` files:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-coverage-msys2.ps1 -CollectOnly -Jobs 4
+```
+
+The verified combined baseline covers the 38 non-vendored production sources
+compiled by at least one registered instrumented test: **41.32% lines**
+(2419/5854), **36.44% branches executed** (3855/10579), **20.40% branches
+taken at least once** (2158/10579), **32.98% calls** (2406/7295), and
+**61.23% functions** (338/552).  This is an aggregate for compiled production
+sources, not repository-wide coverage. `main.cpp` is currently the sole
+production `.cpp` without coverage data and is listed explicitly in the report.
+
+The reviewed denominator excludes vendored
+`DropWidgets/Plots/qcustomplot.cpp`, generated `moc_*`/`qrc_*`/`ui_*` and all
+other build-directory outputs, and `tests/**`.  Header-source diagnostics that
+`gcov` emits while resolving relative include entries are non-fatal when gcov
+returns zero; a missing production record, absent matching report, or non-zero
+gcov exit remains fatal.  No threshold or coverage gate is active.

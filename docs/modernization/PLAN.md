@@ -2,22 +2,23 @@
 
 ## Current milestone
 
-**Milestone 2A — local qmake test infrastructure:** completed on 2026-08-03.
+**Milestone 2B — combined local qmake coverage reporting:** completed on 2026-08-10.
 The existing PlotMeasurements test is registered in a single executable local
-test flow; test and fixture directory structures and coverage evidence are in
-place. No production code, CMake build, new behavioral tests, or coverage
-threshold was added.
+test flow; the dedicated MSYS2/GCC coverage command aggregates all registered
+instrumented tests into documented Markdown and JSON reports. No production
+code, CMake build, or coverage threshold was added.
 
-Acceptance evidence: the documented `tests/run-tests-msys2.ps1` command was
-run successfully against the unchanged PlotMeasurements test. GCC/gcov coverage
-instrumentation was also built and run successfully as a source-level pilot.
+Acceptance evidence: the instrumented runner completed all 11 registered tests,
+and the subsequent `-CollectOnly` aggregation completed with exit code 0 from
+the complete coverage tree. `COVERAGE.md` records the honest 38-source compiled
+production baseline and exclusions; it is not a repository-wide gate.
 
 ## Ordered milestones
 
 1. Repository audit, reproducible baseline, and risk register — completed.
 2. Test harness, CTest integration, fixtures, coverage, and CI — in progress.
-   Milestone 2A (local qmake test flow) is complete; CTest, fixture content,
-   aggregate coverage reporting, and CI remain pending.
+   Milestones 2A (local qmake test flow) and 2B (combined gcov reporting) are
+   complete; CTest, fixture content, coverage gates, and CI remain pending.
 3. Characterize external contracts and critical paths — in progress.
    Milestone 3A characterized the DataManagement manager/set/messenger
    subsystem. Phase 3B characterizes LoadSave experiment XML with real
@@ -35,7 +36,7 @@ instrumentation was also built and run successfully as a source-level pilot.
 
 - Only Windows/MSYS2 was runnable; Linux and all cross-platform claims are unverified.
 - The test baseline is one PlotMeasurements executable; integration contracts have no fixture coverage.
-- qmake has a local test runner but no CTest, aggregate coverage reporting, sanitizer, static-analysis, or CI integration.
+- qmake has a local test runner and combined gcov reporting, but no CTest, coverage gate, sanitizer, static-analysis, or CI integration.
 - Plugin ABI, XML, binary TCP framing, libmatio/HDF5 output, and UI object names are compatibility-critical.
 - Build dependencies are machine-installed rather than locked/reproduced by the repository.
 

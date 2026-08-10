@@ -14,7 +14,8 @@ param(
     [string]$Msys2Root = 'C:\msys64\mingw64',
     [string]$BuildRoot = '',
     [int]$Jobs = $env:NUMBER_OF_PROCESSORS,
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$Coverage
 )
 
 Set-StrictMode -Version Latest
@@ -176,7 +177,14 @@ try {
         try {
             # Reassert the runtime lookup order for every native process.
             $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
-            Invoke-Native -Exe $qmake -Arguments @($testProject.ProjectFile, '-spec', 'win32-g++', 'CONFIG+=release', 'CONFIG-=debug')
+            $qmakeArguments = @($testProject.ProjectFile, '-spec', 'win32-g++', 'CONFIG+=release', 'CONFIG-=debug')
+            if ($Coverage) {
+                # Keep instrumentation scoped to an explicitly supplied coverage
+                # build root. Normal local test builds remain unchanged.
+                $qmakeArguments += 'QMAKE_CXXFLAGS+=--coverage'
+                $qmakeArguments += 'QMAKE_LFLAGS+=--coverage'
+            }
+            Invoke-Native -Exe $qmake -Arguments $qmakeArguments
             $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
             Invoke-Native -Exe $make -Arguments @("-j$Jobs")
             $testExecutable = Join-Path $testBuildDir $testProject.ExecutableRelativePath
