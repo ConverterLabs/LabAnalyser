@@ -194,17 +194,24 @@ jobs:
             mingw-w64-x86_64-fftw
             mingw-w64-x86_64-boost
 
+      - name: Detect MSYS2 MINGW64 paths
+        shell: msys2 {0}
+        run: |
+          printf 'MSYS2_MINGW_BIN=%s\n' "$(cygpath -w /mingw64/bin)" >> "$GITHUB_ENV"
+          printf 'MSYS2_MINGW_ROOT=%s\n' "$(cygpath -w /mingw64)"    >> "$GITHUB_ENV"
+          printf 'MSYS2_USR_BIN=%s\n'   "$(cygpath -w /usr/bin)"     >> "$GITHUB_ENV"
+
       - name: Run combined coverage in a fresh environment
         shell: pwsh
         run: |
-          $mingwBin = 'C:\msys64\mingw64\bin'
-          $msysUsrBin = 'C:\msys64\usr\bin'
+          $mingwBin = $env:MSYS2_MINGW_BIN
+          $msysUsrBin = $env:MSYS2_USR_BIN
           $env:Path = "$mingwBin;$msysUsrBin;$env:Path"
           $env:QT_QPA_PLATFORM = 'offscreen'
           New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
           Start-Transcript -Path build\ci-logs\coverage.log -Force
           try {
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-coverage-msys2.ps1 -Jobs 2
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-coverage-msys2.ps1 -Jobs 2 -Msys2Root $env:MSYS2_MINGW_ROOT
             if ($LASTEXITCODE -ne 0) { throw "Coverage runner failed with exit code $LASTEXITCODE." }
             foreach ($report in @(
               'build\coverage-msys2-mingw64\report\coverage-summary.md',
