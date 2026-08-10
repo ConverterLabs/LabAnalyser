@@ -86,6 +86,7 @@ SOURCES += main.cpp\
         DataManagement/DeviceRegistry.cpp \
         DataManagement/WidgetBindingRegistry.cpp \
         DataManagement/MessageDispatchPolicy.cpp \
+        DataManagement/ProjectIoCoordinator.cpp \
         DataManagement/DataManagementClass.cpp \
         DataManagement/DataManagementSetClass.cpp \
         DataManagement/DataMessengerClass.cpp \
@@ -140,6 +141,7 @@ HEADERS  += mainwindow.h\
             DataManagement/DeviceRegistry.h \
             DataManagement/WidgetBindingRegistry.h \
             DataManagement/MessageDispatchPolicy.h \
+            DataManagement/ProjectIoCoordinator.h \
             DataManagement/DataManagementClass.h \
             DataManagement/DataManagementSetClass.h \
             DataManagement/DataMessengerClass.h \

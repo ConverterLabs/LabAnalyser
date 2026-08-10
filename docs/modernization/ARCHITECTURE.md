@@ -141,3 +141,18 @@ destruction adds no new sweep of raw plugin interfaces. It owns neither a
 QObject returned from `Platform_Interface::GetObject()` nor a `QPluginLoader`.
 Plugin loading, Messenger, XML, GUI and interface/IID headers remain outside
 this slice.
+## Phase 4G.2a Project I/O export coordination
+
+`DataManagement/ProjectIoCoordinator` is a private, QObject-free operation
+helper used only by `UIDataManagementSetClass` for parameter import, parameter
+XML export, MAT export and HDF5 export. It retains a non-owning
+`DataManagementSetClass&` and constructs `ParameterLoader`,
+`ExportInputs2Xml`, `MatExporter` and `Export2HDF5` for each call. It owns no
+adapter, QObject, plugin, messenger, UI state or persistent path state.
+
+The public UI facade remains responsible for all status/error emission,
+exception-to-return conversion and return conventions. In particular, it keeps
+the HDF5 catch path that emits the existing error text and returns `false`.
+Experiment XML, forms, plugin loading, MainWindow routing, CWD/locale behavior
+and `LoadPath`, `StdSavePath` and `ChangeDetected` remain in the facade and
+outside this slice.

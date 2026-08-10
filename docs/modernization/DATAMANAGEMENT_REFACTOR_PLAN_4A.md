@@ -488,3 +488,21 @@ routing and process-state vectors. It must neither absorb MainWindow UI policy
 nor alter the unimplemented `LoadForms` boundary. Rollback is local: restore
 the facade's adapter calls and remove the private coordinator sources; no file
 format, plugin ABI or public API migration is allowed.
+## Phase 4G.2a export/parameter coordination extraction
+
+**Completed 2026-08-10.** `ProjectIoCoordinator.h/.cpp` is a private,
+QObject-free helper holding only a non-owning `DataManagementSetClass&`. It
+constructs the legacy parameter loader and XML/MAT/HDF5 exporters per
+operation, preserving their original manager reference/pointer semantics. It
+does not own adapters, QObjects, plugins, messenger, paths or UI state.
+
+`UIDataManagementSetClass` remains the public QObject facade and retains every
+signal/status/error action, the MAT exception conversion and the unusual HDF5
+catch path (`Error(...)`, then `false`). `UIIO_001..UIIO_006`, parameter, MAT
+and HDF5 contracts passed unchanged, so no test contract was adjusted for the
+extraction. Experiment XML, form loading, plugin loading, CWD/locale effects
+and private load/save/dirty fields remain explicitly out of scope.
+
+Rollback is local: restore the four former adapter-construction bodies in the
+facade and remove the private coordinator source from qmake targets. No public
+API, Qt metaobject method, signal, slot, plugin IID or InterfaceData ABI moved.

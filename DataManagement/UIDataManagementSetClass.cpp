@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "UIDataManagementSetClass.h"
+#include "ProjectIoCoordinator.h"
 #include <QFile>
 #include <QDir>
 #include <QXmlStreamWriter>
@@ -118,9 +119,8 @@ UIDataManagementSetClass::~UIDataManagementSetClass()
 
 bool UIDataManagementSetClass::Export2Xml(QString Path, QStringList ExportIds)
 {
-
-        ExportInputs2Xml Exporter(*this);
-        auto Error = Exporter.Export2XML(Path, ExportIds);
+        ProjectIoCoordinator coordinator(*this);
+        auto Error = coordinator.ExportParameters(Path, ExportIds);
         if(!Error)
             GetMessenger()->WriteStatusMessage("Exported Parameters to " + Path );
         return Error;
@@ -130,8 +130,8 @@ bool UIDataManagementSetClass::Export2Xml(QString Path, QStringList ExportIds)
 bool UIDataManagementSetClass::Export2Mat(QString Path , QStringList ExportIds )
 {
     try {
-        auto Exporter = MatExporter(this);
-        auto Error = Exporter.Export2Mat(Path, ExportIds);
+        ProjectIoCoordinator coordinator(*this);
+        auto Error = coordinator.ExportMat(Path, ExportIds);
         if(!Error)
                GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
         return Error;
@@ -143,10 +143,10 @@ bool UIDataManagementSetClass::Export2Mat(QString Path , QStringList ExportIds )
 
 bool UIDataManagementSetClass::Export2Hdf5(QString Path , QStringList ExportIds )
 {
-    auto Exporter = Export2HDF5(this);
     try
     {
-    auto Error = Exporter.Export(Path, ExportIds);
+    ProjectIoCoordinator coordinator(*this);
+    auto Error = coordinator.ExportHdf5(Path, ExportIds);
     if(!Error)
            GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
          return Error;
@@ -195,8 +195,8 @@ bool UIDataManagementSetClass::LoadPlugin(QString FileName)
 
 bool UIDataManagementSetClass::ImportFromXml(QString Path  )
 {
-    ParameterLoader Loader(this);
-    auto Error = Loader.Load(Path);
+    ProjectIoCoordinator coordinator(*this);
+    auto Error = coordinator.ImportParameters(Path);
     if(!Error)
         GetMessenger()->WriteStatusMessage(Path + " loaded");
     return Error;

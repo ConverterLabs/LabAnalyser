@@ -854,3 +854,14 @@ interface. Focused file metrics are `DataManagementClass.cpp` 94.44% lines,
 96.47% executed branches, 55.29% taken branches and 86.56% calls; and
 `DeviceRegistry.cpp` 93.55% lines, 83.33% executed branches, 75.00% taken
 branches and 100.00% calls. They are not project coverage.
+## Phase 4G.2a ProjectIoCoordinator extraction
+
+`UIDataManagementSetClass::{ImportFromXml,Export2Xml,Export2Mat,Export2Hdf5}`
+delegate only adapter construction/execution to the private non-QObject
+`ProjectIoCoordinator`; their public method signatures, signal/slot surface,
+Messenger emissions and return values remain in the facade. `UIIO_004` and
+`PARAM_001..PARAM_009` map the parameter routes; `UIIO_005`, `MAT_001..008`
+and `HDF5_001..006` map MAT/HDF5. The unchanged HDF5 error contract remains:
+the facade emits `Error` and returns `false` after the coordinator's exporter
+throws. No experiment XML, form, plugin, path, CWD, locale or dirty-state
+operation delegated in this slice.

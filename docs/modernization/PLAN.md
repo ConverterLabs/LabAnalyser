@@ -411,3 +411,22 @@ changed. `LoadForms()` remains a declared-but-undefined blocker; private path
 and dirty-state fields have no public observation API. The following 4G.2
 implementation slice, if separately approved, is limited to an internal
 `ProjectIoCoordinator` behind the unchanged facade.
+## Phase 4G.2a Project I/O export coordination extraction
+
+**Completed 2026-08-10.** A private QObject-free `ProjectIoCoordinator` now
+performs only per-call construction/execution of parameter import, parameter
+XML export, MAT export and HDF5 export adapters with a non-owning manager
+reference. `UIDataManagementSetClass` remains the public QObject facade and
+keeps all status/error emissions, signal order and legacy booleans, including
+the HDF5 error-emission/`false` return contract. Experiment XML, form loading,
+plugin loading, private paths/dirty state, MainWindow routing and process
+state remain untouched.
+
+Unchanged UIIO, parameter, MAT and HDF5 contracts; the full 12-target runner;
+fresh Release and Debug builds; and the scoped warning build passed. Focused
+instrumentation recorded `UIDataManagementSetClass.cpp` at 87.36% lines
+(76/87), 82.02% executed branches (146/178), 44.94% branches taken (80/178)
+and 72.06% calls (98/136); the new coordinator is 100.00% lines (18/18),
+100.00% executed branches (8/8), 62.50% branches taken (5/8) and 77.27% calls
+(17/22). These are per-file UIIO-vector measurements, not project coverage;
+the earlier parameter-suite facade figure used a different denominator.
