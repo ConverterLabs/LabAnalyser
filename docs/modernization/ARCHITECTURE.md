@@ -153,6 +153,25 @@ adapter, QObject, plugin, messenger, UI state or persistent path state.
 The public UI facade remains responsible for all status/error emission,
 exception-to-return conversion and return conventions. In particular, it keeps
 the HDF5 catch path that emits the existing error text and returns `false`.
-Experiment XML, forms, plugin loading, MainWindow routing, CWD/locale behavior
-and `LoadPath`, `StdSavePath` and `ChangeDetected` remain in the facade and
-outside this slice.
+Experiment XML writing, forms, plugin loading, MainWindow routing,
+CWD/locale behavior and `LoadPath`, `StdSavePath` and `ChangeDetected` remain
+in the facade and outside this slice.
+
+## Phase 4G.2b Experiment-read coordination
+
+`ProjectIoCoordinator::ReadExperiment()` now constructs only the unchanged
+`XmlExperimentReader` with the exact pre-extraction arguments:
+`(&uiManager, uiManager.GetMessenger(), &uiManager)`. The coordinator remains
+non-QObject and non-owning; its additional `UIDataManagementSetClass&` is a
+non-owning reference required solely to preserve the reader's existing
+parent/manager hierarchy. The reader, writer, plugin loader, form
+implementation and MainWindow routing were not changed.
+
+`UIDataManagementSetClass::LoadExperiment()` remains the public facade. It
+continues to assign `LoadPath`, retain the reader's boolean convention, emit
+the unchanged parse-error text and send the same `CloseProject` message on
+failure. Consequently the legacy CWD mutation, `.LAdev` resolution, relative
+and absolute path handling, and form/device/figure/widget/connection/state
+processing order remain owned by the unchanged reader path. The `XML_LEGACY`
+fixtures exercise missing UI/plugin dependencies without any migration or
+normalization.

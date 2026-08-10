@@ -440,3 +440,32 @@ and 72.06% calls (98/136); the new coordinator is 100.00% lines (18/18),
 100.00% executed branches (8/8), 62.50% branches taken (5/8) and 77.27% calls
 (17/22). These are per-file UIIO-vector measurements, not project coverage;
 the earlier parameter-suite facade figure used a different denominator.
+
+## Phase 4G.2b Experiment-read delegation
+
+**Completed 2026-08-10.** `LoadExperiment()` remains the unchanged public
+QObject facade for `LoadPath`, return/error conventions and `CloseProject`
+routing. Its one reader-construction operation now delegates to the private,
+non-owning `ProjectIoCoordinator`, which instantiates the unchanged
+`XmlExperimentReader` with the exact historic UI-facade/Messenger/parent
+hierarchy. Experiment saving, form implementation, plugin loader, private
+path/change state, and reader/writer internals remain intentionally outside
+this slice.
+
+The central instrumented runner completed all 12 registered projects green,
+including XML (`XML_001..XML_008` and `XML_LEGACY_001..XML_LEGACY_005`), UIIO,
+Plugin and MainWindow suites. Fresh Release and Debug builds passed. Current
+combined-run file measurements are `UIDataManagementSetClass.cpp`: 91.03%
+lines (71/78), 82.86% executed branches (145/175), 46.29% branches taken
+(81/175), 73.88% calls (99/134), 100.00% functions (10/10); and
+`ProjectIoCoordinator.cpp`: 100.00% lines (22/22), 100.00% executed branches
+(10/10), 60.00% branches taken (6/10), 76.92% calls (20/26), 100.00% functions
+(6/6). These are combined registered-test measurements, not project coverage;
+they are not directly comparable with the earlier focused UIIO denominator.
+
+The scoped additional-warning build completed with no own-production warning
+in `own-production-warnings.txt`; clang-tidy and cppcheck remain unavailable.
+All five committed legacy fixture hashes were unchanged before/after testing.
+Rollback is local: restore the direct reader construction in `LoadExperiment()`
+and remove `ReadExperiment()`; no public API, Qt metaobject member, plugin IID
+or InterfaceData ABI changed.

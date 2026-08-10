@@ -491,8 +491,9 @@ format, plugin ABI or public API migration is allowed.
 ## Phase 4G.2a export/parameter coordination extraction
 
 **Completed 2026-08-10.** `ProjectIoCoordinator.h/.cpp` is a private,
-QObject-free helper holding only a non-owning `DataManagementSetClass&`. It
-constructs the legacy parameter loader and XML/MAT/HDF5 exporters per
+QObject-free helper. The initial export/parameter slice held only a non-owning
+`DataManagementSetClass&`; the separate 4G.2b reader slice adds the required
+non-owning UI-facade reference. It constructs the legacy parameter loader and XML/MAT/HDF5 exporters per
 operation, preserving their original manager reference/pointer semantics. It
 does not own adapters, QObjects, plugins, messenger, paths or UI state.
 
@@ -506,6 +507,26 @@ and private load/save/dirty fields remain explicitly out of scope.
 Rollback is local: restore the four former adapter-construction bodies in the
 facade and remove the private coordinator source from qmake targets. No public
 API, Qt metaobject method, signal, slot, plugin IID or InterfaceData ABI moved.
+
+## Phase 4G.2b Experiment-read delegation
+
+**Completed 2026-08-10.** The next narrow operation moved only construction
+and execution of the existing `XmlExperimentReader` to
+`ProjectIoCoordinator::ReadExperiment(const QString&)`. The coordinator stays
+private, non-QObject and non-owning; it temporarily needs a non-owning
+`UIDataManagementSetClass&` in addition to its core-manager reference so the
+reader receives its historic `(UI facade, Messenger, UI facade parent)`
+hierarchy exactly. This is a compatibility bridge, not a transfer of UI or
+MainWindow policy into core logic.
+
+`UIDataManagementSetClass::LoadExperiment()` retains `LoadPath`, bool/error
+conventions and `CloseProject` routing. XML saving, form implementation,
+plugin loading, private path/change state and reader/writer internals remain
+out of scope. `XML_001..XML_008`, `XML_LEGACY_001..XML_LEGACY_005`,
+`UIIO_001..UIIO_006`, `PLUGIN_001..PLUGIN_007` and the MainWindow suite are
+the required compatibility vectors. Rollback restores the two former local
+reader-construction lines in `LoadExperiment()` and removes this one private
+coordinator method; no format or ABI migration is involved.
 
 ## Legacy experiment XML evidence
 

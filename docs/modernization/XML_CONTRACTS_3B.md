@@ -93,3 +93,19 @@ XML test executable, **not** repository-wide coverage and not a quality gate.
 | `LoadSave/xmlexperimentwriter.cpp` | 94.64% (106/112) | 90.18% (202/224) | 48.66% (109/224) | 76.00% (133/175) |
 | `LoadSave/loadplugin.cpp` | 0.00% (0/30) | 0.00% (0/54) | 0.00% (0/54) | 0.00% (0/47) |
 | `DataManagement/UIDataManagementSetClass.cpp` (XML caller) | 38.64% (34/88) | 34.41% (64/186) | 17.74% (33/186) | 32.21% (48/149) |
+
+## Phase 4G.2b reader-construction delegation
+
+On 2026-08-10 `UIDataManagementSetClass::LoadExperiment()` was reduced only
+to delegation of reader construction/execution to the private
+`ProjectIoCoordinator`. `XmlExperimentReader` is unchanged. The coordinator
+constructs it with the same facade, messenger and QObject parent as the prior
+inline call: `(&uiManager, uiManager.GetMessenger(), &uiManager)`.
+
+`XML_001..XML_008` and `XML_LEGACY_001..XML_LEGACY_005` remained green through
+the central instrumented 12-target run. This preserves the documented reader
+order (forms, devices, figures, widgets, connections, then state), CWD change,
+relative/absolute `.LAdev` resolution, return values and existing error
+messages, including the expected missing UI/plugin integration boundaries.
+The five committed legacy fixture SHA-256 values were checked before and after
+the run and did not change; no XML fixture was migrated or normalized.

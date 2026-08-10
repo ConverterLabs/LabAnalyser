@@ -874,3 +874,16 @@ and `HDF5_001..006` map MAT/HDF5. The unchanged HDF5 error contract remains:
 the facade emits `Error` and returns `false` after the coordinator's exporter
 throws. No experiment XML, form, plugin, path, CWD, locale or dirty-state
 operation delegated in this slice.
+
+## Phase 4G.2b Experiment-read delegation
+
+`UIDataManagementSetClass::LoadExperiment(QString)` remains the public
+facade and is characterized by `UIIO_001..UIIO_006`, `XML_001..XML_008` and
+`XML_LEGACY_001..XML_LEGACY_005`. It now calls the private
+`ProjectIoCoordinator::ReadExperiment(QString)` solely to instantiate and run
+the unchanged `XmlExperimentReader` with the historic facade/messenger/parent
+arguments. The facade still owns `LoadPath`, its exact parse-error text and
+the `CloseProject` message; the reader still owns all XML traversal and CWD
+effects. Missing UI/plugin dependencies, relative `.LAdev` paths and legacy
+state remain covered by the legacy vectors. Writer, plugins, form
+implementation and private save/change state were not moved.

@@ -31,7 +31,6 @@
 #include "../mainwindow.h"
 #include "../ui_mainwindow.h"
 #include "../plugins/platforminterface.h"
-#include "../LoadSave/xmlexperimentreader.h"
 #include "../LoadSave/xmlexperimentwriter.h"
 
 #include "../Import/parameterloader.h"
@@ -101,8 +100,8 @@ bool UIDataManagementSetClass::LoadExperiment(QString Path)
      bool Error = false;
      LoadPath = Path;
 
-     XmlExperimentReader Reader(this, this->GetMessenger(), this);
-     if (Reader.read(LoadPath))
+     ProjectIoCoordinator coordinator(*this);
+     if (coordinator.ReadExperiment(LoadPath))
      {
          Info("Parse error in file " + LoadPath);
          Error = true;
