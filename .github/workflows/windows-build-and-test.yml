@@ -40,7 +40,7 @@ jobs:
             $mingwBin,
             'C:\msys64\mingw64\lib\qt6\bin',
             'C:\msys64\mingw64\share\qt6\bin'
-          ) | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -Unique
+          ) | Select-Object -Unique
           $msysUsrBin = 'C:\msys64\usr\bin'
           if (-not (Test-Path -LiteralPath $mingwBin) -or -not (Test-Path -LiteralPath $msysUsrBin)) {
             throw 'Expected MSYS2 MINGW64 directories are unavailable.'
@@ -48,12 +48,17 @@ jobs:
           ($qtSearchDirs + $msysUsrBin) -join "`n" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           $env:Path = (($qtSearchDirs + $msysUsrBin) -join ';') + ';' + $env:Path
           $qmakeCandidates = foreach ($searchDir in $qtSearchDirs) {
-            foreach ($qmakeName in @('qmake6.exe','qmake-qt6.exe','qmake.exe')) {
+            foreach ($qmakeName in @('qmake6.exe','qmake-qt6.exe','qmake.exe','qmake6.bat','qmake-qt6.bat','qmake.bat')) {
               Join-Path $searchDir $qmakeName
             }
           }
           $qmake = $qmakeCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
-          if (-not $qmake) { throw 'No qmake executable found in known MSYS2 Qt6 directories.' }
+          if (-not $qmake) {
+            Write-Host '## Diagnostic: Qt-related files under C:\msys64\mingw64'
+            Get-ChildItem -LiteralPath 'C:\msys64\mingw64\bin' -File | Where-Object { $_.Name -like '*qmake*' -or $_.Name -like '*qt6*' } | Select-Object FullName | Format-Table -AutoSize
+            Get-ChildItem -LiteralPath 'C:\msys64\mingw64' -Directory | Where-Object { $_.Name -like '*qt*' } | ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Recurse -File | Where-Object { $_.Name -like '*qmake*' } | Select-Object FullName } | Format-Table -AutoSize
+            throw 'No qmake executable found in known MSYS2 Qt6 directories.'
+          }
           & $qmake -query
           mingw32-make.exe --version
 
