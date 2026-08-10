@@ -30,6 +30,7 @@
 class Platform_Interface;
 class DataRegistry;
 class ContainerStore;
+class WidgetBindingRegistry;
 
 /** This Class contains all data that is necessary to mirror the complete data State of LabAnalyser, including the plugin handling.
  *
@@ -290,11 +291,16 @@ private:
     struct ContainerStoreDeleter {
         void operator()(ContainerStore* store) const;
     };
+    struct WidgetBindingRegistryDeleter {
+        void operator()(WidgetBindingRegistry* registry) const;
+    };
 
     /** Internal RAII-owned registry for form, alias and plot/window value state. */
     std::unique_ptr<DataRegistry, DataRegistryDeleter> Registry;
     /** Owns mapper pointers while preserving the externally exposed raw map. */
     std::unique_ptr<ContainerStore, ContainerStoreDeleter> Containers;
+    /** Name-keyed, non-owning widget binding state. */
+    std::unique_ptr<WidgetBindingRegistry, WidgetBindingRegistryDeleter> Bindings;
 
     /** Map that contains the information of the loaded plugin paths and the corresponding Interface Pointers*/
     std::map<QString, Platform_Interface*> _Devices;
@@ -304,7 +310,5 @@ private:
     QString GetDevicePath(QString Name);
 
 
-    /** Map that contains the connection between the objectname of an widget and the connected unique data identifier*/
-    std::map<QString, QString> ElementsToContainerID;
 };
 #endif // GUIDataInterface_H

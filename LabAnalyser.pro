@@ -83,6 +83,7 @@ SOURCES += main.cpp\
         plugins/InterfaceDataType.cpp \
         DataManagement/ContainerStore.cpp \
         DataManagement/DataRegistry.cpp \
+        DataManagement/WidgetBindingRegistry.cpp \
         DataManagement/DataManagementClass.cpp \
         DataManagement/DataManagementSetClass.cpp \
         DataManagement/DataMessengerClass.cpp \
@@ -134,6 +135,7 @@ HEADERS  += mainwindow.h\
             plugins/InterfaceDataType.h\
             DataManagement/ContainerStore.h \
             DataManagement/DataRegistry.h \
+            DataManagement/WidgetBindingRegistry.h \
             DataManagement/DataManagementClass.h \
             DataManagement/DataManagementSetClass.h \
             DataManagement/DataMessengerClass.h \

@@ -22,6 +22,7 @@
 #include "DataManagementClass.h"
 #include "ContainerStore.h"
 #include "DataRegistry.h"
+#include "WidgetBindingRegistry.h"
 #include <QXmlStreamReader>
 #include <QFile>
 #include <QPluginLoader>
@@ -30,7 +31,7 @@
 #include "../plugins/platforminterface.h"
 
 
-DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry), Containers(new ContainerStore)
+DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry), Containers(new ContainerStore), Bindings(new WidgetBindingRegistry)
 {
     connect(this, SIGNAL(CloseProject()),this->parent(),SLOT(CloseProject()));
 }
@@ -43,6 +44,11 @@ void DataManagementClass::DataRegistryDeleter::operator()(DataRegistry* registry
 void DataManagementClass::ContainerStoreDeleter::operator()(ContainerStore* store) const
 {
     delete store;
+}
+
+void DataManagementClass::WidgetBindingRegistryDeleter::operator()(WidgetBindingRegistry* registry) const
+{
+    delete registry;
 }
 
 int DataManagementClass::PlotCount()
@@ -148,13 +154,12 @@ void DataManagementClass::AddElementToContainerEntry(QString ElementName, QStrin
         }
     }
     //Check if the widget is mapped to other element and delete this connection when exists and not a graph
-    auto itt = this->ElementsToContainerID.find(ElementName);
-    if(itt != this->ElementsToContainerID.end() && ClassName.compare("PlotWidget"))
+    if(Bindings->Contains(ElementName) && ClassName.compare("PlotWidget"))
     {
         DeleteEntryOfObject(object);
     }
     //Add connection between ElementName (widget name) and unique data id ContainerID
-    this->ElementsToContainerID[ElementName] = ContainerID;
+    Bindings->Set(ElementName, ContainerID);
     ToFormMapper* Element = Containers->LookupOrInsert(ContainerID);
     //Add widget unique data id
     Element->Objects.push_back(ObjectStruct(ElementName,object,ClassName));
@@ -162,17 +167,13 @@ void DataManagementClass::AddElementToContainerEntry(QString ElementName, QStrin
 
 QString DataManagementClass::GetContainerID(QString ElementName)
 {    
-    return this->ElementsToContainerID[ElementName];
+    return Bindings->LookupOrInsert(ElementName);
 }
 
 QString DataManagementClass::GetContainerID(QObject* Object)
 {
     //Check if map element exists
-    auto itt = this->ElementsToContainerID.find(Object->objectName());
-    if( itt  != this->ElementsToContainerID.end())
-        return this->ElementsToContainerID[Object->objectName()];
-
-    return QString();
+    return Bindings->Find(Object->objectName());
 }
 
 ToFormMapper* DataManagementClass::GetContainer(QObject* Object)
@@ -224,11 +225,9 @@ void DataManagementClass::DeleteEntryOfObject(QString id, QObject* Object)
 void DataManagementClass::DeleteEntryOfObject(QObject* Object)
 {
     //Check if map element exists
-    auto itt = this->ElementsToContainerID.find(Object->objectName());
-    if(itt != this->ElementsToContainerID.end())
+    QString id;
+    if(Bindings->Take(Object->objectName(), &id))
     {
-        QString id = this->ElementsToContainerID[Object->objectName()];
-        this->ElementsToContainerID.erase(this->ElementsToContainerID.find(Object->objectName()));
         DeleteEntryOfObject(id,Object);
     }
  }
@@ -314,7 +313,7 @@ void DataManagementClass::CloseProjectLogic(void)
 
     Containers->Clear();
 
-    this->ElementsToContainerID.clear();
+    Bindings->Clear();
 }
 
 
@@ -391,12 +390,7 @@ std::pair<double, double> DataManagementClass::MinMaxValue(QString ID)
 bool DataManagementClass::IsObjectLinked(QObject* Obj)
 {
     //Check if the object is linked
-    auto itt = this->ElementsToContainerID.find(Obj->objectName());
-    if(itt != this->ElementsToContainerID.end())
-    {
-       return true;
-    }
-    return false;
+    return Bindings->Contains(Obj->objectName());
 }
 
 void DataManagementClass::SetAlias(QString ID, QString Alias)

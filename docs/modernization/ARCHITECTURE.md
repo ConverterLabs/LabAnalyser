@@ -91,3 +91,19 @@ outside Store mediation, so the Store cannot make stronger ownership guarantees
 than the former facade. No parallel `unique_ptr` map or compatibility copy was
 introduced. `ElementsToContainerID` and all widget-ID mapping remain in
 `DataManagementClass` for the later widget-binding slice.
+
+## Phase 4D.2 WidgetBindingRegistry extraction
+
+`WidgetBindingRegistry` is a third private normal-C++ helper, owned through
+RAII by `DataManagementClass`. It holds only the legacy
+`QObject::objectName()` to container-ID value map. It neither owns, observes,
+nor destroys QObjects, and it deliberately has no `destroyed(QObject*)`
+connection. Empty names are valid keys, while renaming a QObject does not move
+the old key.
+
+`DataManagementClass` remains responsible for coordinating the Registry with
+`ContainerStore`: it removes/creates `ToFormMapper::Objects` entries and keeps
+the existing `PlotWidget` duplicate-registration exception. The registry has no
+Mapper, Messenger, device, GUI, plugin, network or IO dependency. Name-keyed
+identity, stale mapper-pointer risk and foreign QObject ownership are unchanged
+compatibility boundaries rather than strengthened ownership guarantees.

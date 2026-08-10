@@ -314,3 +314,21 @@ manager-to-widget updates. These remain characterization evidence and are not
 repaired. The following 4D.2 extraction, if approved, is limited to a private
 WidgetBindingRegistry and must retain all `DM_BIND_*` behavior; ContainerStore,
 DataRegistry, devices, Messenger and GUI/IO remain outside its scope.
+
+## Phase 4D.2 DataManagement widget-binding extraction
+
+**Completed 2026-08-10.** `WidgetBindingRegistry` privately owns only the
+legacy name-to-container-ID value map. `DataManagementClass` remains the public
+facade and still coordinates mapper binding-list changes, `ContainerStore`
+cleanup and the PlotWidget duplicate-registration exception. The unchanged
+`DM_BIND_001..DM_BIND_006` suite passed (32/32 focused checks), all 11 central
+runner targets passed, fresh Release/Debug builds passed, and the scoped
+static-analysis build retained the existing 162 diagnostics with none in the
+new registry.
+
+The registry deliberately does not own or observe QObjects: empty names,
+name collisions, non-migrating renames, stale binding pointers and foreign
+QObject non-ownership remain the characterized legacy behavior. File-specific
+coverage is documented in `BEHAVIOR_INVENTORY.md`, not as a project gate. The
+next slice must not absorb ContainerStore, DataRegistry, Messenger, device or
+GUI/IO responsibilities.

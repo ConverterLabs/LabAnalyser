@@ -716,3 +716,24 @@ current name: a renamed bound widget emits no message; restoring its original
 name restores the existing `set` route. These name-collision and rename states
 remain instance-local. This strengthens the name-keyed/stale-binding defect
 candidate; no pointer-keyed or automatic-cleanup behavior is implied.
+
+## DataManagement widget-binding extraction 4D.2
+
+The private `WidgetBindingRegistry` now implements only the prior
+name-to-container-ID value map under the unchanged public facade. All
+`DM_BIND_001..DM_BIND_006` contracts pass unchanged: names (including empty
+names) remain the identity, collisions/rebinds and non-migrating renames retain
+their behavior, unknown string lookups insert an empty ID, while direct QObject
+lookups do not. `DataManagementClass` still changes mapper binding lists and
+coordinates cleanup with `ContainerStore`; repeated `PlotWidget` registration
+therefore still produces duplicate manager-to-widget propagation.
+
+The Registry neither stores nor owns QObjects and intentionally makes no
+`destroyed(QObject*)` connection. Existing stale mapper pointers after QObject
+death, name-based lookup of another same-name QObject, foreign QObject
+non-ownership and raw mapper-map exposure remain risks/exclusions, not safety
+guarantees. Focused gcov is file-specific: `DataManagementClass.cpp` 91.38%
+lines (159/174), 93.55% branches executed (174/186), 56.99% branches taken
+(106/186), 86.59% calls (155/179); `WidgetBindingRegistry.cpp` 100.00% lines
+(18/18), 100.00% branches executed (10/10), 70.00% branches taken (7/10), and
+100.00% calls (5/5). These are not project coverage.

@@ -338,3 +338,31 @@ empty-ID insertion behavior, ordinary detach/rebind semantics, PlotWidget
 duplicate behavior, cleanup order, and non-ownership of QObjects under the
 unchanged `DM_BIND_*` vectors. It must
 not move ContainerStore, DataRegistry, device, Messenger, GUI or IO logic.
+
+## Phase 4D.2 WidgetBindingRegistry extraction
+
+**Completed 2026-08-10.** `WidgetBindingRegistry.h/.cpp` now contains only the
+former `ElementsToContainerID` map and its exact value-map operations:
+existing-name lookup, `operator[]` insertion, set, take-and-erase and clear.
+`DataManagementClass` remains the unchanged public QObject facade and retains
+all coordination with `ContainerStore`, including mapper `Objects` mutation and
+the `PlotWidget` duplicate-registration exception. The old facade field was
+removed only after all callers delegated.
+
+The unchanged `DM_BIND_001..DM_BIND_006` suite passed (32/32 focused
+DataManagement checks), as did all 11 central runner targets and fresh
+Release/Debug application builds. The scoped static-analysis build passed with
+the pre-existing 162 filtered diagnostics and none in
+`WidgetBindingRegistry.cpp`. Focused gcov is file-specific:
+`DataManagementClass.cpp` is 91.38% lines (159/174), 93.55% executed branches
+(174/186), 56.99% branches taken (106/186), and 86.59% calls (155/179);
+`WidgetBindingRegistry.cpp` is 100.00% lines (18/18), 100.00% executed
+branches (10/10), 70.00% branches taken (7/10), and 100.00% calls (5/5).
+The prior facade denominator was 177 lines; these figures are not project
+coverage and are only a post-extraction comparison.
+
+No public API, Qt signal/slot, plugin IID or `InterfaceData` ABI changed. The
+Registry stores no QObject pointer, makes no destroyed connection and never
+deletes a QObject. It intentionally preserves name collisions, empty-name keys,
+non-migrating renames and stale mapper-pointer behavior. Rollback is local:
+restore the private map/delegation without persistence or consumer migration.
