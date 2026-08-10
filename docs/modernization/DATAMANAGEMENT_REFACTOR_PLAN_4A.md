@@ -210,3 +210,24 @@ coverage through `DM_002`/`DM_003` plus GUI/plot lifecycle contracts; and can
 retain every existing `DataManagementClass` method as a simple forwarding
 facade. Do not include container pointers or device ownership in this first
 slice.
+
+## Phase 4B.1 characterization evidence (unchanged facade)
+
+The first-slice baseline is now explicit in the public-facade tests
+`DM_REG_001..DM_REG_005`; no `DataRegistry` exists in this phase. The facade
+currently treats form files as an ordered multiset and removes the first
+matching form entry only. Skip-form flags are keyed values with last-write-wins
+semantics. Alias fallback returns the requested ID, including after project
+cleanup; unknown IDs, empty aliases and Unicode aliases are accepted. Plot and
+figure/window name maps replace the current lookup on repeated registration,
+while the associated number vectors retain duplicate history. One delete
+therefore may leave the next-number query at `1` despite no lookup entry for
+that name. Unknown window geometry reads return `(0, 0)` through the current
+insertion-capable lookup. All of these are before/after equivalence vectors for
+4A.1, not intended design improvements.
+
+The tests also establish that separate `DataManagementClass` instances do not
+share these value registries and that destruction followed by reconstruction
+does not recover prior form, alias or plot state. They intentionally avoid
+unchecked indexed form access and pointer/device/container ownership paths;
+those remain later-slice risks, not safe registry characterization inputs.

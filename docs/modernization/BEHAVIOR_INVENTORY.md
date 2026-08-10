@@ -59,6 +59,33 @@ require the real MainWindow plus persistence/export/plugin boundaries. Full
 function-to-ID mapping, risk findings and per-file coverage appear in
 `DATAMANAGEMENT_3A.md`.
 
+## DataManagement registry baseline 4B.1 characterization
+
+`component/DataManagementCharacterizationTests` adds `DM_REG_001` through
+`DM_REG_005` against the unchanged public `DataManagementClass` facade, as the
+baseline for the planned private registry extraction. `DM_REG_001` maps
+`AddFormFile`, `RemoveFormFile`, `GetFormFileCount` and `GetFormFileEntry`:
+form entries retain insertion order, duplicate form names are retained, and a
+remove call removes only the first matching entry. `DM_REG_002` maps
+`AddSkipFormFile`/`GetSkipFormFile`: a later registration overwrites an earlier
+flag and `CloseProjectLogic` clears the flags. `DM_REG_003` maps
+`SetAlias`/`GetAlias`: an absent alias falls back to its ID, aliases for unknown
+IDs are accepted, overwrites take effect, and empty and Unicode aliases are
+preserved; no individual alias-removal API exists, while `CloseProjectLogic`
+clears all aliases.
+
+`DM_REG_004` maps safe plot/window registration, lookup, deletion, geometry and
+numbering calls. Re-registering a name replaces its current QObject/geometry
+lookup but leaves duplicate number history; one delete removes only one such
+number. Consequently `GetUniquePlotNumber()` and `GetPlotWindowsIncrementer()`
+can return `1` after the current named object/window has been removed. An
+unknown `GetPlotWindowRowsCols` returns `(0, 0)`; source inspection shows that
+this lookup uses insertion-capable map access, so extraction must preserve that
+side effect unless separately approved. `DM_REG_005` demonstrates that these
+registry values are instance-local and that a destroyed/recreated manager
+starts with no prior form, alias or plot state. These unusual outcomes are
+legacy contracts/defect candidates, not normalizations to make during 4B.1.
+
 ## LoadSave/XML 3B characterization
 
 `contract/XmlExperimentContractTests` maps XML IDs `XML_001` through `XML_008`

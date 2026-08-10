@@ -114,6 +114,11 @@ private slots:
     void DM_008_messengerDeviceRegistrationAndOwnership();
     void DM_009_setDataWidgetPropagationAndRequests();
     void DM_010_setOwnershipAndRepeatedDataFlow();
+    void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
+    void DM_REG_002_skipFormFlags_override_and_project_cleanup();
+    void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
+    void DM_REG_004_plot_and_window_numbers_keep_duplicate_history();
+    void DM_REG_005_registry_state_is_instance_local_and_recreated_empty();
 };
 
 void DataManagementCharacterizationTests::initTestCase()
@@ -446,6 +451,121 @@ void DataManagementCharacterizationTests::DM_010_setOwnershipAndRepeatedDataFlow
 
     delete owner;
     QVERIFY(messenger.isNull());
+}
+
+void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+
+    manager.AddFormFile({"alpha", "alpha.ui"});
+    manager.AddFormFile({"beta", "beta.ui"});
+    manager.AddFormFile({"alpha", "alpha-second.ui"});
+    QCOMPARE(manager.GetFormFileCount(), 3);
+    QCOMPARE(manager.GetFormFileEntry(0), std::make_pair(QString("alpha"), QString("alpha.ui")));
+    QCOMPARE(manager.GetFormFileEntry(1), std::make_pair(QString("beta"), QString("beta.ui")));
+    QCOMPARE(manager.GetFormFileEntry(2), std::make_pair(QString("alpha"), QString("alpha-second.ui")));
+
+    manager.RemoveFormFile("missing");
+    QCOMPARE(manager.GetFormFileCount(), 3);
+    manager.RemoveFormFile("alpha");
+    QCOMPARE(manager.GetFormFileCount(), 2);
+    QCOMPARE(manager.GetFormFileEntry(0), std::make_pair(QString("beta"), QString("beta.ui")));
+    QCOMPARE(manager.GetFormFileEntry(1), std::make_pair(QString("alpha"), QString("alpha-second.ui")));
+    manager.RemoveFormFile("alpha");
+    QCOMPARE(manager.GetFormFileCount(), 1);
+    QCOMPARE(manager.GetFormFileEntry(0), std::make_pair(QString("beta"), QString("beta.ui")));
+}
+
+void DataManagementCharacterizationTests::DM_REG_002_skipFormFlags_override_and_project_cleanup()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+
+    QVERIFY(!manager.GetSkipFormFile("missing.ui"));
+    manager.AddSkipFormFile("alpha.ui", true);
+    QVERIFY(manager.GetSkipFormFile("alpha.ui"));
+    manager.AddSkipFormFile("alpha.ui", false);
+    QVERIFY(!manager.GetSkipFormFile("alpha.ui"));
+    const QString unicodeName = QString::fromUtf8("Mäßwert Ω.ui");
+    manager.AddSkipFormFile(unicodeName, true);
+    QVERIFY(manager.GetSkipFormFile(unicodeName));
+    manager.CloseProjectLogic();
+    QVERIFY(!manager.GetSkipFormFile("alpha.ui"));
+    QVERIFY(!manager.GetSkipFormFile(unicodeName));
+}
+
+void DataManagementCharacterizationTests::DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+
+    QCOMPARE(manager.GetAlias("missing"), QString("missing"));
+    manager.SetAlias("missing", "first");
+    QCOMPARE(manager.GetAlias("missing"), QString("first"));
+    manager.SetAlias("missing", "second");
+    QCOMPARE(manager.GetAlias("missing"), QString("second"));
+    manager.SetAlias("empty", "");
+    QCOMPARE(manager.GetAlias("empty"), QString());
+    const QString unicodeId = QString::fromUtf8("Gerät::Kanal Ω");
+    const QString unicodeAlias = QString::fromUtf8("Mäßwert Ω");
+    manager.SetAlias(unicodeId, unicodeAlias);
+    QCOMPARE(manager.GetAlias(unicodeId), unicodeAlias);
+    manager.CloseProjectLogic();
+    QCOMPARE(manager.GetAlias("missing"), QString("missing"));
+    QCOMPARE(manager.GetAlias("empty"), QString("empty"));
+    QCOMPARE(manager.GetAlias(unicodeId), unicodeId);
+}
+
+void DataManagementCharacterizationTests::DM_REG_004_plot_and_window_numbers_keep_duplicate_history()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject first;
+    QObject replacement;
+    first.setObjectName("first");
+    replacement.setObjectName("replacement");
+
+    manager.AddPlotPointer("plot#1", &first, 0);
+    manager.AddPlotPointer("plot#1", &replacement, 0);
+    QCOMPARE(manager.PlotCount(), 1);
+    QCOMPARE(manager.GetPlotByName("replacement"), &replacement);
+    manager.DeletePlotPointer("plot#1");
+    QCOMPARE(manager.PlotCount(), 0);
+    QCOMPARE(manager.GetUniquePlotNumber(), 1);
+
+    manager.AddPlotWindow("figure#0", 2, 3, 0);
+    manager.AddPlotWindow("figure#0", 4, 5, 0);
+    QCOMPARE(manager.GetPlotWindowRowsCols("figure#0"), std::make_pair(4, 5));
+    manager.DeletePlotWindow("figure#0");
+    QCOMPARE(manager.GetPlotWindowsIncrementer(), 1);
+    QCOMPARE(manager.GetPlotWindowRowsCols("unknown"), std::make_pair(0, 0));
+}
+
+void DataManagementCharacterizationTests::DM_REG_005_registry_state_is_instance_local_and_recreated_empty()
+{
+    QObject owner;
+    DataManagementClass first(&owner);
+    DataManagementClass second(&owner);
+    QObject plot;
+    plot.setObjectName("first-plot");
+
+    first.AddFormFile({"first", "first.ui"});
+    first.AddSkipFormFile("first.ui", true);
+    first.SetAlias("first-id", "first-alias");
+    first.AddPlotPointer("plot#0", &plot, 0);
+    QCOMPARE(second.GetFormFileCount(), 0);
+    QVERIFY(!second.GetSkipFormFile("first.ui"));
+    QCOMPARE(second.GetAlias("first-id"), QString("first-id"));
+    QCOMPARE(second.PlotCount(), 0);
+
+    first.CloseProjectLogic();
+    QCOMPARE(second.GetFormFileCount(), 0);
+    { auto* temporary = new DataManagementClass(&owner); temporary->AddFormFile({"temporary", "temporary.ui"}); temporary->SetAlias("temporary-id", "temporary-alias"); delete temporary; }
+    DataManagementClass recreated(&owner);
+    QCOMPARE(recreated.GetFormFileCount(), 0);
+    QCOMPARE(recreated.GetAlias("temporary-id"), QString("temporary-id"));
+    QCOMPARE(recreated.PlotCount(), 0);
 }
 
 QTEST_MAIN(DataManagementCharacterizationTests)
