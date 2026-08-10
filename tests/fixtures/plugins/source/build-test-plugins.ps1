@@ -1,15 +1,16 @@
-param([string]$BuildRoot = '')
+param([string]$BuildRoot = '', [string]$Msys2Root = 'C:\msys64\mingw64')
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../../../..')).Path
-$mingw = 'C:\msys64\mingw64\bin'
-$env:Path = "$mingw;C:\msys64\usr\bin;" + $env:Path
+$mingw = Join-Path $Msys2Root 'bin'
+$msysUsrBin = Join-Path (Split-Path -Parent $Msys2Root) 'usr\bin'
+$env:Path = "$mingw;$msysUsrBin;" + $env:Path
 $qmake = @(
   "$mingw\qmake6.exe",
   "$mingw\qmake-qt6.exe",
-  'C:\msys64\mingw64\lib\qt6\bin\qmake6.exe',
-  'C:\msys64\mingw64\lib\qt6\bin\qmake-qt6.exe',
-  'C:\msys64\mingw64\share\qt6\bin\qmake6.exe',
-  'C:\msys64\mingw64\share\qt6\bin\qmake-qt6.exe',
+  (Join-Path $Msys2Root 'lib\qt6\bin\qmake6.exe'),
+  (Join-Path $Msys2Root 'lib\qt6\bin\qmake-qt6.exe'),
+  (Join-Path $Msys2Root 'share\qt6\bin\qmake6.exe'),
+  (Join-Path $Msys2Root 'share\qt6\bin\qmake-qt6.exe'),
   "$mingw\qmake.exe"
 ) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
 if (-not $qmake) { throw 'qmake executable was not found in known MSYS2 Qt6 locations.' }

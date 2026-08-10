@@ -184,7 +184,7 @@ try {
     $pluginBuildScript = Join-Path $repositoryRoot 'tests\fixtures\plugins\source\build-test-plugins.ps1'
     Assert-File -Path $pluginBuildScript -Description 'test plugin build script'
     $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
-    Invoke-Native -Exe 'powershell.exe' -Arguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $pluginBuildScript, '-BuildRoot', (Join-Path $repositoryRoot 'build\test-plugins'))
+    Invoke-Native -Exe 'powershell.exe' -Arguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $pluginBuildScript, '-BuildRoot', (Join-Path $repositoryRoot 'build\test-plugins'), '-Msys2Root', $Msys2Root)
     $env:LABANALYSER_TEST_PLUGIN_ROOT = Join-Path $repositoryRoot 'build\test-plugins'
 
     foreach ($testProject in $testProjects) {
