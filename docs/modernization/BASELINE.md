@@ -139,6 +139,14 @@ tab-free indentation were locally validated; no YAML/Actions linter is
 installed. No GitHub-hosted run was available from this workspace, so remote
 CI remains unconfirmed. See `CI.md`.
 
+The workflow also contains a separate fresh-environment combined-coverage job.
+It runs `tests/run-coverage-msys2.ps1`, verifies its Markdown and JSON reports,
+publishes them with the coverage transcript, and writes the current totals to
+the GitHub step summary. It uses the documented local exclusions and no hard
+coverage gate. The local baseline remains 41.32% lines, 36.44% executed
+branches, 20.40% branches taken at least once and 61.23% functions; remote
+execution remains unconfirmed until a GitHub Actions run completes.
+
 ## DataManagement characterization 3A
 
 On 2026-08-03 the normal local command built and passed both registered qmake

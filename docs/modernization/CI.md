@@ -15,6 +15,28 @@ For each build and test process, the workflow puts `C:\msys64\mingw64\bin`
 before `C:\msys64\usr\bin` and inherited PATH entries. GUI tests run with
 `QT_QPA_PLATFORM=offscreen`, scoped to the CI test process.
 
+## Combined coverage job
+
+The separate `coverage` job starts from a fresh MSYS2 MINGW64 environment and
+runs the unchanged local command:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-coverage-msys2.ps1 -Jobs 2
+```
+
+It requires both generated reports, adds the combined totals and the local
+exclusion scope to the GitHub step summary, and uploads the Markdown, JSON and
+coverage transcript as `LabAnalyser-coverage-${{ github.sha }}` for 14 days.
+The report uses the same local exclusions: vendored qcustomplot, generated
+Qt/build outputs and `tests/**`; uncompiled production sources remain listed
+instead of being silently scored as zero. No 90/80 or other hard coverage gate
+is active.
+
+The documented local baseline is 41.32% lines (2419/5854), 36.44% executed
+branches (3855/10579), 20.40% branches taken at least once (2158/10579), and
+61.23% functions (338/552). It is coverage of instrumented compiled production
+sources, not a repository-wide percentage.
+
 The Release step uses the existing deploy mode with
 `-DeployDir dist\LabAnalyser-release`. Before upload, CI requires
 `LabAnalyser.exe`, Qt Core/Gui/Widgets DLLs, the MinGW compiler runtimes, and

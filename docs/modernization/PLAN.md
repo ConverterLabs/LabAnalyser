@@ -5,7 +5,9 @@
 **Reproducible Windows build/test CI:** locally validated on 2026-08-10; remote
 GitHub execution is unconfirmed. The workflow uses the existing qmake
 Release-build and central test-runner commands with an MSYS2-prioritized PATH
-and offscreen Qt GUI tests. It adds neither production code nor a coverage gate.
+and offscreen Qt GUI tests. A separate fresh-environment job publishes the
+combined local coverage report and step summary with no coverage gate. It adds
+neither production code nor a coverage gate.
 
 ## Milestone 2B record
 

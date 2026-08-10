@@ -168,3 +168,83 @@ jobs:
           path: dist/LabAnalyser-release/
           if-no-files-found: error
           retention-days: 14
+
+  coverage:
+    name: MSYS2 MINGW64 combined coverage
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up MSYS2 MINGW64 dependencies
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-qt6-base
+            mingw-w64-x86_64-qt6-tools
+            mingw-w64-x86_64-matio
+            mingw-w64-x86_64-hdf5
+            mingw-w64-x86_64-highfive
+            mingw-w64-x86_64-fftw
+            mingw-w64-x86_64-boost
+
+      - name: Run combined coverage in a fresh environment
+        shell: pwsh
+        run: |
+          $mingwBin = 'C:\msys64\mingw64\bin'
+          $msysUsrBin = 'C:\msys64\usr\bin'
+          $env:Path = "$mingwBin;$msysUsrBin;$env:Path"
+          $env:QT_QPA_PLATFORM = 'offscreen'
+          New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
+          Start-Transcript -Path build\ci-logs\coverage.log -Force
+          try {
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-coverage-msys2.ps1 -Jobs 2
+            if ($LASTEXITCODE -ne 0) { throw "Coverage runner failed with exit code $LASTEXITCODE." }
+            foreach ($report in @(
+              'build\coverage-msys2-mingw64\report\coverage-summary.md',
+              'build\coverage-msys2-mingw64\report\coverage-summary.json'
+            )) {
+              if (-not (Test-Path -LiteralPath $report -PathType Leaf)) {
+                throw "Expected coverage report was not generated: $report"
+              }
+            }
+          }
+          finally { Stop-Transcript }
+
+      - name: Add coverage summary
+        shell: pwsh
+        run: |
+          $jsonPath = 'build\coverage-msys2-mingw64\report\coverage-summary.json'
+          $report = Get-Content -LiteralPath $jsonPath -Raw | ConvertFrom-Json
+          $totals = $report.Totals
+          function Get-Percent([long]$covered, [long]$total) {
+            if ($total -eq 0) { return 'n/a' }
+            return ('{0:N2}%' -f (100.0 * $covered / $total)).Replace(',', '.')
+          }
+          @"
+          ## Combined MSYS2/GCC coverage
+
+          | Lines | Branches executed | Branches taken at least once | Calls | Functions |
+          | --- | --- | --- | --- | --- |
+          | $(Get-Percent $totals.LinesCovered $totals.LinesTotal) ($($totals.LinesCovered)/$($totals.LinesTotal)) | $(Get-Percent $totals.BranchesExecuted $totals.BranchesTotal) ($($totals.BranchesExecuted)/$($totals.BranchesTotal)) | $(Get-Percent $totals.BranchesTaken $totals.BranchesTotal) ($($totals.BranchesTaken)/$($totals.BranchesTotal)) | $(Get-Percent $totals.CallsCovered $totals.CallsTotal) ($($totals.CallsCovered)/$($totals.CallsTotal)) | $(Get-Percent $totals.FunctionsCovered $totals.FunctionsTotal) ($($totals.FunctionsCovered)/$($totals.FunctionsTotal)) |
+
+          Scope: $($report.Scope). Exclusions: $($report.Excluded -join ', '). No coverage gate is active.
+          "@ | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload combined coverage report
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: LabAnalyser-coverage-${{ github.sha }}
+          path: |
+            build/coverage-msys2-mingw64/report/coverage-summary.md
+            build/coverage-msys2-mingw64/report/coverage-summary.json
+            build/ci-logs/coverage.log
+          if-no-files-found: warn
+          retention-days: 14
