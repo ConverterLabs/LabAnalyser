@@ -11,6 +11,10 @@ unchanged; only redundant heavyweight verification is batched deliberately.
 | Subsystem checkpoint after several slices | Full central runner; fresh Release and Debug builds; scoped static analysis; relevant file-level coverage comparison. |
 | Milestone/CI checkpoint | Clean build; full coverage; every required platform and CI job. |
 
+CI remains the mandatory complete remote verification. Local batching never
+removes focused slice tests or any clean-build, complete-test, coverage,
+platform or workflow check from the remote checkpoint.
+
 The delegate-experiment-saving slice is already fully verified. No repeated
 full runner, Debug build, coverage or static-analysis run is required solely
 because of this policy change. The next ProjectIoCoordinator subsystem

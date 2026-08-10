@@ -195,15 +195,17 @@ scope:
    test project, run directly dependent contract suites, perform an
    incremental Release compile check, run scoped `git diff --check`, and check
    public API/IID only when that boundary is affected.
-2. **Subsystem checkpoint after several slices:** run the complete central
-   runner, fresh Release and Debug builds, scoped static analysis, and compare
-   relevant file-level coverage.
+2. **Subsystem checkpoint after several related slices (at the latest):** run
+   the complete central runner, fresh Release and Debug builds, scoped static
+   analysis, and compare relevant file-level coverage.
 3. **Milestone or CI checkpoint:** run a clean build, full coverage, and all
    required platform/CI jobs.
 
 Record which level was used and its exact evidence. A later checkpoint may
 batch redundant full verification, but never replaces the focused behavioral
 tests required for an individual changed function.
+CI remains the complete remote verification: local staging never removes its
+clean build, complete test, coverage, platform or required workflow checks.
 
 - Begin each work session by reading `PLAN.md`, `BASELINE.md`, recent git diff/status, and applicable instructions.
 - Present a short plan before a substantial change, then execute autonomously while the next step is safe and in scope.
