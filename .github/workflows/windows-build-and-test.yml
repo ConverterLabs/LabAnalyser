@@ -32,18 +32,55 @@ jobs:
             mingw-w64-x86_64-fftw
             mingw-w64-x86_64-boost
 
+      - name: Detect MSYS2 MINGW64 paths
+        shell: msys2 {0}
+        run: |
+          set -e
+          # Verify qmake exists in one of the known locations (support both classic and Qt 6.11+ layouts)
+          QMAKE_FOUND=false
+          for CANDIDATE in \
+              "$(command -v qmake6 2>/dev/null || true)" \
+              "$(command -v qmake 2>/dev/null || true)" \
+              /mingw64/bin/qmake6.bat \
+              /mingw64/bin/qmake.bat \
+              /mingw64/share/qt6/bin/qmake6.exe \
+              /mingw64/share/qt6/bin/qmake.exe \
+              /mingw64/bin/qmake6.exe \
+              /mingw64/bin/qmake.exe; do
+            if [ -n "$CANDIDATE" ] && [ -e "$CANDIDATE" ]; then
+              echo "Found qmake at: $CANDIDATE"
+              QMAKE_FOUND=true
+              break
+            fi
+          done
+          if [ "$QMAKE_FOUND" != "true" ]; then
+            echo "ERROR: qmake not found in MSYS2 MINGW64"
+            echo "--- /mingw64/bin (qmake/qt6 related) ---"
+            ls /mingw64/bin/ | grep -iE 'qmake|qt6' || echo "(none)"
+            echo "--- /mingw64/share subdirs ---"
+            ls /mingw64/share/ | grep -iE 'qt' || echo "(none)"
+            exit 1
+          fi
+          # Use cygpath to obtain Windows-style paths that work in PowerShell steps
+          printf 'MSYS2_MINGW_BIN=%s\n' "$(cygpath -w /mingw64/bin)" >> "$GITHUB_ENV"
+          printf 'MSYS2_MINGW_ROOT=%s\n' "$(cygpath -w /mingw64)"    >> "$GITHUB_ENV"
+          printf 'MSYS2_USR_BIN=%s\n'   "$(cygpath -w /usr/bin)"     >> "$GITHUB_ENV"
+          echo "MSYS2_MINGW_BIN: $(cygpath -w /mingw64/bin)"
+          echo "MSYS2_MINGW_ROOT: $(cygpath -w /mingw64)"
+
       - name: Prioritize MSYS2 MINGW64
         shell: pwsh
         run: |
-          $mingwBin = 'C:\msys64\mingw64\bin'
+          $mingwBin  = $env:MSYS2_MINGW_BIN
+          $mingwRoot = $env:MSYS2_MINGW_ROOT
+          $msysUsrBin = $env:MSYS2_USR_BIN
           $qtSearchDirs = @(
             $mingwBin,
-            'C:\msys64\mingw64\lib\qt6\bin',
-            'C:\msys64\mingw64\share\qt6\bin'
+            (Join-Path $mingwRoot 'lib\qt6\bin'),
+            (Join-Path $mingwRoot 'share\qt6\bin')
           ) | Select-Object -Unique
-          $msysUsrBin = 'C:\msys64\usr\bin'
           if (-not (Test-Path -LiteralPath $mingwBin) -or -not (Test-Path -LiteralPath $msysUsrBin)) {
-            throw 'Expected MSYS2 MINGW64 directories are unavailable.'
+            throw "MSYS2 MINGW64 directories are unavailable: bin=$mingwBin usrbin=$msysUsrBin"
           }
           ($qtSearchDirs + $msysUsrBin) -join "`n" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           $env:Path = (($qtSearchDirs + $msysUsrBin) -join ';') + ';' + $env:Path
@@ -54,10 +91,10 @@ jobs:
           }
           $qmake = $qmakeCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
           if (-not $qmake) {
-            Write-Host '## Diagnostic: Qt-related files under C:\msys64\mingw64'
-            Get-ChildItem -LiteralPath 'C:\msys64\mingw64\bin' -File | Where-Object { $_.Name -like '*qmake*' -or $_.Name -like '*qt6*' } | Select-Object FullName | Format-Table -AutoSize
-            Get-ChildItem -LiteralPath 'C:\msys64\mingw64' -Directory | Where-Object { $_.Name -like '*qt*' } | ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Recurse -File | Where-Object { $_.Name -like '*qmake*' } | Select-Object FullName } | Format-Table -AutoSize
-            throw 'No qmake executable found in known MSYS2 Qt6 directories.'
+            Write-Host "## Diagnostic: Qt-related files under $mingwRoot"
+            Get-ChildItem -LiteralPath $mingwBin -File | Where-Object { $_.Name -like '*qmake*' -or $_.Name -like '*qt6*' } | Select-Object FullName | Format-Table -AutoSize | Out-String | Write-Host
+            Get-ChildItem -LiteralPath $mingwRoot -Directory | Where-Object { $_.Name -like '*qt*' } | ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Recurse -File | Where-Object { $_.Name -like '*qmake*' } | Select-Object FullName } | Format-Table -AutoSize | Out-String | Write-Host
+            throw 'No qmake executable found in MSYS2 MINGW64 directories.'
           }
           & $qmake -query
           mingw32-make.exe --version
@@ -65,11 +102,11 @@ jobs:
       - name: Fresh deployable Release build
         shell: pwsh
         run: |
-          $env:Path = 'C:\msys64\mingw64\bin;C:\msys64\usr\bin;' + $env:Path
+          $env:Path = "$env:MSYS2_MINGW_BIN;$env:MSYS2_USR_BIN;" + $env:Path
           New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
           Start-Transcript -Path build\ci-logs\release-build.log -Force
           try {
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2 -Msys2Root $env:MSYS2_MINGW_ROOT
             if ($LASTEXITCODE -ne 0) { throw "Release build failed with exit code $LASTEXITCODE." }
           }
           finally { Stop-Transcript }
@@ -104,12 +141,12 @@ jobs:
       - name: Full qmake test runner (offscreen)
         shell: pwsh
         run: |
-          $env:Path = 'C:\msys64\mingw64\bin;C:\msys64\usr\bin;' + $env:Path
+          $env:Path = "$env:MSYS2_MINGW_BIN;$env:MSYS2_USR_BIN;" + $env:Path
           $env:QT_QPA_PLATFORM = 'offscreen'
           New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
           Start-Transcript -Path build\ci-logs\tests.log -Force
           try {
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -BuildRoot build\ci-tests -Jobs 2
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -BuildRoot build\ci-tests -Jobs 2 -Msys2Root $env:MSYS2_MINGW_ROOT
             if ($LASTEXITCODE -ne 0) { throw "Test runner failed with exit code $LASTEXITCODE." }
           }
           finally { Stop-Transcript }
