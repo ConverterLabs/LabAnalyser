@@ -1,0 +1,1518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Experiment>
+    <Tabs>
+        <Form Name="Mainboard_2024_11_27_13_03_44">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/Mainboard.ui</AbsPath>
+            <RelPath>Mainboard.ui</RelPath>
+        </Form>
+        <Form Name="Sideboard_Error_2024_11_27_13_05_36">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/Sideboard_Error.ui</AbsPath>
+            <RelPath>Sideboard_Error.ui</RelPath>
+        </Form>
+        <Form Name="Overview_2025_11_07_14_33_19">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/Overview.ui</AbsPath>
+            <RelPath>Overview.ui</RelPath>
+        </Form>
+        <Form Name="debug_2026_03_16_10_48_35">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/debug.ui</AbsPath>
+            <RelPath>debug.ui</RelPath>
+        </Form>
+        <Form Name="SpannugsquellenUI_2026_03_17_08_31_10">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/SpannugsquellenUI.ui</AbsPath>
+            <RelPath>SpannugsquellenUI.ui</RelPath>
+        </Form>
+        <Form Name="Sideboard_Error2_2026_05_12_08_37_27">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/Sideboard_Error2.ui</AbsPath>
+            <RelPath>Sideboard_Error2.ui</RelPath>
+        </Form>
+    </Tabs>
+    <Devices>
+        <Device>
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/Device_legacy-a.LAdev</AbsPath>
+            <RelPath>Device_legacy-a.LAdev</RelPath>
+        </Device>
+    </Devices>
+    <FigureWindows>
+        <Window Rows="1" Cols="1" PosX="-1487" PosY="651" Width="357" Height="153">
+            <PlotWidgetName>Plot#3</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="1921" PosY="520" Width="958" Height="488">
+            <PlotWidgetName>Plot#6</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2881" PosY="520" Width="958" Height="488">
+            <PlotWidgetName>Plot#11</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2881" PosY="0" Width="958" Height="488">
+            <PlotWidgetName>Plot#1</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="1921" PosY="0" Width="958" Height="488">
+            <PlotWidgetName>Plot#5</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="285" PosY="397" Width="600" Height="400">
+            <PlotWidgetName>Plot#9</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2700" PosY="520" Width="600" Height="207">
+            <PlotWidgetName>Plot#10</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2130" PosY="331" Width="600" Height="400">
+            <PlotWidgetName>Plot#2</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2200" PosY="323" Width="600" Height="400">
+            <PlotWidgetName>Plot#8</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="660" PosY="301" Width="600" Height="400">
+            <PlotWidgetName>Plot#7</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2282" PosY="249" Width="600" Height="400">
+            <PlotWidgetName>Plot#12</PlotWidgetName>
+        </Window>
+    </FigureWindows>
+    <Widgets>
+        <Widget Name="label_613_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1126_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1147_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_684_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1123_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_683_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1150_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1125_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1149_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1145_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1148_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_614_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1144_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1140_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1146_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1136_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1143_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1155_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1153_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1154_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1151_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_682_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1152_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_602_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_67_Sideboard_Error_2024_11_27_13_05_36" Bit="20"/>
+        <Widget Name="qled_bit1_ilvdc_48_Sideboard_Error_2024_11_27_13_05_36" Bit="6"/>
+        <Widget Name="label_860_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_121_Sideboard_Error_2024_11_27_13_05_36" Bit="21"/>
+        <Widget Name="qled_bit1_ilvdc_57_Sideboard_Error_2024_11_27_13_05_36" Bit="12"/>
+        <Widget Name="label_651_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_49_Sideboard_Error_2024_11_27_13_05_36" Bit="7"/>
+        <Widget Name="label_919_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_58_Sideboard_Error_2024_11_27_13_05_36" Bit="13"/>
+        <Widget Name="label_865_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_598_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_119_Sideboard_Error_2024_11_27_13_05_36" Bit="20"/>
+        <Widget Name="label_920_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit15_oc_ilvt_1_Sideboard_Error_2024_11_27_13_05_36" Bit="15"/>
+        <Widget Name="checkBox_69_Sideboard_Error_2024_11_27_13_05_36" Bit="1"/>
+        <Widget Name="label_905_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_631_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_70_Sideboard_Error_2024_11_27_13_05_36" Bit="15"/>
+        <Widget Name="qled_bit1_ilvdc_52_Sideboard_Error_2024_11_27_13_05_36" Bit="9"/>
+        <Widget Name="label_621_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_110_Sideboard_Error_2024_11_27_13_05_36" Bit="10"/>
+        <Widget Name="checkBox_26_Sideboard_Error_2024_11_27_13_05_36" Bit="15"/>
+        <Widget Name="qled_bit1_ilvdc_51_Sideboard_Error_2024_11_27_13_05_36" Bit="8"/>
+        <Widget Name="label_855_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_638_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_114_Sideboard_Error_2024_11_27_13_05_36" Bit="14"/>
+        <Widget Name="checkBox_105_Sideboard_Error_2024_11_27_13_05_36" Bit="5"/>
+        <Widget Name="checkBox_122_Sideboard_Error_2024_11_27_13_05_36" Bit="20"/>
+        <Widget Name="checkBox_111_Sideboard_Error_2024_11_27_13_05_36" Bit="11"/>
+        <Widget Name="qled_bit1_ilvdc_63_Sideboard_Error_2024_11_27_13_05_36" Bit="17"/>
+        <Widget Name="label_597_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_112_Sideboard_Error_2024_11_27_13_05_36" Bit="12"/>
+        <Widget Name="label_600_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_863_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_116_Sideboard_Error_2024_11_27_13_05_36" Bit="17"/>
+        <Widget Name="label_622_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_1_Sideboard_Error_2024_11_27_13_05_36" Bit="1"/>
+        <Widget Name="label_5_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_120_Sideboard_Error_2024_11_27_13_05_36" Bit="21"/>
+        <Widget Name="label_619_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_652_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_917_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_650_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_109_Sideboard_Error_2024_11_27_13_05_36" Bit="9"/>
+        <Widget Name="label_630_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_107_Sideboard_Error_2024_11_27_13_05_36" Bit="7"/>
+        <Widget Name="qled_bit1_ilvdc_60_Sideboard_Error_2024_11_27_13_05_36" Bit="14"/>
+        <Widget Name="label_653_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_101_Sideboard_Error_2024_11_27_13_05_36" Bit="2"/>
+        <Widget Name="checkBox_5_Sideboard_Error_2024_11_27_13_05_36" Bit="1"/>
+        <Widget Name="qled_bit1_ilvdc_46_Sideboard_Error_2024_11_27_13_05_36" Bit="5"/>
+        <Widget Name="label_862_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_135_Sideboard_Error_2024_11_27_13_05_36" Bit="6"/>
+        <Widget Name="label_861_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_916_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_856_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_54_Sideboard_Error_2024_11_27_13_05_36" Bit="10"/>
+        <Widget Name="checkBox_129_Sideboard_Error_2024_11_27_13_05_36" Bit="12"/>
+        <Widget Name="checkBox_131_Sideboard_Error_2024_11_27_13_05_36" Bit="10"/>
+        <Widget Name="label_864_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_915_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_134_Sideboard_Error_2024_11_27_13_05_36" Bit="7"/>
+        <Widget Name="qled_bit1_ilvdc_61_Sideboard_Error_2024_11_27_13_05_36" Bit="16"/>
+        <Widget Name="checkBox_136_Sideboard_Error_2024_11_27_13_05_36" Bit="5"/>
+        <Widget Name="checkBox_127_Sideboard_Error_2024_11_27_13_05_36" Bit="14"/>
+        <Widget Name="checkBox_128_Sideboard_Error_2024_11_27_13_05_36" Bit="13"/>
+        <Widget Name="checkBox_133_Sideboard_Error_2024_11_27_13_05_36" Bit="8"/>
+        <Widget Name="checkBox_130_Sideboard_Error_2024_11_27_13_05_36" Bit="11"/>
+        <Widget Name="checkBox_102_Sideboard_Error_2024_11_27_13_05_36" Bit="2"/>
+        <Widget Name="checkBox_125_Sideboard_Error_2024_11_27_13_05_36" Bit="17"/>
+        <Widget Name="qled_bit1_ilvdc_69_Sideboard_Error_2024_11_27_13_05_36" Bit="21"/>
+        <Widget Name="checkBox_106_Sideboard_Error_2024_11_27_13_05_36" Bit="6"/>
+        <Widget Name="label_911_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_858_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_55_Sideboard_Error_2024_11_27_13_05_36" Bit="11"/>
+        <Widget Name="label_633_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_918_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_609_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_635_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_908_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_906_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_607_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_577_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_859_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_910_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_907_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_909_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_126_Sideboard_Error_2024_11_27_13_05_36" Bit="16"/>
+        <Widget Name="label_616_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_617_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_857_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_601_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_618_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_29_Sideboard_Error_2024_11_27_13_05_36" Bit="2"/>
+        <Widget Name="checkBox_113_Sideboard_Error_2024_11_27_13_05_36" Bit="13"/>
+        <Widget Name="label_913_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_608_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_642_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_634_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_108_Sideboard_Error_2024_11_27_13_05_36" Bit="8"/>
+        <Widget Name="label_914_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_132_Sideboard_Error_2024_11_27_13_05_36" Bit="9"/>
+        <Widget Name="label_632_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_605_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_643_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_115_Sideboard_Error_2024_11_27_13_05_36" Bit="16"/>
+        <Widget Name="label_912_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_5_Sideboard_Error_2024_11_27_13_05_36" Bit="0"/>
+        <Widget Name="checkBox_59_Sideboard_Error_2024_11_27_13_05_36" Bit="0"/>
+        <Widget Name="checkBox_71_Sideboard_Error_2024_11_27_13_05_36" Bit="0"/>
+        <Widget Name="checkBox_21_Sideboard_Error_2024_11_27_13_05_36" Bit="10"/>
+        <Widget Name="qled_bit7_temphvIGBTu_24_Sideboard_Error_2024_11_27_13_05_36" Bit="7"/>
+        <Widget Name="label_6_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_15_Sideboard_Error_2024_11_27_13_05_36" Bit="7"/>
+        <Widget Name="checkBox_19_Sideboard_Error_2024_11_27_13_05_36" Bit="9"/>
+        <Widget Name="qled_bit7_temphvIGBTu_25_Sideboard_Error_2024_11_27_13_05_36" Bit="6"/>
+        <Widget Name="qled_bit7_temphvIGBTu_22_Sideboard_Error_2024_11_27_13_05_36" Bit="9"/>
+        <Widget Name="checkBox_139_Sideboard_Error_2024_11_27_13_05_36" Bit="28"/>
+        <Widget Name="checkBox_11_Sideboard_Error_2024_11_27_13_05_36" Bit="5"/>
+        <Widget Name="checkBox_27_Sideboard_Error_2024_11_27_13_05_36" Bit="12"/>
+        <Widget Name="checkBox_12_Sideboard_Error_2024_11_27_13_05_36" Bit="5"/>
+        <Widget Name="label_956_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_29_Sideboard_Error_2024_11_27_13_05_36" Bit="13"/>
+        <Widget Name="qled_bit7_temphvIGBTu_11_Sideboard_Error_2024_11_27_13_05_36" Bit="20"/>
+        <Widget Name="label_934_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1021_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1023_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_935_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1015_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_954_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_15_Sideboard_Error_2024_11_27_13_05_36" Bit="16"/>
+        <Widget Name="label_939_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_957_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_945_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_958_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_28_Sideboard_Error_2024_11_27_13_05_36" Bit="3"/>
+        <Widget Name="label_951_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_13_Sideboard_Error_2024_11_27_13_05_36" Bit="18"/>
+        <Widget Name="qled_bit7_temphvIGBTu_12_Sideboard_Error_2024_11_27_13_05_36" Bit="19"/>
+        <Widget Name="label_949_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_17_Sideboard_Error_2024_11_27_13_05_36" Bit="8"/>
+        <Widget Name="checkBox_16_Sideboard_Error_2024_11_27_13_05_36" Bit="7"/>
+        <Widget Name="checkBox_18_Sideboard_Error_2024_11_27_13_05_36" Bit="8"/>
+        <Widget Name="checkBox_22_Sideboard_Error_2024_11_27_13_05_36" Bit="10"/>
+        <Widget Name="checkBox_42_Sideboard_Error_2024_11_27_13_05_36" Bit="20"/>
+        <Widget Name="checkBox_52_Sideboard_Error_2024_11_27_13_05_36" Bit="24"/>
+        <Widget Name="label_625_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_39_Sideboard_Error_2024_11_27_13_05_36" Bit="18"/>
+        <Widget Name="checkBox_46_Sideboard_Error_2024_11_27_13_05_36" Bit="21"/>
+        <Widget Name="checkBox_35_Sideboard_Error_2024_11_27_13_05_36" Bit="16"/>
+        <Widget Name="checkBox_41_Sideboard_Error_2024_11_27_13_05_36" Bit="19"/>
+        <Widget Name="checkBox_44_Sideboard_Error_2024_11_27_13_05_36" Bit="21"/>
+        <Widget Name="label_647_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_43_Sideboard_Error_2024_11_27_13_05_36" Bit="20"/>
+        <Widget Name="label_626_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_646_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_38_Sideboard_Error_2024_11_27_13_05_36" Bit="18"/>
+        <Widget Name="checkBox_51_Sideboard_Error_2024_11_27_13_05_36" Bit="24"/>
+        <Widget Name="checkBox_40_Sideboard_Error_2024_11_27_13_05_36" Bit="19"/>
+        <Widget Name="checkBox_34_Sideboard_Error_2024_11_27_13_05_36" Bit="16"/>
+        <Widget Name="checkBox_55_Sideboard_Error_2024_11_27_13_05_36" Bit="26"/>
+        <Widget Name="checkBox_56_Sideboard_Error_2024_11_27_13_05_36" Bit="26"/>
+        <Widget Name="checkBox_57_Sideboard_Error_2024_11_27_13_05_36" Bit="27"/>
+        <Widget Name="checkBox_53_Sideboard_Error_2024_11_27_13_05_36" Bit="25"/>
+        <Widget Name="checkBox_58_Sideboard_Error_2024_11_27_13_05_36" Bit="27"/>
+        <Widget Name="checkBox_54_Sideboard_Error_2024_11_27_13_05_36" Bit="25"/>
+        <Widget Name="qled_bit7_temphvIGBTu_7_Sideboard_Error_2024_11_27_13_05_36" Bit="24"/>
+        <Widget Name="qled_bit7_temphvIGBTu_30_Sideboard_Error_2024_11_27_13_05_36" Bit="1"/>
+        <Widget Name="checkBox_24_Sideboard_Error_2024_11_27_13_05_36" Bit="11"/>
+        <Widget Name="qled_bit7_temphvIGBTu_4_Sideboard_Error_2024_11_27_13_05_36" Bit="27"/>
+        <Widget Name="qled_bit7_temphvIGBTu_6_Sideboard_Error_2024_11_27_13_05_36" Bit="25"/>
+        <Widget Name="qled_bit7_temphvIGBTu_5_Sideboard_Error_2024_11_27_13_05_36" Bit="26"/>
+        <Widget Name="qled_bit7_temphvIGBTu_10_Sideboard_Error_2024_11_27_13_05_36" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_29_Sideboard_Error_2024_11_27_13_05_36" Bit="2"/>
+        <Widget Name="qled_bit7_temphvIGBTu_3_Sideboard_Error_2024_11_27_13_05_36" Bit="28"/>
+        <Widget Name="checkBox_100_Sideboard_Error_2024_11_27_13_05_36" Bit="28"/>
+        <Widget Name="label_1033_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_636_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1030_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1026_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1027_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1028_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1034_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_604_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_624_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_932_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1029_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_931_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1031_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1032_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_968_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_960_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_26_Sideboard_Error_2024_11_27_13_05_36" Bit="5"/>
+        <Widget Name="checkBox_28_Sideboard_Error_2024_11_27_13_05_36" Bit="13"/>
+        <Widget Name="label_937_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_23_Sideboard_Error_2024_11_27_13_05_36" Bit="11"/>
+        <Widget Name="label_946_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1024_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_948_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_950_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_963_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_938_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_966_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_961_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1020_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_967_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_952_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_955_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_964_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_965_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_936_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1018_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_962_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1019_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_947_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_959_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1025_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1017_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_944_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_969_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_2_Sideboard_Error_2024_11_27_13_05_36" Bit="1"/>
+        <Widget Name="label_629_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_628_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_9_Sideboard_Error_2024_11_27_13_05_36" Bit="4"/>
+        <Widget Name="checkBox_4_Sideboard_Error_2024_11_27_13_05_36" Bit="2"/>
+        <Widget Name="checkBox_6_Sideboard_Error_2024_11_27_13_05_36" Bit="2"/>
+        <Widget Name="qled_bit7_temphvIGBTu_19_Sideboard_Error_2024_11_27_13_05_36" Bit="12"/>
+        <Widget Name="checkBox_3_Sideboard_Error_2024_11_27_13_05_36" Bit="1"/>
+        <Widget Name="label_953_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_21_Sideboard_Error_2024_11_27_13_05_36" Bit="10"/>
+        <Widget Name="qled_bit7_temphvIGBTu_20_Sideboard_Error_2024_11_27_13_05_36" Bit="11"/>
+        <Widget Name="qled_bit7_temphvIGBTu_18_Sideboard_Error_2024_11_27_13_05_36" Bit="13"/>
+        <Widget Name="checkBox_7_Sideboard_Error_2024_11_27_13_05_36" Bit="3"/>
+        <Widget Name="qled_bit7_temphvIGBTu_27_Sideboard_Error_2024_11_27_13_05_36" Bit="4"/>
+        <Widget Name="label_1022_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_1016_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_20_Sideboard_Error_2024_11_27_13_05_36" Bit="9"/>
+        <Widget Name="checkBox_25_Sideboard_Error_2024_11_27_13_05_36" Bit="12"/>
+        <Widget Name="label_639_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_933_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="checkBox_8_Sideboard_Error_2024_11_27_13_05_36" Bit="3"/>
+        <Widget Name="checkBox_10_Sideboard_Error_2024_11_27_13_05_36" Bit="4"/>
+        <Widget Name="checkBox_13_Sideboard_Error_2024_11_27_13_05_36" Bit="6"/>
+        <Widget Name="qled_bit7_temphvIGBTu_23_Sideboard_Error_2024_11_27_13_05_36" Bit="8"/>
+        <Widget Name="checkBox_14_Sideboard_Error_2024_11_27_13_05_36" Bit="6"/>
+        <Widget Name="label_943_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_942_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_941_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_599_Sideboard_Error_2024_11_27_13_05_36" UserDefinedText="0"/>
+        <Widget Name="label_922_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_924_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_126_Sideboard_Error2_2026_05_12_08_37_27" Bit="24"/>
+        <Widget Name="qled_bit1_ilvdc_127_Sideboard_Error2_2026_05_12_08_37_27" Bit="25"/>
+        <Widget Name="qled_bit1_ilvdc_128_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_129_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_83_Sideboard_Error2_2026_05_12_08_37_27" Bit="25"/>
+        <Widget Name="qled_bit1_ilvdc_130_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_77_Sideboard_Error2_2026_05_12_08_37_27" Bit="23"/>
+        <Widget Name="qled_bit1_ilvdc_80_Sideboard_Error2_2026_05_12_08_37_27" Bit="24"/>
+        <Widget Name="qled_bit1_ilvdc_84_Sideboard_Error2_2026_05_12_08_37_27" Bit="23"/>
+        <Widget Name="checkBox_140_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_921_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_923_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_141_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_74_Sideboard_Error2_2026_05_12_08_37_27" Bit="22"/>
+        <Widget Name="qled_bit1_ilvdc_103_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_112_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit15_oc_ilvt_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="15"/>
+        <Widget Name="qled_bit1_ilvdc_7_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_57_Sideboard_Error2_2026_05_12_08_37_27" Bit="12"/>
+        <Widget Name="qled_bit1_ilvdc_5_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_6_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_8_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_115_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_121_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit15_oc_ilvt_1_Sideboard_Error2_2026_05_12_08_37_27" Bit="15"/>
+        <Widget Name="label_627_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_123_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_110_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_67_Sideboard_Error2_2026_05_12_08_37_27" Bit="20"/>
+        <Widget Name="qled_bit1_ilvdc_110_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_919_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_109_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_631_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_860_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_39_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_638_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_91_Sideboard_Error2_2026_05_12_08_37_27" Bit="5"/>
+        <Widget Name="checkBox_70_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_905_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_113_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_48_Sideboard_Error2_2026_05_12_08_37_27" Bit="6"/>
+        <Widget Name="label_623_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_52_Sideboard_Error2_2026_05_12_08_37_27" Bit="9"/>
+        <Widget Name="checkBox_119_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_66_Sideboard_Error2_2026_05_12_08_37_27" Bit="19"/>
+        <Widget Name="label_621_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_116_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_114_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_104_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_107_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_58_Sideboard_Error2_2026_05_12_08_37_27" Bit="13"/>
+        <Widget Name="label_651_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_70_Sideboard_Error2_2026_05_12_08_37_27" Bit="21"/>
+        <Widget Name="qled_bit1_ilvdc_49_Sideboard_Error2_2026_05_12_08_37_27" Bit="7"/>
+        <Widget Name="qled_bit1_ilvdc_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="1"/>
+        <Widget Name="qled_bit1_ilvdc_102_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_124_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_111_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_64_Sideboard_Error2_2026_05_12_08_37_27" Bit="18"/>
+        <Widget Name="qled_bit1_ilvdc_105_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_855_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_90_Sideboard_Error2_2026_05_12_08_37_27" Bit="6"/>
+        <Widget Name="qled_bit1_ilvdc_119_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_98_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_26_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_920_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_597_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_88_Sideboard_Error2_2026_05_12_08_37_27" Bit="8"/>
+        <Widget Name="qled_bit1_ilvdc_87_Sideboard_Error2_2026_05_12_08_37_27" Bit="9"/>
+        <Widget Name="label_600_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_96_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_51_Sideboard_Error2_2026_05_12_08_37_27" Bit="8"/>
+        <Widget Name="qled_bit1_ilvdc_37_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_72_Sideboard_Error2_2026_05_12_08_37_27" Bit="20"/>
+        <Widget Name="qled_bit1_ilvdc_36_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_69_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_40_Sideboard_Error2_2026_05_12_08_37_27" Bit="3"/>
+        <Widget Name="label_598_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_79_Sideboard_Error2_2026_05_12_08_37_27" Bit="14"/>
+        <Widget Name="qled_bit1_ilvdc_42_Sideboard_Error2_2026_05_12_08_37_27" Bit="4"/>
+        <Widget Name="qled_bit1_ilvdc_93_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_121_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_117_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_100_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_108_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_865_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_123_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_120_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_122_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_89_Sideboard_Error2_2026_05_12_08_37_27" Bit="7"/>
+        <Widget Name="qled_bit1_ilvdc_118_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_99_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_43_Sideboard_Error2_2026_05_12_08_37_27" Bit="4"/>
+        <Widget Name="qled_bit1_ilvdc_1_Sideboard_Error2_2026_05_12_08_37_27" Bit="1"/>
+        <Widget Name="checkBox_114_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_86_Sideboard_Error2_2026_05_12_08_37_27" Bit="10"/>
+        <Widget Name="qled_bit1_ilvdc_94_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_101_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_120_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_81_Sideboard_Error2_2026_05_12_08_37_27" Bit="13"/>
+        <Widget Name="checkBox_5_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_3_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_63_Sideboard_Error2_2026_05_12_08_37_27" Bit="17"/>
+        <Widget Name="qled_bit1_ilvdc_73_Sideboard_Error2_2026_05_12_08_37_27" Bit="19"/>
+        <Widget Name="qled_bit1_ilvdc_97_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_105_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_107_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_23_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_630_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_78_Sideboard_Error2_2026_05_12_08_37_27" Bit="16"/>
+        <Widget Name="checkBox_111_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_5_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_26_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_112_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_85_Sideboard_Error2_2026_05_12_08_37_27" Bit="11"/>
+        <Widget Name="checkBox_122_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_917_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_125_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_137_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_856_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_103_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_31_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_650_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_619_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_138_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_131_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_69_Sideboard_Error2_2026_05_12_08_37_27" Bit="21"/>
+        <Widget Name="checkBox_128_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_104_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_653_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_133_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_129_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_95_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_101_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_116_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_652_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_109_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_864_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_622_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_127_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_916_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_60_Sideboard_Error2_2026_05_12_08_37_27" Bit="14"/>
+        <Widget Name="checkBox_118_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_863_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_106_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_76_Sideboard_Error2_2026_05_12_08_37_27" Bit="17"/>
+        <Widget Name="label_918_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_54_Sideboard_Error2_2026_05_12_08_37_27" Bit="10"/>
+        <Widget Name="label_907_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_92_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_616_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_861_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_113_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_82_Sideboard_Error2_2026_05_12_08_37_27" Bit="12"/>
+        <Widget Name="qled_bit1_ilvdc_29_Sideboard_Error2_2026_05_12_08_37_27" Bit="2"/>
+        <Widget Name="label_608_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_34_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_130_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_61_Sideboard_Error2_2026_05_12_08_37_27" Bit="16"/>
+        <Widget Name="label_618_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_108_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_617_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_45_Sideboard_Error2_2026_05_12_08_37_27" Bit="3"/>
+        <Widget Name="qled_bit1_ilvdc_75_Sideboard_Error2_2026_05_12_08_37_27" Bit="18"/>
+        <Widget Name="label_915_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_577_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_136_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_33_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_134_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_607_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_909_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_102_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_135_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_862_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_55_Sideboard_Error2_2026_05_12_08_37_27" Bit="11"/>
+        <Widget Name="qled_bit1_ilvdc_46_Sideboard_Error2_2026_05_12_08_37_27" Bit="5"/>
+        <Widget Name="checkBox_115_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_126_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_643_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_117_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_858_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_609_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_908_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_642_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_106_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_4_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_859_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_601_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_605_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_906_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_602_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_911_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_59_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_60_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_633_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_634_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_635_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_632_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_914_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_620_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_910_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_30_Sideboard_Error2_2026_05_12_08_37_27" Bit="2"/>
+        <Widget Name="label_857_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_912_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_913_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_132_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_124_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_869_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_125_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_866_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_867_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_868_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit1_ilvdc_71_Sideboard_Error2_2026_05_12_08_37_27" Bit="22"/>
+        <Widget Name="qled_bit1_ilvdc_207_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_208_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit1_ilvdc_209_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_182_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_183_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_184_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_185_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_186_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_187_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_21_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_24_Sideboard_Error2_2026_05_12_08_37_27" Bit="7"/>
+        <Widget Name="checkBox_32_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_6_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_15_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_19_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_25_Sideboard_Error2_2026_05_12_08_37_27" Bit="6"/>
+        <Widget Name="qled_bit7_temphvIGBTu_22_Sideboard_Error2_2026_05_12_08_37_27" Bit="9"/>
+        <Widget Name="checkBox_139_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_11_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_27_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_12_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_956_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_29_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_31_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_11_Sideboard_Error2_2026_05_12_08_37_27" Bit="20"/>
+        <Widget Name="label_934_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1021_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_44_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_17_Sideboard_Error2_2026_05_12_08_37_27" Bit="14"/>
+        <Widget Name="qled_bit7_temphvIGBTu_51_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_56_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_49_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_1023_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_62_Sideboard_Error2_2026_05_12_08_37_27" Bit="4"/>
+        <Widget Name="label_935_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_48_Sideboard_Error2_2026_05_12_08_37_27" Bit="12"/>
+        <Widget Name="qled_bit7_temphvIGBTu_33_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_1015_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_954_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_15_Sideboard_Error2_2026_05_12_08_37_27" Bit="16"/>
+        <Widget Name="qled_bit7_temphvIGBTu_16_Sideboard_Error2_2026_05_12_08_37_27" Bit="15"/>
+        <Widget Name="label_939_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_957_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_945_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_42_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_958_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_14_Sideboard_Error2_2026_05_12_08_37_27" Bit="17"/>
+        <Widget Name="qled_bit7_temphvIGBTu_28_Sideboard_Error2_2026_05_12_08_37_27" Bit="3"/>
+        <Widget Name="label_951_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_13_Sideboard_Error2_2026_05_12_08_37_27" Bit="18"/>
+        <Widget Name="qled_bit7_temphvIGBTu_12_Sideboard_Error2_2026_05_12_08_37_27" Bit="19"/>
+        <Widget Name="qled_bit7_temphvIGBTu_64_Sideboard_Error2_2026_05_12_08_37_27" Bit="6"/>
+        <Widget Name="label_949_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_17_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_71_Sideboard_Error2_2026_05_12_08_37_27" Bit="27"/>
+        <Widget Name="qled_bit7_temphvIGBTu_50_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_63_Sideboard_Error2_2026_05_12_08_37_27" Bit="5"/>
+        <Widget Name="qled_bit7_temphvIGBTu_66_Sideboard_Error2_2026_05_12_08_37_27" Bit="8"/>
+        <Widget Name="qled_bit7_temphvIGBTu_65_Sideboard_Error2_2026_05_12_08_37_27" Bit="7"/>
+        <Widget Name="qled_bit7_temphvIGBTu_69_Sideboard_Error2_2026_05_12_08_37_27" Bit="11"/>
+        <Widget Name="checkBox_16_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_61_Sideboard_Error2_2026_05_12_08_37_27" Bit="3"/>
+        <Widget Name="qled_bit7_temphvIGBTu_57_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_18_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_28_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_67_Sideboard_Error2_2026_05_12_08_37_27" Bit="9"/>
+        <Widget Name="qled_bit7_temphvIGBTu_68_Sideboard_Error2_2026_05_12_08_37_27" Bit="10"/>
+        <Widget Name="qled_bit0_iac_132_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_53_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_22_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_72_Sideboard_Error2_2026_05_12_08_37_27" Bit="28"/>
+        <Widget Name="qled_bit7_temphvIGBTu_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="25"/>
+        <Widget Name="qled_bit7_temphvIGBTu_73_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit10_temphvMOSv_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="24"/>
+        <Widget Name="qled_bit7_temphvIGBTu_54_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_58_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_52_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit3_udhvp_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="18"/>
+        <Widget Name="qled_bit6_templvMOSv_161_Sideboard_Error2_2026_05_12_08_37_27" Bit="23"/>
+        <Widget Name="qled_bit7_temphvIGBTu_59_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_12_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_20_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_70_Sideboard_Error2_2026_05_12_08_37_27" Bit="26"/>
+        <Widget Name="qled_bit7_temphvIGBTu_55_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_60_Sideboard_Error2_2026_05_12_08_37_27" Bit="2"/>
+        <Widget Name="checkBox_42_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit4_udhvn_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="19"/>
+        <Widget Name="checkBox_49_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_131_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_52_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_15_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_625_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_39_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_46_Sideboard_Error2_2026_05_12_08_37_27" Bit="21"/>
+        <Widget Name="checkBox_35_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_41_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_44_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_647_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit0_iac_32_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_43_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_47_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_116_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_48_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_33_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_626_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit2_ihvt_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="16"/>
+        <Widget Name="qled_bit0_iac_11_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_16_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_36_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_646_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_37_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_38_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_50_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_51_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_40_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_27_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_34_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_55_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_56_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_57_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_53_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_58_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_54_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_136_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_119_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_24_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_7_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_30_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_36_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_7_Sideboard_Error2_2026_05_12_08_37_27" Bit="24"/>
+        <Widget Name="qled_bit0_iac_23_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_19_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_37_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_135_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_30_Sideboard_Error2_2026_05_12_08_37_27" Bit="1"/>
+        <Widget Name="checkBox_24_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_4_Sideboard_Error2_2026_05_12_08_37_27" Bit="27"/>
+        <Widget Name="qled_bit7_temphvIGBTu_9_Sideboard_Error2_2026_05_12_08_37_27" Bit="22"/>
+        <Widget Name="qled_bit7_temphvIGBTu_43_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_40_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_45_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_6_Sideboard_Error2_2026_05_12_08_37_27" Bit="25"/>
+        <Widget Name="qled_bit7_temphvIGBTu_5_Sideboard_Error2_2026_05_12_08_37_27" Bit="26"/>
+        <Widget Name="qled_bit0_iac_8_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_38_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_35_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_10_Sideboard_Error2_2026_05_12_08_37_27" Bit="21"/>
+        <Widget Name="qled_bit7_temphvIGBTu_29_Sideboard_Error2_2026_05_12_08_37_27" Bit="2"/>
+        <Widget Name="qled_bit7_temphvIGBTu_34_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_3_Sideboard_Error2_2026_05_12_08_37_27" Bit="28"/>
+        <Widget Name="qled_bit0_iac_120_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_100_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_8_Sideboard_Error2_2026_05_12_08_37_27" Bit="23"/>
+        <Widget Name="qled_bit7_temphvIGBTu_47_Sideboard_Error2_2026_05_12_08_37_27" Bit="13"/>
+        <Widget Name="qled_bit0_iac_124_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_1033_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_636_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit0_iac_36_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_1030_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_637_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1026_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1027_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1028_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1034_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_604_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_41_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_115_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_624_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit0_iac_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_140_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_932_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1029_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_931_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit0_iac_123_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_1_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_127_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_31_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_128_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_1031_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit14_ociac_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="14"/>
+        <Widget Name="label_1032_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_968_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_960_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_26_Sideboard_Error2_2026_05_12_08_37_27" Bit="5"/>
+        <Widget Name="checkBox_28_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_937_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_23_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_31_Sideboard_Error2_2026_05_12_08_37_27" Bit="1"/>
+        <Widget Name="label_946_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1024_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_948_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_950_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_963_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_938_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_966_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_961_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1020_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_967_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_952_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_955_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_964_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_965_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_936_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1018_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_962_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_46_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_1019_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_947_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_959_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1025_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1017_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_944_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_969_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_629_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_628_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit0_iac_35_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_9_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_4_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_6_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_19_Sideboard_Error2_2026_05_12_08_37_27" Bit="12"/>
+        <Widget Name="checkBox_3_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_953_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_21_Sideboard_Error2_2026_05_12_08_37_27" Bit="10"/>
+        <Widget Name="qled_bit7_temphvIGBTu_20_Sideboard_Error2_2026_05_12_08_37_27" Bit="11"/>
+        <Widget Name="qled_bit7_temphvIGBTu_18_Sideboard_Error2_2026_05_12_08_37_27" Bit="13"/>
+        <Widget Name="checkBox_7_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_27_Sideboard_Error2_2026_05_12_08_37_27" Bit="4"/>
+        <Widget Name="label_1022_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_1016_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_20_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_45_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_25_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_641_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_639_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_933_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="checkBox_8_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_templvMOSv_9_Sideboard_Error2_2026_05_12_08_37_27" Bit="21"/>
+        <Widget Name="checkBox_10_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_13_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit0_iac_4_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_640_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="qled_bit0_iac_3_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit15_ociaclem_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="15"/>
+        <Widget Name="qled_bit16_ocihvt_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="17"/>
+        <Widget Name="qled_bit5_uhvts_2_Sideboard_Error2_2026_05_12_08_37_27" Bit="20"/>
+        <Widget Name="qled_bit6_templvMOSv_168_Sideboard_Error2_2026_05_12_08_37_27" Bit="22"/>
+        <Widget Name="qled_bit7_temphvIGBTu_23_Sideboard_Error2_2026_05_12_08_37_27" Bit="8"/>
+        <Widget Name="qled_bit7_temphvIGBTu_32_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="checkBox_14_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="qled_bit7_temphvIGBTu_39_Sideboard_Error2_2026_05_12_08_37_27" Bit="0"/>
+        <Widget Name="label_943_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_942_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_941_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_599_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="label_644_Sideboard_Error2_2026_05_12_08_37_27" UserDefinedText="0"/>
+        <Widget Name="plotwidget_SpannugsquellenUI_2026_03_17_08_31_10" XLabel="t [s]" YLabel="Data" Xmin="-0.0333409" Xmax="0.633426" Ymin="-3.23871" Ymax="0.154224" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_SpannugsquellenUI_2026_03_17_08_31_10</Widget>
+        <Widget Name="plotwidget_2_SpannugsquellenUI_2026_03_17_08_31_10" XLabel="t [s]" YLabel="Data" Xmin="-0.0333418" Xmax="0.633425" Ymin="-2.022" Ymax="38.4368" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_2_SpannugsquellenUI_2026_03_17_08_31_10</Widget>
+        <Widget Name="plotwidget_3_SpannugsquellenUI_2026_03_17_08_31_10" XLabel="t [s]" YLabel="Data" Xmin="-0.03334" Xmax="0.633427" Ymin="48.8464" Ymax="49.5185" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_3_SpannugsquellenUI_2026_03_17_08_31_10</Widget>
+        <Widget Name="label_20_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="label_46_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="label_50_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="label_5_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="label_51_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="label_19_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="label_18_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="checkBox_2_SpannugsquellenUI_2026_03_17_08_31_10" Bit="0"/>
+        <Widget Name="checkBox_SpannugsquellenUI_2026_03_17_08_31_10" Bit="0"/>
+        <Widget Name="label_SpannugsquellenUI_2026_03_17_08_31_10" UserDefinedText="0"/>
+        <Widget Name="checkBox_3_SpannugsquellenUI_2026_03_17_08_31_10" Bit="0"/>
+        <Widget Name="qled_3_SpannugsquellenUI_2026_03_17_08_31_10" Bit="0"/>
+        <Widget Name="qled_2_SpannugsquellenUI_2026_03_17_08_31_10" Bit="0"/>
+        <Widget Name="qled_4_SpannugsquellenUI_2026_03_17_08_31_10" Bit="0"/>
+        <Widget Name="checkBox_4_SpannugsquellenUI_2026_03_17_08_31_10" Bit="0"/>
+        <Widget Name="label_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_4_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_3_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_2_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_8_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_11_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::Pmin</Widget>
+        <Widget Name="label_10_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_14_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::KiU</Widget>
+        <Widget Name="label_5_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_16_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::P_lim</Widget>
+        <Widget Name="label_6_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_12_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::Physt</Widget>
+        <Widget Name="label_9_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_15_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::Pff</Widget>
+        <Widget Name="label_7_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_13_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::KpU</Widget>
+        <Widget Name="label_18_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::Ulim</Widget>
+        <Widget Name="label_22_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="qbled_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="label_23_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_19_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::Ksym</Widget>
+        <Widget Name="label_21_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_24_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_20_debug_2026_03_16_10_48_35" UserDefinedText="1">VoltageSource::Controlparameters::Isym</Widget>
+        <Widget Name="label_17_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="qbled_2_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_12_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_3_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_6_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_9_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="label_26_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="qbled_5_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_4_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_10_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_8_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_11_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="qbled_7_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="label_25_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_35_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_33_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_34_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_29_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_31_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_30_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_28_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_27_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_32_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="label_36_debug_2026_03_16_10_48_35" UserDefinedText="0"/>
+        <Widget Name="checkBox_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_2_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_3_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_4_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_5_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_6_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_7_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_8_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_9_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_10_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_11_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="checkBox_12_debug_2026_03_16_10_48_35" Bit="0"/>
+        <Widget Name="plotwidget_Overview_2025_11_07_14_33_19" XLabel="t [s]" YLabel="Data" Xmin="-0.0333403" Xmax="0.633427" Ymin="-0.119693" Ymax="0.103361" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_Overview_2025_11_07_14_33_19</Widget>
+        <Widget Name="plotwidget_4_Overview_2025_11_07_14_33_19" XLabel="t [s]" YLabel="Data" Xmin="-0.03334" Xmax="0.633427" Ymin="-58.3865" Ymax="86.8728" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_4_Overview_2025_11_07_14_33_19</Widget>
+        <Widget Name="plotwidget_6_Overview_2025_11_07_14_33_19" XLabel="t [s]" YLabel="Data" Xmin="-0.0333403" Xmax="0.633427" Ymin="-58.3865" Ymax="86.8728" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_6_Overview_2025_11_07_14_33_19</Widget>
+        <Widget Name="plotwidget_7_Overview_2025_11_07_14_33_19" XLabel="t [s]" YLabel="Data" Xmin="-0.0333404" Xmax="0.633427" Ymin="14.0216" Ymax="14.6936" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_7_Overview_2025_11_07_14_33_19</Widget>
+        <Widget Name="label_18_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_19_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_5_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_20_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_46_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_52_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_621_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_567_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_575_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="checkBox_6_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="qled_5_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="qbled_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="qbled_2_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="qbled_3_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="qbled_4_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="label_571_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_578_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_574_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_570_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_569_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_566_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="checkBox_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="label_3_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_594_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_596_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="cB_Error_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="cB_LVready_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="cB_Precharge_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="cB_HVready_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="cB_Ready2Pulse_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="cB_Operation_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="cB_SendFaultRecorder_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="cB_WaitForDischarge_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="statePrecharge_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="stateOperation_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="stateReady2Pulse_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="stateSendFaultRecorder_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="stateWaitForDischarge_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="stateError_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="stateLVready_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="stateHVReady_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_30_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_hv_mosfet_u</Widget>
+        <Widget Name="label_26_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_hv_igbt_u</Widget>
+        <Widget Name="label_31_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_hv_mosfet_v</Widget>
+        <Widget Name="label_24_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_lv_aux_2</Widget>
+        <Widget Name="label_33_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">:temp_lv_mosfet_v</Widget>
+        <Widget Name="label_29_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_hv_igbt_v</Widget>
+        <Widget Name="label_28_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_hv_air</Widget>
+        <Widget Name="label_25_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_lv_mosfet_u</Widget>
+        <Widget Name="label_27_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_lv_air</Widget>
+        <Widget Name="label_32_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">temp_lv_aux_1</Widget>
+        <Widget Name="label_2_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">VoltageSource::IBS_Output_Data::combinded_states</Widget>
+        <Widget Name="label_6_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">VoltageSource::IBS_INPUT_DATA::DAB_ff_percent</Widget>
+        <Widget Name="checkBox_2_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="label_12_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="label_8_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">VoltageSource::IBS_INPUT_DATA::U_HV</Widget>
+        <Widget Name="label_9_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">VoltageSource::IBS_INPUT_DATA::f_HV</Widget>
+        <Widget Name="qled_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="label_7_Mainboard_2024_11_27_13_03_44" UserDefinedText="1">VoltageSource::ParamACControl::L</Widget>
+        <Widget Name="label_11_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="qled_2_Mainboard_2024_11_27_13_03_44" Bit="0"/>
+        <Widget Name="label_4_Mainboard_2024_11_27_13_03_44" UserDefinedText="0"/>
+        <Widget Name="Plot#3" XLabel="t [s]" YLabel="Data" Xmin="-0.1998" Xmax="0.8001" Ymin="-4.18056" Ymax="3.67787" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#3</Widget>
+        <Widget Name="Plot#6" XLabel="t [s]" YLabel="Data" Xmin="-0.0333401" Xmax="0.633426" Ymin="3.95006" Ymax="4.43833" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#6</Widget>
+        <Widget Name="Plot#11" XLabel="t [s]" YLabel="Data" Xmin="-0.0333413" Xmax="0.633426" Ymin="-14.5714" Ymax="12.9639" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#11</Widget>
+        <Widget Name="Plot#1" XLabel="t [s]" YLabel="Data" Xmin="-0.0333414" Xmax="0.633425" Ymin="-7920" Ymax="7920" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#1</Widget>
+        <Widget Name="Plot#5" XLabel="t [s]" YLabel="Data" Xmin="-0.0333403" Xmax="0.633427" Ymin="-1.27231" Ymax="26.7184" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#5</Widget>
+        <Widget Name="Plot#9" XLabel="t [s]" YLabel="Data" Xmin="-0.0333399" Xmax="0.633426" Ymin="50.2506" Ymax="51.2026" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#9</Widget>
+        <Widget Name="Plot#10" XLabel="t [s]" YLabel="Data" Xmin="-0.0333413" Xmax="0.633426" Ymin="1.8" Ymax="2.2" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#10</Widget>
+        <Widget Name="Plot#2" XLabel="t [s]" YLabel="Data" Xmin="-0.0333401" Xmax="0.633427" Ymin="6.03608" Ymax="15.1998" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#2</Widget>
+        <Widget Name="Plot#8" XLabel="t [s]" YLabel="Data" Xmin="-0.0333401" Xmax="0.633427" Ymin="-58.3865" Ymax="86.8728" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#8</Widget>
+        <Widget Name="Plot#7" XLabel="t [s]" YLabel="Data" Xmin="-0.0333404" Xmax="0.633426" Ymin="50.2506" Ymax="51.2026" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#7</Widget>
+        <Widget Name="Plot#12" XLabel="t [s]" YLabel="Data" Xmin="-0.0333398" Xmax="0.633427" Ymin="47.8449" Ymax="112.97" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#12</Widget>
+    </Widgets>
+    <Connections>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::BufferShift" Type="Parameter" DataType="uint32_t">VoltageSource::BufferTrigger::BufferShift</ID>
+            <ObjectName>lineEdit_20_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>lineEdit_20_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::BufferSize" Type="Parameter" DataType="uint32_t">VoltageSource::BufferTrigger::BufferSize</ID>
+            <ObjectName>lineEdit_21_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>lineEdit_21_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::ErrorTriggerMode" Type="Parameter" DataType="GuiSelection">VoltageSource::BufferTrigger::ErrorTriggerMode</ID>
+            <ObjectName>comboBox_18_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>comboBox_17_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::ErrorTriggerSignal" Type="Parameter" DataType="QStringList">VoltageSource::BufferTrigger::ErrorTriggerSignal</ID>
+            <ObjectName>listView_8_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>listView_10_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerLevel" Type="Parameter" DataType="double">VoltageSource::BufferTrigger::TriggerLevel</ID>
+            <ObjectName>lineEdit_10_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>lineEdit_22_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerMode" Type="Parameter" DataType="GuiSelection">VoltageSource::BufferTrigger::TriggerMode</ID>
+            <ObjectName>comboBox_9_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>comboBox_9_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerSignal" Type="Parameter" DataType="QStringList">VoltageSource::BufferTrigger::TriggerSignal</ID>
+            <ObjectName>listView_7_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>listView_6_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerType" Type="Parameter" DataType="GuiSelection">VoltageSource::BufferTrigger::TriggerType</ID>
+            <ObjectName>comboBox_10_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>comboBox_10_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Controlparameters::Usoll" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Controlparameters::Usoll</ID>
+            <ObjectName>plotwidget_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::N_Dabs_active" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::N_Dabs_active</ID>
+            <ObjectName>Plot#10</ObjectName>
+            <ObjectName>Plot#7</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::P::0" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::P::0</ID>
+            <ObjectName>Plot#1</ObjectName>
+            <ObjectName>Plot#9</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::P::1" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::P::1</ID>
+            <ObjectName>Plot#1</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::UcHV::0" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::UcHV::0</ID>
+            <ObjectName>Plot#6</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::UcHV::1" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::UcHV::1</ID>
+            <ObjectName>Plot#6</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::iDC" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::iDC</ID>
+            <ObjectName>plotwidget_Overview_2025_11_07_14_33_19</ObjectName>
+            <ObjectName>plotwidget_2_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::iLV::0" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::iLV::0</ID>
+            <ObjectName>Plot#11</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::iLV::1" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::iLV::1</ID>
+            <ObjectName>Plot#11</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::phi::0" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::phi::0</ID>
+            <ObjectName>Plot#5</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::phi::1" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Overview::phi::1</ID>
+            <ObjectName>Plot#5</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Powers::CtrlPower" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Powers::CtrlPower</ID>
+            <ObjectName>Plot#8</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Powers::FeedForwardPower" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Powers::FeedForwardPower</ID>
+            <ObjectName>Plot#8</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::0" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::0</ID>
+            <ObjectName>plotwidget_4_Overview_2025_11_07_14_33_19</ObjectName>
+            <ObjectName>plotwidget_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+            <ObjectName>Plot#12</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::1" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::1</ID>
+            <ObjectName>plotwidget_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Sensor_Data_Cell1::ilvdc" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell1::ilvdc</ID>
+            <ObjectName>plotwidget_6_Overview_2025_11_07_14_33_19</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Sensor_Data_Cell1::udhvn" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell1::udhvn</ID>
+            <ObjectName>Plot#2</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Sensor_Data_Cell1::udhvp" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell1::udhvp</ID>
+            <ObjectName>Plot#2</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="u_LV_DC_1" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell1::udlv</ID>
+            <ObjectName>Plot#3</ObjectName>
+            <ObjectName>plotwidget_7_Overview_2025_11_07_14_33_19</ObjectName>
+            <ObjectName>plotwidget_3_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Sensor_Data_Cell2::ilvdc" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell2::ilvdc</ID>
+            <ObjectName>plotwidget_6_Overview_2025_11_07_14_33_19</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Sensor_Data_Cell2::udhvn" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell2::udhvn</ID>
+            <ObjectName>Plot#2</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Sensor_Data_Cell2::udhvp" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell2::udhvp</ID>
+            <ObjectName>Plot#2</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="u_LV_DC_2" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell2::udlv</ID>
+            <ObjectName>Plot#3</ObjectName>
+            <ObjectName>plotwidget_7_Overview_2025_11_07_14_33_19</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::EnaOutput" Type="Parameter" DataType="bool">VoltageSource::Controlparameters::EnaOutput</ID>
+            <ObjectName>checkBox_2_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>checkBox_2_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+            <ObjectName>qled_2_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Isym" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Isym</ID>
+            <ObjectName>lineEdit_20_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::KiU" Type="Parameter" DataType="double">VoltageSource::Controlparameters::KiU</ID>
+            <ObjectName>lineEdit_13_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::KpU" Type="Parameter" DataType="double">VoltageSource::Controlparameters::KpU</ID>
+            <ObjectName>lineEdit_12_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Ksym" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Ksym</ID>
+            <ObjectName>lineEdit_19_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Off" Type="Parameter" DataType="bool">VoltageSource::Controlparameters::Off</ID>
+            <ObjectName>checkBox_5_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>checkBox_4_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::P_lim" Type="Parameter" DataType="double">VoltageSource::Controlparameters::P_lim</ID>
+            <ObjectName>lineEdit_17_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>lineEdit_14_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>lineEdit_25_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Pff" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Pff</ID>
+            <ObjectName>lineEdit_16_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>lineEdit_22_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Physt" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Physt</ID>
+            <ObjectName>lineEdit_11_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Pmin" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Pmin</ID>
+            <ObjectName>lineEdit_10_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Psym" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Psym</ID>
+            <ObjectName>lineEdit_21_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::ResetError" Type="Parameter" DataType="bool">VoltageSource::Controlparameters::ResetError</ID>
+            <ObjectName>checkBox_3_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Symon" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Symon</ID>
+            <ObjectName>lineEdit_23_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Ulim" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Ulim</ID>
+            <ObjectName>lineEdit_18_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>lineEdit_24_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="750" Alias="VoltageSource::Controlparameters::Usoll" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Usoll</ID>
+            <ObjectName>lineEdit_4_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>horizontalSlider_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>lineEdit_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>lineEdit_23_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Vset" Type="Parameter" DataType="bool">VoltageSource::Controlparameters::Vset</ID>
+            <ObjectName>checkBox_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>qled_4_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::slewrate" Type="Parameter" DataType="double">VoltageSource::Controlparameters::slewrate</ID>
+            <ObjectName>lineEdit_24_debug_2026_03_16_10_48_35</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::ResetController" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::ResetController</ID>
+            <ObjectName>pushButton_4_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::ResetInterconnectError" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::ResetInterconnectError</ID>
+            <ObjectName>pushButton_3_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::ResetMaximumProtectionError" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::ResetMaximumProtectionError</ID>
+            <ObjectName>pushButton_5_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::bus_command" Type="Parameter" DataType="uint16_t">VoltageSource::IBS_INPUT_DATA::bus_command</ID>
+            <ObjectName>lineEdit_13_Mainboard_2024_11_27_13_03_44</ObjectName>
+            <ObjectName>lineEdit_15_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::bus_data_signed" Type="Parameter" DataType="int32_t">VoltageSource::IBS_INPUT_DATA::bus_data_signed</ID>
+            <ObjectName>lineEdit_14_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::bus_data_unsigned" Type="Parameter" DataType="uint32_t">VoltageSource::IBS_INPUT_DATA::bus_data_unsigned</ID>
+            <ObjectName>lineEdit_16_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::bus_send_signed" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::bus_send_signed</ID>
+            <ObjectName>pushButton_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::bus_send_unsigned" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::bus_send_unsigned</ID>
+            <ObjectName>pushButton_2_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::clc_command" Type="Parameter" DataType="uint16_t">VoltageSource::IBS_INPUT_DATA::clc_command</ID>
+            <ObjectName>lineEdit_17_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::poweron" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::poweron</ID>
+            <ObjectName>checkBox_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_Output_Data::ADC_Overload" Type="Data" DataType="bool">VoltageSource::IBS_Output_Data::ADC_Overload</ID>
+            <ObjectName>qbled_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_Output_Data::ControllerError" Type="Data" DataType="bool">VoltageSource::IBS_Output_Data::ControllerError</ID>
+            <ObjectName>qbled_2_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_Output_Data::combinded_states" Type="Data" DataType="int32_t">VoltageSource::IBS_Output_Data::combinded_states</ID>
+            <ObjectName>lineEdit_3_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_Output_Data::error" Type="Data" DataType="bool">VoltageSource::IBS_Output_Data::error</ID>
+            <ObjectName>qbled_5_debug_2026_03_16_10_48_35</ObjectName>
+            <ObjectName>qled_3_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::0" Type="Data" DataType="double">VoltageSource::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::0</ID>
+            <ObjectName>lcdNumber_17_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::MatlabScopes::DCDC_Ctrl::pHV" Type="Data" DataType="double">VoltageSource::MatlabScopes::DCDC_Ctrl::pHV</ID>
+            <ObjectName>lcdNumber_13_SpannugsquellenUI_2026_03_17_08_31_10</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::ParamACControl::ResetCurrentSensorError" Type="Parameter" DataType="bool">VoltageSource::ParamACControl::ResetCurrentSensorError</ID>
+            <ObjectName>pushButton_7_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::error_vector_hv" Type="Data" DataType="uint32_t">VoltageSource::Sensor_Data_Cell1::error_vector_hv</ID>
+            <ObjectName>qled_bit7_temphvIGBTu_30_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_29_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_28_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_27_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_26_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_25_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_24_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_23_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_22_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_21_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_20_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_19_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_18_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_15_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_13_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_12_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_11_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_7_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_6_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_5_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_4_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_3_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit0_iac_1_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_30_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_29_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_28_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_27_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_26_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_25_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_24_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_23_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_22_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_21_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_20_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_19_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_18_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_17_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_16_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_15_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_14_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_13_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_12_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_11_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_10_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_9_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_8_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_7_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_6_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_5_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_4_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_3_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::error_vector_lv" Type="Data" DataType="uint32_t">VoltageSource::Sensor_Data_Cell1::error_vector_lv</ID>
+            <ObjectName>qled_bit1_ilvdc_1_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_29_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_46_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_48_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_49_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_51_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_52_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_54_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_55_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_57_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_58_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_60_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit15_oc_ilvt_1_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_61_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_63_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_67_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_69_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_5_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_5_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_1_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_29_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_45_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_43_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_46_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_48_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_49_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_51_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_52_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_54_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_55_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_57_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_58_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_60_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit15_oc_ilvt_1_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_61_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_63_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_64_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_66_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_67_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_69_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_71_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_77_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_80_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_83_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::state_machine_state_lv" Type="Data" DataType="uint8_t">VoltageSource::Sensor_Data_Cell1::state_machine_state_lv</ID>
+            <ObjectName>lcdNumber_Sideboard_Error_2024_11_27_13_05_36</ObjectName>
+            <ObjectName>lcdNumber_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>lcdNumber_7_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>lcdNumber_8_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_hv_air" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_hv_air</ID>
+            <ObjectName>lcdNumber_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_hv_igbt_u" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_hv_igbt_u</ID>
+            <ObjectName>lcdNumber_2_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_hv_igbt_v" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_hv_igbt_v</ID>
+            <ObjectName>lcdNumber_4_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_hv_mosfet_u" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_hv_mosfet_u</ID>
+            <ObjectName>lcdNumber_5_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_hv_mosfet_v" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_hv_mosfet_v</ID>
+            <ObjectName>lcdNumber_6_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_lv_air" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_lv_air</ID>
+            <ObjectName>lcdNumber_12_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_lv_aux_1" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_lv_aux_1</ID>
+            <ObjectName>lcdNumber_7_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_lv_aux_2" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_lv_aux_2</ID>
+            <ObjectName>lcdNumber_8_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_lv_mosfet_u" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_lv_mosfet_u</ID>
+            <ObjectName>lcdNumber_9_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell1::temp_lv_mosfet_v" Type="Data" DataType="float">VoltageSource::Sensor_Data_Cell1::temp_lv_mosfet_v</ID>
+            <ObjectName>lcdNumber_10_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell2::error_vector_hv" Type="Data" DataType="uint32_t">VoltageSource::Sensor_Data_Cell2::error_vector_hv</ID>
+            <ObjectName>qled_bit0_iac_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_31_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_60_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_61_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_62_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_63_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_64_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_65_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_66_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_67_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_68_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_69_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_48_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_47_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit14_ociac_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit15_ociaclem_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit2_ihvt_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit16_ocihvt_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit3_udhvp_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit4_udhvn_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit5_uhvts_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_templvMOSv_9_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit6_templvMOSv_168_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit6_templvMOSv_161_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit10_temphvMOSv_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_70_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_71_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit7_temphvIGBTu_72_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell2::error_vector_lv" Type="Data" DataType="uint32_t">VoltageSource::Sensor_Data_Cell2::error_vector_lv</ID>
+            <ObjectName>qled_bit1_ilvdc_6_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_30_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_40_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_42_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_91_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_90_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_89_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_88_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_87_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_86_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_85_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_82_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_81_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_79_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit15_oc_ilvt_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_78_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_76_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_75_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_73_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_72_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_70_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_74_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_84_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_126_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+            <ObjectName>qled_bit1_ilvdc_127_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Sensor_Data_Cell2::state_machine_state_lv" Type="Data" DataType="uint8_t">VoltageSource::Sensor_Data_Cell2::state_machine_state_lv</ID>
+            <ObjectName>lcdNumber_2_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::stateError" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::stateError</ID>
+            <ObjectName>cB_Error_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::stateHVReady" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::stateHVReady</ID>
+            <ObjectName>cB_HVready_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::stateLVReady" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::stateLVReady</ID>
+            <ObjectName>cB_LVready_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::stateOperation" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::stateOperation</ID>
+            <ObjectName>cB_Operation_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::statePrecharge" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::statePrecharge</ID>
+            <ObjectName>cB_Precharge_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::stateReady2Pulse" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::stateReady2Pulse</ID>
+            <ObjectName>cB_Ready2Pulse_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::stateSendFaultRecorder" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::stateSendFaultRecorder</ID>
+            <ObjectName>cB_SendFaultRecorder_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::State_Machine_Checkboxes::stateWaitForDischarge" Type="Data" DataType="bool">VoltageSource::State_Machine_Checkboxes::stateWaitForDischarge</ID>
+            <ObjectName>cB_WaitForDischarge_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Status::CPULoad" Type="Data" DataType="float">VoltageSource::Status::CPULoad</ID>
+            <ObjectName>progressBar_Mainboard_2024_11_27_13_03_44</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::error_handling::disable_error_HV" Type="Parameter" DataType="uint32_t">VoltageSource::error_handling::disable_error_HV</ID>
+            <ObjectName>checkBox_46_Sideboard_Error2_2026_05_12_08_37_27</ObjectName>
+        </connect>
+    </Connections>
+    <State>AAAA/wAAAAD9AAAAAgAAAAAAAAUkAAADhvwCAAAAEvsAAAAsAFUASQBfADIAMAAyADQAXwAxADAAXwAyADQAXwAxADAAXwAxADgAXwAwADQAAAAAXQAAA/4AAAAAAAAAAPsAAABOAFMAdABhAHQAdQBzAF8ARABhAHMAaABiAG8AYQByAGQAXwBWADQAXwAyADAAMgA0AF8AMQAwAF8AMgA0AF8AMQAwAF8AMQA4AF8AMgAxAQAAAF0AAAP+AAAAAAAAAAD7AAAATgBTAHQAYQB0AHUAcwBfAEQAYQBzAGgAYgBvAGEAcgBkAF8AVgA0AF8AMgAwADIANABfADEAMABfADIANABfADEAMABfADMAMwBfADIANwAAAABdAAADhgAAAAAAAAAA/AAAAF0AAAP+AAAAAAD////6AAAAAAIAAAAF+wAAAE4AUwB0AGEAdAB1AHMAXwBEAGEAcwBoAGIAbwBhAHIAZABfAFYANABfADIAMAAyADQAXwAxADAAXwAyADQAXwAxADAAXwA0ADcAXwAzADQAAAAAAP////8AAAAAAAAAAPsAAABSAFAAbABvAHQAcwBfAEwAVgBfAHUAbgBkAF8ASABWAF8AWgBlAGwAbABlAF8AMgAwADIANABfADEAMABfADIANABfADEANgBfADEAMgBfADAANgAAAAAA/////wAAAAAAAAAA+wAAAFIAUABsAG8AdABzAF8ATABWAF8AdQBuAGQAXwBIAFYAXwBaAGUAbABsAGUAXwAyADAAMgA0AF8AMQAwAF8AMgA1AF8AMQAwAF8ANQAxAF8AMwA1AAAAAAD/////AAAAAAAAAAD7AAAARgBiAHUAZgBmAGUAcgB0AHIAaQBnAGcAZQByAHUAaQBfADIAMAAyADQAXwAxADEAXwAwADUAXwAxADQAXwAwADgAXwAzADkAAAAAAP////8AAAAAAAAAAPsAAABOAFMAdABhAHQAdQBzAF8ARABhAHMAaABiAG8AYQByAGQAXwBWADQAXwAyADAAMgA0AF8AMQAxAF8AMQA5AF8AMQA2AF8AMwAwAF8ANAAzAAAAAAD/////AAAAAAAAAAD7AAAATgBTAHQAYQB0AHUAcwBfAEQAYQBzAGgAYgBvAGEAcgBkAF8AVgA2AF8AMgAwADIANABfADEAMQBfADIANwBfADAAOQBfADIAOQBfADUANgAAAABdAAAD/gAAAAAAAAAA/AAAAF0AAAOGAAAAAAD////6AAAAAAIAAAAC+wAAAEYARQByAHIAbwByAF8ARABhAHMAaABiAG8AYQByAGQAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMAA5AF8ANAAwAF8AMQA4AAAAAAD/////AAAAAAAAAAD7AAAATgBTAHQAYQB0AHUAcwBfAEQAYQBzAGgAYgBvAGEAcgBkAF8AVgA2AF8AMgAwADIANABfADEAMQBfADIANwBfADAAOQBfADQANQBfADAAMgAAAAAA/////wAAAAAAAAAA+wAAAEYARQByAHIAbwByAF8ARABhAHMAaABiAG8AYQByAGQAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAwAF8AMAA0AF8AMgAxAgAAB4AAAAAXAAAHgAAAA/n8AAAAXQAAA4YAAAAAAP////oAAAAAAgAAAAL7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAwAF8AMwA4AF8AMgA5AAAAAAD/////AAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAwAF8ANAAwAF8AMQAxAAAAAAD/////AAAAAAAAAAD8AAAAXQAAA4YAAAAAAP////oAAAAAAgAAAAL7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAwAF8ANAAwAF8AMgA3AAAAAAD/////AAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAwAF8ANAAxAF8AMgAxAAAAAAD/////AAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAwAF8ANQA1AF8AMQAzAAAAAF0AAAOGAAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAwAF8ANQA5AF8ANAA0AAAAAF0AAAOGAAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8AMAAxAF8AMAA1AAAAAF0AAAOGAAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8AMAA5AF8ANQAyAAAAAF0AAAOGAAAAAAAAAAD8AAAAXQAAA4YAAAAAAP////oAAAAAAgAAAAP7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8AMQAwAF8AMwAzAAAAAAD/////AAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8AMQAxAF8AMQAwAAAAAAD/////AAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8AMQAzAF8AMgA2AAAAAAD/////AAAAAAAAAAD8AAAAXQAAA4YAAAAAAP////oAAAAAAgAAAAL7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8AMQAzAF8AMwA1AAAAAAD/////AAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADEAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8AMQA0AF8AMQA2AAAAAAD/////AAAAAAAAAAD7AAAAUABFAHIAcgBvAHIAXwBEAGEAcwBoAGIAbwBhAHIAZAAgAHQAcgB5ADIAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAxAF8ANQA1AF8AMQAzAAAAAF0AAAOGAAAAAAAAAAD8AAAAXQAAA4YAAAAAAP////oAAAAAAgAAAAX7AAAATgBTAHQAYQB0AHUAcwBfAEQAYQBzAGgAYgBvAGEAcgBkAF8AVgA2AF8AMgAwADIANABfADEAMQBfADIANwBfADEAMgBfADIANwBfADAAOQAAAAAA/////wAAAAAAAAAA+wAAAFAARQByAHIAbwByAF8ARABhAHMAaABiAG8AYQByAGQAIAB0AHIAeQAyAF8AMgAwADIANABfADEAMQBfADIANwBfADEAMgBfADEAMQBfADAAMgIAAAEJAAAAWQAAAu0AAANr+wAAAE4AUwB0AGEAdAB1AHMAXwBEAGEAcwBoAGIAbwBhAHIAZABfAFYANgBfADIAMAAyADQAXwAxADEAXwAyADcAXwAxADIAXwAyADMAXwA1ADUAAAAAAP////8AAAAAAAAAAPsAAABQAEUAcgByAG8AcgBfAEQAYQBzAGgAYgBvAGEAcgBkACAAdAByAHkAMgBfADIAMAAyADQAXwAxADEAXwAyADcAXwAxADIAXwA1ADcAXwAxADQAAAAAAP////8AAAAAAAAAAPsAAABQAEUAcgByAG8AcgBfAEQAYQBzAGgAYgBvAGEAcgBkACAAdAByAHkAMgBfADIAMAAyADQAXwAxADEAXwAyADcAXwAxADIAXwA1ADgAXwAwADkAAAAAAP////8AAAAAAAAAAPwAAABdAAADhgAAAHEA////+gAAAAcCAAAACPsAAAA6AE0AYQBpAG4AYgBvAGEAcgBkAF8AMgAwADIANABfADEAMQBfADIANwBfADEAMwBfADAAMwBfADQANAEAAAAA/////wAAAF4A////+wAAAEYAUwBpAGQAZQBiAG8AYQByAGQAXwBFAHIAcgBvAHIAXwAyADAAMgA0AF8AMQAxAF8AMgA3AF8AMQAzAF8AMAA1AF8AMwA2AQAAAAD/////AAAAXgD////7AAAARgBTAHkAcwB0AGUAbQBzAHQAZQB1AGUAcgB1AG4AZwBfADIAMAAyADQAXwAxADIAXwAwADQAXwAxADMAXwAwADEAXwAxADYBAAAAAP////8AAAAAAAAAAPsAAAA4AE8AdgBlAHIAdgBpAGUAdwBfADIAMAAyADQAXwAxADIAXwAwADUAXwAxADAAXwA1ADEAXwA0ADECAAAIOP///HQAAAXhAAADc/sAAAA4AE8AdgBlAHIAdgBpAGUAdwBfADIAMAAyADUAXwAxADEAXwAwADcAXwAxADQAXwAzADMAXwAxADkBAAAAAP////8AAABeAP////sAAAAyAGQAZQBiAHUAZwBfADIAMAAyADYAXwAwADMAXwAxADYAXwAxADAAXwA0ADgAXwAzADUBAAAAAP////8AAABeAP////sAAABKAFMAcABhAG4AbgB1AGcAcwBxAHUAZQBsAGwAZQBuAFUASQBfADIAMAAyADYAXwAwADMAXwAxADcAXwAwADgAXwAzADEAXwAxADABAAAAAP////8AAABeAP////sAAABIAFMAaQBkAGUAYgBvAGEAcgBkAF8ARQByAHIAbwByADIAXwAyADAAMgA2AF8AMAA1AF8AMQAyAF8AMAA4AF8AMwA3AF8AMgA3AQAAAAD/////AAAAXgD///8AAAABAAACWAAAA4b8AgAAAAH8AAAAXQAAA4YAAACIAP////oAAAABAgAAAAT7AAAAGgBQAGEAcgBhAG0AZQB0AGUAcgBEAG8AYwBrAQAAAAD/////AAAAdQD////7AAAAEABEAGEAdABhAEQAbwBjAGsBAAAAAP////8AAAB1AP////sAAAASAFMAdABhAHQAZQBEAG8AYwBrAQAAAAD/////AAAAdQD////7AAAAFABPAHUAdABwAHUAdABEAG8AYwBrAQAAAAD/////AAAAdQD///8AAAAAAAADhgAAAAQAAAAEAAAACAAAAAj8AAAAAQAAAAIAAAABAAAADgB0AG8AbwBsAEIAYQByAQAAAAD/////AAAAAAAAAAA=</State>
+</Experiment>

@@ -506,3 +506,17 @@ and private load/save/dirty fields remain explicitly out of scope.
 Rollback is local: restore the four former adapter-construction bodies in the
 facade and remove the private coordinator source from qmake targets. No public
 API, Qt metaobject method, signal, slot, plugin IID or InterfaceData ABI moved.
+
+## Legacy experiment XML evidence
+
+`XML_LEGACY_001..XML_LEGACY_005` now anchor later XML delegation work with
+three anonymized external experiment structures, their relative device-file
+paths and the existing XML-to-plugin integration boundary. Any future
+experiment XML delegation must preserve their observed missing-form and
+missing-plugin handling, parser return values, and temporary compatible-plugin
+replacement path. This evidence does not authorize a migration of proprietary
+plugin `CustomData`, UI reconstruction, network configuration or path/CWD
+semantics.
+
+The XML suite (15 checks) and central 12-project runner passed on 2026-08-10
+after adding this evidence; no coordinator or production behavior changed.

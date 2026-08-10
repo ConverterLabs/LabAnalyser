@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Experiment>
+    <Tabs>
+        <Form Name="SpannugsquellenUI_2026_03_16_09_17_18">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/SpannugsquellenUI.ui</AbsPath>
+            <RelPath>SpannugsquellenUI.ui</RelPath>
+        </Form>
+        <Form Name="debug_2026_03_16_09_17_21">
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/debug.ui</AbsPath>
+            <RelPath>debug.ui</RelPath>
+        </Form>
+    </Tabs>
+    <Devices>
+        <Device>
+            <AbsPath>C:/Users/legacy-user/LegacyProject/LegacyExperiment/Device_legacy-a.LAdev</AbsPath>
+            <RelPath>Device_legacy-a.LAdev</RelPath>
+        </Device>
+    </Devices>
+    <FigureWindows>
+        <Window Rows="1" Cols="1" PosX="2634" PosY="-817" Width="600" Height="400">
+            <PlotWidgetName>Plot#1</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2440" PosY="-798" Width="600" Height="400">
+            <PlotWidgetName>Plot#3</PlotWidgetName>
+        </Window>
+        <Window Rows="1" Cols="1" PosX="2579" PosY="-806" Width="600" Height="400">
+            <PlotWidgetName>Plot#4</PlotWidgetName>
+        </Window>
+    </FigureWindows>
+    <Widgets>
+        <Widget Name="plotwidget_SpannugsquellenUI_2026_03_16_09_17_18" XLabel="t [s]" YLabel="Data" Xmin="0" Xmax="0.166918" Ymin="-0.0581288" Ymax="0.173524" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_SpannugsquellenUI_2026_03_16_09_17_18</Widget>
+        <Widget Name="plotwidget_2_SpannugsquellenUI_2026_03_16_09_17_18" XLabel="t [s]" YLabel="Data" Xmin="0" Xmax="0.166916" Ymin="0.253205" Ymax="0.323718" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_2_SpannugsquellenUI_2026_03_16_09_17_18</Widget>
+        <Widget Name="plotwidget_3_SpannugsquellenUI_2026_03_16_09_17_18" XLabel="t [s]" YLabel="Data" Xmin="0" Xmax="0.166918" Ymin="48.8464" Ymax="49.5185" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">plotwidget_3_SpannugsquellenUI_2026_03_16_09_17_18</Widget>
+        <Widget Name="label_20_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="label_46_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="label_50_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="label_5_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="label_51_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="label_19_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="label_18_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="checkBox_SpannugsquellenUI_2026_03_16_09_17_18" Bit="0"/>
+        <Widget Name="qled_2_SpannugsquellenUI_2026_03_16_09_17_18" Bit="0"/>
+        <Widget Name="checkBox_2_SpannugsquellenUI_2026_03_16_09_17_18" Bit="0"/>
+        <Widget Name="label_SpannugsquellenUI_2026_03_16_09_17_18" UserDefinedText="0"/>
+        <Widget Name="qled_3_SpannugsquellenUI_2026_03_16_09_17_18" Bit="0"/>
+        <Widget Name="checkBox_3_SpannugsquellenUI_2026_03_16_09_17_18" Bit="0"/>
+        <Widget Name="qled_4_SpannugsquellenUI_2026_03_16_09_17_18" Bit="0"/>
+        <Widget Name="label_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_4_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_3_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_2_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_8_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_11_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_10_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_14_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_5_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_16_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_6_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_12_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_9_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_15_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_7_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_13_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_18_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_22_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="qbled_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="label_23_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_19_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_21_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_24_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_20_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_17_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="qbled_2_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_12_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_3_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_6_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_9_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="label_26_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="qbled_5_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_4_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_10_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_8_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_11_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="qbled_7_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="label_25_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_35_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_33_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_34_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_29_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_31_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_30_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_28_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_27_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_32_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="label_36_debug_2026_03_16_09_17_21" UserDefinedText="0"/>
+        <Widget Name="checkBox_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_2_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_3_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_4_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_5_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_6_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_7_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_8_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_9_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_10_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_11_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="checkBox_12_debug_2026_03_16_09_17_21" Bit="0"/>
+        <Widget Name="Plot#1" XLabel="t [s]" YLabel="Data" Xmin="0" Xmax="0.166918" Ymin="0.9" Ymax="1.1" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#1</Widget>
+        <Widget Name="Plot#3" XLabel="t [s]" YLabel="Data" Xmin="0" Xmax="0.166916" Ymin="0.9" Ymax="1.1" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#3</Widget>
+        <Widget Name="Plot#4" XLabel="t [s]" YLabel="Data" Xmin="0" Xmax="0.166918" Ymin="0.9" Ymax="1.1" XYPlot="0" XYPlotZeroX="0" isFFT="0" XData="0">Plot#4</Widget>
+    </Widgets>
+    <Connections>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::BufferShift" Type="Parameter" DataType="uint32_t">VoltageSource::BufferTrigger::BufferShift</ID>
+            <ObjectName>lineEdit_20_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::BufferSize" Type="Parameter" DataType="uint32_t">VoltageSource::BufferTrigger::BufferSize</ID>
+            <ObjectName>lineEdit_21_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::ErrorTriggerMode" Type="Parameter" DataType="GuiSelection">VoltageSource::BufferTrigger::ErrorTriggerMode</ID>
+            <ObjectName>comboBox_17_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::ErrorTriggerSignal" Type="Parameter" DataType="QStringList">VoltageSource::BufferTrigger::ErrorTriggerSignal</ID>
+            <ObjectName>listView_10_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerLevel" Type="Parameter" DataType="double">VoltageSource::BufferTrigger::TriggerLevel</ID>
+            <ObjectName>lineEdit_22_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerMode" Type="Parameter" DataType="GuiSelection">VoltageSource::BufferTrigger::TriggerMode</ID>
+            <ObjectName>comboBox_9_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerSignal" Type="Parameter" DataType="QStringList">VoltageSource::BufferTrigger::TriggerSignal</ID>
+            <ObjectName>listView_6_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::BufferTrigger::TriggerType" Type="Parameter" DataType="GuiSelection">VoltageSource::BufferTrigger::TriggerType</ID>
+            <ObjectName>comboBox_10_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::IBS_Output_Data::combinded_states" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::IBS_Output_Data::combinded_states</ID>
+            <ObjectName>Plot#3</ObjectName>
+            <ObjectName>Plot#4</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::0" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::0</ID>
+            <ObjectName>plotwidget_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::1" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::MatlabScopes::DCDC_Ctrl::Spannungsregler::abw::Ch1::1</ID>
+            <ObjectName>plotwidget_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="ilvdc" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell1::ilvdc</ID>
+            <ObjectName>plotwidget_2_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Buffered::Sensor_Data_Cell1::state_machine_state_lv" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell1::state_machine_state_lv</ID>
+            <ObjectName>Plot#1</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="uDCLV" Type="Data" DataType="vector&lt;double&gt;">VoltageSource::Buffered::Sensor_Data_Cell1::udlv</ID>
+            <ObjectName>plotwidget_3_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::EnaOutput" Type="Parameter" DataType="bool">VoltageSource::Controlparameters::EnaOutput</ID>
+            <ObjectName>checkBox_2_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+            <ObjectName>qled_2_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::KiU" Type="Parameter" DataType="double">VoltageSource::Controlparameters::KiU</ID>
+            <ObjectName>lineEdit_17_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::KpU" Type="Parameter" DataType="double">VoltageSource::Controlparameters::KpU</ID>
+            <ObjectName>lineEdit_18_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="15000" Alias="VoltageSource::Controlparameters::P_lim" Type="Parameter" DataType="double">VoltageSource::Controlparameters::P_lim</ID>
+            <ObjectName>doubleSpinBox_25_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::ResetError" Type="Parameter" DataType="bool">VoltageSource::Controlparameters::ResetError</ID>
+            <ObjectName>checkBox_3_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="300" Alias="VoltageSource::Controlparameters::Ulim" Type="Parameter" DataType="double">VoltageSource::Controlparameters::Ulim</ID>
+            <ObjectName>doubleSpinBox_26_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::Controlparameters::Vset" Type="Parameter" DataType="bool">VoltageSource::Controlparameters::Vset</ID>
+            <ObjectName>checkBox_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+            <ObjectName>qled_4_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::ReleaseController" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::ReleaseController</ID>
+            <ObjectName>checkBox_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::ResetController" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::ResetController</ID>
+            <ObjectName>checkBox_2_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::ResetInterconnectError" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::ResetInterconnectError</ID>
+            <ObjectName>checkBox_3_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::ResetMaximumProtectionError" Type="Parameter" DataType="bool">VoltageSource::IBS_INPUT_DATA::ResetMaximumProtectionError</ID>
+            <ObjectName>checkBox_4_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_INPUT_DATA::clc_command" Type="Parameter" DataType="uint16_t">VoltageSource::IBS_INPUT_DATA::clc_command</ID>
+            <ObjectName>lineEdit_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::IBS_Output_Data::combinded_states" Type="Data" DataType="int32_t">VoltageSource::IBS_Output_Data::combinded_states</ID>
+            <ObjectName>lineEdit_12_debug_2026_03_16_09_17_21</ObjectName>
+            <ObjectName>lineEdit_2_debug_2026_03_16_09_17_21</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::MatlabScopes::DCDC_Ctrl::Overview::P::0" Type="Data" DataType="double">VoltageSource::MatlabScopes::DCDC_Ctrl::Overview::P::0</ID>
+            <ObjectName>lcdNumber_13_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+        <connect>
+            <ID Min="0" Max="0" Alias="VoltageSource::MatlabScopes::DCDC_Ctrl::Overview::UcHV" Type="Data" DataType="double">VoltageSource::MatlabScopes::DCDC_Ctrl::Overview::UcHV</ID>
+            <ObjectName>lcdNumber_17_SpannugsquellenUI_2026_03_16_09_17_18</ObjectName>
+        </connect>
+    </Connections>
+    <State>AAAA/wAAAAD9AAAAAgAAAAAAAAWZAAADhvwCAAAAAvsAAABKAFMAcABhAG4AbgB1AGcAcwBxAHUAZQBsAGwAZQBuAFUASQBfADIAMAAyADYAXwAwADMAXwAxADYAXwAwADgAXwA1ADAAXwA1ADAAAAAAXQAAA4YAAAAAAAAAAPwAAABdAAADhgAAAHEA////+gAAAAECAAAAAvsAAABKAFMAcABhAG4AbgB1AGcAcwBxAHUAZQBsAGwAZQBuAFUASQBfADIAMAAyADYAXwAwADMAXwAxADYAXwAwADkAXwAxADcAXwAxADgBAAAAAP////8AAABeAP////sAAAAyAGQAZQBiAHUAZwBfADIAMAAyADYAXwAwADMAXwAxADYAXwAwADkAXwAxADcAXwAyADEBAAAAAP////8AAABeAP///wAAAAEAAAHjAAADhvwCAAAAAfwAAABdAAADhgAAAIgA////+gAAAAECAAAABPsAAAAaAFAAYQByAGEAbQBlAHQAZQByAEQAbwBjAGsBAAAAAP////8AAAB1AP////sAAAAQAEQAYQB0AGEARABvAGMAawEAAAAA/////wAAAHUA////+wAAABIAUwB0AGEAdABlAEQAbwBjAGsBAAAAAP////8AAAB1AP////sAAAAUAE8AdQB0AHAAdQB0AEQAbwBjAGsBAAAAAP////8AAAB1AP///wAAAAAAAAOGAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAOAHQAbwBvAGwAQgBhAHIBAAAAAP////8AAAAAAAAAAA==</State>
+</Experiment>

@@ -9,10 +9,13 @@ their QObject parent chain and cast it to `MainWindow`; no test-only seam or
 replacement production header is used.
 
 Fixtures are intentionally tiny, UTF-8, deterministic and free of personal
-data, absolute paths and binaries. There were no checked-in `.LAexp` or other
-experiment XML examples to import or classify as non-sensitive. Relative form
-paths are copied into a `QTemporaryDir` during the test so committed fixtures
-never contain a machine path.
+data, absolute paths and binaries. Relative form paths are copied into a
+`QTemporaryDir` during the test so committed fixtures never contain a machine
+path. `fixtures/xml/legacy/` additionally contains three structurally faithful
+anonymized copies of externally supplied historic experiments and their two
+required device-descriptor sidecars. Their source hashes, fixture hashes,
+provenance, unversioned-format status and anonymization rules are in
+`tests/fixtures/xml/legacy/MANIFEST.md`.
 
 ## Function-to-test mapping
 
@@ -26,6 +29,11 @@ never contain a machine path.
 | XML_006 | `UIDataManagementSetClass::LoadExperiment`, `SaveExperiment` and reader/writer composition | Read → write preserves the semantic experiment root, form identity and data-reference ID. |
 | XML_007 | `UIDataManagementSetClass::SaveExperiment`, `LoadExperiment` | Caller retains the same inverted boolean error convention for writable, valid and absent paths. |
 | XML_008 | `xmlexperimentwriter::writeFigureWindows` | Real subplot window rows/columns and geometry are serialized. |
+| XML_LEGACY_001 | `XmlExperimentReader::read`, `readTab`, `LoadForm`, `readDevices`, `LoadDevice` | Smallest external historic fixture: missing UI and deliberately missing historic plugin yield the observed messages and parser error result without a crash; committed XML/device hashes remain unchanged. |
+| XML_LEGACY_002 | `XmlExperimentReader::LoadForm`, `LoadDevice` relative-path handling | External fixture with a two-parent relative path: the test recreates its relative hierarchy in `QTemporaryDir`, observes all missing-UI and missing-plugin messages, and records the error return without loading a proprietary dependency. |
+| XML_LEGACY_003 | `readExperiment`, figure/window and connection traversal | Largest external fixture reaches the reader without a crash; its observed parser-error and empty facade form/device/container state are asserted. |
+| XML_LEGACY_004 | reader/writer composition on external XML | The smallest fixture is read, written to a temporary file, and read again semantically. The first read reports the unresolved external dependency; the written partial state reads successfully with the same empty form/container state and canonical top-level section order. Byte equality is intentionally not asserted. |
+| XML_LEGACY_005 | XML reader -> `.LAdev` -> `UIDataManagementSetClass::LoadPlugin` boundary | A temporary copy alone replaces `DevicePlugin` with the runtime-built compatible fixture. The XML and committed descriptor hashes remain unchanged; the device is registered under the anonymized name and missing-form messages remain the only errors. |
 
 `CreateFigureWindows` and `CreateFigureWindow` are inspected but not executed
 with arbitrary fixture geometry: the implementation indexes the discovered
@@ -51,9 +59,13 @@ candidate, not a required behavior.
   committed or manufactured for characterization.
 - Deterministic OS-level permission-denied tests are not portable on Windows.
   Missing-file and nonexistent-parent paths cover stable open failures.
-- Loading actual historic user experiment files is unverified because no safe,
-  checked-in example exists. `legacy-complete.xml` is an implementation-derived
-  compatibility vector, not an external-file corpus.
+- The external corpus establishes XML structure, failure handling and the
+  replaceable XML-to-plugin boundary only. It does not establish compatibility
+  of the historic proprietary plugin, its network transport, or `CustomData`.
+- The fixture set intentionally contains no historical `.ui` files. Their
+  absence is verified as an expected external dependency rather than hidden by
+  synthetic substitutes. Full historical form/widget restoration therefore
+  remains unverified.
 
 ## Executed evidence
 
@@ -66,6 +78,8 @@ All commands below were run on 2026-08-03 with MSYS2 MINGW64, GCC 15.2 and Qt
 | Debug application | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration debug -BuildDir build\xml-3b-debug -Jobs 4` | PASS |
 | All local tests | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -Jobs 4` | PASS; 3 projects. XML suite: 10 Qt Test checks, 0 failures. |
 | XML coverage build/run | qmake `XmlExperimentContractTests.pro` with `QMAKE_CXXFLAGS+=--coverage QMAKE_LFLAGS+=--coverage`, then `mingw32-make -j1` and `XmlExperimentContractTests.exe -txt` | PASS. The earlier `uic.exe`/`rcc.exe` `-1073741511` event was later traced to a MiKTeX Qt DLL preceding MSYS2 on `PATH`, not a transient build failure. |
+| Legacy XML smoke suite | qmake build in `build\xml-legacy-smoke`, then `XmlExperimentContractTests.exe -txt` with `QT_QPA_PLATFORM=offscreen` and runtime plugin root | PASS on 2026-08-10: 15 passed, 0 failed. |
+| Central test runner | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Jobs 4` | PASS on 2026-08-10 (exit code 0): all 12 registered projects passed; the runner rebuilt the runtime plugin fixtures first. |
 
 ## Coverage by production file
 

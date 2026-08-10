@@ -122,6 +122,15 @@ test project uses the real application object hierarchy; it has no test-only
 seams, so it cannot affect production builds. Detailed mappings, fixture rules,
 defect candidates and exclusions are in `XML_CONTRACTS_3B.md`.
 
+`XML_LEGACY_001..XML_LEGACY_005` extend that mapping with three externally
+supplied, anonymized historic experiment structures. They verify the current
+reader's missing-form/missing-plugin boundary, temporary read/write/read of
+the smallest corpus member, and a temporary-only compatible-plugin
+substitution. They do not claim compatibility of the historical plugin or its
+custom data; absent historical UI files remain explicit external dependencies.
+The focused XML suite passed 15 checks and the 12-project central runner passed
+on 2026-08-10.
+
 ## Parameter XML 3C characterization
 
 `contract/ParameterContractTests` maps `PARAM_001` through `PARAM_009` to the

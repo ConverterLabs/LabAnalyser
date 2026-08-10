@@ -56,8 +56,10 @@ production baseline and exclusions; it is not a repository-wide gate.
    Milestone 3A characterized the DataManagement manager/set/messenger
    subsystem. Phase 3B characterizes LoadSave experiment XML with real
    MainWindow integration, deterministic fixtures and per-file coverage;
-   compatible plugin binaries, historic external experiment samples and
-   deterministic permission failures remain pending.
+   compatible plugin binaries and deterministic permission failures remain
+   pending. A small anonymized externally supplied experiment corpus is now
+   characterized, but full historical UI/plugin/custom-data compatibility is
+   still intentionally unverified.
 4. Isolate pure/core logic from GUI and infrastructure — pending.
 5. Ownership/lifetime, undefined behavior, error handling, and security hardening — pending.
 6. Build-system and dependency modernization — pending.
@@ -86,13 +88,21 @@ refactoring or coverage gate was introduced.
 ## Phase 3B completion
 
 LoadSave experiment XML is characterized by the real-application contract suite
-`XML_001` through `XML_008`. The suite is part of the documented qmake runner
+`XML_001` through `XML_008` and the anonymized external-corpus vectors
+`XML_LEGACY_001` through `XML_LEGACY_005`. The suite is part of the documented qmake runner
 and covers small valid/legacy-shaped fixtures, semantic read/write behavior,
 UTF-8, unknown and optional content, malformed/missing files, UI caller return
 conventions and figure-window serialization. No production code was changed and
-no coverage threshold was enabled. Binary plugin success, a safe corpus of
-historic user files, deterministic permission denial, and malformed figure
-window widget-count handling remain explicit follow-up risks.
+no coverage threshold was enabled. The legacy vectors preserve three real
+experiment structures, expected missing UI/plugin dependency handling and a
+temporary compatible-plugin replacement boundary. Proprietary plugin/custom
+data behavior, full historical UI restoration, deterministic permission denial,
+and malformed figure-window widget-count handling remain explicit follow-up
+risks.
+
+On 2026-08-10 the XML suite passed 15 checks and the full 12-project qmake
+runner passed after the three anonymized fixtures were added. No XML production
+code, plugin ABI, or coordinator delegation changed.
 
 ## Phase 3C status
 

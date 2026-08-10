@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LEDevice DevicePlugin = "HistoricalPluginMissing.dll" DeviceName = "LegacyDeviceA">
+ <Connection IP = "192.0.2.157" Device = "1" Core = "0" />
+</LEDevice>

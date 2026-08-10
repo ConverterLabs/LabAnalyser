@@ -232,7 +232,7 @@ try {
             $suiteQtQpaPlatform = $env:QT_QPA_PLATFORM
             $suiteRepositoryRoot = $env:LABANALYSER_TEST_REPOSITORY_ROOT
             try {
-                if ($testProject.Id -in @('integration/mainwindow/MainWindowIntegrationTests', 'contract/plotwidget/PlotWidgetContractTests', 'contract/projectio/ProjectIoFacadeContractTests')) {
+                if ($testProject.Id -in @('contract/XmlExperimentContractTests', 'integration/mainwindow/MainWindowIntegrationTests', 'contract/plotwidget/PlotWidgetContractTests', 'contract/projectio/ProjectIoFacadeContractTests')) {
                     $env:QT_QPA_PLATFORM = 'offscreen'
                     $env:LABANALYSER_TEST_REPOSITORY_ROOT = $repositoryRoot
                 }
