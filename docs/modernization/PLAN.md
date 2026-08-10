@@ -164,6 +164,18 @@ clean-runner result, unsafe malformed-frame exclusions and legacy behavior are
 documented in `REMOTE_CONTROL_CONTRACTS_3F.md`; no production protocol or
 dependency changed.
 
+## Phase 4H.1 Remote-control frame splitting
+
+**Completed 2026-08-10.** The first remote-control extraction delegates only
+raw complete-frame versus remainder splitting to the private, QObject-free
+`RemoteControlFrameSplitter`. `RemoteControlServer` remains the public
+transport facade and retains all byte decoding, map access, socket writes and
+Messenger emission. `TCP_001`–`TCP_007` remain unchanged; a focused partial
+remainder vector supplements the existing fragmentation/coalescing evidence.
+No command, encoding, string/list, Qt-connection, socket-lifetime or public
+API behavior was changed. Later 4H protocol decoding and connection-state
+slices remain planned in `REMOTE_CONTROL_REFACTOR_PLAN_4H.md`.
+
 ## Phase 3G status
 
 **Completed 2026-08-04.** The owner approved the minimal security behavior

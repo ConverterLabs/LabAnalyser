@@ -7,6 +7,7 @@
 #include <cstring>
 
 #include "RemoteControl/RemoteControlServer.h"
+#include "RemoteControl/RemoteControlFrameSplitter.h"
 
 Q_DECLARE_METATYPE(InterfaceData)
 
@@ -71,6 +72,7 @@ private slots:
     void TCP_005_fragmentationAndCoalescedFrames();
     void TCP_006_unknownCommandNullDataAndNoTimeoutReply();
     void TCP_007_disconnectRepeatedAndMultipleConnections();
+    void frameSplitterPreservesPartialRemainder();
 };
 
 void RemoteControlContractTests::initTestCase() { qRegisterMetaType<InterfaceData>("InterfaceData"); }
@@ -146,6 +148,23 @@ void RemoteControlContractTests::TCP_007_disconnectRepeatedAndMultipleConnection
     QTcpSocket* second = connectClient(server, this); second->write(frame("set", "value", f64(10.0))); QVERIFY(second->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 10.0); QCOMPARE(data["value"]->GetAsDouble(), 7.0);
     QTcpSocket* third = connectClient(server, this); third->write(frame("get", "value")); QVERIFY(third->waitForBytesWritten(1000)); const QByteArray reply = readReply(third, 13); QCOMPARE(readF64(reply, 5), 7.0);
     second->disconnectFromHost(); third->disconnectFromHost(); QTRY_COMPARE(second->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(third->state(), QAbstractSocket::UnconnectedState); clear(data);
+}
+
+void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {
+    const QByteArray first = frame("set", "one", f64(1.0));
+    const QByteArray second = frame("get", "two");
+    RemoteControlFrameSplitter splitter;
+    QByteArray extracted;
+
+    splitter.Append(first + second.left(7));
+    QVERIFY(splitter.TakeCompleteFrame(&extracted));
+    QCOMPARE(extracted, first);
+    QVERIFY(!splitter.TakeCompleteFrame(&extracted));
+
+    splitter.Append(second.mid(7));
+    QVERIFY(splitter.TakeCompleteFrame(&extracted));
+    QCOMPARE(extracted, second);
+    QVERIFY(!splitter.TakeCompleteFrame(&extracted));
 }
 
 QTEST_MAIN(RemoteControlContractTests)

@@ -227,3 +227,19 @@ command parsing, `InterfaceData` conversion, mapper access, socket writes and
 Messenger emission in `RemoteControlServer`.  This is the smallest reversible
 boundary with direct `TCP_005` protection and does not decide malformed-frame,
 socket-ownership, encoding, or legacy payload-defect semantics.
+
+## 4H.1 implementation record
+
+**Completed 2026-08-10.** `RemoteControlFrameSplitter` is a private value
+helper that stores only raw `QByteArray` input and separates a complete native
+size-prefixed frame from an incomplete remainder. It has no QObject, socket,
+Messenger, mapper, command, ID, type, or payload dependency. The server
+continues to decode the returned bytes, access the map, emit `MessageSender`
+and write replies. A focused remainder vector supplements `TCP_005` with one
+complete frame followed by a partial second frame and confirms that the latter
+is returned unchanged only after its remaining bytes arrive.
+
+The focused remote-control target and the incremental Release compile check
+passed. The server's public constructor, `GetPort`, `MessageSender` signal and
+private Qt slots were not changed. No string/list conversion, socket error
+connection, encoding, dispatch or ownership behavior was changed.

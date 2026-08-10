@@ -38,7 +38,7 @@ void RemoteControlServer::acceptConnection()
     // if(tcpServerConnection)
     //     tcpServerConnection->close();
     tcpServerConnection = tcpServer.nextPendingConnection();
-    DataBuffer.clear();
+    FrameSplitter.Clear();
 
     connect(tcpServerConnection, SIGNAL(readyRead()),
             this, SLOT(HeaderReceived()));
@@ -50,23 +50,11 @@ void RemoteControlServer::HeaderReceived()
 {
     while (tcpServerConnection->bytesAvailable())
     {
-        DataBuffer = DataBuffer.append(tcpServerConnection->readAll());
-        uint32_t DataSize = *((uint32_t *)DataBuffer.data());
-        if (DataBuffer.size() < DataSize)
+        FrameSplitter.Append(tcpServerConnection->readAll());
+        QByteArray Data;
+        while (FrameSplitter.TakeCompleteFrame(&Data))
         {
-            return;
-        }
-        while (DataBuffer.size() && DataBuffer.size() >= DataSize)
-        {
-            if (DataBuffer.size() > DataSize)
-            {
-                NextDataBuffer = DataBuffer.mid(DataSize, DataBuffer.size() - DataSize);
-                DataBuffer.remove(DataSize, DataBuffer.size() - DataSize);
-            }
-
-            QByteArray Data = DataBuffer;
-            DataBuffer = NextDataBuffer;
-            NextDataBuffer.clear();
+            uint32_t DataSize = *((uint32_t *)Data.data());
 
             int DataPointer = 0;
             while (DataPointer < DataSize)
@@ -251,7 +239,6 @@ void RemoteControlServer::HeaderReceived()
                 }
                 DataPointer += 15 + LengthID + LengthofData;
             }
-            DataSize = *((uint32_t *)DataBuffer.data());
         }
     }
 }
