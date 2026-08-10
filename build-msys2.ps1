@@ -145,14 +145,14 @@ $qmakeSearchDirs = @(
     $mingwBin,
     (Join-Path $Msys2Root 'lib\qt6\bin'),
     (Join-Path $Msys2Root 'share\qt6\bin')
-) | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -Unique
+) | Select-Object -Unique
 
 Assert-File -Path $ProjectFile -Description 'Qt project file'
 Assert-Directory -Path $Msys2Root -Description 'MSYS2 MINGW64 root'
 Assert-Directory -Path $mingwBin -Description 'MSYS2 MINGW64 bin directory'
 
 $qmakeCandidates = foreach ($searchDir in $qmakeSearchDirs) {
-    foreach ($qmakeName in @('qmake6.exe', 'qmake-qt6.exe', 'qmake.exe')) {
+    foreach ($qmakeName in @('qmake6.exe', 'qmake-qt6.exe', 'qmake.exe', 'qmake6.bat', 'qmake-qt6.bat', 'qmake.bat')) {
         Join-Path $searchDir $qmakeName
     }
 }
