@@ -393,3 +393,21 @@ Public method/signature, Qt signal/slot, plugin IID and `InterfaceData` header
 checks are unchanged; the only `DataManagementClass.h` diff is private storage
 delegation. The remaining raw-pointer destruction boundary is explicitly
 deferred to a separate approved ownership-hardening slice.
+
+## Phase 4G.1 Project-IO facade characterization
+
+**Completed 2026-08-10.** The new offscreen
+`ProjectIoFacadeContractTests` suite is reproducibly registered in
+`tests/run-tests-msys2.ps1`; it sets `QT_QPA_PLATFORM=offscreen` only while
+this real-MainWindow target runs. `UIIO_001..UIIO_006` passed with temporary
+files, directories and runtime-built test plugins, and the central runner
+completed all 12 registered test projects with exit code 0.
+
+The façade evidence covers successful/repeated experiment save/load, missing,
+malformed and partial experiment handling, form routing, parameter XML,
+MAT/HDF5, valid/incompatible/missing plugins, exact public bool conventions,
+Messenger ordering and process CWD/locale observations. No production code was
+changed. `LoadForms()` remains a declared-but-undefined blocker; private path
+and dirty-state fields have no public observation API. The following 4G.2
+implementation slice, if separately approved, is limited to an internal
+`ProjectIoCoordinator` behind the unchanged facade.

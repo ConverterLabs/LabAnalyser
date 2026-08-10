@@ -462,3 +462,29 @@ then remove the helper from qmake targets. No persistence, public API, signal,
 slot, plugin IID or `InterfaceData` ABI migration is involved. The raw-pointer
 and manager-destruction lifetime boundary remains a later ownership-hardening
 decision, not a side effect of this extraction.
+## Phase 4G.1 Project-IO facade characterization
+
+**Completed 2026-08-10.** `UIIO_001..UIIO_006` characterize the public
+`UIDataManagementSetClass` boundary against the real offscreen `MainWindow`
+graph without exposing private state or changing production code. The vectors
+cover save/load, repeated form routing and partial XML loading, parameter
+import/export, MAT/HDF5 return/error conventions, runtime-built valid and
+rejected plugins, Messenger ordering, temporary-path handling, CWD/locale
+effects and instance-local operation.
+
+The characterization records three legacy limits that a future coordinator
+must preserve or explicitly change: state fields `LoadPath`, `StdSavePath` and
+`ChangeDetected` are not public observables; `LoadExperiment` routes form
+events directly to MainWindow rather than the facade's declared signal and
+leaves the process CWD at the experiment directory; and an HDF5 write failure
+emits `Error` while returning the same `false` value as success. `LoadForms()`
+has no repository definition, so it is a documented blocker rather than an
+invented contract.
+
+The next implementation slice may introduce only an internal
+`ProjectIoCoordinator` behind this facade. It must retain all public method
+signatures, inverted bool conventions, Messenger signal order, plugin/XML
+routing and process-state vectors. It must neither absorb MainWindow UI policy
+nor alter the unimplemented `LoadForms` boundary. Rollback is local: restore
+the facade's adapter calls and remove the private coordinator sources; no file
+format, plugin ABI or public API migration is allowed.

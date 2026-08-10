@@ -161,6 +161,11 @@ $testProjects = @(
         ExecutableRelativePath = 'release\PluginLoaderContractTests.exe'
     }
     ,[PSCustomObject]@{
+        Id = 'contract/projectio/ProjectIoFacadeContractTests'
+        ProjectFile = Join-Path $repositoryRoot 'tests\contract\projectio\ProjectIoFacadeContractTests.pro'
+        ExecutableRelativePath = 'release\ProjectIoFacadeContractTests.exe'
+    }
+    ,[PSCustomObject]@{
         Id = 'integration/mainwindow/MainWindowIntegrationTests'
         ProjectFile = Join-Path $repositoryRoot 'tests\integration\mainwindow\MainWindowIntegrationTests.pro'
         ExecutableRelativePath = 'release\MainWindowIntegrationTests.exe'
@@ -227,7 +232,7 @@ try {
             $suiteQtQpaPlatform = $env:QT_QPA_PLATFORM
             $suiteRepositoryRoot = $env:LABANALYSER_TEST_REPOSITORY_ROOT
             try {
-                if ($testProject.Id -in @('integration/mainwindow/MainWindowIntegrationTests', 'contract/plotwidget/PlotWidgetContractTests')) {
+                if ($testProject.Id -in @('integration/mainwindow/MainWindowIntegrationTests', 'contract/plotwidget/PlotWidgetContractTests', 'contract/projectio/ProjectIoFacadeContractTests')) {
                     $env:QT_QPA_PLATFORM = 'offscreen'
                     $env:LABANALYSER_TEST_REPOSITORY_ROOT = $repositoryRoot
                 }

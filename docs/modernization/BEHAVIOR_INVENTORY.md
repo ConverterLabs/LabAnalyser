@@ -54,10 +54,38 @@ evidence of a characterized format yet.
 `component/DataManagementCharacterizationTests` adds stable IDs `DM_001` through
 `DM_010` for `DataManagementClass`, `DataManagementSetClass`, and
 `MessengerClass`; it uses QSignalSpy for message counts, order and payloads.
-`UIDataManagementSetClass` remains unverified because its public operations
-require the real MainWindow plus persistence/export/plugin boundaries. Full
-function-to-ID mapping, risk findings and per-file coverage appear in
-`DATAMANAGEMENT_3A.md`.
+`UIDataManagementSetClass` was subsequently characterized through its real
+`MainWindow` graph by `UIIO_001..UIIO_006`; the focused facade evidence and its
+remaining blockers are recorded below. Full function-to-ID mapping, risk
+findings and per-file coverage appear in `DATAMANAGEMENT_3A.md`.
+
+## Phase 4G.1 project-IO facade characterization
+
+`contract/projectio/ProjectIoFacadeContractTests` exercises the unchanged
+public `UIDataManagementSetClass` facade offscreen, with temporary files,
+directories and runtime-built plugin fixtures. `UIIO_001` establishes an
+important observability limit: private `LoadPath`, `StdSavePath` and
+`ChangeDetected` have neither a Qt property nor a public getter, so their
+initial values and transitions are not publicly testable without changing the
+API. `LoadForms()` is declared but has no repository definition and is a
+separate implementation blocker.
+
+`UIIO_002` records successful save/load and repeated form loading; the reader
+loads forms through its direct MainWindow connection, not by emitting the
+facade's public `LoadFormFromXML` signal (zero facade emissions). `UIIO_003`
+records partial continuation after a missing form, ordered Messenger info then
+error events, and the legacy process-CWD mutation to the experiment directory;
+the test restores CWD and locale during cleanup. `UIIO_004` covers parameter
+XML route/status conventions. `UIIO_005` covers public MAT/HDF5 return paths:
+MAT reports an invalid target as `true`, while HDF5 emits `Error("Export
+failed...")` but still returns `false`. `UIIO_006` maps valid plugin loading to
+`false` and missing/incompatible fixtures to `true`, with exactly one Messenger
+error per rejected fixture. All methods retain the established inverted
+boolean convention where `false` normally represents success.
+
+Unsafe null-MainWindow, null-device and unimplemented `LoadForms` paths are
+excluded; detailed XML, export and plugin content contracts remain owned by
+their existing `XML_*`, `PARAM_*`, `MAT_*`, `HDF5_*` and `PLUGIN_*` suites.
 
 ## DataManagement registry baseline 4B.1 characterization
 
