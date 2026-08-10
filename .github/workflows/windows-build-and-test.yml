@@ -47,17 +47,44 @@ jobs:
           & (Join-Path $mingwBin $qmake) -query
           mingw32-make.exe --version
 
-      - name: Fresh Release build
+      - name: Fresh deployable Release build
         shell: pwsh
         run: |
           $env:Path = 'C:\msys64\mingw64\bin;C:\msys64\usr\bin;' + $env:Path
           New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
           Start-Transcript -Path build\ci-logs\release-build.log -Force
           try {
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -BuildDir build\ci-release -Jobs 2
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2
             if ($LASTEXITCODE -ne 0) { throw "Release build failed with exit code $LASTEXITCODE." }
           }
           finally { Stop-Transcript }
+
+      - name: Verify deployable runtime contents
+        shell: pwsh
+        run: |
+          $deployDir = 'dist\LabAnalyser-release'
+          $requiredPatterns = @(
+            'LabAnalyser.exe',
+            'Qt6Core.dll',
+            'Qt6Gui.dll',
+            'Qt6Widgets.dll',
+            'libgcc_s_seh-1.dll',
+            'libstdc++-6.dll',
+            'libwinpthread-1.dll',
+            'libhdf5-*.dll',
+            'libmatio-*.dll',
+            'libfftw3-*.dll'
+          )
+          if (-not (Test-Path -LiteralPath $deployDir -PathType Container)) {
+            throw "Deployment directory was not created: $deployDir"
+          }
+          foreach ($pattern in $requiredPatterns) {
+            $match = Get-ChildItem -LiteralPath $deployDir -Recurse -File -Filter $pattern | Select-Object -First 1
+            if ($null -eq $match) {
+              throw "Required deployment runtime file is missing: $pattern"
+            }
+          }
+          Get-ChildItem -LiteralPath $deployDir -Recurse -File | Select-Object FullName, Length | Format-Table -AutoSize
 
       - name: Full qmake test runner (offscreen)
         shell: pwsh
@@ -79,4 +106,13 @@ jobs:
           name: windows-msys2-build-and-test-logs
           path: build/ci-logs/
           if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload deployable Windows application
+        if: success()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: LabAnalyser-windows-release
+          path: dist/LabAnalyser-release/
+          if-no-files-found: error
           retention-days: 14

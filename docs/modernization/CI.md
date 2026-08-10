@@ -7,13 +7,22 @@ Windows job. It runs on `windows-latest`, provisions MSYS2 `MINGW64`, and uses
 the same PowerShell entry points as local development:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -BuildDir build\ci-release -Jobs 2
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -BuildRoot build\ci-tests -Jobs 2
 ```
 
 For each build and test process, the workflow puts `C:\msys64\mingw64\bin`
 before `C:\msys64\usr\bin` and inherited PATH entries. GUI tests run with
 `QT_QPA_PLATFORM=offscreen`, scoped to the CI test process.
+
+The Release step uses the existing deploy mode with
+`-DeployDir dist\LabAnalyser-release`. Before upload, CI requires
+`LabAnalyser.exe`, Qt Core/Gui/Widgets DLLs, the MinGW compiler runtimes, and
+HDF5, matio and FFTW runtime DLLs. The existing deployment script also follows
+native dependencies recursively. The downloadable artifact is named
+`LabAnalyser-windows-release`, contains only `dist/LabAnalyser-release/`, and
+is retained for 14 days. This is a CI artifact only; it creates no GitHub
+Release or published package.
 
 ## Provisioned packages
 
