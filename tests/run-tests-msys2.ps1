@@ -61,6 +61,18 @@ function Invoke-Native {
     }
 }
 
+function Resolve-Tool {
+    param([Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string[]]$Candidates)
+
+    foreach ($candidate in $Candidates) {
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+            return $candidate
+        }
+    }
+
+    throw "$Name not found. Checked: $($Candidates -join ', ')"
+}
+
 $Msys2Root = Get-FullPath $Msys2Root
 if ([string]::IsNullOrWhiteSpace($BuildRoot)) {
     $BuildRoot = Join-Path $repositoryRoot 'build\tests-msys2-mingw64'
@@ -72,13 +84,19 @@ if ($Jobs -lt 1) {
 
 $mingwBin = Join-Path $Msys2Root 'bin'
 $msysUsrBin = Join-Path (Split-Path -Parent $Msys2Root) 'usr\bin'
-$qmake = Join-Path $mingwBin 'qmake6.exe'
-if (-not (Test-Path -LiteralPath $qmake -PathType Leaf)) {
-    $qmake = Join-Path $mingwBin 'qmake.exe'
+$qmakeSearchDirs = @(
+    $mingwBin,
+    (Join-Path $Msys2Root 'lib\qt6\bin'),
+    (Join-Path $Msys2Root 'share\qt6\bin')
+) | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -Unique
+$qmakeCandidates = foreach ($searchDir in $qmakeSearchDirs) {
+    foreach ($qmakeName in @('qmake6.exe', 'qmake-qt6.exe', 'qmake.exe')) {
+        Join-Path $searchDir $qmakeName
+    }
 }
+$qmake = Resolve-Tool -Name 'qmake' -Candidates $qmakeCandidates
 $make = Join-Path $mingwBin 'mingw32-make.exe'
 
-Assert-File -Path $qmake -Description 'qmake'
 Assert-File -Path $make -Description 'mingw32-make'
 
 # Add every test project here.  The order is explicit so failures are stable and
