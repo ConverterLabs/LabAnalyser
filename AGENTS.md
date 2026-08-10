@@ -184,6 +184,27 @@ Within a milestone, take one subsystem at a time. Do not modify unrelated subsys
 
 ## Agent operating rules
 
+### Staged verification model
+
+Preserve the required behavioral characterization and do not reduce any
+contract coverage. To avoid repeating identical expensive checks after every
+small, behavior-neutral refactoring slice, select the verification level by
+scope:
+
+1. **Small behavior-neutral refactoring slice:** build and run the affected
+   test project, run directly dependent contract suites, perform an
+   incremental Release compile check, run scoped `git diff --check`, and check
+   public API/IID only when that boundary is affected.
+2. **Subsystem checkpoint after several slices:** run the complete central
+   runner, fresh Release and Debug builds, scoped static analysis, and compare
+   relevant file-level coverage.
+3. **Milestone or CI checkpoint:** run a clean build, full coverage, and all
+   required platform/CI jobs.
+
+Record which level was used and its exact evidence. A later checkpoint may
+batch redundant full verification, but never replaces the focused behavioral
+tests required for an individual changed function.
+
 - Begin each work session by reading `PLAN.md`, `BASELINE.md`, recent git diff/status, and applicable instructions.
 - Present a short plan before a substantial change, then execute autonomously while the next step is safe and in scope.
 - Never hide a failing baseline. Distinguish pre-existing failures from regressions with evidence.

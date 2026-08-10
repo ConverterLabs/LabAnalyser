@@ -1,5 +1,21 @@
 # Modernization plan
 
+## Staged verification model
+
+**Adopted 2026-08-10.** Behavioral contracts and their required coverage are
+unchanged; only redundant heavyweight verification is batched deliberately.
+
+| Scope | Required evidence |
+| --- | --- |
+| Small behavior-neutral refactoring slice | Affected test target; directly dependent contract suites; incremental Release compile check; scoped `git diff --check`; public API/IID check only at a changed boundary. |
+| Subsystem checkpoint after several slices | Full central runner; fresh Release and Debug builds; scoped static analysis; relevant file-level coverage comparison. |
+| Milestone/CI checkpoint | Clean build; full coverage; every required platform and CI job. |
+
+The delegate-experiment-saving slice is already fully verified. No repeated
+full runner, Debug build, coverage or static-analysis run is required solely
+because of this policy change. The next ProjectIoCoordinator subsystem
+checkpoint remains responsible for the bundled heavyweight evidence.
+
 ## Milestone 2C.1 status
 
 **Reproducible Windows build/test CI:** locally validated on 2026-08-10; remote
