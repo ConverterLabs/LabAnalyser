@@ -19,13 +19,17 @@ installed or updated, and no sanitizer CI gate is enabled. See `SANITIZERS.md`.
 
 ## Static-analysis pilot status
 
-**Baseline recorded on 2026-08-10.** The dedicated GCC 15.2 warning build with
+**Baseline recorded on 2026-08-10; focused QSlider correction verified.** The dedicated GCC 15.2 warning build with
 `-Wall -Wextra -Wpedantic -Wformat=2 -Wshadow` completed successfully without
 `-Werror`. clang-tidy and cppcheck are not installed; no package was changed.
-The filtered own-production baseline has 163 diagnostic lines, led by one
-possible uninitialized QSlider value, 23 signed/unsigned comparisons, 35 Qt
-deprecations and style diagnostics. No production repair or mandatory analysis
-gate was added. See `STATIC_ANALYSIS.md`.
+The original filtered baseline had 163 diagnostic lines, including one possible
+uninitialized QSlider value. The explicitly approved minimal QSlider fix and
+its `DW_016` regression now produce 162 lines with zero
+`-Wmaybe-uninitialized` diagnostics; 23 signed/unsigned comparisons, 35 Qt
+deprecations and the existing style categories remain visible. No warning was
+suppressed and no mandatory analysis gate was added. A separate numeric
+equal-Min/Max division risk remains documented as an open QSlider defect
+candidate. See `STATIC_ANALYSIS.md`.
 
 ## Milestone 2B record
 

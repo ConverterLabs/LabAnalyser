@@ -257,6 +257,26 @@ void DropWidgetAdapterTests::DW_016_data_driven_adapter_signals_ranges_and_value
     QSliderD slider; slider.setRange(0, 100); QSignalSpy sliderSpy(&slider, &QSlider::valueChanged); slider.setValue(-1); QCOMPARE(slider.value(), 0); slider.setValue(55); slider.setValue(55); QCOMPARE(sliderSpy.count(), 1); QCOMPARE(sliderSpy.at(0).at(0).toInt(), 55);
     ToFormMapper sliderOut = mapper("double"); sliderOut.SetData(0.0); sliderOut.MinValue = 10.0; sliderOut.MaxValue = 20.0; slider.setValue(50); slider.GetVariantData(&sliderOut); QCOMPARE(sliderOut.GetDouble(), 15.0);
 
+    auto* manager = GetMainWindow()->GetLogic();
+    const QString sliderId("DW16::numeric-range");
+    manager->AddContainerElement(sliderId, "double", "Parameter", "");
+    manager->SetMinMaxValue(sliderId, 0.0, 100.0);
+    QSliderD connectedSlider;
+    connectedSlider.setRange(0, 100);
+    connectedSlider.ConnectToID(manager, sliderId);
+    connectedSlider.setValue(37);
+    QSignalSpy connectedSliderSpy(&connectedSlider, &QSlider::valueChanged);
+    ToFormMapper stringValue = mapper("QString"); stringValue.SetData(QString("not-a-number"));
+    ToFormMapper listValue = mapper("QStringList"); listValue.SetData(QStringList({"not", "numeric"}));
+    ToFormMapper selectionValue = mapper("GuiSelection"); selectionValue.SetData(GuiSelection("not-numeric", QStringList({"not-numeric"})));
+    const QList<ToFormMapper> nonnumericValues {stringValue, listValue, selectionValue};
+    for (ToFormMapper data : nonnumericValues) {
+        QVERIFY(data.IsEditable()); QVERIFY(!data.IsFloatingPointNumber()); QVERIFY(!data.IsSigedNumber()); QVERIFY(!data.IsUnsigedNumber());
+        connectedSlider.SetVariantData(data);
+        QCOMPARE(connectedSlider.value(), 37); QCOMPARE(connectedSliderSpy.count(), 0); QVERIFY(!connectedSlider.signalsBlocked());
+    }
+    connectedSlider.setValue(38); QCOMPARE(connectedSliderSpy.count(), 1); QCOMPARE(connectedSliderSpy.at(0).at(0).toInt(), 38);
+
     QSpinBoxD spin; spin.setRange(-2, 2); QSignalSpy spinSpy(&spin, &QSpinBox::valueChanged); spin.setValue(9); spin.setValue(2); QCOMPARE(spin.value(), 2); QCOMPARE(spinSpy.count(), 1); QCOMPARE(spinSpy.at(0).at(0).toInt(), 2);
     QCheckBoxD check; QSignalSpy checkSpy(&check, &QCheckBox::clicked); check.click(); QCOMPARE(checkSpy.count(), 1); QCOMPARE(checkSpy.at(0).at(0).toBool(), true); check.click(); QCOMPARE(checkSpy.count(), 2); QCOMPARE(checkSpy.at(1).at(0).toBool(), false);
     QComboBoxD combo; combo.addItems({"one", "two"}); QSignalSpy comboSpy(&combo, qOverload<int>(&QComboBox::currentIndexChanged)); combo.setCurrentIndex(1); combo.setCurrentIndex(1); QCOMPARE(comboSpy.count(), 1); QCOMPARE(comboSpy.at(0).at(0).toInt(), 1);

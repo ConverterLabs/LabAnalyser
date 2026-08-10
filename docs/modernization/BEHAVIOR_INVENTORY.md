@@ -199,6 +199,19 @@ legacy behavior, not repaired. The remaining DropWidget gaps are 3I
 manager/drag/MainWindow, 3J PlotWidget, visual-pixel, or unsafe null/index
 paths; see `DROPWIDGET_CONTRACTS_3H.md` for fresh per-file gcov comparison.
 
+## QSlider nonnumeric-update correctness fix (2026-08-10)
+
+The GCC static-analysis baseline reported `DropWidgets/QSlider.cpp` may use
+`value` uninitialized when an editable but nonnumeric `InterfaceData` reaches
+`QSliderD::SetVariantData`. The unsafe calculation was not executed as a
+baseline contract. The approved minimal guard now scales only after a supported
+floating-point, signed or unsigned value was assigned. `DW_016` verifies the
+safe rejection of editable `QString`, `QStringList` and `GuiSelection`: the
+connected slider value is unchanged, no `valueChanged` occurs, and its normal
+unblocked signal state remains usable. Existing numeric conversion behavior is
+unchanged. The distinct `MinMax.second == MinMax.first` numeric division risk
+remains an open defect candidate.
+
 ## MainWindow integration 3I.1 characterization
 
 `integration/mainwindow/MainWindowIntegrationTests` exercises the real

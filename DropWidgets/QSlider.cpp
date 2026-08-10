@@ -145,15 +145,28 @@ void QSliderD::SetVariantData(ToFormMapper Data)
             if(MW->GetLogic()->ElementExists(ConnectedID))
                 MinMax = MW->GetLogic()->MinMaxValue(ConnectedID);
 
-        double value;
+        double value = 0.0;
+        bool hasNumericValue = false;
         if(Data.IsFloatingPointNumber())
+        {
              value = (Data.GetFloatingPointData());
+             hasNumericValue = true;
+        }
         else if(Data.IsSigedNumber())
+        {
             value =  (double)Data.GetSignedData();
+            hasNumericValue = true;
+        }
         else if(Data.IsUnsigedNumber())
+        {
            value =  (double)Data.GetUnsignedData();
-        int valueC = (int) round((value - MinMax.first)/(MinMax.second-MinMax.first)*100.0);
-        setValue((int)valueC );
+           hasNumericValue = true;
+        }
+        if(hasNumericValue)
+        {
+            int valueC = (int) round((value - MinMax.first)/(MinMax.second-MinMax.first)*100.0);
+            setValue((int)valueC );
+        }
     }
     blockSignals(false);
 

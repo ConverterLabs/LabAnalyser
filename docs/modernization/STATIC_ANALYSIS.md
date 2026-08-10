@@ -44,7 +44,7 @@ No package was installed or updated. Therefore no clang-tidy or cppcheck result
 is claimed. The fresh GCC build is the complete available analysis result for
 this pilot.
 
-## Baseline findings
+## Initial baseline findings
 
 The filtered report contains 163 distinct diagnostic lines. This is a compiler
 source-line baseline; repeated inclusion of `DropWidget.h` through different
@@ -61,11 +61,35 @@ as 163 independent defects.
 | Style / likely harmless | 104 | 77 unused parameters, 6 unused variables, 3 unused-but-set variables, 18 shadowing diagnostics. Most occur in widget adapter override surfaces; no blanket suppression or cleanup was made. |
 | Possible false positive | 1 included above | The QSlider uninitialized report can be compiler-conservative, but code inspection shows a real unassigned path unless the caller contract forbids all other types. Treat it as a characterization/security candidate until proven. |
 
-The highest-priority review order is: (1) QSlider's nonnumeric input path;
+The highest-priority review order was: (1) QSlider's nonnumeric input path;
 (2) RemoteControl framing comparisons together with existing unsafe cast/index
 risks; (3) numeric adapter bounds; (4) Qt 6 API migration only after contracts
 are protected. Ownership and lifetime need sanitizer/runtime support or focused
 behavioral tests, not this warning baseline.
+
+## QSlider correctness fix verification (2026-08-10)
+
+The initial `-Wmaybe-uninitialized` diagnostic was safely characterized without
+executing its unassigned-value path: an editable `QString`, `QStringList` or
+`GuiSelection` reaches `QSliderD::SetVariantData()` without selecting any of
+its three numeric assignments. `DW_016` now exercises those three real
+`InterfaceData` variants against a connected slider with a valid 0..100
+manager range. Each leaves its value at 37, emits no `valueChanged`, and leaves
+the existing unblocked signal state usable for a subsequent normal set.
+
+The approved minimal production change records whether a floating-point,
+signed, or unsigned branch assigned `value` and performs the existing scaling
+only in that case. It changes neither accepted numeric conversion nor the
+existing signal-blocking convention. A fresh run of the same scoped GCC pilot
+completed with exit code 0 and 162 filtered own-production diagnostic lines:
+`-Wmaybe-uninitialized` is now 0. The other category counts are unchanged
+(77 unused parameters, 35 deprecated APIs, 23 sign comparisons, 18 shadowing,
+6 unused variables and 3 unused-but-set variables); no warning suppression or
+filter change was used.
+
+`(MinMax.second - MinMax.first)` remains deliberately unchanged. A zero range
+can still make the numeric scaling division invalid; it is a separate
+high-priority QSlider defect candidate and is not covered by this fix.
 
 ## Gates and limits
 
