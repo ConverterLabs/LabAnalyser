@@ -528,6 +528,24 @@ the required compatibility vectors. Rollback restores the two former local
 reader-construction lines in `LoadExperiment()` and removes this one private
 coordinator method; no format or ABI migration is involved.
 
+## Phase 4G.2c Experiment-write delegation
+
+**Completed 2026-08-10.** The corresponding save operation moved only
+construction/execution of the unchanged `xmlexperimentwriter` to
+`ProjectIoCoordinator::WriteExperiment(const QString&)`. The coordinator
+passes the original UI facade as QObject parent, its existing Messenger
+reference and the same UI facade as the `DataManagementClass` reference. It
+does not own the writer, adapter, QObject, plugin, path or state.
+
+`UIDataManagementSetClass::SaveExperiment(QString)` remains the public Qt slot
+and retains the inverted bool convention, error/success messages, post-write
+plugin `save` routing and all private path/change state. `XML_006..XML_008`,
+`XML_LEGACY_004`, `UIIO_001..UIIO_006` and MainWindow vectors are the
+compatibility basis. Rollback restores the one local writer construction/call
+in `SaveExperiment()` and removes this private coordinator method. Writer
+implementation, XML format, settings/UI state and public API/ABI remain out
+of scope.
+
 ## Legacy experiment XML evidence
 
 `XML_LEGACY_001..XML_LEGACY_005` now anchor later XML delegation work with

@@ -109,3 +109,20 @@ relative/absolute `.LAdev` resolution, return values and existing error
 messages, including the expected missing UI/plugin integration boundaries.
 The five committed legacy fixture SHA-256 values were checked before and after
 the run and did not change; no XML fixture was migrated or normalized.
+
+## Phase 4G.2c writer-construction delegation
+
+On 2026-08-10 `UIDataManagementSetClass::SaveExperiment()` was reduced only
+to delegation of writer construction/execution to the private
+`ProjectIoCoordinator`. `xmlexperimentwriter` is unchanged. The coordinator
+uses the identical historic arguments: `(&uiManager,
+uiManager.GetMessengerRef(), uiManager)`.
+
+The unchanged XML suite covers `XML_006` semantic read/write, `XML_007`
+inverted save/load returns and `XML_008` figure persistence; `XML_LEGACY_004`
+preserves the temporary-only legacy read/write/read contract. The full XML,
+UIIO and MainWindow vectors passed in the central runner. Thus no byte or
+fixture expectation was changed: section order, attributes, UTF-8, paths,
+formatting, overwrite and invalid-path semantics remain those of the existing
+writer. The five legacy fixture hashes match their manifest before and after
+the run.

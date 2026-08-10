@@ -7,6 +7,7 @@
 #include "../Export/exportinputs2xml.h"
 #include "../Import/parameterloader.h"
 #include "../LoadSave/xmlexperimentreader.h"
+#include "../LoadSave/xmlexperimentwriter.h"
 
 ProjectIoCoordinator::ProjectIoCoordinator(UIDataManagementSetClass& manager_)
     : manager(manager_), uiManager(manager_)
@@ -41,4 +42,10 @@ bool ProjectIoCoordinator::ReadExperiment(const QString& path) const
 {
     XmlExperimentReader reader(&uiManager, uiManager.GetMessenger(), &uiManager);
     return reader.read(path);
+}
+
+bool ProjectIoCoordinator::WriteExperiment(const QString& path) const
+{
+    xmlexperimentwriter writer(&uiManager, uiManager.GetMessengerRef(), uiManager);
+    return writer.write(path);
 }

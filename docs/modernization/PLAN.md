@@ -469,3 +469,33 @@ All five committed legacy fixture hashes were unchanged before/after testing.
 Rollback is local: restore the direct reader construction in `LoadExperiment()`
 and remove `ReadExperiment()`; no public API, Qt metaobject member, plugin IID
 or InterfaceData ABI changed.
+
+## Phase 4G.2c Experiment-write delegation
+
+**Completed 2026-08-10.** `SaveExperiment()` remains the public Qt slot and
+facade for its inverted error return, status/error text, plugin-save routing
+and private path/change state. Only construction/execution of the unchanged
+`xmlexperimentwriter` is now delegated to private, non-owning
+`ProjectIoCoordinator::WriteExperiment()`, with the exact former UI
+facade/Messenger/parent-manager arguments. XML writer implementation, format,
+paths, formatting, settings/UI state and overwrite semantics were not altered.
+
+The central instrumented runner completed all 12 registered projects green,
+including the full XML/legacy, UIIO and MainWindow suites. Fresh Release and
+Debug builds passed. Current combined-run measurements are
+`UIDataManagementSetClass.cpp`: 90.91% lines (70/77), 82.35% executed branches
+(140/170), 46.47% branches taken (79/170), 74.24% calls (98/132), 100.00%
+functions (10/10); `ProjectIoCoordinator.cpp`: 100.00% lines (26/26), 100.00%
+executed branches (12/12), 58.33% branches taken (7/12), 76.67% calls (23/30),
+100.00% functions (7/7); and unchanged `xmlexperimentwriter.cpp`: 50.89%
+lines (57/112), 25.86% executed branches (60/232), 13.79% branches taken
+(32/232), 28.00% calls (49/175), 100.00% functions (9/9). These are combined
+registered-test measurements, not project coverage; their denominator differs
+from earlier focused XML coverage.
+
+The scoped additional-warning build remained at the established 161 filtered
+own-production diagnostics, with no diagnostic in `ProjectIoCoordinator.cpp`.
+Legacy fixture hashes matched the manifest before/after. Rollback is local:
+restore the direct writer construction in `SaveExperiment()` and remove
+`WriteExperiment()`; no public API, Qt metaobject member, plugin IID or
+InterfaceData ABI changed.

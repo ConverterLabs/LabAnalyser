@@ -153,7 +153,7 @@ adapter, QObject, plugin, messenger, UI state or persistent path state.
 The public UI facade remains responsible for all status/error emission,
 exception-to-return conversion and return conventions. In particular, it keeps
 the HDF5 catch path that emits the existing error text and returns `false`.
-Experiment XML writing, forms, plugin loading, MainWindow routing,
+Forms, plugin loading, MainWindow routing,
 CWD/locale behavior and `LoadPath`, `StdSavePath` and `ChangeDetected` remain
 in the facade and outside this slice.
 
@@ -175,3 +175,20 @@ and absolute path handling, and form/device/figure/widget/connection/state
 processing order remain owned by the unchanged reader path. The `XML_LEGACY`
 fixtures exercise missing UI/plugin dependencies without any migration or
 normalization.
+
+## Phase 4G.2c Experiment-write coordination
+
+`ProjectIoCoordinator::WriteExperiment()` now constructs only the unchanged
+`xmlexperimentwriter` with the exact pre-extraction arguments:
+`(&uiManager, uiManager.GetMessengerRef(), uiManager)`. As with reading, the
+coordinator remains non-QObject and non-owning; the existing UI-facade
+reference preserves the writer's QObject parent and manager hierarchy.
+
+`UIDataManagementSetClass::SaveExperiment(QString)` remains the public Qt slot
+and keeps all orchestration after the writer call: its inverted boolean/error
+convention, existing error and success status text, plugin `save` messages,
+and the private `LoadPath`, `StdSavePath`, `ChangeDetected` and MainWindow
+state boundaries. The writer itself is unchanged, so its UTF-8 XML output,
+section/attribute order, paths, formatting and overwrite/invalid-path behavior
+remain governed by the existing XML contracts. Legacy fixtures are read only;
+round trips write exclusively to temporary paths.

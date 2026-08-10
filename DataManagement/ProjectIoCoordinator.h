@@ -9,8 +9,8 @@ class UIDataManagementSetClass;
 // Private value-like operation helper for the UI project-I/O facade.  It owns
 // no QObject or adapter: each adapter is constructed for one operation with
 // the same manager reference/pointer used by the legacy facade. Experiment
-// reading also keeps the exact UI facade hierarchy required by
-// XmlExperimentReader.
+// reading and writing also keep the exact UI facade hierarchy required by the
+// legacy XML adapters.
 class ProjectIoCoordinator
 {
 public:
@@ -21,6 +21,7 @@ public:
     bool ExportMat(const QString& path, const QStringList& exportIds) const;
     bool ExportHdf5(const QString& path, const QStringList& exportIds) const;
     bool ReadExperiment(const QString& path) const;
+    bool WriteExperiment(const QString& path) const;
 
 private:
     DataManagementSetClass& manager;

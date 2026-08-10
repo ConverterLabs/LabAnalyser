@@ -31,7 +31,6 @@
 #include "../mainwindow.h"
 #include "../ui_mainwindow.h"
 #include "../plugins/platforminterface.h"
-#include "../LoadSave/xmlexperimentwriter.h"
 
 #include "../Import/parameterloader.h"
 #include "../Export/Export2Mat.h"
@@ -71,9 +70,8 @@ bool UIDataManagementSetClass::SaveExperiment(QString Path)
 
     bool Error = false;
     //create a backup
-    xmlexperimentwriter Writer(this, GetMessengerRef(), *this);
-
-    if ((Writer.write(Path)))
+    ProjectIoCoordinator coordinator(*this);
+    if ((coordinator.WriteExperiment(Path)))
     {
         Info("Error saving File ");
         Error = true;

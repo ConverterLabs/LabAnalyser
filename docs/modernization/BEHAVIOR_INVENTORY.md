@@ -887,3 +887,14 @@ the `CloseProject` message; the reader still owns all XML traversal and CWD
 effects. Missing UI/plugin dependencies, relative `.LAdev` paths and legacy
 state remain covered by the legacy vectors. Writer, plugins, form
 implementation and private save/change state were not moved.
+
+## Phase 4G.2c Experiment-write delegation
+
+`UIDataManagementSetClass::SaveExperiment(QString)` remains a public Qt slot
+covered by `XML_006..XML_008`, `XML_LEGACY_004` and `UIIO_001..UIIO_006`. It
+now calls private `ProjectIoCoordinator::WriteExperiment(QString)` only to
+instantiate/run the unchanged `xmlexperimentwriter` with the same UI facade,
+Messenger reference and QObject parent. The facade retains its inverted return
+value, exact status/error handling and post-write plugin `save` messages;
+writer traversal preserves sections, attributes, UTF-8, paths and formatting.
+Legacy files remain inputs only and are never overwritten by these vectors.
