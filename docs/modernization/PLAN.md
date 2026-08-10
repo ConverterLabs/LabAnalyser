@@ -342,3 +342,13 @@ IDs/payloads, manager container effects, repeats, safe empty/unknown input and
 the valid parent/parent-parent CloseProject path. The next possible slice is a
 private `MessageDispatchPolicy`; it must retain these vectors exactly and may
 not absorb transport, plugins, XML, UI or device logic.
+
+## Phase 4E.2 MessageDispatchPolicy extraction
+
+**Completed 2026-08-10.** A private value-only `MessageDispatchPolicy`
+classifies the existing case-sensitive command strings into ordered intents;
+`MessengerClass` remains the sole QObject/Signal/Slot executor. `DM_MSG_001`
+through `DM_MSG_003` remained unchanged and green. No public API, Qt signal,
+slot, plugin IID or InterfaceData ABI changed. The remaining unsafe null-parent,
+null-sender and destroyed-QObject paths are unchanged exclusions, not fixed by
+this refactoring.

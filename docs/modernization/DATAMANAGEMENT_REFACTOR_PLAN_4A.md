@@ -383,3 +383,17 @@ not contracts. A later 4E.2 may introduce a private, non-QObject
 `MessageDispatchPolicy` only behind the unchanged Messenger facade and only if
 all `DM_MSG_*` vectors remain unchanged; it must not absorb TCP, plugin, XML,
 UI or device logic.
+
+## Phase 4E.2 MessageDispatchPolicy extraction
+
+**Completed 2026-08-10.** `MessageDispatchPolicy` now holds only the typed,
+case-sensitive command-to-ordered-intent classification. It neither stores nor
+interprets `InterfaceData`, derives parent IDs, emits signals, mutates manager
+state, nor owns any QObject or infrastructure dependency. `MessengerClass`
+iterates the returned intents and remains the sole executor. The unchanged
+`DM_MSG_001..DM_MSG_003` vectors retain publish ordering, CloseProject's
+parent-parent notification and transmitter-before-forward ordering.
+
+Rollback is local: restore the former command branches in `MessengerClass` and
+remove the private source from qmake targets. No public header, Qt signal/slot,
+plugin IID or InterfaceData ABI change is involved.

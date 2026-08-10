@@ -107,3 +107,20 @@ the existing `PlotWidget` duplicate-registration exception. The registry has no
 Mapper, Messenger, device, GUI, plugin, network or IO dependency. Name-keyed
 identity, stale mapper-pointer risk and foreign QObject ownership are unchanged
 compatibility boundaries rather than strengthened ownership guarantees.
+
+## Phase 4E.2 Message dispatch policy extraction
+
+`DataManagement/MessageDispatchPolicy.h/.cpp` is a value-only internal helper.
+It classifies the exact case-sensitive Messenger command strings into a small,
+ordered `MessageDispatchIntent` list. It has no QObject, Manager, GUI, plugin,
+network, status-bar or payload ownership. `MessengerClass` remains the only
+QObject and retains all signal/slot, parent-chain, status-bar and InterfaceData
+execution. The policy is deliberately not exposed through the Messenger public
+header.
+
+The `publish` list preserves `AddContainerElement`, `SetData`,
+`AddElementToWidget`, `SetData`, `NewDataReceived`; `CloseProject` has a
+distinct notification intent so its parent-parent-derived identifier remains a
+Messenger concern. Unknown, empty and legacy no-op `remove` commands classify
+to no intents. `MessageTransmitter` still invokes receiver processing before
+exactly one `MessageSender` emission.

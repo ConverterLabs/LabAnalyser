@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "DataMessengerClass.h"
+#include "MessageDispatchPolicy.h"
 #include <QDebug>
 
 MessengerClass::MessengerClass(QObject *parent, QStatusBar* SB) : QObject(parent)
@@ -38,57 +39,51 @@ MessengerClass::MessengerClass(QObject *parent, QStatusBar* SB) : QObject(parent
 
 void MessengerClass::MessageReceiver(const QString &Command, const QString &ID, InterfaceData Data)
 {
-    //Check if we already know this Data
-    if(Command.compare("publish")==0)
-    {
-         emit AddContainerElement(ID,Data.GetDataType(),Data.GetType(),Data.GetStateDependency());
-         emit SetData(ID, Data);
-         //Add elemet to ListWidget
-         emit AddElementToWidget(ID,Data);
-         MessageReceiver("set", ID, Data);
-    }
-    else if(Command.compare("StatusMessage")== 0)
-    {
-        if(MessageStatusbar)
-            MessageStatusbar->showMessage(ID + " -> " + Data.GetString(),1000);
-        return;
-    }
-    else if(Command.compare("remove")==0)
-    {
-//            this->this->RemoveID(ID);
-//            this->RemoveElementFromWidget(ID);
-    }
-    else if(Command.compare("CloseProject")==0)
-    {
-        InterfaceData Data;
-        Data.SetData("Closing forced by: " + ID);
-        NotificationWriter(this->parent()->parent()->objectName(), Data.GetString());
-        emit CloseProject();
-    }
-    else if(Command.compare("error")==0)
-    {
-        emit ErrorWriter(ID, Data.GetString());
-    }
-    else if(Command.compare("info")==0)
-    {
-        emit InfoWriter(ID, Data.GetString());
-    }
-    if(Command.compare("notification")==0)
-    {
-        emit NotificationWriter(ID, Data.GetString());
-    }
-    if(Command.compare("set")==0)
-    {
-       emit SetData(ID,Data);
-       emit NewDataReceived(ID);
-    }
-    if(Command.compare("publish_finished")==0)
-    {
-        emit PublishFinished();
-    }
-    if(Command.compare("publish_start")==0)
-    {
-        emit PublishStart();
+    const QVector<MessageDispatchIntent> intents = MessageDispatchPolicy::ReceiverIntents(Command);
+    for (const MessageDispatchIntent intent : intents) {
+        switch (intent) {
+        case MessageDispatchIntent::AddContainerElement:
+            emit AddContainerElement(ID,Data.GetDataType(),Data.GetType(),Data.GetStateDependency());
+            break;
+        case MessageDispatchIntent::SetData:
+            emit SetData(ID, Data);
+            break;
+        case MessageDispatchIntent::AddElementToWidget:
+            emit AddElementToWidget(ID,Data);
+            break;
+        case MessageDispatchIntent::NewDataReceived:
+            emit NewDataReceived(ID);
+            break;
+        case MessageDispatchIntent::WriteStatusMessage:
+            if(MessageStatusbar)
+                MessageStatusbar->showMessage(ID + " -> " + Data.GetString(),1000);
+            break;
+        case MessageDispatchIntent::CloseProject:
+            emit CloseProject();
+            break;
+        case MessageDispatchIntent::WriteError:
+            emit ErrorWriter(ID, Data.GetString());
+            break;
+        case MessageDispatchIntent::WriteInfo:
+            emit InfoWriter(ID, Data.GetString());
+            break;
+        case MessageDispatchIntent::WriteNotification:
+            emit NotificationWriter(ID, Data.GetString());
+            break;
+        case MessageDispatchIntent::WriteCloseProjectNotification:
+            {
+                InterfaceData closeData;
+                closeData.SetData("Closing forced by: " + ID);
+                NotificationWriter(this->parent()->parent()->objectName(), closeData.GetString());
+            }
+            break;
+        case MessageDispatchIntent::PublishFinished:
+            emit PublishFinished();
+            break;
+        case MessageDispatchIntent::PublishStart:
+            emit PublishStart();
+            break;
+        }
     }
 }
 

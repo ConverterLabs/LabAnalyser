@@ -11,6 +11,7 @@ SOURCES += \
     ../../../DataManagement/ContainerStore.cpp \
     ../../../DataManagement/DataRegistry.cpp \
     ../../../DataManagement/WidgetBindingRegistry.cpp \
+    ../../../DataManagement/MessageDispatchPolicy.cpp \
     ../../../DataManagement/DataManagementClass.cpp \
     ../../../DataManagement/DataManagementSetClass.cpp \
     ../../../DataManagement/DataMessengerClass.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     ../../../DataManagement/ContainerStore.h \
     ../../../DataManagement/DataRegistry.h \
     ../../../DataManagement/WidgetBindingRegistry.h \
+    ../../../DataManagement/MessageDispatchPolicy.h \
     ../../../DataManagement/DataManagementSetClass.h \
     ../../../DataManagement/DataMessengerClass.h \
     ../../../DataManagement/mapper.h \

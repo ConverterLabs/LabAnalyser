@@ -10,6 +10,7 @@ SOURCES += DropWidgetAdapterTests.cpp TestMainWindowSeam.cpp PlotWidgetLinkSeam.
     $$REPOSITORY_ROOT/DataManagement/ContainerStore.cpp \
     $$REPOSITORY_ROOT/DataManagement/DataRegistry.cpp \
     $$REPOSITORY_ROOT/DataManagement/WidgetBindingRegistry.cpp \
+    $$REPOSITORY_ROOT/DataManagement/MessageDispatchPolicy.cpp \
     $$REPOSITORY_ROOT/DataManagement/DataManagementClass.cpp \
     $$REPOSITORY_ROOT/DataManagement/DataMessengerClass.cpp \
     $$REPOSITORY_ROOT/DropWidgets/CreateID.cpp \
@@ -31,6 +32,7 @@ HEADERS += $$REPOSITORY_ROOT/mainwindow.h \
     $$REPOSITORY_ROOT/DataManagement/ContainerStore.h \
     $$REPOSITORY_ROOT/DataManagement/DataRegistry.h \
     $$REPOSITORY_ROOT/DataManagement/WidgetBindingRegistry.h \
+    $$REPOSITORY_ROOT/DataManagement/MessageDispatchPolicy.h \
     $$REPOSITORY_ROOT/DataManagement/DataMessengerClass.h \
     $$REPOSITORY_ROOT/plugins/InterfaceDataType.h \
     $$REPOSITORY_ROOT/DropWidgets/QBLed.h $$REPOSITORY_ROOT/DropWidgets/QCheckBox.h \

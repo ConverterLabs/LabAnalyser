@@ -763,3 +763,19 @@ Null parent, null sender and destroyed-QObject paths are deliberately excluded:
 `CloseProject` dereferences `parent()->parent()`. TCP, plugin and XML suites
 retain their transport, plugin and persistence contracts; this slice maps only
 their shared Messenger command boundary.
+
+## DataManagement MessageDispatchPolicy extraction 4E.2
+
+`MessageDispatchPolicy::ReceiverIntents` is internally covered through the
+unchanged `DM_MSG_001..DM_MSG_003` Messenger vectors. It maps all emitting
+commands to typed ordered intents and returns none for empty, unknown and
+legacy `remove` commands. `MessengerClass::MessageReceiver` remains the only
+signal executor; `MessageTransmitter` remains a receiver invocation followed by
+one `MessageSender`. No parent/null safety behavior was changed.
+
+Focused gcov evidence is file-specific, not project coverage:
+`DataMessengerClass.cpp` recorded 65/72 lines, 67/77 executed branches, 39/77
+taken branches, 63/82 calls and 7/8 functions; the new policy recorded 19/20
+lines, 18/18 executed branches, 17/18 taken branches, 9/10 calls and 1/1
+function. Statusbar-only and registration/status-write paths remain outside the
+safe messenger command vectors.
