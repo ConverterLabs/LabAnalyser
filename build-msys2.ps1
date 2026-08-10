@@ -141,16 +141,22 @@ if ($Jobs -lt 1) {
 
 $mingwBin = Join-Path $Msys2Root 'bin'
 $msysUsrBin = Join-Path (Split-Path -Parent $Msys2Root) 'usr\bin'
+$qmakeSearchDirs = @(
+    $mingwBin,
+    (Join-Path $Msys2Root 'lib\qt6\bin'),
+    (Join-Path $Msys2Root 'share\qt6\bin')
+) | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -Unique
 
 Assert-File -Path $ProjectFile -Description 'Qt project file'
 Assert-Directory -Path $Msys2Root -Description 'MSYS2 MINGW64 root'
 Assert-Directory -Path $mingwBin -Description 'MSYS2 MINGW64 bin directory'
 
-$qmake = Resolve-Tool -Name 'qmake' -Candidates @(
-    (Join-Path $mingwBin 'qmake6.exe'),
-    (Join-Path $mingwBin 'qmake-qt6.exe'),
-    (Join-Path $mingwBin 'qmake.exe')
-)
+$qmakeCandidates = foreach ($searchDir in $qmakeSearchDirs) {
+    foreach ($qmakeName in @('qmake6.exe', 'qmake-qt6.exe', 'qmake.exe')) {
+        Join-Path $searchDir $qmakeName
+    }
+}
+$qmake = Resolve-Tool -Name 'qmake' -Candidates $qmakeCandidates
 $make = Resolve-Tool -Name 'mingw32-make' -Candidates @(
     (Join-Path $mingwBin 'mingw32-make.exe')
 )
@@ -185,7 +191,7 @@ $oldMSYSTEM = $env:MSYSTEM
 $oldCHERE = $env:CHERE_INVOKING
 
 try {
-    $pathParts = @($mingwBin)
+    $pathParts = @($mingwBin) + $qmakeSearchDirs
     if (Test-Path -LiteralPath $msysUsrBin -PathType Container) {
         $pathParts += $msysUsrBin
     }
