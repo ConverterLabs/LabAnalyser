@@ -1,24 +1,24 @@
 # Modernization plan
 
-## Staged verification model
+## Fast local verification and remote checkpoints
 
-**Adopted 2026-08-10.** Behavioral contracts and their required coverage are
-unchanged; only redundant heavyweight verification is batched deliberately.
+**Updated 2026-08-10.** Behavioral contracts and their required coverage are
+unchanged. Local fast verification has a total budget of at most five minutes;
+already proven unchanged results are not rerun.
 
-| Scope | Required evidence |
+| Scope | Required local evidence |
 | --- | --- |
-| Small behavior-neutral refactoring slice | Affected test target; directly dependent contract suites; incremental Release compile check; scoped `git diff --check`; public API/IID check only at a changed boundary. |
-| Subsystem checkpoint after several slices | Full central runner; fresh Release and Debug builds; scoped static analysis; relevant file-level coverage comparison. |
-| Milestone/CI checkpoint | Clean build; full coverage; every required platform and CI job. |
+| Documentation-only change | Scoped `git diff --check` only; no builds, tests, coverage or analysis. |
+| Small behavior-neutral production refactoring | Affected test target; directly dependent contract suites; incremental Release compile check; scoped `git diff --check`; public API/IID check only at a changed boundary. No full runner, Debug build, coverage or static analysis per slice. |
+| Subsystem checkpoint | Gather focused evidence from several related slices and push the batch; do not automatically repeat local heavyweight checks. |
+| Full local verification | Only at milestone completion, after a build-system/toolchain change, for a CI-specific failure, or when focused tests indicate a possible system-wide regression. |
 
-CI remains the mandatory complete remote verification. Local batching never
-removes focused slice tests or any clean-build, complete-test, coverage,
-platform or workflow check from the remote checkpoint.
-
-The delegate-experiment-saving slice is already fully verified. No repeated
-full runner, Debug build, coverage or static-analysis run is required solely
-because of this policy change. The next ProjectIoCoordinator subsystem
-checkpoint remains responsible for the bundled heavyweight evidence.
+Do not use `-Clean` unless toolchain/build configuration changed or there is a
+concrete stale-build suspicion. If a command is likely to exceed the local
+budget, do not start it: use focused verification or CI. Multiple small commits
+are pushed together. GitHub CI remains the mandatory complete remote
+verification and runs the full Release build, central runner and coverage; no
+local batching weakens those remote platform/workflow checks.
 
 ## Milestone 2C.1 status
 

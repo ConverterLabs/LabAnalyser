@@ -184,28 +184,32 @@ Within a milestone, take one subsystem at a time. Do not modify unrelated subsys
 
 ## Agent operating rules
 
-### Staged verification model
+### Fast local verification and remote checkpoints
 
 Preserve the required behavioral characterization and do not reduce any
-contract coverage. To avoid repeating identical expensive checks after every
-small, behavior-neutral refactoring slice, select the verification level by
-scope:
+contract coverage. Local fast verification has a strict total budget of at
+most five minutes. Record the selected evidence; already proven unchanged
+results must not be rerun.
 
-1. **Small behavior-neutral refactoring slice:** build and run the affected
-   test project, run directly dependent contract suites, perform an
-   incremental Release compile check, run scoped `git diff --check`, and check
-   public API/IID only when that boundary is affected.
-2. **Subsystem checkpoint after several related slices (at the latest):** run
-   the complete central runner, fresh Release and Debug builds, scoped static
-   analysis, and compare relevant file-level coverage.
-3. **Milestone or CI checkpoint:** run a clean build, full coverage, and all
-   required platform/CI jobs.
+1. **Documentation-only change:** run only scoped `git diff --check`; do not
+   build, test, collect coverage or run analysis.
+2. **Small behavior-neutral production refactoring:** run the affected test
+   target and directly dependent contract suites, then an incremental Release
+   compile check, scoped `git diff --check`, and public API/IID comparison only
+   where the changed boundary requires it. Do not run a local full runner,
+   Debug build, coverage or static-analysis job per slice.
+3. **Clean builds:** do not use `-Clean` unless the toolchain or build
+   configuration changed, or there is a concrete stale-build suspicion.
+4. **Full local verification:** run it only at a milestone completion, after a
+   build-system/toolchain change, for a CI-specific failure, or when focused
+   tests indicate a possible system-wide regression. Otherwise a subsystem
+   checkpoint gathers the focused evidence from several related slices.
 
-Record which level was used and its exact evidence. A later checkpoint may
-batch redundant full verification, but never replaces the focused behavioral
-tests required for an individual changed function.
-CI remains the complete remote verification: local staging never removes its
-clean build, complete test, coverage, platform or required workflow checks.
+If a command is likely to exceed the five-minute budget, do not start it;
+choose focused verification or use CI. Multiple small commits are pushed as a
+batch. GitHub CI remains the complete remote verification and runs the full
+Release build, central runner and coverage; local batching never removes those
+remote platform/workflow checks.
 
 - Begin each work session by reading `PLAN.md`, `BASELINE.md`, recent git diff/status, and applicable instructions.
 - Present a short plan before a substantial change, then execute autonomously while the next step is safe and in scope.
