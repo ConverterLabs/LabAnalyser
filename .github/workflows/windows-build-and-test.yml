@@ -42,7 +42,9 @@ jobs:
           }
           "$mingwBin`n$msysUsrBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           $env:Path = "$mingwBin;$msysUsrBin;$env:Path"
-          qmake6.exe -query
+          $qmake = @('qmake6.exe','qmake-qt6.exe','qmake.exe') | Where-Object { Test-Path (Join-Path $mingwBin $_) } | Select-Object -First 1
+          if (-not $qmake) { throw 'No qmake executable found in MINGW64 bin.' }
+          & (Join-Path $mingwBin $qmake) -query
           mingw32-make.exe --version
 
       - name: Fresh Release build
