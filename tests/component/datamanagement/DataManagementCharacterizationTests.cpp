@@ -124,6 +124,11 @@ private slots:
     void DM_CONT_003_multipleContainersUseMapOrderAndIndependentPointers();
     void DM_CONT_004_projectCleanupInvalidatesMappersButNotForeignWidgets();
     void DM_CONT_005_managerDestructionAndContainerStateAreIsolated();
+    void DM_BIND_001_bindingIsNameKeyedAndPreservesBoundQObjectPointer();
+    void DM_BIND_002_rebindingAndRemovalKeepCurrentLegacySideEffects();
+    void DM_BIND_003_destroyedBoundQObjectIsNotAutoCleanedButProjectCleanupIs();
+    void DM_BIND_004_boundWidgetsRouteMessagesAndExposePlotDuplicatePropagation();
+    void DM_BIND_005_bindingStateAndForeignQObjectOwnershipAreInstanceLocal();
 };
 
 void DataManagementCharacterizationTests::initTestCase()
@@ -699,6 +704,169 @@ void DataManagementCharacterizationTests::DM_CONT_005_managerDestructionAndConta
     QCOMPARE(second.GetContainerCount(), 1);
     QCOMPARE(second.GetContainer("shared-id")->GetType(), QString("Data"));
     // releasedMapper belonged to first and is intentionally not dereferenced after destruction.
+}
+
+void DataManagementCharacterizationTests::DM_BIND_001_bindingIsNameKeyedAndPreservesBoundQObjectPointer()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject bound;
+    QObject sameNameDifferentPointer;
+    QObject unknown;
+    bound.setObjectName("bound-name");
+    sameNameDifferentPointer.setObjectName("bound-name");
+    unknown.setObjectName("unknown-name");
+
+    manager.AddContainerElement("id", "double", "Parameter", "");
+    QVERIFY(!manager.IsObjectLinked(&bound));
+    QCOMPARE(manager.GetContainerID(&bound), QString());
+    manager.AddElementToContainerEntry("bound-name", "id", "QWidget", &bound);
+
+    QVERIFY(manager.IsObjectLinked(&bound));
+    QCOMPARE(manager.GetContainerID(&bound), QString("id"));
+    QCOMPARE(manager.GetContainer(&bound), manager.GetContainer("id"));
+    QCOMPARE(manager.GetContainer("id")->Objects.size(), size_t(1));
+    QCOMPARE(manager.GetContainer("id")->Objects.at(0).FormP, &bound);
+    QCOMPARE(manager.GetContainer("id")->Objects.at(0).FormName, QString("bound-name"));
+
+    // Binding lookup is keyed by objectName, not by QObject pointer identity.
+    QVERIFY(manager.IsObjectLinked(&sameNameDifferentPointer));
+    QCOMPARE(manager.GetContainerID(&sameNameDifferentPointer), QString("id"));
+    QCOMPARE(manager.GetContainer(&sameNameDifferentPointer), manager.GetContainer("id"));
+
+    QCOMPARE(manager.GetContainerID(&unknown), QString());
+    QCOMPARE(manager.GetContainer(&unknown), nullptr);
+    QVERIFY(manager.IsObjectLinked(&unknown));
+    QVERIFY(manager.GetContainerPointer()->find(QString()) != manager.GetContainerPointer()->end());
+    QCOMPARE(manager.GetContainerPointer()->at(QString()), nullptr);
+}
+
+void DataManagementCharacterizationTests::DM_BIND_002_rebindingAndRemovalKeepCurrentLegacySideEffects()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject widget;
+    widget.setObjectName("widget");
+    manager.AddContainerElement("one", "double", "Parameter", "");
+    manager.AddContainerElement("two", "double", "Parameter", "");
+
+    manager.AddElementToContainerEntry("widget", "one", "QWidget", &widget);
+    manager.AddElementToContainerEntry("widget", "one", "QWidget", &widget);
+    QCOMPARE(manager.GetContainer("one")->Objects.size(), size_t(1));
+    QCOMPARE(manager.GetContainer("one")->Objects.at(0).FormP, &widget);
+
+    manager.AddElementToContainerEntry("widget", "two", "QWidget", &widget);
+    QCOMPARE(manager.GetContainerID(&widget), QString("two"));
+    QCOMPARE(manager.GetContainer("one")->Objects.size(), size_t(0));
+    QCOMPARE(manager.GetContainer("two")->Objects.size(), size_t(1));
+    QCOMPARE(manager.GetContainer("two")->Objects.at(0).FormP, &widget);
+
+    // The ID-specific removal changes the mapper list only; it leaves the
+    // name-to-ID lookup in place until the QObject overload removes it.
+    manager.DeleteEntryOfObject("two", &widget);
+    QCOMPARE(manager.GetContainer("two")->Objects.size(), size_t(0));
+    QVERIFY(manager.IsObjectLinked(&widget));
+    QCOMPARE(manager.GetContainerID(&widget), QString("two"));
+    manager.DeleteEntryOfObject(&widget);
+    QVERIFY(!manager.IsObjectLinked(&widget));
+    QCOMPARE(manager.GetContainer("two")->Objects.size(), size_t(0));
+}
+
+void DataManagementCharacterizationTests::DM_BIND_003_destroyedBoundQObjectIsNotAutoCleanedButProjectCleanupIs()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    auto* bound = new QObject(&owner);
+    QPointer<QObject> boundGuard(bound);
+    bound->setObjectName("destroyed-widget");
+    manager.AddContainerElement("id", "double", "Parameter", "");
+    manager.AddElementToContainerEntry("destroyed-widget", "id", "QWidget", bound);
+    QCOMPARE(manager.GetContainer("id")->Objects.size(), size_t(1));
+
+    delete bound;
+    QVERIFY(boundGuard.isNull());
+    // Do not dereference the stale ObjectStruct pointer. A fresh object with
+    // the same name demonstrates that no destroyed(QObject*) cleanup exists.
+    QObject replacement;
+    replacement.setObjectName("destroyed-widget");
+    QVERIFY(manager.IsObjectLinked(&replacement));
+    QCOMPARE(manager.GetContainerID(&replacement), QString("id"));
+    QCOMPARE(manager.GetContainerElementForms(0).second, std::vector<QString>{"destroyed-widget"});
+
+    manager.CloseProjectLogic();
+    QCOMPARE(manager.GetContainerCount(), 0);
+    QVERIFY(!manager.IsObjectLinked(&replacement));
+}
+
+void DataManagementCharacterizationTests::DM_BIND_004_boundWidgetsRouteMessagesAndExposePlotDuplicatePropagation()
+{
+    QObject owner;
+    owner.setObjectName("LabAnalyser");
+    DataManagementSetClass manager(&owner);
+    ProbeDropWidget parameterWidget;
+    parameterWidget.setObjectName("parameter-widget");
+    parameterWidget.nextValue = number(7.0);
+    manager.AddContainerElement("parameter", "double", "Parameter", "");
+    manager.AddElementToContainerEntry("parameter-widget", "parameter", "ProbeDropWidget", &parameterWidget);
+    manager.AddElementToContainerEntry("parameter-widget", "parameter", "ProbeDropWidget", &parameterWidget);
+    QCOMPARE(manager.GetContainer("parameter")->Objects.size(), size_t(1));
+
+    QSignalSpy messages(&manager, &DataManagementClass::MessageSender);
+    connect(&parameterWidget, &ProbeDropWidget::changed, &manager, &DataManagementSetClass::SendNewValue);
+    emit parameterWidget.changed();
+    QCOMPARE(parameterWidget.getCalls, 1);
+    QCOMPARE(messages.count(), 1);
+    QCOMPARE(messages.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(messages.at(0).at(1).toString(), QString("parameter"));
+    QCOMPARE(qvariant_cast<InterfaceData>(messages.at(0).at(2)).GetDouble(), 7.0);
+    // The existing Manager -> Messenger route feeds a successful "set" back
+    // into the bound widget once before the test performs an explicit update.
+    QCOMPARE(parameterWidget.setCalls, 1);
+
+    static_cast<DataManagementClass&>(manager).SetData("parameter", number(3.0));
+    manager.SetData(QString("parameter"));
+    QCOMPARE(parameterWidget.setCalls, 2);
+
+    ProbeDropWidget plotWidget;
+    plotWidget.setObjectName("plot-widget");
+    manager.AddContainerElement("plot", "double", "Parameter", "");
+    // The current PlotWidget class-name exception does not detach the prior
+    // entry, so repeated registration propagates manager updates twice.
+    manager.AddElementToContainerEntry("plot-widget", "plot", "PlotWidget", &plotWidget);
+    manager.AddElementToContainerEntry("plot-widget", "plot", "PlotWidget", &plotWidget);
+    QCOMPARE(manager.GetContainer("plot")->Objects.size(), size_t(2));
+    static_cast<DataManagementClass&>(manager).SetData("plot", number(4.0));
+    manager.SetData(QString("plot"));
+    QCOMPARE(plotWidget.setCalls, 2);
+
+    connect(&plotWidget, &ProbeDropWidget::changed, &manager, &DataManagementSetClass::SendNewValue);
+    emit plotWidget.changed();
+    QCOMPARE(plotWidget.getCalls, 1);
+    QCOMPARE(messages.count(), 2);
+    QCOMPARE(messages.at(1).at(0).toString(), QString("set"));
+    QCOMPARE(messages.at(1).at(1).toString(), QString("plot"));
+}
+
+void DataManagementCharacterizationTests::DM_BIND_005_bindingStateAndForeignQObjectOwnershipAreInstanceLocal()
+{
+    QObject owner;
+    auto* foreign = new QObject(&owner);
+    QPointer<QObject> foreignGuard(foreign);
+    foreign->setObjectName("foreign-binding");
+    auto* first = new DataManagementClass;
+    DataManagementClass second(&owner);
+    first->AddContainerElement("id", "double", "Parameter", "");
+    first->AddElementToContainerEntry("foreign-binding", "id", "QWidget", foreign);
+
+    QVERIFY(first->IsObjectLinked(foreign));
+    QVERIFY(!second.IsObjectLinked(foreign));
+    delete first;
+    QVERIFY(foreignGuard);
+    QCOMPARE(foreignGuard->parent(), &owner);
+    QVERIFY(!second.IsObjectLinked(foreign));
+    second.AddContainerElement("id", "double", "Parameter", "");
+    second.AddElementToContainerEntry("foreign-binding", "id", "QWidget", foreign);
+    QVERIFY(second.IsObjectLinked(foreign));
 }
 
 QTEST_MAIN(DataManagementCharacterizationTests)

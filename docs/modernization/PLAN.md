@@ -296,3 +296,20 @@ the Store deletes only mappers and never form QObjects. File-specific coverage
 is recorded in `BEHAVIOR_INVENTORY.md` and is not a project gate. Widget ID
 mapping (`ElementsToContainerID`), devices, Messenger and GUI/IO remain out of
 scope for the next slice.
+
+## Phase 4D.1 DataManagement widget-binding characterization
+
+**Completed 2026-08-10.** `DM_BIND_001..DM_BIND_005` record the current public
+facade behavior of `ElementsToContainerID` and bound mapper-object lists before
+any extraction. They cover valid/unknown lookup insertion, ordinary repeat and
+rebind behavior, both removal overloads, project cleanup, QObject lifetime and
+non-ownership, Messenger feedback from a bound widget, the PlotWidget duplicate
+registration exception, and instance isolation.
+
+The resulting risks are explicit: bindings are keyed by object name rather than
+QObject identity; QObject destruction leaves a stale mapper pointer/name
+binding until cleanup; and repeated `PlotWidget` registration causes duplicate
+manager-to-widget updates. These remain characterization evidence and are not
+repaired. The following 4D.2 extraction, if approved, is limited to a private
+WidgetBindingRegistry and must retain all `DM_BIND_*` behavior; ContainerStore,
+DataRegistry, devices, Messenger and GUI/IO remain outside its scope.

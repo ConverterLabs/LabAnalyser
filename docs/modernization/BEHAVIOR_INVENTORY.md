@@ -660,3 +660,44 @@ once (109/192), 85.80% calls (151/176); `ContainerStore.cpp` 94.12% lines
 (32/34), 100.00% branches executed (16/16), 93.75% branches taken (15/16),
 100.00% calls (13/13). These are not project coverage and are not directly
 denominator-comparable to the prior facade-only 87.50% line figure.
+
+## DataManagement widget-binding characterization 4D.1
+
+`DM_BIND_001..DM_BIND_005` characterize `ElementsToContainerID` and the public
+facade paths without exposing its private map. `AddElementToContainerEntry`,
+`GetContainerID(QString/QObject*)`, `GetContainer(QObject*)`,
+`IsObjectLinked`, both `DeleteEntryOfObject` overloads and
+`CloseProjectLogic` are covered directly; `DataManagementSetClass::SetData` and
+`SendNewValue` are exercised through a real bound `VariantDropWidget` probe.
+
+Bindings are keyed by `QObject::objectName()`, not by QObject pointer identity:
+a different live QObject with the same name resolves to the original binding,
+while the mapper retains the exact originally bound `QObject*`. An unknown
+QObject lookup through `GetContainer(QObject*)` retains the existing paired
+side effect: it inserts the empty string mapping and the empty/null container
+entry, after which `IsObjectLinked` reports true. The direct QObject ID lookup
+alone does not insert.
+
+Repeated ordinary widget registration detaches then re-adds the binding, so the
+mapper has one entry. Rebinding to a different ID removes the old mapper entry
+and replaces the name-to-ID mapping. The ID-specific deletion removes only the
+mapper entry; the QObject overload additionally removes the name mapping.
+There is no public single-container removal operation to characterize safely;
+`CloseProjectLogic` clears both containers and all name bindings.
+
+No `destroyed(QObject*)` cleanup is connected: after a parented bound QObject
+is destroyed, its name binding and stale mapper pointer remain until project
+cleanup. Tests use `QPointer` and a fresh same-name QObject only; they never
+dereference the stale pointer. This is a lifetime defect candidate. Bound form
+QObjects remain foreign/non-owning: manager cleanup and manager destruction do
+not delete them. Binding state is instance-local.
+
+For an ordinary repeated bound widget, manager-to-widget propagation has one
+mapper entry. A successful `SendNewValue` emits one `set` message and the
+existing Messenger feedback updates that widget once. The special `ClassName ==
+"PlotWidget"` registration path does not detach prior entries: repeated
+registration stores two mapper entries and a manager update invokes
+`SetVariantData` twice, while a single widget signal still produces one `set`
+message. This signal/data-flow asymmetry is a second defect candidate. Senderless
+`SendNewValue`, null objects, direct stale-pointer use and raw-map mutation are
+dangerous exclusions, not contracts.
