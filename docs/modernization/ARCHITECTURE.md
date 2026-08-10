@@ -55,3 +55,22 @@ extract private value-only registry helpers behind unchanged manager facades,
 then separately treat container/binding ownership, messenger dispatch, devices
 and GUI/IO orchestration. `InterfaceData`, plugin headers, Qt signals/slots and
 the existing qmake target remain compatibility boundaries.
+
+## Phase 4B.1 DataRegistry extraction
+
+The first compatible DataManagement slice is implemented. `DataRegistry` is an
+internal normal C++ type owned exclusively by `DataManagementClass` through a
+private `std::unique_ptr` with a private deleter. It has no GUI, MainWindow,
+Messenger, plugin, network or IO dependency; its `QObject*` plot entries are
+strictly non-owning observations. `DataManagementClass` remains the complete
+public QObject facade and delegates only form-file order/removal, skip-form
+flags, aliases, plot pointers, plot-window geometry and number histories to the
+registry. Container, device, widget-binding, mapper and ownership state remains
+in `DataManagementClass` unchanged.
+
+The facade preserves the characterized legacy contracts: form duplicates and
+insertion order, first-match removal, alias fallback, duplicate plot/window
+number history, and insertion-capable unknown window-geometry lookup. No
+public signal, slot, method signature, plugin header or `InterfaceData` ABI was
+changed. This private boundary can be rolled back by restoring the former
+fields/delegation without a data-format migration.

@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "DataManagementClass.h"
+#include "DataRegistry.h"
 #include <QXmlStreamReader>
 #include <QFile>
 #include <QPluginLoader>
@@ -28,172 +29,90 @@
 #include "../plugins/platforminterface.h"
 
 
-DataManagementClass::DataManagementClass(QObject* parent): QObject(parent)
+DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry)
 {
     connect(this, SIGNAL(CloseProject()),this->parent(),SLOT(CloseProject()));
 }
 
+void DataManagementClass::DataRegistryDeleter::operator()(DataRegistry* registry) const
+{
+    delete registry;
+}
+
 int DataManagementClass::PlotCount()
 {
-    return (int)(this->PlotObjects.size());
+    return Registry->PlotCount();
 }
 
 int DataManagementClass::GetUniquePlotNumber()
 {
-    int LastNumber = 0;
-    if(!PlotObjectsNumbers.size())
-        return 0;
-    if(PlotObjectsNumbers[0] != 0)
-        return 0;
-    for(auto index = 1; index < PlotObjectsNumbers.size(); index++)
-    {
-        if (PlotObjectsNumbers[index] - LastNumber > 1)
-        {
-            break;
-        }
-        LastNumber= PlotObjectsNumbers[index];
-    }
-    return LastNumber+1;
+    return Registry->GetUniquePlotNumber();
 
 }
 
 void DataManagementClass::AddPlotPointer(QString id, QObject* pointer)
 {
-    this->PlotObjects[id] = pointer;
+    Registry->AddPlotPointer(id, pointer);
 }
 
 void DataManagementClass::AddPlotPointer(QString id, QObject* pointer, int number)
 {
-    this->PlotObjects[id] = pointer;
-    PlotObjectsNumber[id]  = number;
-    PlotObjectsNumbers.push_back(number);
-    std::sort(PlotObjectsNumbers.begin(), PlotObjectsNumbers.end());
+    Registry->AddPlotPointer(id, pointer, number);
 
 }
 
 void DataManagementClass::RenamePlotPointer(QString IdOld, QString IdNew)
 {
-    auto it = this->PlotObjects.find(IdOld);
-    auto itNumber = this->PlotObjectsNumber.find(IdOld);
-
-    if(it != this->PlotObjects.end())
-    {
-        auto data =  this->PlotObjects[IdOld];
-        this->PlotObjects.erase (it);
-
-        if(itNumber != this->PlotObjectsNumber.end())
-        {
-            int number = this->PlotObjectsNumber[IdOld];
-            this->PlotObjectsNumber.erase(itNumber);
-            auto itNumber_vec = find (PlotObjectsNumbers.begin(), PlotObjectsNumbers.end(), number);
-            this->PlotObjectsNumbers.erase(itNumber_vec);
-
-            number = IdNew.split("#").at(1).toInt()-1;
-            AddPlotPointer(IdNew, data, number);
-        }
-        else
-            AddPlotPointer(IdNew, data);
-    }
+    Registry->RenamePlotPointer(IdOld, IdNew);
 }
 
 void DataManagementClass::AddPlotWindow(QString id, int rows, int cols, int number )
 {
-    this->PlotWindows[id] = std::pair<int,int>(rows,cols);
-    this->PlotWindowNumber[id]  = number;
-    this->PlotWindowNumbers.push_back(number);
-    std::sort(PlotWindowNumbers.begin(), PlotWindowNumbers.end());
-
-    PlotWindowsIncrementer++;
+    Registry->AddPlotWindow(id, rows, cols, number);
 }
 
 
 void DataManagementClass::AddPlotWindow(QString id, int rows, int cols )
 {
-    this->PlotWindows[id] = std::pair<int,int>(rows,cols);
-    PlotWindowsIncrementer++;
+    Registry->AddPlotWindow(id, rows, cols);
 }
 
 void DataManagementClass::DeletePlotPointer(QString id )
 {
-    //Check if map element exists
-
-    auto it = this->PlotObjects.find(id);
-    if(it != this->PlotObjects.end())
-        this->PlotObjects.erase (it);
-
-    auto it2 = this->PlotObjectsNumber.find(id);
-    if(it2 != this->PlotObjectsNumber.end())
-    {
-        auto number = PlotObjectsNumber[id];
-        this->PlotObjectsNumber.erase(it2);
-        auto itNumber_vec = find (PlotObjectsNumbers.begin(), PlotObjectsNumbers.end(), number);
-        this->PlotObjectsNumbers.erase(itNumber_vec);
-    }
+    Registry->DeletePlotPointer(id);
 
 }
 
 QObject* DataManagementClass::GetPlotByName(QString Name)
 {
 
-    //Itterate over all map elements
-    for(auto e : PlotObjects)
-            if(e.second->objectName().compare(Name) == 0)
-                return e.second;
-
-    return NULL;
+    return Registry->GetPlotByName(Name);
 }
 
 void DataManagementClass::DeletePlotWindow(QString id )
 {
-    //Check if map element exists
-    auto it = this->PlotWindows.find(id);
-    if(it != this->PlotWindows.end())
-        this->PlotWindows.erase (it);
-
-    auto it2 = this->PlotWindowNumber.find(id);
-    if(it2 != this->PlotWindowNumber.end())
-    {
-        auto number = PlotWindowNumber[id];
-        this->PlotWindowNumber.erase(it2);
-        auto itNumber_vec = find (PlotWindowNumbers.begin(), PlotWindowNumbers.end(), number);
-        this->PlotWindowNumbers.erase(itNumber_vec);
-    }
+    Registry->DeletePlotWindow(id);
 
 }
 
 void DataManagementClass::AddFormFile(std::pair<QString, QString> Filename )
 {
-   this->FormFiles.push_back(Filename);
+   Registry->AddFormFile(Filename);
 }
 
 void DataManagementClass::AddSkipFormFile(QString Filename, bool skip )
 {
-   this->SkipFormFiles[Filename] = skip;
+   Registry->AddSkipFormFile(Filename, skip);
 }
 
 bool DataManagementClass::GetSkipFormFile(QString Filename)
 {
-    //Check if map element exists
-    auto itt = this->SkipFormFiles.find(Filename);
-    if(itt != this->SkipFormFiles.end())
-    {
-       return  this->SkipFormFiles[Filename];
-    }
-    return false;
+    return Registry->GetSkipFormFile(Filename);
 }
 
 void DataManagementClass::RemoveFormFile(QString Filename )
 {
-    //Search for the corresponding vector element
-    int j=-1;
-    for(int i = 0; i < this->FormFiles.size() && j ==-1; i++)
-    {
-        if(FormFiles[i].first.compare(Filename)==0)
-            j = i;
-    }
-    //if found delete
-    if(j != -1)
-        FormFiles.erase(FormFiles.begin()+j);
+    Registry->RemoveFormFile(Filename);
 }
 
 
@@ -336,12 +255,12 @@ void DataManagementClass::AddContainerElement(QString ID,QString DataType, QStri
 
 int DataManagementClass::GetFormFileCount(void)
 {
-    return (int) this->FormFiles.size();
+    return Registry->GetFormFileCount();
 }
 
 std::pair<QString, QString> DataManagementClass::GetFormFileEntry(int i)
 {
-    return this->FormFiles[i];
+    return Registry->GetFormFileEntry(i);
 }
 
 Platform_Interface* DataManagementClass::GetDevice(QString Filename)
@@ -400,8 +319,7 @@ void DataManagementClass::CloseDevice(QString dev)
 void DataManagementClass::CloseProjectLogic(void)
 {
     //Clean up
-    FormFiles.clear();
-    SkipFormFiles.clear();
+    Registry->Clear();
 
     for(auto itt : _Devices)
         if(itt.second)
@@ -414,17 +332,7 @@ void DataManagementClass::CloseProjectLogic(void)
             delete itt.second;
     Container.clear();
 
-    this->PlotWindowsIncrementer = 0;
-    this->PlotWindows.clear();
-    this->PlotWindowNumber.clear();
-    this->PlotWindowNumbers.clear();
-    this->PlotObjectsNumber.clear();
-    this->PlotObjectsNumbers.clear();
-    this->PlotObjects.clear();
-    this->PlotWindowsIncrementer = 0;
-
     this->ElementsToContainerID.clear();
-    this->AliasMap.clear();
 }
 
 
@@ -446,7 +354,7 @@ QList<QString> DataManagementClass::GetDevicePaths()
 
 std::pair<int,int>  DataManagementClass::GetPlotWindowRowsCols(QString Name)
 {
-    return this->PlotWindows[Name];
+    return Registry->GetPlotWindowRowsCols(Name);
 }
 
 int DataManagementClass::GetContainerCount(void)
@@ -479,20 +387,7 @@ std::pair<QString, std::vector<QString>> DataManagementClass::GetContainerElemen
 int DataManagementClass::GetPlotWindowsIncrementer()
 {
 
-    int LastNumber = 0;
-    if(!PlotWindowNumbers.size())
-        return 0;
-    if(PlotWindowNumbers[0] != 0)
-        return 0;
-    for(auto index = 1; index < PlotWindowNumbers.size(); index++)
-    {
-        if (PlotWindowNumbers[index] - LastNumber > 1)
-        {
-            break;
-        }
-        LastNumber= PlotWindowNumbers[index];
-    }
-    return LastNumber+1;
+    return Registry->GetPlotWindowsIncrementer();
 }
 
 void DataManagementClass::SetMinMaxValue(QString ID, double Min, double Max)
@@ -519,19 +414,12 @@ bool DataManagementClass::IsObjectLinked(QObject* Obj)
 
 void DataManagementClass::SetAlias(QString ID, QString Alias)
 {
-    AliasMap[ID ] = Alias;
+    Registry->SetAlias(ID, Alias);
 }
 
 QString DataManagementClass::GetAlias(QString ID)
 {
-    //Check if map element exists
-    auto it = this->AliasMap.find(ID);
-    if(it != this->AliasMap.end())
-    {
-        return AliasMap[ID ] ;
-    }
-    else
-        return ID;
+    return Registry->GetAlias(ID);
 }
 
 void DataManagementClass::SetData(const QString &ID, InterfaceData Data)

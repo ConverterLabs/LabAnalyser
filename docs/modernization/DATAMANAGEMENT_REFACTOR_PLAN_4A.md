@@ -231,3 +231,27 @@ share these value registries and that destruction followed by reconstruction
 does not recover prior form, alias or plot state. They intentionally avoid
 unchecked indexed form access and pointer/device/container ownership paths;
 those remain later-slice risks, not safe registry characterization inputs.
+
+## Phase 4B.1 implementation outcome
+
+**Completed 2026-08-10.** `DataRegistry.h/.cpp` now holds only the initially
+approved form/skip-form, alias and plot/window bookkeeping. `DataManagementClass`
+owns it privately via RAII and forwards its unchanged public methods. The old
+facade fields were removed only after every covered operation delegated to the
+registry. Its non-owning plot `QObject*` entries preserve the former lifetime
+policy; no container, device, widget, mapper or Messenger field moved.
+
+The unchanged `DM_REG_001..DM_REG_005` suite passed (17/17 total), the central
+runner passed all 11 registered targets, and fresh Release/Debug application
+builds passed. A scoped GCC analysis build passed with the unchanged 162
+filtered diagnostics; three pre-existing signed/unsigned loop diagnostics move
+from `DataManagementClass.cpp` to `DataRegistry.cpp` with their code.
+Focused coverage reports 87.50% lines for `DataManagementClass.cpp` and 91.58%
+for `DataRegistry.cpp`; the pre/post denominator change is documented in the
+inventory. The bundle retains 88.89% line coverage under the same focused
+vector. Rollback remains local: remove the private delegation and restore the
+former fields; no external API, signal/slot, ABI or persisted data migration is
+involved.
+
+The next slice remains 4A.2 container ownership. It must not absorb registry,
+device or widget changes opportunistically.

@@ -10,6 +10,7 @@ CONFIG += testcase console
 
 SOURCES += \
     $$REPOSITORY_ROOT/Export/export2highfive.cpp \
+    $$REPOSITORY_ROOT/DataManagement/DataRegistry.cpp \
     $$REPOSITORY_ROOT/DataManagement/DataManagementClass.cpp \
     $$REPOSITORY_ROOT/plugins/InterfaceDataType.cpp \
     Hdf5ExportContractTests.cpp
@@ -17,6 +18,7 @@ SOURCES += \
 HEADERS += \
     $$REPOSITORY_ROOT/Export/export2highfive.h \
     $$REPOSITORY_ROOT/DataManagement/DataManagementClass.h \
+    $$REPOSITORY_ROOT/DataManagement/DataRegistry.h \
     $$REPOSITORY_ROOT/DataManagement/mapper.h \
     $$REPOSITORY_ROOT/plugins/InterfaceDataType.h
 

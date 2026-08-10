@@ -23,10 +23,12 @@
 #define DataManagementClass_H
 #include <QMainWindow>
 #include <map>
+#include <memory>
 #include "mapper.h"
 #include "../plugins/InterfaceDataType.h"
 
 class Platform_Interface;
+class DataRegistry;
 
 /** This Class contains all data that is necessary to mirror the complete data State of LabAnalyser, including the plugin handling.
  *
@@ -281,10 +283,12 @@ signals:
 
 private:
 
-    /** Vector that contains the connection between (FormName and UiFileName)*/
-    std::vector<std::pair<QString, QString>> FormFiles;
-    /** Map that contains the information if FormName has user defined ui-labels*/
-    std::map<QString,bool> SkipFormFiles;
+    struct DataRegistryDeleter {
+        void operator()(DataRegistry* registry) const;
+    };
+
+    /** Internal RAII-owned registry for form, alias and plot/window value state. */
+    std::unique_ptr<DataRegistry, DataRegistryDeleter> Registry;
 
     /** Map that contains the information of the loaded plugin paths and the corresponding Interface Pointers*/
     std::map<QString, Platform_Interface*> _Devices;
@@ -294,28 +298,9 @@ private:
     QString GetDevicePath(QString Name);
 
 
-    /** Map that contains the information of the loaded plotnames and the corresponding pointers*/
-    std::map<QString, QObject* > PlotObjects;
-    std::map<QString, int > PlotObjectsNumber;
-    /** std::vector which holds the PlotObject Numbers*/
-    std::vector<int> PlotObjectsNumbers;
-
-
-    /** Map that contains the information of the loaded PlotWindowNames and the corresponding pointers*/
-    std::map<QString, std::pair<int,int>> PlotWindows;
-    /** Number of total plot Window openings*/
-    int PlotWindowsIncrementer = 0;
-    std::map<QString, int > PlotWindowNumber;
-    /** std::vector which holds the PlotObject Numbers*/
-    std::vector<int> PlotWindowNumbers;
-
-
     /** Map that contains the connection between the objectname of an widget and the connected unique data identifier*/
     std::map<QString, QString> ElementsToContainerID;
     /** Map that contains the connection between the connected unique data identifier and its ToFormMapper Object */
     std::map<QString, ToFormMapper*> Container;
-    /** Map that contains the connection between the unique data identifier and its alias */
-    std::map<QString, QString> AliasMap;
-
 };
 #endif // GUIDataInterface_H

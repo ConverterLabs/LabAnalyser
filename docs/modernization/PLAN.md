@@ -248,3 +248,19 @@ form/skip-form, alias and plot/window registry bookkeeping behind
 `DataManagementClass`. Container/device ownership, widget signal routing and
 UI/IO orchestration remain separate later slices and must retain their existing
 facades, Qt signal/slot contracts and plugin/data ABI.
+
+## Phase 4B.1 DataManagement registry extraction
+
+**Completed 2026-08-10.** The first rollbackable implementation slice extracted
+only form files, skip-form flags, aliases, plot pointers and plot/window number
+state into a private RAII-owned `DataRegistry` behind the unchanged
+`DataManagementClass` facade. `DM_REG_001..DM_REG_005` retained their observed
+duplicate/order/removal, alias-fallback and numbering semantics without test
+changes. The focused 17/17 DataManagement suite, all 11 central runner targets,
+fresh Release and Debug builds, and scoped static-analysis build passed (the
+unchanged 162 filtered diagnostics include three signed/unsigned diagnostics
+relocated with the extracted loops). The
+focused file metrics are recorded in `BEHAVIOR_INVENTORY.md`; they are not a
+project coverage gate. No public API, Qt signal/slot, plugin/data ABI or
+persistence contract changed. Container/device ownership, widget mappings and
+Messenger/UI orchestration remain explicitly deferred to later 4A slices.

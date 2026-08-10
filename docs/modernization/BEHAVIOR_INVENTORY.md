@@ -592,3 +592,26 @@ or protected production-function register. That remains an open quality gate
 before broad refactoring. Milestone 3 therefore records the characterization
 of identified critical external contracts, not a claim that every production
 function has been tested or fully inventoried.
+
+## DataManagement registry extraction 4B.1
+
+The approved first refactoring slice delegates precisely the existing
+`DM_REG_001` through `DM_REG_005` contracts to the private RAII-owned
+`DataRegistry`; the tests themselves were not changed for the extraction.
+`DataManagementClass` remains the only public facade. The final focused suite
+passed 17/17, and the central runner passed all 11 registered targets. Fresh
+Release and Debug application builds passed. The private registry stores only
+value state and non-owning plot observations; container, device, mapper,
+widget-binding and Messenger state stays in the facade for later slices.
+
+Focused gcov evidence is intentionally file-specific rather than project-wide:
+`DataManagementClass.cpp` has 87.50% lines (161/184), 90.91% executed branches
+(180/198), 57.58% branches taken at least once (114/198), and 78.33% calls
+(141/180). The new `DataRegistry.cpp` has 91.58% lines (87/95), 97.06% executed
+branches (66/68), 76.47% branches taken at least once (52/68), and 87.18% calls
+(34/39). The historical pre-extraction focused facade figure was 88.89% lines
+(200/225); the relocated two-file line total is likewise 88.89% (248/279).
+Branch denominators changed with the extraction, so percentages are evidence,
+not directly identical source metrics. Unreached registry paths are the safe
+no-number plot/window overloads and the rename fallback without a number; they
+retain their prior exclusions/coverage status.
