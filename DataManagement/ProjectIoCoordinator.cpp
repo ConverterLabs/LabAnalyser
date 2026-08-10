@@ -8,6 +8,9 @@
 #include "../Import/parameterloader.h"
 #include "../LoadSave/xmlexperimentreader.h"
 #include "../LoadSave/xmlexperimentwriter.h"
+#include "../LoadSave/loadplugin.h"
+
+#include <QFile>
 
 ProjectIoCoordinator::ProjectIoCoordinator(UIDataManagementSetClass& manager_)
     : manager(manager_), uiManager(manager_)
@@ -48,4 +51,21 @@ bool ProjectIoCoordinator::WriteExperiment(const QString& path) const
 {
     xmlexperimentwriter writer(&uiManager, uiManager.GetMessengerRef(), uiManager);
     return writer.write(path);
+}
+
+PluginLoadOutcome ProjectIoCoordinator::LoadPlugin(const QString& path) const
+{
+    class LoadPlugin loader(&uiManager, uiManager.GetMessenger());
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+        return { PluginLoadOutcomeKind::FileOpenError, nullptr, QString() };
+
+    if (loader.read(&file, path))
+        return { PluginLoadOutcomeKind::ParseError, nullptr, loader.errorString() };
+
+    Platform_Interface* device = loader.GetNewDevice();
+    if (!device)
+        return { PluginLoadOutcomeKind::NoDevice, nullptr, QString() };
+
+    return { PluginLoadOutcomeKind::Loaded, device, QString() };
 }

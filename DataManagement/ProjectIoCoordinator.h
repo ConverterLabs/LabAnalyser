@@ -5,6 +5,22 @@
 
 class DataManagementSetClass;
 class UIDataManagementSetClass;
+class Platform_Interface;
+
+enum class PluginLoadOutcomeKind
+{
+    Loaded,
+    FileOpenError,
+    ParseError,
+    NoDevice
+};
+
+struct PluginLoadOutcome
+{
+    PluginLoadOutcomeKind kind;
+    Platform_Interface* device = nullptr;
+    QString parserError;
+};
 
 // Private value-like operation helper for the UI project-I/O facade.  It owns
 // no QObject or adapter: each adapter is constructed for one operation with
@@ -22,6 +38,7 @@ public:
     bool ExportHdf5(const QString& path, const QStringList& exportIds) const;
     bool ReadExperiment(const QString& path) const;
     bool WriteExperiment(const QString& path) const;
+    PluginLoadOutcome LoadPlugin(const QString& path) const;
 
 private:
     DataManagementSetClass& manager;

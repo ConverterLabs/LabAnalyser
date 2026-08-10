@@ -21,7 +21,6 @@
 
 #include "UIDataManagementSetClass.h"
 #include "ProjectIoCoordinator.h"
-#include <QFile>
 #include <QDir>
 #include <QXmlStreamWriter>
 #include <QPluginLoader>
@@ -158,36 +157,29 @@ bool UIDataManagementSetClass::Export2Hdf5(QString Path , QStringList ExportIds 
 
 bool UIDataManagementSetClass::LoadPlugin(QString FileName)
 {
-
-    class LoadPlugin PluginLoader(this, this->GetMessenger());
-    QFile file(FileName);
-    if(!file.open(QFile::ReadOnly | QFile::Text)){
+    ProjectIoCoordinator coordinator(*this);
+    const PluginLoadOutcome outcome = coordinator.LoadPlugin(FileName);
+    if (outcome.kind == PluginLoadOutcomeKind::FileOpenError) {
         Error("Cannot read file " + FileName);
         return true;
     }
-    if (PluginLoader.read(&file, FileName))
+    if (outcome.kind == PluginLoadOutcomeKind::ParseError)
     {
-        Error("Parse error in file " + FileName + ". Reason: " + PluginLoader.errorString());
+        Error("Parse error in file " + FileName + ". Reason: " + outcome.parserError);
         return true;
     }
-    else
+    if (outcome.kind == PluginLoadOutcomeKind::Loaded)
     {
-        if(PluginLoader.GetNewDevice())
-        {
-            #undef GetObject
-            GetMessenger()->NewDeviceRegistration(PluginLoader.GetNewDevice()->GetObject());
-            InterfaceData Data;
-            Data.SetData(FileName);
-            GetMessenger()->MessageTransmitter("load" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
-            Data.SetData(LoadPath);
-            GetMessenger()->MessageTransmitter("LoadCustomData" ,PluginLoader.GetNewDevice()->GetObject()->objectName(),Data);
-
-        }
-        else
-            return true;
-
+        #undef GetObject
+        GetMessenger()->NewDeviceRegistration(outcome.device->GetObject());
+        InterfaceData Data;
+        Data.SetData(FileName);
+        GetMessenger()->MessageTransmitter("load" ,outcome.device->GetObject()->objectName(),Data);
+        Data.SetData(LoadPath);
+        GetMessenger()->MessageTransmitter("LoadCustomData" ,outcome.device->GetObject()->objectName(),Data);
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool UIDataManagementSetClass::ImportFromXml(QString Path  )
