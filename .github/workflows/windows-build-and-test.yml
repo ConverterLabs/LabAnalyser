@@ -1,0 +1,80 @@
+name: Windows build and test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: MSYS2 MINGW64 qmake
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up MSYS2 MINGW64 dependencies
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-qt6-base
+            mingw-w64-x86_64-qt6-tools
+            mingw-w64-x86_64-matio
+            mingw-w64-x86_64-hdf5
+            mingw-w64-x86_64-highfive
+            mingw-w64-x86_64-fftw
+            mingw-w64-x86_64-boost
+
+      - name: Prioritize MSYS2 MINGW64
+        shell: pwsh
+        run: |
+          $mingwBin = 'C:\msys64\mingw64\bin'
+          $msysUsrBin = 'C:\msys64\usr\bin'
+          if (-not (Test-Path -LiteralPath $mingwBin) -or -not (Test-Path -LiteralPath $msysUsrBin)) {
+            throw 'Expected MSYS2 MINGW64 directories are unavailable.'
+          }
+          "$mingwBin`n$msysUsrBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $env:Path = "$mingwBin;$msysUsrBin;$env:Path"
+          qmake6.exe -query
+          mingw32-make.exe --version
+
+      - name: Fresh Release build
+        shell: pwsh
+        run: |
+          $env:Path = 'C:\msys64\mingw64\bin;C:\msys64\usr\bin;' + $env:Path
+          New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
+          Start-Transcript -Path build\ci-logs\release-build.log -Force
+          try {
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -BuildDir build\ci-release -Jobs 2
+            if ($LASTEXITCODE -ne 0) { throw "Release build failed with exit code $LASTEXITCODE." }
+          }
+          finally { Stop-Transcript }
+
+      - name: Full qmake test runner (offscreen)
+        shell: pwsh
+        run: |
+          $env:Path = 'C:\msys64\mingw64\bin;C:\msys64\usr\bin;' + $env:Path
+          $env:QT_QPA_PLATFORM = 'offscreen'
+          New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
+          Start-Transcript -Path build\ci-logs\tests.log -Force
+          try {
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -BuildRoot build\ci-tests -Jobs 2
+            if ($LASTEXITCODE -ne 0) { throw "Test runner failed with exit code $LASTEXITCODE." }
+          }
+          finally { Stop-Transcript }
+
+      - name: Upload build and test logs
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: windows-msys2-build-and-test-logs
+          path: build/ci-logs/
+          if-no-files-found: warn
+          retention-days: 14

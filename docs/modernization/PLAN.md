@@ -1,6 +1,13 @@
 # Modernization plan
 
-## Current milestone
+## Milestone 2C.1 status
+
+**Reproducible Windows build/test CI:** locally validated on 2026-08-10; remote
+GitHub execution is unconfirmed. The workflow uses the existing qmake
+Release-build and central test-runner commands with an MSYS2-prioritized PATH
+and offscreen Qt GUI tests. It adds neither production code nor a coverage gate.
+
+## Milestone 2B record
 
 **Milestone 2B — combined local qmake coverage reporting:** completed on 2026-08-10.
 The existing PlotMeasurements test is registered in a single executable local
@@ -18,7 +25,9 @@ production baseline and exclusions; it is not a repository-wide gate.
 1. Repository audit, reproducible baseline, and risk register — completed.
 2. Test harness, CTest integration, fixtures, coverage, and CI — in progress.
    Milestones 2A (local qmake test flow) and 2B (combined gcov reporting) are
-   complete; CTest, fixture content, coverage gates, and CI remain pending.
+   complete. Milestone 2C.1 adds a locally validated Windows build/test
+   workflow; CTest, fixture content, coverage gates, wider CI and remote
+   workflow evidence remain pending.
 3. Characterize external contracts and critical paths — in progress.
    Milestone 3A characterized the DataManagement manager/set/messenger
    subsystem. Phase 3B characterizes LoadSave experiment XML with real
@@ -36,7 +45,9 @@ production baseline and exclusions; it is not a repository-wide gate.
 
 - Only Windows/MSYS2 was runnable; Linux and all cross-platform claims are unverified.
 - The test baseline is one PlotMeasurements executable; integration contracts have no fixture coverage.
-- qmake has a local test runner and combined gcov reporting, but no CTest, coverage gate, sanitizer, static-analysis, or CI integration.
+- qmake has a local test runner, combined gcov reporting and a locally validated
+  Windows CI workflow, but no CTest, coverage gate, sanitizer, static-analysis,
+  or remote CI confirmation.
 - Plugin ABI, XML, binary TCP framing, libmatio/HDF5 output, and UI object names are compatibility-critical.
 - Build dependencies are machine-installed rather than locked/reproduced by the repository.
 

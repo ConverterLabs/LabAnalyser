@@ -127,6 +127,18 @@ sources are excluded by documented rules. Non-fatal gcov header diagnostics do
 not hide a non-zero gcov exit or a missing production report. No coverage gate
 is enabled.
 
+## Windows CI baseline (Milestone 2C.1)
+
+The repository now contains a GitHub Actions workflow for a fresh MSYS2 MINGW64
+Release build and the complete central qmake test runner. It installs the
+documented Qt 6, GCC, matio, HDF5, HighFive, FFTW and Boost packages, puts the
+MINGW64 runtime first on PATH, scopes GUI tests to `QT_QPA_PLATFORM=offscreen`,
+and uploads text logs on both success and failure. It has no secrets, package
+publication, release, or coverage gate. Required workflow entries and
+tab-free indentation were locally validated; no YAML/Actions linter is
+installed. No GitHub-hosted run was available from this workspace, so remote
+CI remains unconfirmed. See `CI.md`.
+
 ## DataManagement characterization 3A
 
 On 2026-08-03 the normal local command built and passed both registered qmake
