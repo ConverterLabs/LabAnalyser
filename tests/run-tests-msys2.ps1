@@ -55,9 +55,22 @@ function Invoke-Native {
     param([Parameter(Mandatory)][string]$Exe, [string[]]$Arguments = @())
 
     Write-Host "> $Exe $($Arguments -join ' ')"
-    & $Exe @Arguments
-    if ($LASTEXITCODE -ne 0) {
-        throw "Command failed with exit code $LASTEXITCODE`: $Exe"
+    # Some contract vectors intentionally exercise HDF5 file errors.  HDF5
+    # reports those diagnostics on stderr even though the Qt test executable
+    # returns success after asserting the contract.  Keep the runner's failure
+    # convention based on the native exit code, rather than letting PowerShell
+    # turn any stderr line into a terminating NativeCommandError under Stop.
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        & $Exe @Arguments
+        $nativeExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($nativeExitCode -ne 0) {
+        throw "Command failed with exit code $nativeExitCode`: $Exe"
     }
 }
 

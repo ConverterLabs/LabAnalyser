@@ -91,6 +91,20 @@ filter change was used.
 can still make the numeric scaling division invalid; it is a separate
 high-priority QSlider defect candidate and is not covered by this fix.
 
+## Current 161-diagnostic count after MessageDispatchPolicy extraction
+
+The scoped GCC report after Phase 4E.2 contains 161 filtered own-production
+diagnostic lines, down from 162. This is not caused by a filter, compiler-flag
+or compilation-coverage change: the extraction renamed the local
+`InterfaceData Data` in `DataMessengerClass::MessageReceiver`'s `CloseProject`
+branch to `closeData`, removing that one real `-Wshadow` diagnostic against the
+method parameter. The branch remains compiled and behaviorally covered by
+`DM_MSG_001..DM_MSG_003`; no warning was hidden by moving code out of the build.
+All other recorded category counts are unchanged: 23 sign comparisons, 35 Qt
+deprecations, 77 unused parameters, 6 unused variables, 3 unused-but-set
+variables and 17 remaining shadowing diagnostics; `-Wmaybe-uninitialized`
+remains zero after the separately approved QSlider fix.
+
 ## Gates and limits
 
 This pilot adds no CI job and no mandatory warning, static-analysis, or quality

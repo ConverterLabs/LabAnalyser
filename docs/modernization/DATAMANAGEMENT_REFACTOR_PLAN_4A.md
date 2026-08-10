@@ -397,3 +397,39 @@ parent-parent notification and transmitter-before-forward ordering.
 Rollback is local: restore the former command branches in `MessengerClass` and
 remove the private source from qmake targets. No public header, Qt signal/slot,
 plugin IID or InterfaceData ABI change is involved.
+
+## Phase 4F.1 device-ownership characterization
+
+`DM_DEV_001..DM_DEV_004` now establish the public-facade baseline for the
+still-unextracted device maps. `AddDevice` adopts the first non-null interface
+for a name and its first path; repeated registration with the same pointer or a
+different pointer preserves that entry and does not destroy the rejected
+pointer. The caller of a rejected pointer therefore remains responsible for
+its cleanup. Device and path enumeration follows lexical `std::map` key order,
+and repeated `GetDevice` calls return the same raw pointer while it is owned.
+
+`CloseDevice` deletes a known owned interface exactly once, removes its path,
+and has no further visible effect for an unknown or already-closed name.
+`RemoveDevices`, in contrast, deletes all currently owned interfaces but leaves
+the legacy path map intact: `GetDevices()` and `GetDevicePaths()` can therefore
+still report paths for unavailable devices until a later close/project cleanup
+or replacement. Re-registration after removal replaces that surviving path.
+`CloseProjectLogic` clears both maps and deletes devices in lexical map order.
+It does not own the `QObject*` returned by `Platform_Interface::GetObject()`;
+the QPointer vector records that this object remains alive until its external
+owner deletes it. Separate managers isolate all device state and cleanup.
+
+These tests deliberately do not register null interfaces, dereference released
+raw pointers, or force plugin unload sequences. Those remain dangerous
+ownership/plugin-boundary risks. The existing `PLUGIN_001..PLUGIN_007`
+contracts cover failed plugin loading and safe incompatible-plugin rejection;
+4F.1 relies on that evidence rather than duplicating plugin-loader tests.
+The focused DataManagement suite passed 35 checks, the independent plugin
+contract suite passed 9 checks, and the central runner completed all 11
+registered projects with exit code 0. The runner now deliberately treats native
+stderr as diagnostic output while retaining its explicit non-zero native
+exit-code failure rule, because the HDF5 negative contract vectors emit
+expected library diagnostics on stderr.
+The next implementation slice may introduce only a private `DeviceRegistry`
+behind the unchanged facade, preserving both the raw-pointer and stale-path
+semantics above before any separately approved ownership hardening.

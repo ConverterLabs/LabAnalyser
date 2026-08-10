@@ -96,6 +96,28 @@ private:
     int* destroyed_;
 };
 
+class DeviceLifecycleProbe final : public Platform_Interface
+{
+public:
+    DeviceLifecycleProbe(const QString& label, QStringList* lifecycle, QObject* object = nullptr)
+        : label_(label), lifecycle_(lifecycle), object_(object) {}
+
+    ~DeviceLifecycleProbe() override
+    {
+        lifecycle_->append(label_ + ":destroyed");
+    }
+
+    InterfaceData* GetSymbol(const QString&) override { return nullptr; }
+    QObject* GetObject() override { return object_; }
+    void MessageReceiver(const QString&, const QString&, InterfaceData) override {}
+    void MessageSender(const QString&, const QString&, InterfaceData) override {}
+
+private:
+    QString label_;
+    QStringList* lifecycle_;
+    QObject* object_;
+};
+
 InterfaceData number(double value)
 {
     InterfaceData data;
@@ -139,6 +161,10 @@ private slots:
     void DM_MSG_001_messageReceiver_commandMatrix();
     void DM_MSG_002_messageTransmitter_commandMatrix();
     void DM_MSG_003_parentHierarchy_emptyInputs_and_mixedSequence();
+    void DM_DEV_001_registration_lookup_and_order_are_facade_observable();
+    void DM_DEV_002_duplicate_names_do_not_take_the_rejected_pointer();
+    void DM_DEV_003_close_remove_and_reregistration_keep_legacy_path_state();
+    void DM_DEV_004_project_cleanup_order_qobject_lifetime_and_instance_isolation();
 };
 
 void DataManagementCharacterizationTests::initTestCase()
@@ -305,6 +331,125 @@ void DataManagementCharacterizationTests::DM_005_deviceLifetimeAndProjectCleanup
     QCOMPARE(manager.GetFormFileCount(), 0);
     QCOMPARE(manager.GetDevices().size(), 0);
     QCOMPARE(manager.GetPlotWindowsIncrementer(), 0);
+}
+
+void DataManagementCharacterizationTests::DM_DEV_001_registration_lookup_and_order_are_facade_observable()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QStringList lifecycle;
+    auto* beta = new DeviceLifecycleProbe("beta", &lifecycle);
+    auto* alpha = new DeviceLifecycleProbe("alpha", &lifecycle);
+
+    manager.AddDevice("beta", "beta.xml", beta);
+    manager.AddDevice("alpha", "alpha.xml", alpha);
+
+    QCOMPARE(manager.GetDevice("alpha"), alpha);
+    QCOMPARE(manager.GetDevice("alpha"), alpha);
+    QCOMPARE(manager.GetDevice("beta"), beta);
+    QCOMPARE(manager.GetDevice("unknown"), nullptr);
+    QCOMPARE(manager.GetDevices(), QList<QString>({"alpha", "beta"}));
+    QCOMPARE(manager.GetDevicePaths(), QList<QString>({"alpha.xml", "beta.xml"}));
+    QCOMPARE(lifecycle, QStringList());
+
+    manager.CloseProjectLogic();
+    QCOMPARE(lifecycle, QStringList({"alpha:destroyed", "beta:destroyed"}));
+}
+
+void DataManagementCharacterizationTests::DM_DEV_002_duplicate_names_do_not_take_the_rejected_pointer()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QStringList lifecycle;
+    auto* accepted = new DeviceLifecycleProbe("accepted", &lifecycle);
+    auto* rejected = new DeviceLifecycleProbe("rejected", &lifecycle);
+
+    manager.AddDevice("device", "first.xml", accepted);
+    manager.AddDevice("device", "same-pointer.xml", accepted);
+    manager.AddDevice("device", "rejected-pointer.xml", rejected);
+
+    QCOMPARE(manager.GetDevice("device"), accepted);
+    QCOMPARE(manager.GetDevices(), QList<QString>({"device"}));
+    QCOMPARE(manager.GetDevicePaths(), QList<QString>({"first.xml"}));
+    QCOMPARE(lifecycle, QStringList());
+
+    manager.RemoveDevices();
+    QCOMPARE(lifecycle, QStringList({"accepted:destroyed"}));
+    QCOMPARE(manager.GetDevice("device"), nullptr);
+    // RemoveDevices deliberately retains the legacy path map.
+    QCOMPARE(manager.GetDevices(), QList<QString>({"device"}));
+    QCOMPARE(manager.GetDevicePaths(), QList<QString>({"first.xml"}));
+
+    // The rejected duplicate was never adopted by the manager; its creator
+    // remains responsible for deleting it.
+    delete rejected;
+    QCOMPARE(lifecycle, QStringList({"accepted:destroyed", "rejected:destroyed"}));
+    manager.CloseProjectLogic();
+}
+
+void DataManagementCharacterizationTests::DM_DEV_003_close_remove_and_reregistration_keep_legacy_path_state()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QStringList lifecycle;
+    auto* alpha = new DeviceLifecycleProbe("alpha", &lifecycle);
+    auto* beta = new DeviceLifecycleProbe("beta", &lifecycle);
+
+    manager.AddDevice("alpha", "alpha.xml", alpha);
+    manager.AddDevice("beta", "beta.xml", beta);
+    manager.CloseDevice("unknown");
+    QCOMPARE(lifecycle, QStringList());
+
+    manager.CloseDevice("alpha");
+    QCOMPARE(lifecycle, QStringList({"alpha:destroyed"}));
+    QCOMPARE(manager.GetDevice("alpha"), nullptr);
+    QCOMPARE(manager.GetDevices(), QList<QString>({"beta"}));
+    manager.CloseDevice("alpha");
+    QCOMPARE(lifecycle, QStringList({"alpha:destroyed"}));
+
+    manager.RemoveDevices();
+    QCOMPARE(lifecycle, QStringList({"alpha:destroyed", "beta:destroyed"}));
+    QCOMPARE(manager.GetDevice("beta"), nullptr);
+    QCOMPARE(manager.GetDevices(), QList<QString>({"beta"}));
+    QCOMPARE(manager.GetDevicePaths(), QList<QString>({"beta.xml"}));
+
+    auto* replacement = new DeviceLifecycleProbe("replacement", &lifecycle);
+    manager.AddDevice("beta", "replacement.xml", replacement);
+    QCOMPARE(manager.GetDevice("beta"), replacement);
+    QCOMPARE(manager.GetDevicePaths(), QList<QString>({"replacement.xml"}));
+    manager.CloseDevice("beta");
+    QCOMPARE(lifecycle, QStringList({"alpha:destroyed", "beta:destroyed", "replacement:destroyed"}));
+    QVERIFY(manager.GetDevices().isEmpty());
+    QVERIFY(manager.GetDevicePaths().isEmpty());
+}
+
+void DataManagementCharacterizationTests::DM_DEV_004_project_cleanup_order_qobject_lifetime_and_instance_isolation()
+{
+    QObject firstOwner;
+    QObject secondOwner;
+    DataManagementClass first(&firstOwner);
+    DataManagementClass second(&secondOwner);
+    QStringList lifecycle;
+    auto* providedObject = new QObject;
+    QPointer<QObject> objectGuard(providedObject);
+
+    first.AddDevice("zeta", "zeta.xml", new DeviceLifecycleProbe("first-zeta", &lifecycle));
+    first.AddDevice("alpha", "alpha.xml", new DeviceLifecycleProbe("first-alpha", &lifecycle, providedObject));
+    second.AddDevice("other", "other.xml", new DeviceLifecycleProbe("second-other", &lifecycle));
+    QVERIFY(first.GetDevice("alpha")->GetObject() == providedObject);
+
+    first.CloseProjectLogic();
+    QCOMPARE(lifecycle, QStringList({"first-alpha:destroyed", "first-zeta:destroyed"}));
+    QVERIFY(objectGuard);
+    QVERIFY(first.GetDevices().isEmpty());
+    QVERIFY(first.GetDevicePaths().isEmpty());
+    QVERIFY(second.GetDevice("other") != nullptr);
+    QCOMPARE(second.GetDevices(), QList<QString>({"other"}));
+
+    delete providedObject;
+    QVERIFY(objectGuard.isNull());
+    second.CloseProjectLogic();
+    QCOMPARE(lifecycle, QStringList({"first-alpha:destroyed", "first-zeta:destroyed", "second-other:destroyed"}));
 }
 
 void DataManagementCharacterizationTests::DM_006_messengerPublishSignalOrderAndValues()

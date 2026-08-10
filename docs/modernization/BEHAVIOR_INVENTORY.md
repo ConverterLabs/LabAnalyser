@@ -779,3 +779,34 @@ taken branches, 63/82 calls and 7/8 functions; the new policy recorded 19/20
 lines, 18/18 executed branches, 17/18 taken branches, 9/10 calls and 1/1
 function. Statusbar-only and registration/status-write paths remain outside the
 safe messenger command vectors.
+
+## DataManagement device ownership characterization 4F.1
+
+`DM_DEV_001..DM_DEV_004` cover the public device-facade methods
+`AddDevice`, `GetDevice`, `GetDevices`, `GetDevicePaths`, `CloseDevice`,
+`RemoveDevices` and the device part of `CloseProjectLogic`, using instrumented
+test-only `Platform_Interface` implementations. A first registration retains
+the raw interface pointer and path; repeated lookup returns that same pointer.
+Enumeration is lexical by device name. A duplicate name, whether supplied with
+the same or a different interface pointer, retains the first pointer and first
+path. The different rejected pointer is not destroyed by the manager, so its
+creator must delete it.
+
+Known devices are destroyed once by `CloseDevice`; unknown and repeated closes
+have no visible effect. `RemoveDevices` destroys each owned interface in lexical
+order but intentionally leaves `_Devicepaths` observable through
+`GetDevices()`/`GetDevicePaths()`. `CloseProjectLogic` clears both maps and
+destroys devices in lexical order. Re-registering after removal restores a live
+device and replaces its surviving path. The manager does not own a QObject
+returned by `Platform_Interface::GetObject()`: QPointer evidence shows that it
+survives device/project cleanup until its external owner destroys it. Device
+state and cleanup are instance-local.
+
+Null-interface registration, released raw-pointer dereference and explicit
+plugin unload remain unsafe exclusions. `PLUGIN_001..PLUGIN_007` remain the
+authoritative contracts for plugin-loader rejection/recovery; this device slice
+does not duplicate them. The stale-path result after `RemoveDevices`, exposed
+raw device pointers and unclear plugin-loader lifetime remain refactoring risks
+for a later, compatibility-preserving DeviceRegistry slice. The focused suite
+passed 35 checks, the plugin suite passed 9, and the 11-target central runner
+completed with exit code 0.

@@ -352,3 +352,25 @@ through `DM_MSG_003` remained unchanged and green. No public API, Qt signal,
 slot, plugin IID or InterfaceData ABI changed. The remaining unsafe null-parent,
 null-sender and destroyed-QObject paths are unchanged exclusions, not fixed by
 this refactoring.
+
+## Phase 4F.1 DataManagement device-ownership characterization
+
+**Completed 2026-08-10.** `DM_DEV_001..DM_DEV_004` characterize the unchanged
+public device facade with instrumented test-only `Platform_Interface` probes.
+They record first-registration/pointer identity, lexical enumeration, duplicate
+name/path handling, known/unknown/repeated close, multi-device removal,
+re-registration, `CloseProjectLogic` destruction order, external QObject
+non-ownership via QPointer and manager-instance isolation. The existing plugin
+contracts remain the source of failed-load/recovery evidence.
+
+The observed legacy boundary is intentionally explicit: `RemoveDevices()`
+deletes owned interfaces but leaves their paths in the separate path map; a
+different pointer rejected by a duplicate name is not adopted and remains the
+caller’s cleanup responsibility. Null interfaces, stale raw-pointer access and
+explicit plugin unload remain unsafe exclusions. No production code changed;
+the focused DataManagement suite (35 checks), plugin contract suite (9 checks)
+and central 11-target runner all passed with exit code 0. The runner preserves
+native non-zero exit-code failures while allowing expected HDF5 negative-vector
+stderr diagnostics to remain nonfatal.
+The next potential 4F.2 slice is limited to a private `DeviceRegistry` that
+must retain these vectors before separately approved ownership hardening.
