@@ -615,3 +615,23 @@ Branch denominators changed with the extraction, so percentages are evidence,
 not directly identical source metrics. Unreached registry paths are the safe
 no-number plot/window overloads and the rename fallback without a number; they
 retain their prior exclusions/coverage status.
+
+## DataManagement container ownership baseline 4C.1
+
+`DM_CONT_001..DM_CONT_005` characterize the unmodified public container facade
+for the planned private owner extraction. The `GetContainerPointer()` address
+is stable and maps known IDs to the same repeatedly returned `ToFormMapper*`.
+Missing string lookup returns null without insertion, but unlinked QObject
+lookup inserts the empty ID with a null mapper. Replacing an existing container
+creates a new mapper pointer, retains its non-owning form-object bindings and
+Min/Max values, and applies the new type/state metadata; the former mapper is
+released and deliberately never dereferenced.
+
+Container enumeration follows the current map-key order. `CloseProjectLogic`
+empties the container map and releases all mappers, while a bound QObject owned
+by another parent remains valid. Manager destruction likewise does not delete
+such foreign QObjects, and manager instances do not share container state.
+These released mapper pointers are explicitly invalid after replacement,
+project cleanup or manager destruction; no desired raw-pointer lifetime beyond
+those boundaries is asserted. `ElementsToContainerID` remains unmodified for
+the later widget-binding slice.

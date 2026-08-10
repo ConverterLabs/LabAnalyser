@@ -249,7 +249,14 @@ form/skip-form, alias and plot/window registry bookkeeping behind
 UI/IO orchestration remain separate later slices and must retain their existing
 facades, Qt signal/slot contracts and plugin/data ABI.
 
-## Phase 4B.1 DataManagement registry extraction
+## Phase 4B.1 DataManagement registry characterization
+
+**Completed 2026-08-10.** `DM_REG_001..DM_REG_005` recorded the public-facade
+semantics for form/skip-form, alias and plot/window number state before moving
+it. The tests capture duplicate/order/removal, alias fallback and numbering
+history without coupling to an internal registry.
+
+## Phase 4B.2 DataManagement registry extraction
 
 **Completed 2026-08-10.** The first rollbackable implementation slice extracted
 only form files, skip-form flags, aliases, plot pointers and plot/window number
@@ -264,3 +271,19 @@ focused file metrics are recorded in `BEHAVIOR_INVENTORY.md`; they are not a
 project coverage gate. No public API, Qt signal/slot, plugin/data ABI or
 persistence contract changed. Container/device ownership, widget mappings and
 Messenger/UI orchestration remain explicitly deferred to later 4A slices.
+
+## Phase 4C.1 DataManagement container-ownership characterization
+
+**Completed 2026-08-10.** `DM_CONT_001..DM_CONT_005` define the public-facade
+baseline for container map identity, known/missing lookup behavior, the empty-ID
+QObject lookup insertion side effect, mapper replacement, metadata/binding
+preservation, lexical map enumeration, cleanup, foreign-QObject survival and
+manager-instance isolation. Released mapper pointers are documented as invalid
+and are never dereferenced by tests.
+
+## Phase 4C.2 DataManagement container-owner extraction
+
+**Planned.** Extract only the `Container` owner behind `DataManagementClass`.
+Public raw-pointer and map-address behavior, lookup side effects and cleanup
+order must remain equivalent under `DM_CONT_001..DM_CONT_005`; widget ID mapping,
+devices, Messenger and GUI/IO remain out of scope.

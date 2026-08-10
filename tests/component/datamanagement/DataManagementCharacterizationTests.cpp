@@ -119,6 +119,11 @@ private slots:
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
     void DM_REG_004_plot_and_window_numbers_keep_duplicate_history();
     void DM_REG_005_registry_state_is_instance_local_and_recreated_empty();
+    void DM_CONT_001_containerPointerAndLookupSideEffects();
+    void DM_CONT_002_replacementPreservesBindingsAndMinMaxButInvalidatesMapper();
+    void DM_CONT_003_multipleContainersUseMapOrderAndIndependentPointers();
+    void DM_CONT_004_projectCleanupInvalidatesMappersButNotForeignWidgets();
+    void DM_CONT_005_managerDestructionAndContainerStateAreIsolated();
 };
 
 void DataManagementCharacterizationTests::initTestCase()
@@ -566,6 +571,134 @@ void DataManagementCharacterizationTests::DM_REG_005_registry_state_is_instance_
     QCOMPARE(recreated.GetFormFileCount(), 0);
     QCOMPARE(recreated.GetAlias("temporary-id"), QString("temporary-id"));
     QCOMPARE(recreated.PlotCount(), 0);
+}
+
+void DataManagementCharacterizationTests::DM_CONT_001_containerPointerAndLookupSideEffects()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+
+    auto* firstMap = manager.GetContainerPointer();
+    auto* secondMap = manager.GetContainerPointer();
+    QCOMPARE(firstMap, secondMap);
+    QCOMPARE(firstMap->size(), size_t(0));
+    QCOMPARE(manager.GetContainer("missing"), nullptr);
+    QCOMPARE(firstMap->size(), size_t(0));
+
+    manager.AddContainerElement("known", "double", "Parameter", "state");
+    ToFormMapper* firstLookup = manager.GetContainer("known");
+    ToFormMapper* secondLookup = manager.GetContainer("known");
+    QVERIFY(firstLookup != nullptr);
+    QCOMPARE(firstLookup, secondLookup);
+    QCOMPARE(firstLookup, firstMap->at("known"));
+
+    QObject missingWidget;
+    missingWidget.setObjectName("missing-widget");
+    QCOMPARE(manager.GetContainer(&missingWidget), nullptr);
+    QVERIFY(firstMap->find(QString()) != firstMap->end());
+    QCOMPARE(firstMap->at(QString()), nullptr);
+}
+
+void DataManagementCharacterizationTests::DM_CONT_002_replacementPreservesBindingsAndMinMaxButInvalidatesMapper()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject boundWidget;
+    boundWidget.setObjectName("bound-widget");
+
+    manager.AddContainerElement("id", "double", "Parameter", "old-state");
+    manager.SetMinMaxValue("id", -2.0, 4.0);
+    manager.SetData("id", number(3.5));
+    manager.AddElementToContainerEntry("bound-widget", "id", "QWidget", &boundWidget);
+    ToFormMapper* beforeReplacement = manager.GetContainer("id");
+    QVERIFY(beforeReplacement != nullptr);
+
+    manager.AddContainerElement("id", "int", "Data", "new-state");
+    ToFormMapper* afterReplacement = manager.GetContainer("id");
+    QVERIFY(afterReplacement != nullptr);
+    QVERIFY(afterReplacement != beforeReplacement);
+    QCOMPARE(manager.GetContainerPointer()->at("id"), afterReplacement);
+    QCOMPARE(afterReplacement->GetType(), QString("Data"));
+    QCOMPARE(afterReplacement->GetStateDependency(), QString("new-state"));
+    QCOMPARE(manager.MinMaxValue("id"), std::make_pair(-2.0, 4.0));
+    QCOMPARE(afterReplacement->Objects.size(), size_t(1));
+    QCOMPARE(afterReplacement->Objects.at(0).FormP, &boundWidget);
+    QCOMPARE(afterReplacement->Objects.at(0).FormName, QString("bound-widget"));
+    // beforeReplacement was deleted by the current facade and must not be dereferenced.
+}
+
+void DataManagementCharacterizationTests::DM_CONT_003_multipleContainersUseMapOrderAndIndependentPointers()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    QObject alphaWidget;
+    QObject zetaWidget;
+    alphaWidget.setObjectName("alpha-widget");
+    zetaWidget.setObjectName("zeta-widget");
+
+    manager.AddContainerElement("zeta", "double", "Data", "");
+    manager.AddContainerElement("alpha", "double", "Parameter", "");
+    manager.AddContainerElement("middle", "double", "State", "");
+    manager.AddElementToContainerEntry("alpha-widget", "alpha", "QWidget", &alphaWidget);
+    manager.AddElementToContainerEntry("zeta-widget", "zeta", "QWidget", &zetaWidget);
+
+    QCOMPARE(manager.GetContainerCount(), 3);
+    QCOMPARE(manager.GetContainer("alpha"), manager.GetContainerPointer()->at("alpha"));
+    QVERIFY(manager.GetContainer("alpha") != manager.GetContainer("middle"));
+    QVERIFY(manager.GetContainer("middle") != manager.GetContainer("zeta"));
+    QCOMPARE(manager.GetContainerElementForms(0).first, QString("alpha"));
+    QCOMPARE(manager.GetContainerElementForms(0).second, std::vector<QString>{"alpha-widget"});
+    QCOMPARE(manager.GetContainerElementForms(1).first, QString("middle"));
+    QCOMPARE(manager.GetContainerElementForms(1).second, std::vector<QString>{});
+    QCOMPARE(manager.GetContainerElementForms(2).first, QString("zeta"));
+    QCOMPARE(manager.GetContainerElementForms(2).second, std::vector<QString>{"zeta-widget"});
+}
+
+void DataManagementCharacterizationTests::DM_CONT_004_projectCleanupInvalidatesMappersButNotForeignWidgets()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    auto* foreignWidget = new QObject(&owner);
+    QPointer<QObject> widgetGuard(foreignWidget);
+    foreignWidget->setObjectName("foreign-widget");
+
+    manager.AddContainerElement("id", "double", "Parameter", "");
+    manager.AddElementToContainerEntry("foreign-widget", "id", "QWidget", foreignWidget);
+    ToFormMapper* releasedMapper = manager.GetContainer("id");
+    QVERIFY(releasedMapper != nullptr);
+    manager.CloseProjectLogic();
+
+    QCOMPARE(manager.GetContainerCount(), 0);
+    QCOMPARE(manager.GetContainer("id"), nullptr);
+    QVERIFY(widgetGuard);
+    QCOMPARE(widgetGuard->parent(), &owner);
+    // releasedMapper has been released by CloseProjectLogic and is intentionally not dereferenced.
+}
+
+void DataManagementCharacterizationTests::DM_CONT_005_managerDestructionAndContainerStateAreIsolated()
+{
+    QObject owner;
+    auto* foreignWidget = new QObject(&owner);
+    QPointer<QObject> widgetGuard(foreignWidget);
+    foreignWidget->setObjectName("surviving-widget");
+
+    auto* first = new DataManagementClass;
+    QPointer<DataManagementClass> firstGuard(first);
+    DataManagementClass second(&owner);
+    first->AddContainerElement("shared-id", "double", "Parameter", "");
+    first->AddElementToContainerEntry("surviving-widget", "shared-id", "QWidget", foreignWidget);
+    second.AddContainerElement("shared-id", "double", "Data", "");
+    ToFormMapper* releasedMapper = first->GetContainer("shared-id");
+    QVERIFY(releasedMapper != nullptr);
+    QCOMPARE(second.GetContainer("shared-id")->GetType(), QString("Data"));
+
+    delete first;
+    QVERIFY(firstGuard.isNull());
+    QVERIFY(widgetGuard);
+    QCOMPARE(widgetGuard->parent(), &owner);
+    QCOMPARE(second.GetContainerCount(), 1);
+    QCOMPARE(second.GetContainer("shared-id")->GetType(), QString("Data"));
+    // releasedMapper belonged to first and is intentionally not dereferenced after destruction.
 }
 
 QTEST_MAIN(DataManagementCharacterizationTests)

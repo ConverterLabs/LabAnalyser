@@ -232,7 +232,7 @@ does not recover prior form, alias or plot state. They intentionally avoid
 unchecked indexed form access and pointer/device/container ownership paths;
 those remain later-slice risks, not safe registry characterization inputs.
 
-## Phase 4B.1 implementation outcome
+## Phase 4B.2 implementation outcome
 
 **Completed 2026-08-10.** `DataRegistry.h/.cpp` now holds only the initially
 approved form/skip-form, alias and plot/window bookkeeping. `DataManagementClass`
@@ -255,3 +255,28 @@ involved.
 
 The next slice remains 4A.2 container ownership. It must not absorb registry,
 device or widget changes opportunistically.
+
+## Phase 4C.1 container-ownership characterization
+
+`DM_CONT_001..DM_CONT_005` establish the public-facade baseline before any
+container owner exists. `GetContainerPointer()` repeatedly returns the same
+map address; known string lookups return the map's exact mapper pointer, while
+a missing string lookup returns null without insertion. In contrast, an
+unlinked QObject lookup inserts the empty ID with a null mapper through the
+existing `operator[]` path. This is an observable legacy side effect.
+
+Replacing an existing container deletes its old mapper, produces a different
+mapper pointer, preserves its `Objects` list and Min/Max values, and applies
+the new type/state metadata. The released pointer is never dereferenced by the
+tests. Map traversal used by `GetContainerElementForms` is lexical-key order.
+`CloseProjectLogic` clears containers and releases mappers while externally
+parented bound QObjects survive. Destroying a manager likewise leaves such
+foreign QObjects intact; separate manager instances keep independent container
+state. These are the required before/after vectors for Phase 4C.2.
+
+## Phase 4C.2 planned container-owner extraction
+
+Move only `Container` storage behind a private RAII owner while preserving raw
+non-owning facade pointers, public map address, replacement behavior, lookup
+insertion side effects and cleanup order documented by `DM_CONT_001..DM_CONT_005`.
+Do not move `ElementsToContainerID`, device ownership or widget-binding logic.
