@@ -238,3 +238,13 @@ permission/error injection, visual rendering and deliberately dangerous
 null/index/allocation paths require separate treatment. Aggregate coverage,
 coverage gates, CTest/CI, sanitizer/static-analysis and multi-platform
 verification also remain later milestones.
+
+## Phase 4A DataManagement refactoring analysis
+
+**Planning complete; implementation pending.**
+`DATAMANAGEMENT_REFACTOR_PLAN_4A.md` defines compatible, rollbackable
+DataManagement slices. The recommended first slice extracts only value-only
+form/skip-form, alias and plot/window registry bookkeeping behind
+`DataManagementClass`. Container/device ownership, widget signal routing and
+UI/IO orchestration remain separate later slices and must retain their existing
+facades, Qt signal/slot contracts and plugin/data ABI.

@@ -43,3 +43,15 @@ Incrementally separate GUI presentation from core numerical/data logic, IO
 adapters, network transport/protocol, and plugin-loading adapter while retaining
 the existing qmake build until CMake parity is demonstrated.  No such refactoring
 is part of this audit.
+
+## Phase 4A DataManagement refactoring direction (planned only)
+
+`DataManagementClass` currently combines value registries, raw mapper/device
+ownership, widget bindings and plot/form bookkeeping. `DataManagementSetClass`
+adds QWidget/message dispatch, while `UIDataManagementSetClass` additionally
+orchestrates MainWindow, XML, import/export and plugin loading. Phase 4A records
+an incremental extraction plan in `DATAMANAGEMENT_REFACTOR_PLAN_4A.md`: first
+extract private value-only registry helpers behind unchanged manager facades,
+then separately treat container/binding ownership, messenger dispatch, devices
+and GUI/IO orchestration. `InterfaceData`, plugin headers, Qt signals/slots and
+the existing qmake target remain compatibility boundaries.

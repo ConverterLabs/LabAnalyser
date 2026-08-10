@@ -66,3 +66,17 @@ The defect baseline was isolated in a separate process. Regression contracts
 and safe rejection of wrong-IID and QObject-only plugins. The source-level
 public header/IID comparison is unchanged; it is not a claim of binary
 compatibility for every independently built third-party plugin.
+
+## ADR-007: Preserve DataManagement facades during incremental core isolation
+
+**Date:** 2026-08-10
+**Status:** accepted for Phase 4 planning
+
+Phase 4 will not replace `DataManagementClass`, `DataManagementSetClass`,
+`UIDataManagementSetClass`, `MessengerClass`, `ToFormMapper` or `InterfaceData`
+in one step. Private helpers may be introduced only behind the existing public
+classes and their Qt meta-object surface. The initial extraction is value-only
+registry bookkeeping; widget signal routing, plugin/device ownership and GUI/IO
+orchestration are independent later slices. This preserves public APIs, signal
+order, plugin ABI/IID and file-format behavior while creating a testable core
+without MainWindow dependencies.
