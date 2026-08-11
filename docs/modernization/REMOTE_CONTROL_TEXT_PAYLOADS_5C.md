@@ -1,0 +1,78 @@
+# Remote-control text payloads 5C
+
+## 5C.2a legacy characterization
+
+`payloadLength` is the exact number of bytes after the NUL-terminated ID. The
+test frame builder does not append a payload terminator. For the three text
+branches, the existing server uses:
+
+```cpp
+QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1))
+```
+
+Thus it always removes exactly the final byte. Qt 6 clamps `left(-1)` to an
+empty array. The result below is the current observable baseline, not an
+approved desired contract.
+
+| Payload bytes | Declared `payloadLength` | Current QString / one QStringList element |
+| --- | ---: | --- |
+| empty | 0 | empty |
+| `A` | 1 | empty |
+| `AB` | 2 | `A` |
+| `AB 00` | 3 | `AB` |
+| `A 00 B 00` | 4 | `A`, embedded NUL, `B` |
+| `A 00 00` | 3 | `A`, one remaining NUL |
+| `E4 00` | 2 | U+00E4 through existing Latin-1 decoding |
+
+`TCP_027` checks every value for both `QString` and `QStringList`: exactly one
+`MessageSender("set", id, InterfaceData)` event, actual type, QChar length and
+contents, and unchanged backing container. A QStringList payload has no list
+separator or multi-element encoding: the server always constructs a fresh
+single-element list.
+
+`TCP_028` records the related but separate Selection outcome for choices
+`{"a", "b"}`. Nonterminated `b` is shortened to empty, fails membership and
+emits the unchanged `a`; `b 00` becomes `b` and is accepted; `x 00` and an
+empty payload leave `a`. Every case still emits exactly one `set` signal. The
+Selection behavior combines byte loss with an additional domain membership
+rule, so it remains a separately approval-required change.
+
+## Get contract and asymmetry
+
+String, StringList and GuiSelection replies are currently encoded as one type
+byte `01`, a native `uint32_t` element count, then `elements * 8` zero-padded
+bytes. `elements` is `strlen(value.toStdString().c_str()) + 1`; the first
+region contains a NUL terminator. Existing `TCP_003` and `TCP_008` assert
+ASCII bytes, count and padding, including that QStringList serializes only its
+first element.
+
+Set and get are not symmetric: set consumes the frame payload through
+`QString::fromLatin1`, while get forms a UTF-8 `std::string` before `strlen`
+and padding. Embedded NULs are retained by the set conversion but truncate the
+get representation. This phase does not change encoding or claim a UTF-8
+protocol contract.
+
+## History and proposed later correction
+
+The Git history contains no specification that `payloadLength` always includes
+a NUL terminator. The 2021 initial implementation (`5767435`) passed the full
+calculated String/Selection payload to `fromLatin1`; the 2025-02-18 change
+`915d32d` introduced `Size - 1` for String, StringList and Selection under the
+unrelated message “updated DataManagement/DataManagementClass.cpp”. The later
+protocol extraction preserved that behavior. This is therefore an
+unversioned, inconsistent legacy implementation rather than demonstrated wire
+intent.
+
+The planned, not-yet-implemented correction for String and QStringList is a
+private pure helper that retains all payload bytes and removes exactly one byte
+only when the actual final byte is NUL. It must retain Latin-1 decoding, frame
+format, get replies and the single-element QStringList behavior. GuiSelection
+is intentionally excluded pending its own approval because normalizing a bare
+`b` would make the membership check mutate the selected value.
+
+## Evidence
+
+The focused RemoteControl build and full `RemoteControlContractTests` run
+completed with exit code 0: 29 test functions (`TCP_001..TCP_028` and the
+legacy splitter test), reported as 31 passed, 0 failed in 4180 ms. No
+production file changed in this phase.

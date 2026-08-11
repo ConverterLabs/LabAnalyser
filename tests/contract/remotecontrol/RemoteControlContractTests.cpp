@@ -112,6 +112,13 @@ private:
 QList<QTcpSocket*> acceptedSockets(RemoteControlServer& server) {
     return server.tcpServer.findChildren<QTcpSocket*>();
 }
+
+void compareLatin1QString(const QString& actual, const QByteArray& expectedBytes) {
+    const QString expected = QString::fromLatin1(expectedBytes);
+    QCOMPARE(actual.size(), expected.size());
+    for (qsizetype index = 0; index < expected.size(); ++index)
+        QCOMPARE(actual.at(index).unicode(), expected.at(index).unicode());
+}
 }
 
 class RemoteControlContractTests : public QObject {
@@ -144,6 +151,8 @@ private slots:
     void TCP_024_shortNumericSetIsDiscardedAndConnectionRecovers();
     void TCP_025_validUnknownCommandKeepsConnectionUsable();
     void TCP_026_coalescedInvalidAndValidFramesRecoverInOrder();
+    void TCP_027_qStringAndStringListLegacyPayloads();
+    void TCP_028_guiSelectionLegacyPayloads();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -634,6 +643,95 @@ void RemoteControlContractTests::TCP_026_coalescedInvalidAndValidFramesRecoverIn
     QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(0).toString(), QString("set"));
     QCOMPARE(spy.at(0).at(1).toString(), QString("value")); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 11.0);
     QCOMPARE(data["value"]->GetAsDouble(), 7.0); QVERIFY(!client->waitForReadyRead(100));
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_027_qStringAndStringListLegacyPayloads() {
+    struct PayloadCase {
+        QByteArray name;
+        QByteArray payload;
+        QByteArray expected;
+    };
+    const std::vector<PayloadCase> cases = {
+        {"empty", QByteArray(), QByteArray()},
+        {"one-byte", QByteArray("A", 1), QByteArray()},
+        {"multiple-bytes", QByteArray("AB", 2), QByteArray("A", 1)},
+        {"one-trailing-nul", QByteArray("AB\0", 3), QByteArray("AB", 2)},
+        {"embedded-and-trailing-nul", QByteArray("A\0B\0", 4), QByteArray("A\0B", 3)},
+        {"two-trailing-nuls", QByteArray("A\0\0", 3), QByteArray("A\0", 2)},
+        {"latin-1", QByteArray("\xE4\0", 2), QByteArray("\xE4", 1)}
+    };
+
+    std::map<QString, ToFormMapper*> data;
+    data["text"] = text("unchanged-text");
+    data["list"] = list({"unchanged-first", "unchanged-second"});
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* client = connectClient(server, this);
+
+    int expectedSignals = 0;
+    for (const PayloadCase& payloadCase : cases) {
+        client->write(frame("set", "text", payloadCase.payload));
+        QVERIFY(client->waitForBytesWritten(1000));
+        ++expectedSignals;
+        QTRY_COMPARE(spy.count(), expectedSignals);
+        QCOMPARE(spy.at(expectedSignals - 1).at(0).toString(), QString("set"));
+        QCOMPARE(spy.at(expectedSignals - 1).at(1).toString(), QString("text"));
+        InterfaceData textData = spy.at(expectedSignals - 1).at(2).value<InterfaceData>();
+        QVERIFY(textData.IsString());
+        compareLatin1QString(textData.GetString(), payloadCase.expected);
+
+        client->write(frame("set", "list", payloadCase.payload));
+        QVERIFY(client->waitForBytesWritten(1000));
+        ++expectedSignals;
+        QTRY_COMPARE(spy.count(), expectedSignals);
+        QCOMPARE(spy.at(expectedSignals - 1).at(0).toString(), QString("set"));
+        QCOMPARE(spy.at(expectedSignals - 1).at(1).toString(), QString("list"));
+        InterfaceData listData = spy.at(expectedSignals - 1).at(2).value<InterfaceData>();
+        QVERIFY(listData.IsStringList());
+        const QStringList values = listData.GetStringList();
+        QCOMPARE(values.size(), 1);
+        compareLatin1QString(values.first(), payloadCase.expected);
+    }
+
+    QCOMPARE(data["text"]->GetString(), QString("unchanged-text"));
+    QCOMPARE(data["list"]->GetStringList(), QStringList({"unchanged-first", "unchanged-second"}));
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_028_guiSelectionLegacyPayloads() {
+    struct SelectionCase {
+        QByteArray payload;
+        QString expected;
+    };
+    const std::vector<SelectionCase> cases = {
+        {QByteArray("b", 1), QString("a")},
+        {QByteArray("b\0", 2), QString("b")},
+        {QByteArray("x\0", 2), QString("a")},
+        {QByteArray(), QString("a")}
+    };
+
+    std::map<QString, ToFormMapper*> data;
+    data["choice"] = selection("a", {"a", "b"});
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* client = connectClient(server, this);
+
+    for (int index = 0; index < int(cases.size()); ++index) {
+        client->write(frame("set", "choice", cases[index].payload));
+        QVERIFY(client->waitForBytesWritten(1000));
+        QTRY_COMPARE(spy.count(), index + 1);
+        QCOMPARE(spy.at(index).at(0).toString(), QString("set"));
+        QCOMPARE(spy.at(index).at(1).toString(), QString("choice"));
+        InterfaceData selectionData = spy.at(index).at(2).value<InterfaceData>();
+        QVERIFY(selectionData.IsGuiSelection());
+        const GuiSelection selectionValue = selectionData.GetGuiSelection();
+        QCOMPARE(selectionValue.first, cases[index].expected);
+        QCOMPARE(selectionValue.second, QStringList({"a", "b"}));
+    }
+
+    QCOMPARE(data["choice"]->GetGuiSelection().first, QString("a"));
+    QCOMPARE(data["choice"]->GetGuiSelection().second, QStringList({"a", "b"}));
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
     clear(data);
 }

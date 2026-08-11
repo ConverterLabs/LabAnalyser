@@ -150,6 +150,23 @@ No public RemoteControl API, signal or slot changed. The native host byte order
 remains the compatibility contract. Reply-size limits and payload-semantic
 defects remain explicitly open; see `REMOTE_CONTROL_FRAME_HARDENING_5B.md`.
 
+## Milestone 5C.2a TCP text-payload characterization
+
+**Completed 2026-08-11 without production changes.** `TCP_027` establishes
+the current byte-for-byte final-payload-byte loss for QString and the existing
+single-element QStringList mapping, including empty, embedded-NUL, two-NUL and
+Latin-1 vectors. `TCP_028` separately establishes that the same shortening
+interacts with GuiSelection membership: bare `b` remains unchanged, while
+`b\0` selects `b`. The 2021 and 2025 history is inconsistent and supplies no
+versioned evidence that `payloadLength` always includes a terminator.
+
+The proposed, not-yet-approved String/StringList correction removes exactly
+one actual trailing NUL and otherwise preserves all payload bytes with the
+existing Latin-1 conversion. GuiSelection remains deliberately outside that
+change because a bare valid choice would become a new observable selection
+mutation. Get remains asymmetric and unchanged. See
+`REMOTE_CONTROL_TEXT_PAYLOADS_5C.md`.
+
 ## Milestone 3A completion
 
 DataManagement characterization is complete for the safely isolated manager,
