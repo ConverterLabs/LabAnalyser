@@ -1,0 +1,2 @@
+/tests/fixtures/xml/legacy/*.LAexp -text
+/tests/fixtures/xml/legacy/*.LAdev -text
