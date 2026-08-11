@@ -1022,3 +1022,14 @@ and central runner, including ProjectIoFacadeContractTests/UIIO. The evidence
 does not prove all third-party allocation, thread, hardware or cross-CRT
 models. Lifecycle-V2 with a new IID and plugin-side release operation remains
 an explicit future compatibility decision.
+
+## Phase 5 QSlider equal-bound hardening
+
+`DW_018` covers the explicitly approved exact-equality guard in
+`QSliderD::SetVariantData()`. With manager bounds `5.0/5.0`, editable floating,
+signed and unsigned data preserve the current slider value and emit neither a
+widget value-change nor a manager message. The historical signal-unblocking
+path remains usable for a subsequent direct value change. Normal non-equal
+bounds retain the existing rounding vector (`7.5` in `0..100` maps to `8`).
+The unsafe pre-fix division/cast is documented from source and static-analysis
+evidence and was not executed as an in-process behavior contract.

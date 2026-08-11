@@ -50,6 +50,7 @@ private slots:
     void DW_015_blink_timer_repeats_and_is_owned();
     void DW_016_data_driven_adapter_signals_ranges_and_values();
     void DW_017_isolated_xml_properties_and_list_mutation();
+    void DW_018_equal_slider_bounds_preserve_value();
 };
 
 class ExposedTreeWidget : public TreeWidgetCustomDrop
@@ -290,6 +291,59 @@ void DropWidgetAdapterTests::DW_017_isolated_xml_properties_and_list_mutation()
     for (VariantDropWidget* widget : QList<VariantDropWidget*> {&led, &blink, &traffic}) { std::vector<std::pair<QString, QString>> saved; QVERIFY(widget->SaveToXML(saved, text)); QCOMPARE(saved.size(), size_t(1)); QCOMPARE(saved.front().first, QString("Bit")); QCOMPARE(saved.front().second, QString("2")); }
     QListViewD list; list.model->setStringList({"a", "b"}); QSignalSpy newEntry(&list, &QListViewD::NewEntry); list.setCurrentIndex(list.model->index(0, 0)); list.DeleteEntry(); QCOMPARE(newEntry.count(), 1); QCOMPARE(list.model->stringList(), QStringList({"b"})); list.DeleteAllEntries(); QCOMPARE(newEntry.count(), 2); QCOMPARE(list.model->rowCount(), 0);
     QWidget parent; QLineEditD* line = new QLineEditD(&parent); line->setReadOnly(true); QVERIFY(line->isReadOnly()); QCOMPARE(line->parentWidget(), &parent); delete line;
+}
+
+void DropWidgetAdapterTests::DW_018_equal_slider_bounds_preserve_value()
+{
+    auto* manager = GetMainWindow()->GetLogic();
+    const QString sliderId("DW18::equal-range");
+    manager->AddContainerElement(sliderId, "double", "Parameter", "");
+    manager->SetMinMaxValue(sliderId, 5.0, 5.0);
+    manager->GetContainer(sliderId)->SetData(5.0);
+
+    QSliderD slider;
+    slider.setRange(0, 100);
+    slider.setValue(37);
+    slider.setObjectName("dw18Slider");
+    manager->AddElementToContainerEntry(slider.objectName(), sliderId, slider.metaObject()->className(), &slider);
+    slider.ConnectToID(manager, sliderId);
+    QSignalSpy valueChanged(&slider, &QSlider::valueChanged);
+    QSignalSpy messages(manager, &DataManagementClass::MessageSender);
+
+    ToFormMapper floating = mapper("double");
+    floating.SetData(7.5);
+    ToFormMapper signedValue = mapper("int32_t");
+    signedValue.SetData(int32_t(-4));
+    ToFormMapper unsignedValue = mapper("uint64_t");
+    unsignedValue.SetData(uint64_t(42));
+    const QList<ToFormMapper> numericValues {floating, signedValue, unsignedValue};
+    for (ToFormMapper data : numericValues) {
+        QVERIFY(data.IsEditable());
+        QVERIFY(data.IsFloatingPointNumber() || data.IsSigedNumber() || data.IsUnsigedNumber());
+        slider.SetVariantData(data);
+        QCOMPARE(slider.value(), 37);
+        QCOMPARE(valueChanged.count(), 0);
+        QCOMPARE(messages.count(), 0);
+        QVERIFY(!slider.signalsBlocked());
+    }
+
+    slider.setValue(38);
+    QCOMPARE(valueChanged.count(), 1);
+    QCOMPARE(valueChanged.at(0).at(0).toInt(), 38);
+    QCOMPARE(messages.count(), 1);
+    QCOMPARE(messages.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(messages.at(0).at(1).toString(), sliderId);
+
+    manager->SetMinMaxValue(sliderId, 0.0, 100.0);
+    valueChanged.clear();
+    messages.clear();
+    slider.setValue(37);
+    valueChanged.clear();
+    messages.clear();
+    slider.SetVariantData(floating);
+    QCOMPARE(slider.value(), 8);
+    QCOMPARE(valueChanged.count(), 0);
+    QCOMPARE(messages.count(), 0);
 }
 
 int main(int argc, char** argv)

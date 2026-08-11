@@ -792,3 +792,13 @@ ProjectIoFacadeContractTests boundary. Combined coverage is 49.79% lines
 least once (2667/10805), 40.16% calls (3053/7602), and 66.51% functions
 (423/636); no coverage gate is active. Lifecycle-V2, with a new IID and a
 plugin-side release operation, remains separately approval-gated.
+
+## Milestone 5 QSlider equal-bound hardening
+
+**Explicitly approved and implemented.** `QSliderD::SetVariantData()` now
+skips only the scaling/set-value operation when `MinMax.first ==
+MinMax.second`; it does not alter non-equal range rounding, slider ranges,
+manager bindings, XML or signals outside that unsafe input. `DW_018` covers
+floating, signed and unsigned updates, absence of manager/value signals, and
+subsequent signal usability. The unsafe baseline division/cast was documented
+without executing undefined behavior in-process.

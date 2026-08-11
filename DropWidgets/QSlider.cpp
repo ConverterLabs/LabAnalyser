@@ -162,7 +162,7 @@ void QSliderD::SetVariantData(ToFormMapper Data)
            value =  (double)Data.GetUnsignedData();
            hasNumericValue = true;
         }
-        if(hasNumericValue)
+        if(hasNumericValue && MinMax.first != MinMax.second)
         {
             int valueC = (int) round((value - MinMax.first)/(MinMax.second-MinMax.first)*100.0);
             setValue((int)valueC );

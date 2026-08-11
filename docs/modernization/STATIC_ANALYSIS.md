@@ -91,6 +91,17 @@ filter change was used.
 can still make the numeric scaling division invalid; it is a separate
 high-priority QSlider defect candidate and is not covered by this fix.
 
+## QSlider equal-bound hardening (2026-08-11)
+
+The explicitly approved follow-up adds an exact `MinMax.first !=
+MinMax.second` guard immediately before the existing scaling division in
+`QSliderD::SetVariantData()`. This preserves the current slider value and
+suppresses programmatic value changes for equal bounds, while leaving every
+non-equal range on the prior calculation path. `DW_018` covers floating,
+signed and unsigned input with a product-like manager binding and reconfirms
+the existing `7.5 -> 8` rounding vector in a `0..100` range. The unsafe
+pre-fix division/cast was not executed as a test contract.
+
 ## Current 161-diagnostic count after MessageDispatchPolicy extraction
 
 The scoped GCC report after Phase 4E.2 contains 161 filtered own-production
