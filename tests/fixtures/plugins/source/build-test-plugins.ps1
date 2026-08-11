@@ -15,7 +15,7 @@ $qmake = @(
 ) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
 if (-not $qmake) { throw 'qmake executable was not found in known MSYS2 Qt6 locations.' }
 if (!$BuildRoot) { $BuildRoot = Join-Path $repo 'build\test-plugins' }
-$projects = @('compatible/CompatiblePlugin.pro','wrong_iid/WrongIidPlugin.pro','qobject_only/QObjectOnlyPlugin.pro')
+$projects = @('compatible/CompatiblePlugin.pro','wrong_iid/WrongIidPlugin.pro','qobject_only/QObjectOnlyPlugin.pro','member_owned/MemberOwnedInterfacePlugin.pro','heap_owned/HeapOwnedInterfacePlugin.pro')
 foreach ($project in $projects) {
   $name = [IO.Path]::GetFileNameWithoutExtension($project)
   $dir = Join-Path $BuildRoot $name; New-Item -ItemType Directory -Force $dir | Out-Null

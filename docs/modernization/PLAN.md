@@ -698,3 +698,25 @@ artifact checks are the remaining documentation-commit validation below.
 Legacy XML compatibility stays mandatory: committed fixture hashes must remain
 unchanged, fixtures must never be overwritten, and legacy read/write/read
 contracts continue to write only temporary targets.
+
+## Phase 5E.2a plugin ownership-fixture characterization
+
+`PLUGIN_008..PLUGIN_011` add two runtime-built, test-only ownership models at
+the existing plugin boundary: a member-owned interface that must never be host
+deleted, and a separately heap-allocated interface that receives one controlled
+fixture-only rest cleanup after manager destruction. They characterize only
+safe loading, pointer/QObject observation, the absence of implicit manager
+device cleanup, and local loader/root persistence. They do not generalize to
+third-party plugins and do not alter the IID or ABI.
+
+The explicitly deferred 5E.2b decision is the dangerous boundary itself:
+whether and under which versioned contract `DeviceRegistry` may delete a real
+plugin-provided `Platform_Interface`. Member-interface deletion, retained
+interface unload, null plugin returns, cross-CRT ABI combinations and stale
+raw-pointer accesses remain excluded until a separately approved hardening
+slice.
+
+The focused evidence is green: portable fixture build exit code 0 and
+`PluginLoaderContractTests` exit code 0 with 13 Qt Test checks. The manager
+destruction observation is deliberately narrow: it is not proof that explicit
+device cleanup or arbitrary plugin unloading is safe.
