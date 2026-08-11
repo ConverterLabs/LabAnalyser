@@ -54,6 +54,29 @@ accumulate `QTcpServer` children and that server destruction remains safe while
 a disconnect cleanup may be pending. `TCP_016` proves that disconnecting older
 A releases only A; current B and B's frame state remain usable for `get`.
 
+## 5A.3a TCP_007 testfixture cleanup stabilization
+
+Before this test-only change, a 25-process TCP_007 diagnosis reproduced the
+intermittent Qt warning `QObject: shared QObject was deleted directly` and
+Windows access violation `0xC0000005` on the 21st isolated process. TCP_007
+had waited only for client-side `UnconnectedState`; it could then destroy its
+stack-owned server while accepted server-side sockets still had scheduled
+`DeferredDelete` events.
+
+TCP_007 now records each accepted `QTcpSocket` through the existing test-only
+private visibility seam. Before its local `RemoteControlServer` ends, it waits
+for every observed server-socket `QPointer` to become null and for the
+`QTcpServer` child list to contain no `QTcpSocket`. These event-loop conditions
+exercise the existing `disconnected()`/`deleteLater()` behavior; they neither
+delete a socket directly nor change the production lifetime policy.
+
+After the fixture change, 50 separate TCP_007 processes passed with a
+three-second process bound, and the one full focused suite passed 31/31. This
+stabilizes fixture teardown only. It does **not** prove that every production
+server-shutdown ordering is safe; the previously observed Qt warning remains a
+documented production-lifetime risk until a dedicated production shutdown
+scenario identifies its object and cause.
+
 ## Test mapping and evidence
 
 | Test ID | Observed result |
@@ -62,6 +85,7 @@ A releases only A; current B and B's frame state remain usable for `get`.
 | `TCP_014` | Current accepted socket is reset, its partial-frame state is cleared and its QPointer becomes null after `deleteLater()`; a fresh connection works. |
 | `TCP_015` | Repeated disconnected accepted sockets are released and do not accumulate as `QTcpServer` children; server destruction remains safe. |
 | `TCP_016` | Disconnecting older A releases A only; current B stays current and returns the existing byte-exact `get` reply. |
+| `TCP_007` | The pre-existing fragmentation/reconnection vectors now also wait for all observed accepted sockets to complete deferred deletion before fixture server destruction. |
 
 The 5A.2b focused suite passed with exit code 0: 17 test functions plus Qt Test
 initialization/cleanup, reported as 19 passed, 0 failed, 0 skipped in 2520 ms.

@@ -225,10 +225,17 @@ void RemoteControlContractTests::TCP_006_unknownCommandNullDataAndNoTimeoutReply
 
 void RemoteControlContractTests::TCP_007_disconnectRepeatedAndMultipleConnections() {
     std::map<QString, ToFormMapper*> data; data["value"] = numeric(7.0); RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
-    QTcpSocket* first = connectClient(server, this); const QByteArray partial = frame("set", "value", f64(9.0)).left(8); first->write(partial); QVERIFY(first->waitForBytesWritten(1000)); first->disconnectFromHost(); QTRY_COMPARE(first->state(), QAbstractSocket::UnconnectedState);
-    QTcpSocket* second = connectClient(server, this); second->write(frame("set", "value", f64(10.0))); QVERIFY(second->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 10.0); QCOMPARE(data["value"]->GetAsDouble(), 7.0);
-    QTcpSocket* third = connectClient(server, this); third->write(frame("get", "value")); QVERIFY(third->waitForBytesWritten(1000)); const QByteArray reply = readReply(third, 13); QCOMPARE(readF64(reply, 5), 7.0);
-    second->disconnectFromHost(); third->disconnectFromHost(); QTRY_COMPARE(second->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(third->state(), QAbstractSocket::UnconnectedState); clear(data);
+    QTcpSocket* first = connectClient(server, this); QTRY_COMPARE(acceptedSockets(server).size(), 1); QPointer<QTcpSocket> firstServerSocket(acceptedSockets(server).first());
+    const QByteArray partial = frame("set", "value", f64(9.0)).left(8); first->write(partial); QVERIFY(first->waitForBytesWritten(1000)); first->disconnectFromHost(); QTRY_COMPARE(first->state(), QAbstractSocket::UnconnectedState);
+    QTRY_VERIFY(firstServerSocket.isNull()); QTRY_COMPARE(acceptedSockets(server).size(), 0);
+
+    QTcpSocket* second = connectClient(server, this); QTRY_COMPARE(acceptedSockets(server).size(), 1); QPointer<QTcpSocket> secondServerSocket(acceptedSockets(server).first());
+    second->write(frame("set", "value", f64(10.0))); QVERIFY(second->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 10.0); QCOMPARE(data["value"]->GetAsDouble(), 7.0);
+    QTcpSocket* third = connectClient(server, this); QTRY_COMPARE(acceptedSockets(server).size(), 2); QPointer<QTcpSocket> thirdServerSocket(acceptedSockets(server).last());
+    third->write(frame("get", "value")); QVERIFY(third->waitForBytesWritten(1000)); const QByteArray reply = readReply(third, 13); QCOMPARE(readF64(reply, 5), 7.0);
+    second->disconnectFromHost(); third->disconnectFromHost(); QTRY_COMPARE(second->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(third->state(), QAbstractSocket::UnconnectedState);
+    QTRY_VERIFY(secondServerSocket.isNull()); QTRY_VERIFY(thirdServerSocket.isNull()); QTRY_COMPARE(acceptedSockets(server).size(), 0);
+    clear(data);
 }
 
 void RemoteControlContractTests::TCP_008_protocolByteBoundariesAndReplies() {

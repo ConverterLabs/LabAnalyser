@@ -129,6 +129,18 @@ repair with an explicit observable error policy beyond the existing no-op. The
 approved disconnected-socket `deleteLater()` policy is now implemented; see
 `REMOTE_CONTROL_HARDENING_5A.md` for its boundaries.
 
+## Milestone 5A.3a TCP_007 fixture teardown
+
+**Completed 2026-08-11 without production changes.** An isolated 25-process
+diagnosis reproduced the Qt direct-shared-QObject warning and access violation
+on process 21 while TCP_007 waited only for client disconnects. TCP_007 now
+observes all accepted server sockets through its test-only seam and waits for
+their `QPointer` null state plus no remaining `QTcpServer` socket children
+before fixture server destruction. Fifty separate post-change runs and the
+full focused suite passed. This is a testfixture stabilization, not proof that
+all production server-shutdown interleavings are safe; the production-lifetime
+risk remains open and 5C stays paused pending a separate decision.
+
 ## Milestone 5B.2 remote-control frame validation
 
 **Completed 2026-08-11.** 5B.2a added the private QObject-free
