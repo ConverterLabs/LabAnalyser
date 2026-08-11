@@ -11,12 +11,14 @@ INCLUDEPATH += $$REPOSITORY_ROOT
 
 SOURCES += \
     RemoteControlContractTests.cpp \
+    $$REPOSITORY_ROOT/RemoteControl/RemoteControlConnectionState.cpp \
     $$REPOSITORY_ROOT/RemoteControl/RemoteControlFrameSplitter.cpp \
     $$REPOSITORY_ROOT/RemoteControl/RemoteControlProtocol.cpp \
     $$REPOSITORY_ROOT/RemoteControl/RemoteControlServer.cpp \
     $$REPOSITORY_ROOT/plugins/InterfaceDataType.cpp
 
 HEADERS += \
+    $$REPOSITORY_ROOT/RemoteControl/RemoteControlConnectionState.h \
     $$REPOSITORY_ROOT/RemoteControl/RemoteControlFrameSplitter.h \
     $$REPOSITORY_ROOT/RemoteControl/RemoteControlProtocol.h \
     $$REPOSITORY_ROOT/RemoteControl/RemoteControlServer.h \

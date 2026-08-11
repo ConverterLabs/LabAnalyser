@@ -90,6 +90,7 @@ SOURCES += main.cpp\
         DataManagement/DataManagementClass.cpp \
         DataManagement/DataManagementSetClass.cpp \
         DataManagement/DataMessengerClass.cpp \
+        RemoteControl/RemoteControlConnectionState.cpp \
         RemoteControl/RemoteControlFrameSplitter.cpp \
         RemoteControl/RemoteControlProtocol.cpp \
         RemoteControl/RemoteControlServer.cpp \
@@ -147,6 +148,7 @@ HEADERS  += mainwindow.h\
             DataManagement/DataManagementClass.h \
             DataManagement/DataManagementSetClass.h \
             DataManagement/DataMessengerClass.h \
+            RemoteControl/RemoteControlConnectionState.h \
             RemoteControl/RemoteControlFrameSplitter.h \
             RemoteControl/RemoteControlProtocol.h \
             RemoteControl/RemoteControlServer.h \

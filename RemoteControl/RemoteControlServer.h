@@ -24,7 +24,7 @@
 #include <QtNetwork>
 #include <QObject>
 #include "../DataManagement/mapper.h"
-#include "RemoteControlFrameSplitter.h"
+#include "RemoteControlConnectionState.h"
 #include <map>
 
 class QTcpServer;
@@ -52,7 +52,7 @@ public slots:
 
 private:
     QTcpServer tcpServer;
-    QTcpSocket *tcpServerConnection = NULL;
+    RemoteControlConnectionState ConnectionState;
     int bytesToWrite;
     int bytesWritten;
     int bytesReceived;
@@ -60,7 +60,6 @@ private:
     bool IsHeaderReceived = false;
     std::map<QString, ToFormMapper*> *DataContainer;
     QString ReceivedID;
-    RemoteControlFrameSplitter FrameSplitter;
     int debugCounter = 0;
     int m_port = 4080;
 

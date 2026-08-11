@@ -36,24 +36,23 @@ RemoteControlServer::RemoteControlServer(std::map<QString, ToFormMapper *> *Data
 
 void RemoteControlServer::acceptConnection()
 {
-    // if(tcpServerConnection)
-    //     tcpServerConnection->close();
-    tcpServerConnection = tcpServer.nextPendingConnection();
-    FrameSplitter.Clear();
+    // if(ConnectionState.GetCurrentSocket())
+    //     ConnectionState.GetCurrentSocket()->close();
+    ConnectionState.SetCurrentSocket(tcpServer.nextPendingConnection());
 
-    connect(tcpServerConnection, SIGNAL(readyRead()),
+    connect(ConnectionState.GetCurrentSocket(), SIGNAL(readyRead()),
             this, SLOT(HeaderReceived()));
-    connect(tcpServerConnection, SIGNAL(error(QAbstractSocket::SocketError)),
+    connect(ConnectionState.GetCurrentSocket(), SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
 }
 
 void RemoteControlServer::HeaderReceived()
 {
-    while (tcpServerConnection->bytesAvailable())
+    while (ConnectionState.GetCurrentSocket()->bytesAvailable())
     {
-        FrameSplitter.Append(tcpServerConnection->readAll());
+        ConnectionState.GetFrameSplitter().Append(ConnectionState.GetCurrentSocket()->readAll());
         QByteArray Data;
-        while (FrameSplitter.TakeCompleteFrame(&Data))
+        while (ConnectionState.GetFrameSplitter().TakeCompleteFrame(&Data))
         {
             const RemoteControlProtocol::DecodedFrame decoded = RemoteControlProtocol::DecodeCompleteFrame(Data);
             uint32_t DataSize = decoded.TotalSize;
@@ -154,7 +153,7 @@ void RemoteControlServer::HeaderReceived()
                                     DataOut = RemoteControlProtocol::EncodeEmptyReply();
                                 }
                             }
-                            tcpServerConnection->write(DataOut);
+                            ConnectionState.GetCurrentSocket()->write(DataOut);
                         }
                         else
                         {
@@ -183,12 +182,12 @@ void RemoteControlServer::HeaderReceived()
                             {
                                 DataOut = RemoteControlProtocol::EncodeEmptyReply();
                             }
-                            tcpServerConnection->write(DataOut);
+                            ConnectionState.GetCurrentSocket()->write(DataOut);
                         }
                     }
                     else
                     {
-                        tcpServerConnection->write(DataOut);
+                        ConnectionState.GetCurrentSocket()->write(DataOut);
                     }
                 }
                 DataPointer += 15 + LengthID + LengthofData;

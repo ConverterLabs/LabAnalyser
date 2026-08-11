@@ -295,3 +295,30 @@ OS socket failures, backpressure, port exhaustion and malformed frames remain
 dangerous exclusions. The String/StringList trailing-byte loss, container
 non-mutation, one-byte selection behavior and invalid Qt-6 error-signal
 connection remain unchanged defect candidates.
+
+## 4H.3b current-connection state extraction
+
+**Completed 2026-08-11.** `RemoteControlConnectionState` is a private,
+non-owning helper for exactly one current connection. It stores a
+`QPointer<QTcpSocket>` observer and one `RemoteControlFrameSplitter`. Replacing
+the current socket assigns the new observer and clears the splitter in the
+same synchronous operation. The helper has no `QTcpServer`, Messenger, mapper,
+protocol, GUI or socket-deletion responsibility; its reset operation likewise
+only clears its observer and buffer.
+
+`RemoteControlServer` still creates the `QTcpServer`, accepts connections,
+creates the existing `readyRead`/legacy-error connections, decodes frames,
+looks up mappers, mutates `InterfaceData`, emits `MessageSender` and writes the
+reply to the current socket. Consequently, `TCP_009`–`TCP_012` continue to
+prove the legacy semantics: B replaces A, clears A's remainder, and only B is
+processed or receives a reply. No old connection is reactivated and no new
+socket ownership, reparenting, deletion or `deleteLater()` timing is added.
+
+The raw `tcpServerConnection` and standalone `FrameSplitter` fields were
+removed because their entire private behavior moved to the helper.
+`bytesToWrite`, `bytesWritten`, `bytesReceived`, `IsHeaderReceived`,
+`ReceivedID` and `debugCounter` remain in the server: they are pre-existing
+private fields outside this narrowly characterized ownership extraction, so no
+unrelated cleanup or behavioral assumption was made. The focused TCP suite and
+incremental Release build passed. The public server constructor, `GetPort`,
+signal and slots remain unchanged.
