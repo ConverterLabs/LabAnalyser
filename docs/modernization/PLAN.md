@@ -773,3 +773,22 @@ direct UIIO target did not complete its full application-graph regeneration
 within the local tool limit and is therefore explicitly unverified for this
 commit rather than reported green; it remains a focused follow-up before any
 Project-IO change.
+
+## Phase 5E Legacy-V1 plugin ownership hardening
+
+**Completed 2026-08-11.** The approved compatibility strategy is complete for
+Legacy-V1: `4fc5aad` selects `RetainLegacyPlugin` only for private successful
+loader registrations, while public `AddDevice()` remains `HostDelete`.
+Logical removal removes registry access and recorded Messenger connections but
+does not host-delete or unload the Legacy interface; loader, root and
+interface remain resident until process end. The consequence is deliberate:
+legacy resources, threads and hardware state can persist until exit, and no
+absolute third-party plugin compatibility claim is made.
+
+GitHub Actions run `31519846064` confirms the normal Windows qmake build and
+central test job, including the previously locally unconfirmed UIIO/
+ProjectIoFacadeContractTests boundary. Combined coverage is 49.79% lines
+(3088/6202), 44.21% executed branches (4777/10805), 24.68% branches taken at
+least once (2667/10805), 40.16% calls (3053/7602), and 66.51% functions
+(423/636); no coverage gate is active. Lifecycle-V2, with a new IID and a
+plugin-side release operation, remains separately approval-gated.

@@ -153,3 +153,29 @@ its full application graph was still regenerating at the local 120-second
 tool limit, so no UIIO result is claimed for this slice. The unmodified
 ProjectIo adapter remains a required focused checkpoint before the next
 Project-IO change; it was not substituted by a full runner.
+
+## Phase 5E completion evidence
+
+Phase 5E is complete for the approved Legacy-V1 ownership-hardening scope.
+GitHub Actions run `31519846064` completed green: its normal Windows qmake
+build and central test job include the previously locally unconfirmed
+`ProjectIoFacadeContractTests`/UIIO boundary. This is remote CI evidence; the
+local 120-second regeneration limit is not retrospectively reported as a local
+pass.
+
+Commit `4fc5aad` activates `RetainLegacyPlugin` only for the successful private
+Legacy-V1 loader path. Public `DataManagementClass::AddDevice()` registrations
+remain `HostDelete`. Logical Legacy removal removes the active registry entry,
+disconnects its recorded Messenger endpoint pair, and neither host-deletes nor
+unloads the interface. Its loader, plugin root and interface stay resident
+until process end. The legacy XML fixture hash alignment is committed and
+pushed as `e33002f`; `73a89b8` protects those approved bytes from EOL
+conversion.
+
+The same CI run published combined evidence without enabling a coverage gate:
+49.79% lines (3088/6202), 44.21% executed branches (4777/10805), 24.68%
+branches taken at least once (2667/10805), 40.16% calls (3053/7602), and
+66.51% functions (423/636). This does not establish compatibility with every
+third-party plugin. Legacy plugin resources, threads and hardware state may
+remain until process exit; a lifecycle-capable V2 API/IID remains a separately
+approved future decision.

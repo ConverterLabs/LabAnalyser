@@ -283,3 +283,17 @@ Debug builds passed on 2026-08-04. Existing file-level evidence is
 separate `PlotMeasurementsTests` unit suite remains authoritative for
 `PlotMeasurements.cpp`. These are not project-wide metrics or a threshold;
 details and remaining risks are in `PLOT_CONTRACTS_3J.md`.
+
+## Phase 5E Legacy plugin ownership CI evidence
+
+GitHub Actions run `31519846064` is green for the normal Windows qmake build
+and central test job, including the previously locally unconfirmed
+ProjectIoFacadeContractTests/UIIO boundary of the Legacy-V1 plugin ownership
+work. It is remote confirmation, not a reclassification of the local
+120-second build-tool limit.
+
+Its combined coverage report, with no coverage gate enabled, records 49.79%
+lines (3088/6202), 44.21% executed branches (4777/10805), 24.68% branches
+taken at least once (2667/10805), 40.16% calls (3053/7602), and 66.51%
+functions (423/636). Legacy fixture hash alignment is `e33002f`; the tracked
+fixture bytes are protected from EOL conversion by `73a89b8`.

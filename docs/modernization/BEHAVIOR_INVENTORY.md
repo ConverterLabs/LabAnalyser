@@ -1007,3 +1007,18 @@ resident until process termination, `PluginReleaseV2` is not implemented, and
 the result does not claim safety for arbitrary third-party plugin allocation,
 cross-CRT combinations, null interface/object returns, or stale raw-pointer
 use.
+
+## Phase 5E Legacy-V1 ownership completion
+
+`PLUGIN_001..PLUGIN_019` retain their documented contracts. `4fc5aad` makes
+only the private successful Legacy-V1 loading path use `RetainLegacyPlugin`;
+the public `AddDevice()` path remains `HostDelete`. A logically removed legacy
+device is no longer looked up or connected to its recorded Messenger endpoint,
+but its loader, root and interface remain process-resident and must not be
+dereferenced through removed raw pointers.
+
+GitHub Actions run `31519846064` is green for the normal Windows qmake build
+and central runner, including ProjectIoFacadeContractTests/UIIO. The evidence
+does not prove all third-party allocation, thread, hardware or cross-CRT
+models. Lifecycle-V2 with a new IID and plugin-side release operation remains
+an explicit future compatibility decision.
