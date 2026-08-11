@@ -12,6 +12,7 @@
 #define DEVICEREGISTRY_H
 
 #include <QList>
+#include <QPointer>
 #include <QString>
 
 #include <map>
@@ -24,6 +25,8 @@ public:
     Platform_Interface* Find(QString name) const;
     QString Path(QString name) const;
     void Add(QString name, QString path, Platform_Interface* device);
+    bool AddLegacyPlugin(QString name, QString path, Platform_Interface* device,
+                         QObject* pluginObject, QObject* messenger);
     void Close(QString name);
     void RemoveDevices();
     void ClearProjectDevices();
@@ -41,11 +44,15 @@ private:
         Platform_Interface* interface = nullptr;
         QString descriptorPath;
         CleanupStrategy cleanup = CleanupStrategy::HostDelete;
+        QPointer<QObject> pluginObject;
+        QPointer<QObject> messenger;
     };
 
     void AddWithCleanupStrategy(QString name, QString path,
                                 Platform_Interface* device,
-                                CleanupStrategy cleanup);
+                                CleanupStrategy cleanup,
+                                QObject* pluginObject = nullptr,
+                                QObject* messenger = nullptr);
     void Cleanup(DeviceRecord& record);
 
     std::map<QString, DeviceRecord> Devices;

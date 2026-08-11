@@ -269,6 +269,14 @@ void DataManagementClass::AddDevice(QString Filename, QString Filepath, Platform
     Devices->Add(Filename, Filepath, Device);
 }
 
+bool DataManagementClass::AddLegacyPluginDevice(QString name, QString path,
+                                                 Platform_Interface* device,
+                                                 QObject* pluginObject,
+                                                 QObject* messenger)
+{
+    return Devices->AddLegacyPlugin(name, path, device, pluginObject, messenger);
+}
+
 void DataManagementClass::RemoveDevices(void)
 {
     Devices->RemoveDevices();

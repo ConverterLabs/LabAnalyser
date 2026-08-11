@@ -1,4 +1,5 @@
 #include <QObject>
+#include <QPointer>
 #include <QVariant>
 
 #include "plugins/platforminterface.h"
@@ -8,10 +9,12 @@
 // only after the manager has demonstrably performed no implicit cleanup.
 class HeapOwnedDevice : public QObject, public Platform_Interface
 {
+    Q_OBJECT
 public:
     explicit HeapOwnedDevice(QObject* telemetry) : Telemetry(telemetry)
     {
         setObjectName("HeapOwnedInterfaceDevice");
+        setProperty("test_messageReceives", 0);
         setProperty("test_pluginRoot", QVariant::fromValue(telemetry));
     }
     ~HeapOwnedDevice() override
@@ -22,8 +25,14 @@ public:
 
     InterfaceData* GetSymbol(const QString&) override { return nullptr; }
     QObject* GetObject() override { return this; }
-    void MessageReceiver(const QString&, const QString&, InterfaceData) override {}
-    void MessageSender(const QString&, const QString&, InterfaceData) override {}
+public slots:
+    void MessageReceiver(const QString&, const QString&, InterfaceData) override
+    {
+        setProperty("test_messageReceives", property("test_messageReceives").toInt() + 1);
+    }
+
+signals:
+    void MessageSender(const QString&, const QString&, InterfaceData);
 
 private:
     QObject* Telemetry;
@@ -52,7 +61,10 @@ public:
     }
 
 private:
-    HeapOwnedDevice* Device = nullptr;
+    // Test-fixture-only observation: PLUGIN_010 may perform its documented
+    // controlled heap cleanup, after which a later independent load must not
+    // return the stale member value.
+    QPointer<HeapOwnedDevice> Device;
 };
 
 #include "HeapOwnedInterfacePlugin.moc"

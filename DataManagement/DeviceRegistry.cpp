@@ -23,12 +23,26 @@ void DeviceRegistry::Add(QString name, QString path, Platform_Interface* device)
     AddWithCleanupStrategy(name, path, device, CleanupStrategy::HostDelete);
 }
 
+bool DeviceRegistry::AddLegacyPlugin(QString name, QString path,
+                                     Platform_Interface* device,
+                                     QObject* pluginObject, QObject* messenger)
+{
+    if (Devices.find(name) != Devices.end())
+        return false;
+
+    AddWithCleanupStrategy(name, path, device, CleanupStrategy::RetainLegacyPlugin,
+                           pluginObject, messenger);
+    return true;
+}
+
 void DeviceRegistry::AddWithCleanupStrategy(QString name, QString path,
                                              Platform_Interface* device,
-                                             CleanupStrategy cleanup)
+                                             CleanupStrategy cleanup,
+                                             QObject* pluginObject,
+                                             QObject* messenger)
 {
     if (!Devices[name].interface) {
-        Devices[name] = { device, path, cleanup };
+        Devices[name] = { device, path, cleanup, pluginObject, messenger };
         DevicePaths[name] = path;
     }
 }
@@ -43,9 +57,17 @@ void DeviceRegistry::Cleanup(DeviceRecord& record)
         delete record.interface;
         break;
     case CleanupStrategy::RetainLegacyPlugin:
+        // A Legacy-V1 plugin does not declare who owns the returned interface.
+        // Disconnect only this Messenger/plugin-object pair before retiring the
+        // active record; the loader and interface remain application-resident.
+        if (record.messenger && record.pluginObject) {
+            QObject::disconnect(record.messenger, nullptr, record.pluginObject, nullptr);
+            QObject::disconnect(record.pluginObject, nullptr, record.messenger, nullptr);
+        }
+        break;
     case CleanupStrategy::PluginReleaseV2:
-        // Prepared only: no current registration path can create either
-        // strategy. Do not delete an interface with unproven ownership.
+        // Prepared only: no current registration path can create this strategy.
+        // Do not delete an interface with unproven ownership.
         break;
     }
 }

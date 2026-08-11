@@ -70,9 +70,12 @@ void LoadPlugin::readDevice()
                             return;
                         }
                         Platform_Interface* PI = NewDevice->GetInterface(Messenger);
-                        DCObj->AddDevice(Name, m_devFileName, PI);
+                        QObject* pluginObject = PI->GetObject();
+                        if (!DCObj->AddLegacyPluginDevice(Name, m_devFileName, PI,
+                                                          pluginObject, Messenger))
+                            return;
                         NewDeviceReg = DCObj->GetDevice(Name);
-                        NewDeviceReg->GetObject()->setObjectName(Name);
+                        pluginObject->setObjectName(Name);
                         PluginLeasePool* leases = PluginLeasePool::ForCurrentApplication();
                         if (leases)
                             leases->Adopt(std::move(loader));

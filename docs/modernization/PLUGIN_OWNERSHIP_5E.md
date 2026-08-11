@@ -118,3 +118,38 @@ compiled only in `PluginLoaderContractTests`.
 This changes loader lifetime only. DeviceRegistry still registers every
 reachable device as `HostDelete`; no Legacy retain strategy, loader release,
 Messenger change or logical removal is active in 5E.3c1.
+
+## 5E.3c2 approved Legacy-V1 logical removal
+
+The isolated 5E.2b baseline established deterministic `0xC0000374` heap
+corruption when the host deleted the member-owned fixture interface. The
+approved compatibility fix therefore distinguishes registration provenance,
+not pointer shape: only the private successful Legacy-V1 loader path records
+`RetainLegacyPlugin`; the unchanged public `DataManagementClass::AddDevice()`
+continues to record `HostDelete`.
+
+`DeviceRegistry::DeviceRecord` now also retains non-owning `QPointer`s for
+the plugin `GetObject()` QObject and its Messenger. On `CloseDevice`,
+`RemoveDevices`, or `CloseProjectLogic`, a retained Legacy-V1 record removes
+only the active lookup and applies the pre-existing path rule: close/project
+remove its path, while remove-all retains it. It disconnects exactly the
+Messenger/plugin QObject pair in both directions, performs neither `delete`
+nor `unload`, and leaves the `PluginLeasePool` loader, root and interface
+resident until application shutdown. `PluginReleaseV2` remains inactive.
+
+`PLUGIN_014..PLUGIN_018` cover member/heap logical removal, path behavior,
+pair-specific Messenger disconnection, and a fresh active registration after
+logical removal. `PLUGIN_019` reconfirms one `HostDelete` destructor call for
+a direct public `AddDevice()` registration. The member and heap fixtures are
+test models only; this does not establish a third-party plugin matrix, a
+hardware shutdown guarantee, or cleanup of plugin threads/resources before
+process end.
+
+Fast verification ran the rebuilt plugin fixtures, `PluginLoaderContractTests`
+(21 passed), and `DataManagementCharacterizationTests` (35 passed), plus an
+incremental Release compile of the changed loader/registry/facade units. The
+direct `ProjectIoFacadeContractTests` rebuild was intentionally not completed:
+its full application graph was still regenerating at the local 120-second
+tool limit, so no UIIO result is claimed for this slice. The unmodified
+ProjectIo adapter remains a required focused checkpoint before the next
+Project-IO change; it was not substituted by a full runner.

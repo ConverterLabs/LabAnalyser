@@ -162,6 +162,18 @@ without assigning loaders a QObject parent and makes no explicit unload call.
 It is deliberately separate from `DeviceRegistry`: all active devices still
 use the legacy `HostDelete` strategy, and no Messenger connection or logical
 removal policy changed.
+
+## Phase 5E.3c2 Legacy plugin logical-removal boundary
+
+`DeviceRegistry` distinguishes internal registration provenance without
+changing `DataManagementClass::AddDevice()`: public caller-created interfaces
+remain `HostDelete`, while the private `LoadPlugin` success path records
+Legacy-V1 interfaces as `RetainLegacyPlugin`. A retained record holds only
+non-owning `QPointer`s to its Messenger and plugin device QObject. Logical
+removal disconnects this endpoint pair and removes the active record; it does
+not delete the interface or unload its application-lifetime loader. The
+resident loader/interface boundary intentionally trades prompt plugin-resource
+release for Legacy-V1 ownership safety.
 ## Phase 4G.2a Project I/O export coordination
 
 `DataManagement/ProjectIoCoordinator` is a private, QObject-free operation

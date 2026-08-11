@@ -32,6 +32,7 @@ class DataRegistry;
 class ContainerStore;
 class WidgetBindingRegistry;
 class DeviceRegistry;
+class LoadPlugin;
 
 /** This Class contains all data that is necessary to mirror the complete data State of LabAnalyser, including the plugin handling.
  *
@@ -285,6 +286,14 @@ signals:
     void PublishFinished();
 
 private:
+
+    friend class LoadPlugin;
+
+    // Internal Legacy-V1 registration path. Public AddDevice() remains the
+    // host-owned contract and always selects DeviceRegistry::HostDelete.
+    bool AddLegacyPluginDevice(QString name, QString path,
+                               Platform_Interface* device,
+                               QObject* pluginObject, QObject* messenger);
 
     struct DataRegistryDeleter {
         void operator()(DataRegistry* registry) const;

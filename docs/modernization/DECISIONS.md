@@ -93,3 +93,22 @@ continues to own its documented QObject, MainWindow, state and signal/status
 responsibilities, while `LoadForms()` remains blocked because it has no
 repository implementation. A later boundary requires a demonstrated dependency
 or test benefit, characterization evidence and its own approved slice.
+
+## ADR-009: Retain Legacy-V1 plugin interfaces after logical removal
+
+**Date:** 2026-08-11
+**Status:** accepted security/ownership fix
+
+The existing `org.qt-project.Qt.Examples.EchoInterface` Legacy-V1 boundary
+does not declare ownership of `Platform_Fabric::GetInterface()` results. The
+isolated member-interface fixture diagnosis demonstrated deterministic heap
+corruption under host deletion. Successful Legacy-V1 loader registrations are
+therefore internally marked `RetainLegacyPlugin`: logical removal disconnects
+only its Messenger/device-QObject pair and removes active registry visibility,
+but neither deletes the interface nor unloads the leased plugin loader.
+
+The public `DataManagementClass::AddDevice()` API stays `HostDelete` with its
+characterized exactly-once cleanup. No IID, `Platform_Interface`, or
+`InterfaceData` ABI changes. This deliberately permits Legacy plugin resources
+to survive to process end. A future optional V2 IID with plugin-side
+`ReleaseInterface()` remains a separate migration decision.

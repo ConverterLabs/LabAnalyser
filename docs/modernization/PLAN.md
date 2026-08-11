@@ -752,3 +752,24 @@ the approved Legacy retain behavior yet: DeviceRegistry still uses only
 `HostDelete`, and no cleanup, Messenger connection, IID or plugin-interface
 semantics changed. The following slice must characterize and then activate
 logical Legacy removal separately.
+
+## Phase 5E.3c2 Legacy-V1 plugin ownership fix
+
+**Completed 2026-08-11.** The explicitly approved parallel strategy is active:
+only successful Legacy-V1 loads through the private loader path receive
+`RetainLegacyPlugin`; direct public `AddDevice()` callers still receive
+`HostDelete`. Logical removal drops the active record, preserves the historic
+per-operation path semantics, disconnects only the recorded Messenger/plugin
+QObject pair, and deliberately neither deletes the interface nor unloads its
+application-lifetime lease. `PLUGIN_014..PLUGIN_019` cover the safe member and
+heap fixture models, targeted Messenger disconnect, reload and unchanged
+HostDelete behavior. `PluginReleaseV2` remains a future versioned IID/API
+decision. Legacy plugin resources and threads may remain active until process
+end; no real third-party ownership matrix is claimed.
+
+The fast evidence is limited to rebuilt fixtures, Plugin contracts (21 passed),
+DataManagement contracts (35 passed), and an incremental Release compile. The
+direct UIIO target did not complete its full application-graph regeneration
+within the local tool limit and is therefore explicitly unverified for this
+commit rather than reported green; it remains a focused follow-up before any
+Project-IO change.

@@ -989,3 +989,21 @@ mapper exactly once observably and a following TCP `get` returns the new value.
 The server-alone contracts continue to establish that the server itself does
 not mutate the supplied map. This is an intentional transport/dispatch split;
 direct server mutation would introduce a double-mutation/order risk.
+
+## Phase 5E.3c2 Legacy plugin ownership hardening
+
+`LoadPlugin::readDevice()` registers a successfully loaded Legacy-V1
+`Platform_Interface` only through the private retained-registration path;
+the public `DataManagementClass::AddDevice()` contract remains host-owned.
+`DeviceRegistry::{Close,RemoveDevices,ClearProjectDevices}` map to
+`PLUGIN_014..PLUGIN_019`: retained member/heap plugin interfaces are logically
+removed without host deletion or loader unload; Close/project remove paths and
+RemoveDevices retains paths; only the exact Messenger/device-QObject pair is
+disconnected; a later load creates a new active record. `PLUGIN_019` preserves
+the direct `HostDelete` one-delete contract.
+
+The known boundaries remain explicit: Legacy resources and threads can remain
+resident until process termination, `PluginReleaseV2` is not implemented, and
+the result does not claim safety for arbitrary third-party plugin allocation,
+cross-CRT combinations, null interface/object returns, or stale raw-pointer
+use.
