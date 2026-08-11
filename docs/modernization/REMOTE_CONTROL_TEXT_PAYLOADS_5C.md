@@ -96,6 +96,29 @@ and an U+00E4 Latin-1 choice with the shared testfixture cleanup.
 
 StringList stays one element, and get/set asymmetry remains intentionally open.
 
+## 5D.2 TCP-to-DataManagement dispatch boundary
+
+`TCP_DM_001` supplies the missing loopback integration vector without changing
+the server. It constructs a real `DataManagementSetClass`, its real
+`MessengerClass`, and a `RemoteControlServer` over the manager's existing map,
+then installs the same direct connection as `MainWindow`: server
+`MessageSender` to `MessengerClass::MessageTransmitter`.
+
+For a numeric container initially holding `2.0`, the first native numeric
+`get` returns the existing exact reply bytes. A TCP `set` to `12.5` then has
+the synchronous observable order `RemoteControlServer::MessageSender` →
+`MessengerClass::SetData` → `MessengerClass::NewDataReceived` →
+`MessengerClass::MessageSender`. Each signal occurs once; the original
+`ToFormMapper*` remains identical, its value becomes `12.5`, no additional
+container or form is created, and a subsequent TCP `get` returns `12.5`.
+
+The isolated-server observation is therefore a transport/dispatch boundary,
+not a product defect: the server emits but does not mutate its supplied map;
+the productive Messenger/DataManagement path performs exactly one observed
+mutation. Direct server-side mutation is rejected as a double-mutation and
+ordering risk because it would bypass or precede the established
+`SetData → NewDataReceived → plugin-forwarding` path.
+
 ## Evidence
 
 The baseline characterization in `3244b4f` completed with exit code 0. The

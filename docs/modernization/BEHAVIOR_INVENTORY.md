@@ -946,3 +946,16 @@ server destruction with a live client, while `TCP_017..TCP_021` and `TCP_029`
 have no loopback socket. The former intermittent `TCP_007` and `TCP_013`
 warnings are documented fixture-cleanup findings; production shutdown safety
 is not asserted solely from this test stabilization.
+
+## Phase 5D.2 TCP-to-DataManagement integration
+
+`TCP_DM_001` adds the missing real loopback-to-manager boundary. It combines
+the unchanged `RemoteControlServer` with the production `DataManagementSetClass`
+and `MessengerClass`, using the direct production connection to
+`MessageTransmitter`. A numeric TCP `set` produces exactly one server message,
+one Messenger `SetData`, one `NewDataReceived`, and one downstream Messenger
+message in that order; `DataManagementClass::SetData` mutates the existing
+mapper exactly once observably and a following TCP `get` returns the new value.
+The server-alone contracts continue to establish that the server itself does
+not mutate the supplied map. This is an intentional transport/dispatch split;
+direct server mutation would introduce a double-mutation/order risk.

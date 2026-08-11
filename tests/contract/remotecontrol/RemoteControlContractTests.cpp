@@ -16,6 +16,7 @@
 #undef private
 #include "RemoteControl/RemoteControlFrameSplitter.h"
 #include "RemoteControl/RemoteControlProtocol.h"
+#include "DataManagement/DataManagementSetClass.h"
 
 Q_DECLARE_METATYPE(InterfaceData)
 
@@ -187,6 +188,7 @@ private slots:
     void TCP_027_qStringAndStringListLegacyPayloads();
     void TCP_028_guiSelectionLegacyPayloads();
     void TCP_029_optionalTrailingNulHelper();
+    void TCP_DM_001_tcpSetMutatesContainerThroughMessenger();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -810,6 +812,87 @@ void RemoteControlContractTests::TCP_029_optionalTrailingNulHelper() {
         QCOMPARE(RemoteControlProtocol::RemoveOptionalTrailingNul(payloads[index]), expected[index]);
         QCOMPARE(payloads[index], original);
     }
+}
+
+void RemoteControlContractTests::TCP_DM_001_tcpSetMutatesContainerThroughMessenger() {
+    QObject root;
+    root.setObjectName("LabAnalyser");
+    DataManagementSetClass manager(&root);
+    const QString id("tcp::manager::double");
+    manager.AddContainerElement(id, "double", "Parameter", "");
+    manager.GetContainer(id)->SetData(2.0);
+
+    ToFormMapper* const mapper = manager.GetContainer(id);
+    QVERIFY(mapper);
+    QCOMPARE(mapper->GetDouble(), 2.0);
+    QCOMPARE(manager.GetContainerCount(), 1);
+
+    RemoteControlServer server(manager.GetContainerPointer());
+    MessengerClass* const messenger = manager.GetMessenger();
+    QVERIFY(messenger);
+
+    QStringList order;
+    QObject::connect(&server, &RemoteControlServer::MessageSender, &root,
+                     [&order](const QString&, const QString&, InterfaceData) { order << "server"; });
+    QObject::connect(&server, &RemoteControlServer::MessageSender,
+                     messenger, &MessengerClass::MessageTransmitter);
+    QObject::connect(messenger, &MessengerClass::SetData, &root,
+                     [&order](const QString&, InterfaceData) { order << "messenger-set"; });
+    QObject::connect(messenger, &MessengerClass::NewDataReceived, &root,
+                     [&order](const QString&) { order << "messenger-new-data"; });
+    QObject::connect(messenger, &MessengerClass::MessageSender, &root,
+                     [&order](const QString&, const QString&, InterfaceData) { order << "messenger-send"; });
+
+    QSignalSpy serverMessages(&server, &RemoteControlServer::MessageSender);
+    QSignalSpy messengerSet(messenger, &MessengerClass::SetData);
+    QSignalSpy messengerNewData(messenger, &MessengerClass::NewDataReceived);
+    QSignalSpy messengerMessages(messenger, &MessengerClass::MessageSender);
+    QVERIFY(serverMessages.isValid());
+    QVERIFY(messengerSet.isValid());
+    QVERIFY(messengerNewData.isValid());
+    QVERIFY(messengerMessages.isValid());
+
+    QTcpSocket* client = connectClient(server, this);
+    client->write(frame("get", id.toLatin1()));
+    QVERIFY(client->waitForBytesWritten(1000));
+    QCOMPARE(readReply(client, 13), numericReply(2.0));
+    QCOMPARE(serverMessages.count(), 0);
+    QCOMPARE(messengerSet.count(), 0);
+    QCOMPARE(messengerNewData.count(), 0);
+    QCOMPARE(messengerMessages.count(), 0);
+
+    client->write(frame("set", id.toLatin1(), f64(12.5)));
+    QVERIFY(client->waitForBytesWritten(1000));
+    QTRY_COMPARE(serverMessages.count(), 1);
+    QTRY_COMPARE(messengerSet.count(), 1);
+    QTRY_COMPARE(messengerNewData.count(), 1);
+    QTRY_COMPARE(messengerMessages.count(), 1);
+
+    QCOMPARE(order, QStringList({"server", "messenger-set", "messenger-new-data", "messenger-send"}));
+    QCOMPARE(serverMessages.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(serverMessages.at(0).at(1).toString(), id);
+    QCOMPARE(serverMessages.at(0).at(2).value<InterfaceData>().GetDouble(), 12.5);
+    QCOMPARE(messengerSet.at(0).at(0).toString(), id);
+    QCOMPARE(messengerSet.at(0).at(1).value<InterfaceData>().GetDouble(), 12.5);
+    QCOMPARE(messengerNewData.at(0).at(0).toString(), id);
+    QCOMPARE(messengerMessages.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(messengerMessages.at(0).at(1).toString(), id);
+    QCOMPARE(messengerMessages.at(0).at(2).value<InterfaceData>().GetDouble(), 12.5);
+
+    QCOMPARE(manager.GetContainer(id), mapper);
+    QCOMPARE(mapper->GetDouble(), 12.5);
+    QCOMPARE(manager.GetContainerCount(), 1);
+    QCOMPARE(manager.GetFormFileCount(), 0);
+
+    client->write(frame("get", id.toLatin1()));
+    QVERIFY(client->waitForBytesWritten(1000));
+    QCOMPARE(readReply(client, 13), numericReply(12.5));
+    QCOMPARE(serverMessages.count(), 1);
+    QCOMPARE(messengerSet.count(), 1);
+    QCOMPARE(messengerNewData.count(), 1);
+    QCOMPARE(messengerMessages.count(), 1);
+
+    QVERIFY(finalizeRemoteServer(server, {client}));
 }
 
 void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {

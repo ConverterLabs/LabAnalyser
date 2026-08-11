@@ -202,6 +202,18 @@ emission and container nonmutation. TCP_028 covers bare/trailing/double and
 embedded NUL payloads plus a Latin-1 list entry. Get/set asymmetry and any
 other InterfaceData conversion remain outside this correction.
 
+## Milestone 5D.2 TCP-set manager integration
+
+**Completed 2026-08-11 without production changes.** `TCP_DM_001` now covers
+the missing production-equivalent boundary from a loopback TCP `set` through
+`RemoteControlServer::MessageSender`, `MessengerClass::MessageTransmitter`,
+`SetData`, `NewDataReceived` and downstream Messenger forwarding. The
+existing mapper is updated exactly once observably and the following TCP `get`
+returns the new value. The isolated server intentionally remains a transport
+and signal source; it does not directly mutate the supplied map. Adding such a
+mutation would create a double-mutation and ordering risk, so it is not a
+pending product fix.
+
 ## Milestone 3A completion
 
 DataManagement characterization is complete for the safely isolated manager,
