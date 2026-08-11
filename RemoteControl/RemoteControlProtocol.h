@@ -12,16 +12,25 @@ class RemoteControlProtocol
 {
 public:
     enum class Command { Set, Get, Unknown };
+    enum class DecodeStatus { Valid, Invalid };
 
     struct DecodedFrame {
-        uint32_t TotalSize;
-        uint32_t IdLength;
-        uint32_t PayloadLength;
-        Command CommandType;
+        uint32_t TotalSize = 0;
+        uint32_t IdLength = 0;
+        uint32_t PayloadLength = 0;
+        Command CommandType = Command::Unknown;
+        DecodeStatus Status = DecodeStatus::Invalid;
         QString Id;
         QByteArray Payload;
     };
 
+    // Safe structural decoder for already complete frames. Invalid identifies
+    // malformed framing separately from a structurally valid unknown command.
+    static DecodedFrame DecodeValidatedFrame(const QByteArray& frame);
+    static bool HasNumericSetPayload(const DecodedFrame& frame);
+
+    // Legacy server decoder. Retained unchanged until the server delegation
+    // slice adopts DecodeValidatedFrame().
     static DecodedFrame DecodeCompleteFrame(const QByteArray& frame);
     static QByteArray EncodeEmptyReply();
     static QByteArray EncodeNumericReply(double value);

@@ -129,6 +129,24 @@ repair with an explicit observable error policy beyond the existing no-op. The
 approved disconnected-socket `deleteLater()` policy is now implemented; see
 `REMOTE_CONTROL_HARDENING_5A.md` for its boundaries.
 
+## Milestone 5B.2a remote-control frame validation primitives
+
+**Completed 2026-08-11.** The private QObject-free
+`RemoteControlFrameSplitter::TakeFrame()` now distinguishes `Incomplete`,
+`Complete` and `InvalidPrefix` without unaligned reads. It bounds native
+`totalSize` to 16 bytes through 1 MiB and clears its direct-use buffer once on
+an invalid prefix. `RemoteControlProtocol::DecodeValidatedFrame()` separately
+validates complete-frame structure with bounded `memcpy`, exact size sums and
+the required ID NUL; valid unknown commands remain distinguishable and ignored
+by the existing contract. `TCP_017..TCP_021` passed directly against these
+primitives.
+
+This is deliberately not yet a server hardening change: `RemoteControlServer`
+continues to use `TakeCompleteFrame()` and `DecodeCompleteFrame()`. The next
+explicitly approved slice must delegate invalid-prefix handling to a current
+connection reset/close and structurally-invalid complete-frame discard with no
+signal or reply. See `REMOTE_CONTROL_FRAME_HARDENING_5B.md`.
+
 ## Milestone 3A completion
 
 DataManagement characterization is complete for the safely isolated manager,

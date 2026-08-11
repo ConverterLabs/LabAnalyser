@@ -3,6 +3,14 @@
 #include <cstring>
 
 namespace {
+bool readUInt32Safely(const QByteArray& bytes, int offset, uint32_t* value)
+{
+    if (offset < 0 || offset > bytes.size() - int(sizeof(uint32_t)))
+        return false;
+    std::memcpy(value, bytes.constData() + offset, sizeof(*value));
+    return true;
+}
+
 uint32_t readUInt32(const QByteArray& bytes, int offset)
 {
     uint32_t value = 0;
@@ -21,6 +29,47 @@ QByteArray encodeDouble(double value)
 }
 }
 
+RemoteControlProtocol::DecodedFrame RemoteControlProtocol::DecodeValidatedFrame(const QByteArray& frame)
+{
+    DecodedFrame result;
+    if (frame.size() < 16)
+        return result;
+
+    if (!readUInt32Safely(frame, 0, &result.TotalSize)
+            || !readUInt32Safely(frame, 7, &result.IdLength)
+            || !readUInt32Safely(frame, 11, &result.PayloadLength))
+        return result;
+
+    if (result.TotalSize != uint32_t(frame.size()) || result.IdLength < 1)
+        return result;
+
+    const quint64 expectedSize = quint64(15) + result.IdLength + result.PayloadLength;
+    if (expectedSize != quint64(frame.size()))
+        return result;
+
+    const int idEnd = 15 + int(result.IdLength) - 1;
+    if (frame.at(idEnd) != '\0')
+        return result;
+
+    const QByteArray command = frame.mid(4, 3);
+    if (command == "set")
+        result.CommandType = Command::Set;
+    else if (command == "get")
+        result.CommandType = Command::Get;
+
+    result.Id = QString::fromLatin1(frame.mid(15, int(result.IdLength) - 1));
+    result.Payload = frame.mid(15 + int(result.IdLength), int(result.PayloadLength));
+    result.Status = DecodeStatus::Valid;
+    return result;
+}
+
+bool RemoteControlProtocol::HasNumericSetPayload(const DecodedFrame& frame)
+{
+    return frame.Status == DecodeStatus::Valid
+            && frame.CommandType == Command::Set
+            && frame.Payload.size() >= int(sizeof(double));
+}
+
 RemoteControlProtocol::DecodedFrame RemoteControlProtocol::DecodeCompleteFrame(const QByteArray& frame)
 {
     DecodedFrame result;
@@ -37,6 +86,7 @@ RemoteControlProtocol::DecodedFrame RemoteControlProtocol::DecodeCompleteFrame(c
     result.PayloadLength = readUInt32(frame, 11);
     result.Id = QString::fromLatin1(frame.mid(15, result.IdLength - 1));
     result.Payload = frame.mid(15 + result.IdLength, result.PayloadLength);
+    result.Status = DecodeStatus::Valid;
     return result;
 }
 

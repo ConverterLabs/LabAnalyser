@@ -14,6 +14,7 @@
 #include "RemoteControl/RemoteControlServer.h"
 #undef private
 #include "RemoteControl/RemoteControlFrameSplitter.h"
+#include "RemoteControl/RemoteControlProtocol.h"
 
 Q_DECLARE_METATYPE(InterfaceData)
 
@@ -133,6 +134,11 @@ private slots:
     void TCP_014_serverSocketAfterClientDisconnect();
     void TCP_015_repeatedConnectionsAndServerSocketLifetime();
     void TCP_016_oldSocketDisconnectKeepsCurrentConnection();
+    void TCP_017_frameSplitterShortPrefixIsIncomplete();
+    void TCP_018_frameSplitterRejectsTooSmallPrefixes();
+    void TCP_019_frameSplitterBuffersPlausiblePartialFrame();
+    void TCP_020_frameSplitterMaxSizeBoundary();
+    void TCP_021_protocolStructuralValidation();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -466,6 +472,84 @@ void RemoteControlContractTests::TCP_016_oldSocketDisconnectKeepsCurrentConnecti
     QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
     QTRY_VERIFY(serverSocketBGuard.isNull());
     clear(data);
+}
+
+void RemoteControlContractTests::TCP_017_frameSplitterShortPrefixIsIncomplete() {
+    for (int size = 0; size < 4; ++size) {
+        RemoteControlFrameSplitter splitter;
+        const QByteArray partial(size, '\x5a');
+        QByteArray extracted("unchanged");
+        splitter.Append(partial);
+        QCOMPARE(splitter.TakeFrame(&extracted), RemoteControlFrameSplitter::FrameResult::Incomplete);
+        QCOMPARE(splitter.Buffer, partial);
+        QCOMPARE(extracted, QByteArray("unchanged"));
+    }
+}
+
+void RemoteControlContractTests::TCP_018_frameSplitterRejectsTooSmallPrefixes() {
+    for (uint32_t size = 0; size < RemoteControlFrameSplitter::MinimumFrameSize; ++size) {
+        RemoteControlFrameSplitter splitter;
+        QByteArray extracted;
+        splitter.Append(u32(size));
+        QCOMPARE(splitter.TakeFrame(&extracted), RemoteControlFrameSplitter::FrameResult::InvalidPrefix);
+        QVERIFY(splitter.Buffer.isEmpty());
+        QCOMPARE(splitter.TakeFrame(&extracted), RemoteControlFrameSplitter::FrameResult::Incomplete);
+    }
+}
+
+void RemoteControlContractTests::TCP_019_frameSplitterBuffersPlausiblePartialFrame() {
+    RemoteControlFrameSplitter splitter;
+    QByteArray extracted;
+    const QByteArray partial = u32(32) + QByteArray("get", 3) + QByteArray(4, '\0');
+    splitter.Append(partial);
+    QCOMPARE(splitter.TakeFrame(&extracted), RemoteControlFrameSplitter::FrameResult::Incomplete);
+    QCOMPARE(splitter.Buffer, partial);
+}
+
+void RemoteControlContractTests::TCP_020_frameSplitterMaxSizeBoundary() {
+    RemoteControlFrameSplitter splitter;
+    QByteArray extracted;
+    splitter.Append(u32(RemoteControlFrameSplitter::MaxFrameSize));
+    QCOMPARE(splitter.TakeFrame(&extracted), RemoteControlFrameSplitter::FrameResult::Incomplete);
+    QCOMPARE(splitter.Buffer.size(), int(sizeof(uint32_t)));
+
+    RemoteControlFrameSplitter tooLarge;
+    tooLarge.Append(u32(RemoteControlFrameSplitter::MaxFrameSize + 1));
+    QCOMPARE(tooLarge.TakeFrame(&extracted), RemoteControlFrameSplitter::FrameResult::InvalidPrefix);
+    QVERIFY(tooLarge.Buffer.isEmpty());
+}
+
+void RemoteControlContractTests::TCP_021_protocolStructuralValidation() {
+    const QByteArray validSet = frame("set", "id", f64(3.0));
+    const RemoteControlProtocol::DecodedFrame known = RemoteControlProtocol::DecodeValidatedFrame(validSet);
+    QCOMPARE(known.Status, RemoteControlProtocol::DecodeStatus::Valid);
+    QCOMPARE(known.CommandType, RemoteControlProtocol::Command::Set);
+    QCOMPARE(known.Id, QString("id"));
+    QCOMPARE(known.Payload, f64(3.0));
+    QVERIFY(RemoteControlProtocol::HasNumericSetPayload(known));
+
+    const RemoteControlProtocol::DecodedFrame unknown = RemoteControlProtocol::DecodeValidatedFrame(frame("bad", "id"));
+    QCOMPARE(unknown.Status, RemoteControlProtocol::DecodeStatus::Valid);
+    QCOMPARE(unknown.CommandType, RemoteControlProtocol::Command::Unknown);
+
+    QByteArray idLengthZero = validSet; idLengthZero.replace(7, 4, u32(0));
+    QCOMPARE(RemoteControlProtocol::DecodeValidatedFrame(idLengthZero).Status, RemoteControlProtocol::DecodeStatus::Invalid);
+
+    QByteArray missingNul = validSet; missingNul[17] = 'x';
+    QCOMPARE(RemoteControlProtocol::DecodeValidatedFrame(missingNul).Status, RemoteControlProtocol::DecodeStatus::Invalid);
+
+    QByteArray totalMismatch = validSet; totalMismatch.replace(0, 4, u32(uint32_t(validSet.size() + 1)));
+    QCOMPARE(RemoteControlProtocol::DecodeValidatedFrame(totalMismatch).Status, RemoteControlProtocol::DecodeStatus::Invalid);
+
+    QByteArray sumMismatch = validSet; sumMismatch.replace(11, 4, u32(uint32_t(f64(3.0).size() + 1)));
+    QCOMPARE(RemoteControlProtocol::DecodeValidatedFrame(sumMismatch).Status, RemoteControlProtocol::DecodeStatus::Invalid);
+
+    QByteArray oversizedFields = u32(16) + QByteArray("get", 3) + u32(0xfffffff0U) + u32(32) + QByteArray("\0", 1);
+    QCOMPARE(RemoteControlProtocol::DecodeValidatedFrame(oversizedFields).Status, RemoteControlProtocol::DecodeStatus::Invalid);
+
+    const RemoteControlProtocol::DecodedFrame shortNumeric = RemoteControlProtocol::DecodeValidatedFrame(frame("set", "id", QByteArray(7, '\0')));
+    QCOMPARE(shortNumeric.Status, RemoteControlProtocol::DecodeStatus::Valid);
+    QVERIFY(!RemoteControlProtocol::HasNumericSetPayload(shortNumeric));
 }
 
 void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {
