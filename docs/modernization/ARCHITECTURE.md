@@ -26,7 +26,7 @@ Qt UI / .ui forms --> MainWindow --> DataManagementSetClass --> Messenger <-- pl
 | Export | `Export2Mat.*`, `export2highfive.*` | MATLAB MAT via libmatio and HDF5 via HighFive/HDF5. Output schema has not yet been fixture-characterized. |
 | Plot/numerics | `PlotWidget`, `FFTPlotWidget`, `PlotMeasurements`, vendored `qcustomplot` | Charts, FFT, interpolation, interval statistics, RMS and THD. `PlotMeasurements` is the only tested production module. |
 | Custom/drop widgets | `DropWidgets/*`, `CustomWidgets/*` | Widget-specific binding, data updates, XML save/load, and visual indicators. |
-| Network | `RemoteControlServer`, private `RemoteControlConnectionState`, `RemoteControlFrameSplitter`, `RemoteControlProtocol` | Loopback TCP server (initial port 4080, incremented until bound); binary `set`/`get` protocol. The private state observes only the last accepted socket and clears its sole frame buffer on replacement; it does not introduce independent client sessions or socket ownership. |
+| Network | `RemoteControlServer`, private `RemoteControlConnectionState`, `RemoteControlFrameSplitter`, `RemoteControlProtocol` | `RemoteControlServer` remains the Qt transport and dispatch facade for the loopback binary `set`/`get` protocol (initial port 4080, incremented until bound). `RemoteControlConnectionState` observes the current non-owning socket and its sole frame state; `RemoteControlFrameSplitter` separates complete frames from remainder bytes; `RemoteControlProtocol` decodes/encodes safe complete frames. The implementation still has only the last-accepted-client contract, not independent multi-client sessions or new socket ownership. |
 
 ## External formats and dependencies
 

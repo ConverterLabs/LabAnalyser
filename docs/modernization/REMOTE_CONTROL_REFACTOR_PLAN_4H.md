@@ -322,3 +322,52 @@ private fields outside this narrowly characterized ownership extraction, so no
 unrelated cleanup or behavioral assumption was made. The focused TCP suite and
 incremental Release build passed. The public server constructor, `GetPort`,
 signal and slots remain unchanged.
+
+## 4H structural isolation checkpoint
+
+**Completed 2026-08-11 from already recorded focused evidence.** The following
+small, rollbackable internal slices are complete:
+
+| Scope | Result | Evidence commit |
+| --- | --- | --- |
+| 4H.1 `RemoteControlFrameSplitter` | Complete frames and remainder bytes isolated without protocol interpretation. | `20807a3` |
+| TCP_008 protocol-byte characterization | Safe length, NUL, padding, reply-category and coalesced-`get` vectors recorded. | `29edc00` |
+| 4H.2 `RemoteControlProtocol` | Complete safe-frame decode/classification and existing `get` reply encoding isolated. | `7e098d2` |
+| TCP_009--TCP_012 connection characterization | Existing multiple-client, fragment replacement and disconnect behavior recorded. | `85e8aa7` |
+| 4H.3 `RemoteControlConnectionState` | Current non-owning socket observation plus one splitter isolated. | `56c22c9` |
+
+### Preserved single-current-connection contract
+
+This checkpoint intentionally preserves the observed legacy behavior. Only the
+last accepted client is current and processed. Accepting B discards A's
+incomplete-frame remainder; A may remain connected but receives neither
+processing nor replies after that point. Replies are written only to the
+current socket. No older connection is reactivated, no additional `readyRead`
+connection is made, and no independent multi-client session model has been
+introduced.
+
+### Internal rollback boundaries
+
+* Reverting `RemoteControlFrameSplitter` restores only the server's prior
+  private complete-frame/remainder buffering; it does not alter framing bytes,
+  protocol interpretation, socket ownership, or dispatch.
+* Reverting `RemoteControlProtocol` restores only the private decode/encode
+  call sites in `RemoteControlServer`; transport, mapper lookup, signals and
+  reply writes remain at the same public boundary.
+* Reverting `RemoteControlConnectionState` restores the prior private current
+  socket observer plus splitter fields. It neither changes QObject ownership
+  nor deletes, reparents, or revives a socket.
+
+Focused `TCP_001`--`TCP_012` plus the frame-splitter vector were green after
+their respective slices. The focused production slices also had green
+incremental Release compile checks; the public server API, signals and slots
+remained unchanged, and no generated artifact was versioned.
+
+### 4H.4: explicitly approval-required hardening
+
+The following are not ordinary behavior-preserving refactorings and remain
+open for an explicit product decision: repair the Qt-6 error-signal/socket
+lifetime path; introduce genuinely independent multi-client sessions; correct
+the String/StringList `set` payload-byte loss; and decide the Selection and
+container-mutation semantics. The established behavior and its risks remain
+documented until such approval is given.

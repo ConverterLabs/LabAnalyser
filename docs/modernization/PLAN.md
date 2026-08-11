@@ -173,8 +173,30 @@ transport facade and retains all byte decoding, map access, socket writes and
 Messenger emission. `TCP_001`–`TCP_008` preserve the prior vectors and add
 safe byte-exact request/reply category and coalesced-`get` evidence. No
 command, encoding, string/list, Qt-connection, socket-lifetime or public API
-behavior was changed. Later 4H protocol decoding and connection-state slices
-remain planned in `REMOTE_CONTROL_REFACTOR_PLAN_4H.md`.
+behavior was changed. The subsequent protocol and current-connection slices
+are completed as the 4H structural checkpoint below.
+
+## Phase 4H Remote-control isolation checkpoint
+
+**Structurally completed 2026-08-11.** 4H.1 `RemoteControlFrameSplitter`
+(`20807a3`), the TCP_008 byte characterization (`29edc00`), 4H.2
+`RemoteControlProtocol` (`7e098d2`), TCP_009--TCP_012 connection
+characterization (`85e8aa7`) and 4H.3 `RemoteControlConnectionState`
+(`56c22c9`) preserve the established single-current-connection behavior. The
+focused remote-control suite was green after every extraction; production
+slices had green incremental Release compile checks; public API, signals and
+slots were unchanged; no generated artifacts were versioned.
+
+**4H.4 remains approval-required hardening, not normal refactoring:**
+
+* Qt-6 error-signal and accepted-socket lifetime handling;
+* genuinely independent multi-client sessions;
+* the String/StringList `set` payload-byte loss;
+* Selection and container-mutation semantics.
+
+These behavior/security decisions remain open. Their current legacy behavior,
+unsafe exclusions and test limits are preserved in
+`REMOTE_CONTROL_REFACTOR_PLAN_4H.md` and `BEHAVIOR_INVENTORY.md`.
 
 ## Phase 3G status
 
