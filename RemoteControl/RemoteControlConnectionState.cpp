@@ -12,6 +12,15 @@ void RemoteControlConnectionState::ResetCurrentSocket()
     FrameSplitter.Clear();
 }
 
+bool RemoteControlConnectionState::ResetIfCurrent(QTcpSocket* socket)
+{
+    if (CurrentSocket.data() != socket)
+        return false;
+
+    ResetCurrentSocket();
+    return true;
+}
+
 QTcpSocket* RemoteControlConnectionState::GetCurrentSocket() const
 {
     return CurrentSocket.data();

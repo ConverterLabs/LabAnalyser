@@ -1,11 +1,12 @@
 # Remote-control hardening 5A
 
-## 5A.1 characterization scope
+## 5A.1 characterization and approved 5A.2 corrections
 
 5A.1 left production code unchanged. 5A.2a is an explicitly approved,
-minimal Qt-6 error-connection correction. `RemoteControlContractTests` records
-the current accepted-server-socket behavior using loopback-only, bounded
-event-loop waits. The test-only `private`-visibility seam is compiled
+minimal Qt-6 error-connection correction; 5A.2b is an explicitly approved,
+controlled accepted-socket release correction. `RemoteControlContractTests`
+uses loopback-only, bounded event-loop waits. The test-only
+`private`-visibility seam is compiled
 only into this contract target; it observes the private `QTcpServer` member and
 its QObject children without changing any production header or ownership.
 
@@ -29,35 +30,43 @@ records only that known warning and forwards all other Qt messages to the prior
 handler.
 
 `displayError` deliberately remains a no-op: this correction adds no visible
-message, recovery, socket close, deletion, reparenting or lifetime policy.
+message, recovery, socket close, reparenting or error-lifetime policy.
 
 ## Observed accepted-socket ownership and lifetime
 
 `RemoteControlServer` contains a value `QTcpServer`. On acceptance it obtains
-the pending `QTcpSocket`; Qt parents that socket to this `QTcpServer`.
-`TCP_014` shows that after client disconnect both endpoints become
-`UnconnectedState`, while the accepted server socket remains a live child. A
-fresh client is accepted and adds a second child.
+the pending `QTcpSocket`; Qt parents that socket to this `QTcpServer`. Before
+the approved 5A.2b correction, `TCP_014..TCP_015` established that disconnected
+sockets remained children until server destruction.
 
-`TCP_015` repeats three connect/disconnect cycles. Each accepted socket remains
-an `UnconnectedState` child until the server is destroyed; the observed child
-count grows from one to three. `QPointer` observers become null when destruction
-of `RemoteControlServer` destroys its value `QTcpServer` and these children.
-No accepted socket is manually deleted, reparented or dereferenced after its
-`QPointer` becomes null.
+After the approved correction, the typed `disconnected()` connection runs this
+order: `RemoteControlConnectionState::ResetIfCurrent(socket)` first clears the
+current QPointer and its frame-splitter remainder only when the disconnecting
+socket is current; then `socket->deleteLater()` schedules Qt-owned destruction.
+The lambda is connected with `RemoteControlServer` as context, so it cannot run
+against a destroyed server. No socket is manually deleted, reparented or owned
+by a smart pointer.
+
+`TCP_014` proves that a disconnected current socket becomes null through its
+QPointer after deferred deletion, the current state and its remainder are
+empty, and a fresh connection works. `TCP_015` proves repeated cycles do not
+accumulate `QTcpServer` children and that server destruction remains safe while
+a disconnect cleanup may be pending. `TCP_016` proves that disconnecting older
+A releases only A; current B and B's frame state remain usable for `get`.
 
 ## Test mapping and evidence
 
 | Test ID | Observed result |
 | --- | --- |
 | `TCP_013` | Qt-6 metaobject lacks historical `error(...)`, exposes `errorOccurred(...)`, and the typed accept path has no legacy warning. |
-| `TCP_014` | Accepted socket is a `QTcpServer` child, survives client disconnect, and a fresh connection is accepted. |
-| `TCP_015` | Repeated disconnected accepted sockets remain until server destruction; all observed QPointers null on destruction. |
-| `TCP_016` | Not implemented: a real socket-error delivery test would depend on OS/network timing and cannot prove the unconnected legacy slot safely. |
+| `TCP_014` | Current accepted socket is reset, its partial-frame state is cleared and its QPointer becomes null after `deleteLater()`; a fresh connection works. |
+| `TCP_015` | Repeated disconnected accepted sockets are released and do not accumulate as `QTcpServer` children; server destruction remains safe. |
+| `TCP_016` | Disconnecting older A releases A only; current B stays current and returns the existing byte-exact `get` reply. |
 
-The 5A.1 focused suite passed with exit code 0: 16 test functions plus Qt Test
-initialization/cleanup, reported as 18 passed, 0 failed, 0 skipped in 2268 ms.
-5A.2a reruns only this focused suite and its incremental Release compile check.
+The 5A.2b focused suite passed with exit code 0: 17 test functions plus Qt Test
+initialization/cleanup, reported as 19 passed, 0 failed, 0 skipped in 2520 ms.
+It and the incremental Release compile check are the only technical
+verification performed for this correction.
 
 ## Exclusions and decision preparation
 
@@ -74,10 +83,10 @@ slice must still decide any observable error policy: message, signal, logging,
 close/retry behavior and interaction with current connection state. 5A.2a does
 not prescribe or implement that policy.
 
-### B. Accepted-socket lifetime (not implemented)
+### B. Accepted-socket lifetime (implemented as approved controlled release)
 
-Choose whether disconnected server-side sockets remain children until server
-destruction, as observed, or are released through controlled `deleteLater()`.
-The decision must characterize effects on `QTcpServer` children, QPointer
-observers, repeated connections and any current-socket reference. It must not
-be bundled with independent multi-client behavior.
+The approved choice is controlled `deleteLater()` release after each server-side
+socket's `disconnected()` signal. Current-state reset is conditional on pointer
+identity; older-socket disconnects do not disturb the current socket or frame
+state. Independent multi-client sessions, error-policy changes and any other
+socket ownership changes remain outside this correction.

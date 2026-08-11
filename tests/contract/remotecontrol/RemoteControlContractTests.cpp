@@ -132,6 +132,7 @@ private slots:
     void TCP_013_qt6ErrorSignalMetaobjectAndNoLegacyWarning();
     void TCP_014_serverSocketAfterClientDisconnect();
     void TCP_015_repeatedConnectionsAndServerSocketLifetime();
+    void TCP_016_oldSocketDisconnectKeepsCurrentConnection();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -392,16 +393,25 @@ void RemoteControlContractTests::TCP_014_serverSocketAfterClientDisconnect() {
     QPointer<QTcpSocket> acceptedGuard(accepted);
     QCOMPARE(accepted->parent(), static_cast<QObject*>(&server.tcpServer));
 
+    client->write(frame("set", "partial", f64(1.0)).left(8));
+    QVERIFY(client->waitForBytesWritten(1000));
+    QTRY_VERIFY(!server.ConnectionState.GetFrameSplitter().Buffer.isEmpty());
     client->disconnectFromHost();
     QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
-    QTRY_COMPARE(accepted->state(), QAbstractSocket::UnconnectedState);
-    QVERIFY(!acceptedGuard.isNull());
+    QTRY_VERIFY(acceptedGuard.isNull());
+    QCOMPARE(server.ConnectionState.GetCurrentSocket(), static_cast<QTcpSocket*>(nullptr));
+    QVERIFY(server.ConnectionState.GetFrameSplitter().Buffer.isEmpty());
+    QTRY_COMPARE(acceptedSockets(server).size(), 0);
 
     QTcpSocket* fresh = connectClient(server, this);
-    QTRY_COMPARE(acceptedSockets(server).size(), 2);
+    QTRY_COMPARE(acceptedSockets(server).size(), 1);
     QCOMPARE(acceptedSockets(server).last()->parent(), static_cast<QObject*>(&server.tcpServer));
+    fresh->write(frame("get", "missing"));
+    QVERIFY(fresh->waitForBytesWritten(1000));
+    QCOMPARE(readReply(fresh, 5), QByteArray("\0\0\0\0\0", 5));
     fresh->disconnectFromHost();
     QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState);
+    QTRY_COMPARE(acceptedSockets(server).size(), 0);
 }
 
 void RemoteControlContractTests::TCP_015_repeatedConnectionsAndServerSocketLifetime() {
@@ -410,19 +420,52 @@ void RemoteControlContractTests::TCP_015_repeatedConnectionsAndServerSocketLifet
 
     for (int cycle = 0; cycle < 3; ++cycle) {
         QTcpSocket* client = connectClient(*server, this);
-        QTRY_COMPARE(acceptedSockets(*server).size(), cycle + 1);
+        QTRY_COMPARE(acceptedSockets(*server).size(), 1);
         QPointer<QTcpSocket> accepted(acceptedSockets(*server).last());
         QCOMPARE(accepted->parent(), static_cast<QObject*>(&server->tcpServer));
         serverSockets.append(accepted);
         client->disconnectFromHost();
         QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
-        QTRY_COMPARE(accepted->state(), QAbstractSocket::UnconnectedState);
-        QVERIFY(!accepted.isNull());
+        QTRY_VERIFY(accepted.isNull());
+        QTRY_COMPARE(acceptedSockets(*server).size(), 0);
         client->deleteLater();
     }
 
+    QTcpSocket* pendingClient = connectClient(*server, this);
+    QTRY_COMPARE(acceptedSockets(*server).size(), 1);
+    QPointer<QTcpSocket> pendingSocket(acceptedSockets(*server).last());
+    pendingClient->disconnectFromHost();
+    QTRY_COMPARE(pendingClient->state(), QAbstractSocket::UnconnectedState);
     delete server;
     for (const QPointer<QTcpSocket>& accepted : serverSockets) QTRY_VERIFY(accepted.isNull());
+    QTRY_VERIFY(pendingSocket.isNull());
+}
+
+void RemoteControlContractTests::TCP_016_oldSocketDisconnectKeepsCurrentConnection() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(8.0);
+    RemoteControlServer server(&data);
+    QTcpSocket* clientA = connectClient(server, this);
+    QTRY_COMPARE(acceptedSockets(server).size(), 1);
+    QPointer<QTcpSocket> serverSocketA(acceptedSockets(server).first());
+    QTcpSocket* clientB = connectClient(server, this);
+    QTRY_COMPARE(acceptedSockets(server).size(), 2);
+    QTcpSocket* serverSocketB = acceptedSockets(server).last();
+    QPointer<QTcpSocket> serverSocketBGuard(serverSocketB);
+    QCOMPARE(server.ConnectionState.GetCurrentSocket(), serverSocketB);
+
+    clientA->disconnectFromHost();
+    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState);
+    QTRY_VERIFY(serverSocketA.isNull());
+    QCOMPARE(server.ConnectionState.GetCurrentSocket(), serverSocketB);
+    QVERIFY(!serverSocketBGuard.isNull());
+
+    clientB->write(frame("get", "value"));
+    QVERIFY(clientB->waitForBytesWritten(1000));
+    QCOMPARE(readReply(clientB, 13), numericReply(8.0));
+    clientB->disconnectFromHost();
+    QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    QTRY_VERIFY(serverSocketBGuard.isNull());
+    clear(data);
 }
 
 void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {

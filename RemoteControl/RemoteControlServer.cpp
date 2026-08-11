@@ -38,12 +38,17 @@ void RemoteControlServer::acceptConnection()
 {
     // if(ConnectionState.GetCurrentSocket())
     //     ConnectionState.GetCurrentSocket()->close();
-    ConnectionState.SetCurrentSocket(tcpServer.nextPendingConnection());
+    QTcpSocket* socket = tcpServer.nextPendingConnection();
+    ConnectionState.SetCurrentSocket(socket);
 
-    connect(ConnectionState.GetCurrentSocket(), SIGNAL(readyRead()),
+    connect(socket, SIGNAL(readyRead()),
             this, SLOT(HeaderReceived()));
-    connect(ConnectionState.GetCurrentSocket(), &QAbstractSocket::errorOccurred,
+    connect(socket, &QAbstractSocket::errorOccurred,
             this, &RemoteControlServer::displayError);
+    connect(socket, &QAbstractSocket::disconnected, this, [this, socket]() {
+        ConnectionState.ResetIfCurrent(socket);
+        socket->deleteLater();
+    });
 }
 
 void RemoteControlServer::HeaderReceived()

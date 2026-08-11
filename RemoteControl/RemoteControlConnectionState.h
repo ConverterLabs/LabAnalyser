@@ -13,6 +13,7 @@ class RemoteControlConnectionState
 public:
     void SetCurrentSocket(QTcpSocket* socket);
     void ResetCurrentSocket();
+    bool ResetIfCurrent(QTcpSocket* socket);
 
     QTcpSocket* GetCurrentSocket() const;
     RemoteControlFrameSplitter& GetFrameSplitter();

@@ -117,16 +117,17 @@ meta-signal and captured the invalid legacy `error(...)` connection warning.
 The explicitly approved 5A.2a correction replaces only that connection with a
 typed `errorOccurred(QAbstractSocket::SocketError)` connection to the existing
 no-op `displayError`; `TCP_013` confirms the warning no longer occurs.
-`TCP_014..TCP_015`
-record that accepted sockets are `QTcpServer` children, remain after disconnect
-and are destroyed with the server. `TCP_016` is deliberately unimplemented:
-real socket-error delivery is not deterministic under the current connection.
+The explicitly approved 5A.2b correction resets current state only for the
+disconnecting current socket and schedules every disconnected accepted socket
+with `deleteLater()`. `TCP_014..TCP_016` confirm cleared current frame state,
+no disconnected-child accumulation, safe server destruction and preservation
+of current B when older A disconnects. Real socket-error delivery remains
+unverified because it is not deterministic under the current connection.
 
 The two separate approval-required decisions are a typed Qt-6 error-signal
-repair with an explicit observable error policy beyond the existing no-op, and whether disconnected
-accepted sockets remain until server destruction or are released by controlled
-`deleteLater()`. See `REMOTE_CONTROL_HARDENING_5A.md`; neither decision was
-implemented in 5A.1.
+repair with an explicit observable error policy beyond the existing no-op. The
+approved disconnected-socket `deleteLater()` policy is now implemented; see
+`REMOTE_CONTROL_HARDENING_5A.md` for its boundaries.
 
 ## Milestone 3A completion
 
