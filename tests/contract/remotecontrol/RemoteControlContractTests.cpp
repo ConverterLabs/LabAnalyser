@@ -86,21 +86,26 @@ QByteArray vectorReply(const std::vector<double>& time, const std::vector<double
     return result;
 }
 
-QStringList capturedQtMessages;
+QStringList capturedTargetWarnings;
 QtMessageHandler previousQtMessageHandler = nullptr;
 
 class QtMessageCapture {
 public:
-    QtMessageCapture() { capturedQtMessages.clear(); previousQtMessageHandler = qInstallMessageHandler(handler); }
+    QtMessageCapture() { capturedTargetWarnings.clear(); previousQtMessageHandler = qInstallMessageHandler(handler); }
     ~QtMessageCapture() { qInstallMessageHandler(previousQtMessageHandler); }
 
     static bool contains(const QString& part) {
-        for (const QString& message : capturedQtMessages) if (message.contains(part)) return true;
+        for (const QString& message : capturedTargetWarnings) if (message.contains(part)) return true;
         return false;
     }
 
 private:
-    static void handler(QtMsgType, const QMessageLogContext&, const QString& message) { capturedQtMessages.append(message); }
+    static void handler(QtMsgType type, const QMessageLogContext& context, const QString& message) {
+        if (message.contains("No such signal QTcpSocket::error(QAbstractSocket::SocketError)"))
+            capturedTargetWarnings.append(message);
+        if (previousQtMessageHandler)
+            previousQtMessageHandler(type, context, message);
+    }
 };
 
 QList<QTcpSocket*> acceptedSockets(RemoteControlServer& server) {
@@ -124,7 +129,7 @@ private slots:
     void TCP_010_fragmentStateIsDiscardedOnSecondConnection();
     void TCP_011_firstClientRequestsAfterSecondAcceptance();
     void TCP_012_disconnectLifetimeAndFreshConnection();
-    void TCP_013_qt6ErrorSignalMetaobjectAndWarning();
+    void TCP_013_qt6ErrorSignalMetaobjectAndNoLegacyWarning();
     void TCP_014_serverSocketAfterClientDisconnect();
     void TCP_015_repeatedConnectionsAndServerSocketLifetime();
     void frameSplitterPreservesPartialRemainder();
@@ -365,7 +370,7 @@ void RemoteControlContractTests::TCP_012_disconnectLifetimeAndFreshConnection() 
     clear(data);
 }
 
-void RemoteControlContractTests::TCP_013_qt6ErrorSignalMetaobjectAndWarning() {
+void RemoteControlContractTests::TCP_013_qt6ErrorSignalMetaobjectAndNoLegacyWarning() {
     QTcpSocket socket;
     QCOMPARE(socket.metaObject()->indexOfSignal("error(QAbstractSocket::SocketError)"), -1);
     QVERIFY(socket.metaObject()->indexOfSignal("errorOccurred(QAbstractSocket::SocketError)") >= 0);
@@ -374,7 +379,7 @@ void RemoteControlContractTests::TCP_013_qt6ErrorSignalMetaobjectAndWarning() {
     RemoteControlServer server(nullptr);
     QTcpSocket* client = connectClient(server, this);
     QTRY_COMPARE(acceptedSockets(server).size(), 1);
-    QVERIFY(QtMessageCapture::contains("No such signal QTcpSocket::error(QAbstractSocket::SocketError)"));
+    QVERIFY(!QtMessageCapture::contains("No such signal QTcpSocket::error(QAbstractSocket::SocketError)"));
     client->disconnectFromHost();
     QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
 }

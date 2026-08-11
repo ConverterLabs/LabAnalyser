@@ -112,15 +112,18 @@ system and dependency modernization remain Milestone-6 work.
 
 ## Milestone 5A.1 remote-control socket characterization
 
-**Completed 2026-08-11 without production changes.** `TCP_013` confirms the
-Qt-6 `errorOccurred(QAbstractSocket::SocketError)` meta-signal and captures the
-existing invalid legacy `error(...)` connection warning. `TCP_014..TCP_015`
+**Completed 2026-08-11.** 5A.1 characterized the Qt-6 `errorOccurred`
+meta-signal and captured the invalid legacy `error(...)` connection warning.
+The explicitly approved 5A.2a correction replaces only that connection with a
+typed `errorOccurred(QAbstractSocket::SocketError)` connection to the existing
+no-op `displayError`; `TCP_013` confirms the warning no longer occurs.
+`TCP_014..TCP_015`
 record that accepted sockets are `QTcpServer` children, remain after disconnect
 and are destroyed with the server. `TCP_016` is deliberately unimplemented:
 real socket-error delivery is not deterministic under the current connection.
 
 The two separate approval-required decisions are a typed Qt-6 error-signal
-repair with an explicit observable error policy, and whether disconnected
+repair with an explicit observable error policy beyond the existing no-op, and whether disconnected
 accepted sockets remain until server destruction or are released by controlled
 `deleteLater()`. See `REMOTE_CONTROL_HARDENING_5A.md`; neither decision was
 implemented in 5A.1.

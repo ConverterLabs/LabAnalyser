@@ -2,9 +2,10 @@
 
 ## 5A.1 characterization scope
 
-Production code was not changed. `RemoteControlContractTests` records the
-current Qt-6 signal and accepted-server-socket behavior using loopback-only,
-bounded event-loop waits. The test-only `private`-visibility seam is compiled
+5A.1 left production code unchanged. 5A.2a is an explicitly approved,
+minimal Qt-6 error-connection correction. `RemoteControlContractTests` records
+the current accepted-server-socket behavior using loopback-only, bounded
+event-loop waits. The test-only `private`-visibility seam is compiled
 only into this contract target; it observes the private `QTcpServer` member and
 its QObject children without changing any production header or ownership.
 
@@ -13,14 +14,22 @@ its QObject children without changing any production header or ownership.
 The locally installed Qt 6.9.2 `QAbstractSocket` header exposes
 `errorOccurred(QAbstractSocket::SocketError)`. Its `QTcpSocket` metaobject has
 that signal and does not have the historical
-`error(QAbstractSocket::SocketError)` signal. `TCP_013` triggers the existing
-server accept path and deterministically captures Qt's runtime warning:
+`error(QAbstractSocket::SocketError)` signal. Before the 5A.2a correction,
+`TCP_013` triggered the accept path and deterministically captured Qt's runtime
+warning:
 
 `QObject::connect: No such signal QTcpSocket::error(QAbstractSocket::SocketError)`
 
-The warning demonstrates that the current legacy connection is invalid under
-Qt 6. It does not demonstrate any desired error message or recovery behavior:
-`displayError` remains a no-op and the obsolete connection never invokes it.
+The approved 5A.2a change replaces only the invalid string-based connection
+with `&QAbstractSocket::errorOccurred` connected to the existing
+`RemoteControlServer::displayError`. The same focused test now confirms that
+the historical signal is still absent, `errorOccurred` remains present, and no
+such-signal warning occurs during acceptance. Its temporary Qt message handler
+records only that known warning and forwards all other Qt messages to the prior
+handler.
+
+`displayError` deliberately remains a no-op: this correction adds no visible
+message, recovery, socket close, deletion, reparenting or lifetime policy.
 
 ## Observed accepted-socket ownership and lifetime
 
@@ -41,14 +50,14 @@ No accepted socket is manually deleted, reparented or dereferenced after its
 
 | Test ID | Observed result |
 | --- | --- |
-| `TCP_013` | Qt-6 metaobject lacks historical `error(...)`, exposes `errorOccurred(...)`, and the existing accept path warns. |
+| `TCP_013` | Qt-6 metaobject lacks historical `error(...)`, exposes `errorOccurred(...)`, and the typed accept path has no legacy warning. |
 | `TCP_014` | Accepted socket is a `QTcpServer` child, survives client disconnect, and a fresh connection is accepted. |
 | `TCP_015` | Repeated disconnected accepted sockets remain until server destruction; all observed QPointers null on destruction. |
 | `TCP_016` | Not implemented: a real socket-error delivery test would depend on OS/network timing and cannot prove the unconnected legacy slot safely. |
 
-The focused suite passed with exit code 0: 16 test functions plus Qt Test
+The 5A.1 focused suite passed with exit code 0: 16 test functions plus Qt Test
 initialization/cleanup, reported as 18 passed, 0 failed, 0 skipped in 2268 ms.
-This is the only technical verification performed for 5A.1.
+5A.2a reruns only this focused suite and its incremental Release compile check.
 
 ## Exclusions and decision preparation
 
@@ -57,13 +66,13 @@ unbounded wait, use-after-free, malformed frame or independent multi-client
 session. Socket error injection remains unverified because it is not
 deterministic under the current public contract and production connection.
 
-### A. Qt-6 signal repair (not implemented)
+### A. Qt-6 signal repair (implemented only as approved connection correction)
 
-Replace the historical string-based `error(...)` connection with a typed
-`errorOccurred(QAbstractSocket::SocketError)` connection. A subsequent approved
-slice must first decide the observable error policy: message, signal, logging,
-close/retry behavior and any interaction with the current connection state.
-This characterization does not prescribe that policy.
+The historical string-based `error(...)` connection is now replaced by the
+typed `errorOccurred(QAbstractSocket::SocketError)` connection. A later approved
+slice must still decide any observable error policy: message, signal, logging,
+close/retry behavior and interaction with current connection state. 5A.2a does
+not prescribe or implement that policy.
 
 ### B. Accepted-socket lifetime (not implemented)
 

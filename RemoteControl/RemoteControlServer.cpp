@@ -42,8 +42,8 @@ void RemoteControlServer::acceptConnection()
 
     connect(ConnectionState.GetCurrentSocket(), SIGNAL(readyRead()),
             this, SLOT(HeaderReceived()));
-    connect(ConnectionState.GetCurrentSocket(), SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(displayError(QAbstractSocket::SocketError)));
+    connect(ConnectionState.GetCurrentSocket(), &QAbstractSocket::errorOccurred,
+            this, &RemoteControlServer::displayError);
 }
 
 void RemoteControlServer::HeaderReceived()
