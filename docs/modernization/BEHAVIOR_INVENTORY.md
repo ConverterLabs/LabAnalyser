@@ -927,6 +927,14 @@ still emit exactly one `set` event and QStringList still contains one element.
 `TCP_028` remains unchanged: GuiSelection continues to use legacy shortening
 and membership semantics. Get-reply asymmetry remains open.
 
+## Phase 5C.3 remote GuiSelection payload correction
+
+`TCP_028` now proves the explicitly approved GuiSelection use of the optional
+trailing-NUL helper. Bare `b` and `b 00` select `b`; exact embedded-NUL and
+Latin-1 choices are accepted; empty, nonmember and double-NUL values retain
+the incoming current selection. The existing choice list, one signal per set,
+container nonmutation and get-reply asymmetry remain unchanged.
+
 ## Phase 5A.3c RemoteControl fixture teardown
 
 All loopback contract tests that leave a `RemoteControlServer` scope now use a

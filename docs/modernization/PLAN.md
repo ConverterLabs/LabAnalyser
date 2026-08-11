@@ -193,6 +193,15 @@ passed without warning, crash or timeout. This is deterministic test cleanup,
 not a production-lifetime proof or a replacement for a separately approved
 shutdown hardening decision.
 
+## Milestone 5C.3 GuiSelection text-payload correction
+
+**Explicitly approved and implemented.** GuiSelection `set` now uses the same
+optional-final-NUL normalization as QString and QStringList, while preserving
+its existing membership condition, Latin-1 conversion, one `MessageSender`
+emission and container nonmutation. TCP_028 covers bare/trailing/double and
+embedded NUL payloads plus a Latin-1 list entry. Get/set asymmetry and any
+other InterfaceData conversion remain outside this correction.
+
 ## Milestone 3A completion
 
 DataManagement characterization is complete for the safely isolated manager,

@@ -80,6 +80,22 @@ then performs the existing membership check. Thus TCP_028 remains unchanged:
 bare `b` does not select `b`, while `b 00` does. Get replies, framing, native
 byte order and the existing get/set asymmetry are also unchanged.
 
+## 5C.3 approved GuiSelection correction
+
+**5C.3 is an explicitly approved behavior correction.** The GuiSelection set
+branch now uses the same `RemoveOptionalTrailingNul()` helper as QString and
+QStringList. It therefore preserves a bare `b`, removes exactly one final NUL
+from `b 00`, retains embedded NULs, and continues to decode with Latin-1.
+The existing membership condition remains the only state gate: only a text
+exactly present in the existing choice list becomes the current selection.
+Nonmembers, empty input, `b 00 00`, and embedded-NUL nonmembers retain the
+preexisting current value. Every structurally valid set frame still emits one
+MessageSender event, even when membership rejects it; the backing container is
+still not directly mutated. TCP_028 covers bare/trailing/double/embedded NUL
+and an U+00E4 Latin-1 choice with the shared testfixture cleanup.
+
+StringList stays one element, and get/set asymmetry remains intentionally open.
+
 ## Evidence
 
 The baseline characterization in `3244b4f` completed with exit code 0. The

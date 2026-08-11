@@ -225,7 +225,7 @@ void RemoteControlContractTests::TCP_003_stringListAndSelectionContracts() {
     RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender); QTcpSocket* client = connectClient(server, this);
     client->write(frame("set", "text", "new")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetString(), QString("new")); QCOMPARE(data["text"]->GetString(), QString("old"));
     client->write(frame("set", "list", "only")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 2); QCOMPARE(spy.at(1).at(2).value<InterfaceData>().GetStringList(), QStringList({"only"}));
-    client->write(frame("set", "choice", "b")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 3); QCOMPARE(spy.at(2).at(2).value<InterfaceData>().GetGuiSelection().first, QString("a"));
+    client->write(frame("set", "choice", "b")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 3); QCOMPARE(spy.at(2).at(2).value<InterfaceData>().GetGuiSelection().first, QString("b"));
     client->write(frame("set", "choice", "missing")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 4); QCOMPARE(spy.at(3).at(2).value<InterfaceData>().GetGuiSelection().first, QString("a"));
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
     QTcpSocket* getter = connectClient(server, this); getter->write(frame("get", "text")); QVERIFY(getter->waitForBytesWritten(1000)); const QByteArray reply = readReply(getter, 5 + 4 * 8); QCOMPARE(uchar(reply.at(0)), uchar(1)); QCOMPARE(readU32(reply, 1), uint32_t(4)); QCOMPARE(reply.mid(5, 4), QByteArray("old\0", 4)); getter->disconnectFromHost(); QTRY_COMPARE(getter->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client, getter})); clear(data);
@@ -756,15 +756,22 @@ void RemoteControlContractTests::TCP_028_guiSelectionLegacyPayloads() {
         QByteArray payload;
         QString expected;
     };
+    const QString embeddedChoice = QString::fromLatin1(QByteArray("b\0x", 3));
+    const QString latin1Choice(QChar(0x00e4));
+    const QStringList choices = {"a", "b", embeddedChoice, latin1Choice};
     const std::vector<SelectionCase> cases = {
-        {QByteArray("b", 1), QString("a")},
+        {QByteArray("b", 1), QString("b")},
         {QByteArray("b\0", 2), QString("b")},
         {QByteArray("x\0", 2), QString("a")},
-        {QByteArray(), QString("a")}
+        {QByteArray(), QString("a")},
+        {QByteArray("b\0\0", 3), QString("a")},
+        {QByteArray("b\0x\0", 4), embeddedChoice},
+        {QByteArray("b\0z\0", 4), QString("a")},
+        {QByteArray("\xE4\0", 2), latin1Choice}
     };
 
     std::map<QString, ToFormMapper*> data;
-    data["choice"] = selection("a", {"a", "b"});
+    data["choice"] = selection("a", choices);
     RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
     QTcpSocket* client = connectClient(server, this);
 
@@ -778,11 +785,12 @@ void RemoteControlContractTests::TCP_028_guiSelectionLegacyPayloads() {
         QVERIFY(selectionData.IsGuiSelection());
         const GuiSelection selectionValue = selectionData.GetGuiSelection();
         QCOMPARE(selectionValue.first, cases[index].expected);
-        QCOMPARE(selectionValue.second, QStringList({"a", "b"}));
+        QCOMPARE(selectionValue.second, choices);
+        QVERIFY(!client->waitForReadyRead(50));
     }
 
     QCOMPARE(data["choice"]->GetGuiSelection().first, QString("a"));
-    QCOMPARE(data["choice"]->GetGuiSelection().second, QStringList({"a", "b"}));
+    QCOMPARE(data["choice"]->GetGuiSelection().second, choices);
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }

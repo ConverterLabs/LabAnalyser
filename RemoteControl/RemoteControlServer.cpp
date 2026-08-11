@@ -113,7 +113,7 @@ void RemoteControlServer::HeaderReceived()
                         else if (Data_.IsGuiSelection())
                         {
                             auto Sel = Data_.GetGuiSelection();
-                            QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
+                            QString TS = QString::fromLatin1(RemoteControlProtocol::RemoveOptionalTrailingNul(decoded.Payload));
                             Sel.first = TS;
                             if (Sel.second.contains(TS))
                                 Data_.SetData(Sel);
