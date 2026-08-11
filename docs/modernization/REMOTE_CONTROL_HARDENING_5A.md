@@ -77,6 +77,32 @@ server-shutdown ordering is safe; the previously observed Qt warning remains a
 documented production-lifetime risk until a dedicated production shutdown
 scenario identifies its object and cause.
 
+## 5A.3c common RemoteControl fixture teardown
+
+The later focused run exposed the same fixture boundary in `TCP_013`: it had
+completed its Qt-6 metaobject assertion after only the client reached
+`UnconnectedState`. The earlier intermittent observations are therefore
+testfixture cleanup findings in both `TCP_007` and `TCP_013`, not evidence that
+either their protocol assertions were wrong.
+
+`finalizeRemoteServer()` is test-only. It snapshots currently accepted sockets
+as `QPointer`s, requests disconnect only from the supplied loopback clients,
+processes `DeferredDelete` through the event loop, and succeeds only after all
+observed server sockets are null and `QTcpServer` has no `QTcpSocket` children.
+It never deletes a server-side socket. Every TCP test that ends a real
+loopback/server scope now calls it after its existing business assertions;
+`TCP_001` is the deliberate exception because it characterizes direct server
+destruction with a still-connected client, and `TCP_017..TCP_021`/`TCP_029`
+use no server sockets.
+
+The separate process-isolated production-shutdown harness compared immediate
+server destruction from the disconnect signal (A) with destruction after
+deferred deletion (B): 50/50 A and 50/50 B runs exited cleanly. It produced no
+production correction. After the common fixture cleanup, 20/20 complete
+RemoteControlContractTests processes passed without warnings, crashes or
+timeouts. This improves test determinism only; it is not a proof of every
+possible production shutdown interleaving.
+
 ## Test mapping and evidence
 
 | Test ID | Observed result |

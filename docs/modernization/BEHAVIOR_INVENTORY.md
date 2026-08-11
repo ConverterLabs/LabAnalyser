@@ -926,3 +926,15 @@ retains embedded NULs and removes no more than one trailing NUL. Both branches
 still emit exactly one `set` event and QStringList still contains one element.
 `TCP_028` remains unchanged: GuiSelection continues to use legacy shortening
 and membership semantics. Get-reply asymmetry remains open.
+
+## Phase 5A.3c RemoteControl fixture teardown
+
+All loopback contract tests that leave a `RemoteControlServer` scope now use a
+shared test-only cleanup boundary after their existing contract assertions. It
+waits for client disconnect, accepted-socket `QPointer` null state and an empty
+`QTcpServer` socket-child list; it owns and deletes no production QObject.
+`TCP_001` remains intentionally separate because it characterizes direct
+server destruction with a live client, while `TCP_017..TCP_021` and `TCP_029`
+have no loopback socket. The former intermittent `TCP_007` and `TCP_013`
+warnings are documented fixture-cleanup findings; production shutdown safety
+is not asserted solely from this test stabilization.

@@ -181,6 +181,18 @@ directly covers helper purity. GuiSelection deliberately remains on the legacy
 still does not select `b`. Get remains asymmetric and unchanged. See
 `REMOTE_CONTROL_TEXT_PAYLOADS_5C.md`.
 
+## Milestone 5A.3c RemoteControl fixture teardown
+
+**Completed 2026-08-11 without production changes.** A shared test-only
+fixture cleanup now waits for disconnected loopback clients, deferred deletion
+of every observed accepted socket and an empty `QTcpServer` socket-child list
+before local server destruction. It consolidates the prior intermittent
+TCP_007/TCP_013 teardown findings. The process-isolated shutdown harness was
+50/50 clean for immediate and drained variants, and 20 complete focused suites
+passed without warning, crash or timeout. This is deterministic test cleanup,
+not a production-lifetime proof or a replacement for a separately approved
+shutdown hardening decision.
+
 ## Milestone 3A completion
 
 DataManagement characterization is complete for the safely isolated manager,

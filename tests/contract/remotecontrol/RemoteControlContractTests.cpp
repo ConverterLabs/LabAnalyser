@@ -3,6 +3,7 @@
 #include <QTcpServer>
 #include <QPointer>
 #include <QElapsedTimer>
+#include <QEvent>
 #include <QEventLoop>
 #include <QTimer>
 #include <cstring>
@@ -113,6 +114,38 @@ QList<QTcpSocket*> acceptedSockets(RemoteControlServer& server) {
     return server.tcpServer.findChildren<QTcpSocket*>();
 }
 
+// Test-only fixture boundary: each observed socket remains QObject-owned by
+// QTcpServer. The helper never deletes it; it only drives client disconnects
+// and the event loop until production's disconnected()->deleteLater() path has
+// completed before the stack-allocated server leaves scope.
+bool finalizeRemoteServer(RemoteControlServer& server, std::initializer_list<QTcpSocket*> clients) {
+    QList<QPointer<QTcpSocket>> observedSockets;
+    for (QTcpSocket* socket : acceptedSockets(server)) observedSockets.append(socket);
+    for (QTcpSocket* client : clients)
+        if (client && client->state() != QAbstractSocket::UnconnectedState)
+            client->disconnectFromHost();
+
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed() < 1000) {
+        bool clientsClosed = true;
+        for (QTcpSocket* client : clients)
+            clientsClosed = clientsClosed && (!client || client->state() == QAbstractSocket::UnconnectedState);
+        bool observedDestroyed = true;
+        for (const QPointer<QTcpSocket>& socket : observedSockets)
+            observedDestroyed = observedDestroyed && socket.isNull();
+        if (clientsClosed && observedDestroyed && acceptedSockets(server).isEmpty())
+            return true;
+
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+    bool observedDestroyed = true;
+    for (const QPointer<QTcpSocket>& socket : observedSockets)
+        observedDestroyed = observedDestroyed && socket.isNull();
+    return observedDestroyed && acceptedSockets(server).isEmpty();
+}
+
 void compareLatin1QString(const QString& actual, const QByteArray& expectedBytes) {
     const QString expected = QString::fromLatin1(expectedBytes);
     QCOMPARE(actual.size(), expected.size());
@@ -184,7 +217,7 @@ void RemoteControlContractTests::TCP_002_numericSetSignalAndGetBytes() {
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
     QTcpSocket* getter = connectClient(server, this); QCOMPARE(getter->write(frame("get", "numeric")), qint64(23)); QVERIFY(getter->waitForBytesWritten(1000));
     const QByteArray reply = readReply(getter, 13); QCOMPARE(reply.size(), 13); QCOMPARE(uchar(reply.at(0)), uchar(0)); QCOMPARE(readU32(reply, 1), uint32_t(1)); QCOMPARE(readF64(reply, 5), 2.0);
-    getter->disconnectFromHost(); QTRY_COMPARE(getter->state(), QAbstractSocket::UnconnectedState); clear(data);
+    getter->disconnectFromHost(); QTRY_COMPARE(getter->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client, getter})); clear(data);
 }
 
 void RemoteControlContractTests::TCP_003_stringListAndSelectionContracts() {
@@ -195,7 +228,7 @@ void RemoteControlContractTests::TCP_003_stringListAndSelectionContracts() {
     client->write(frame("set", "choice", "b")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 3); QCOMPARE(spy.at(2).at(2).value<InterfaceData>().GetGuiSelection().first, QString("a"));
     client->write(frame("set", "choice", "missing")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 4); QCOMPARE(spy.at(3).at(2).value<InterfaceData>().GetGuiSelection().first, QString("a"));
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
-    QTcpSocket* getter = connectClient(server, this); getter->write(frame("get", "text")); QVERIFY(getter->waitForBytesWritten(1000)); const QByteArray reply = readReply(getter, 5 + 4 * 8); QCOMPARE(uchar(reply.at(0)), uchar(1)); QCOMPARE(readU32(reply, 1), uint32_t(4)); QCOMPARE(reply.mid(5, 4), QByteArray("old\0", 4)); getter->disconnectFromHost(); QTRY_COMPARE(getter->state(), QAbstractSocket::UnconnectedState); clear(data);
+    QTcpSocket* getter = connectClient(server, this); getter->write(frame("get", "text")); QVERIFY(getter->waitForBytesWritten(1000)); const QByteArray reply = readReply(getter, 5 + 4 * 8); QCOMPARE(uchar(reply.at(0)), uchar(1)); QCOMPARE(readU32(reply, 1), uint32_t(4)); QCOMPARE(reply.mid(5, 4), QByteArray("old\0", 4)); getter->disconnectFromHost(); QTRY_COMPARE(getter->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client, getter})); clear(data);
 }
 
 void RemoteControlContractTests::TCP_004_vectorAndUnknownIdResponses() {
@@ -204,7 +237,7 @@ void RemoteControlContractTests::TCP_004_vectorAndUnknownIdResponses() {
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
     QTcpSocket* vectorClient = connectClient(server, this); vectorClient->write(frame("get", "wave")); QVERIFY(vectorClient->waitForBytesWritten(1000)); const QByteArray vectorReply = readReply(vectorClient, 37); QCOMPARE(uchar(vectorReply.at(0)), uchar(0)); QCOMPARE(readU32(vectorReply, 1), uint32_t(4)); QCOMPARE(readF64(vectorReply, 5), 1.0); QCOMPARE(readF64(vectorReply, 13), 2.0); QCOMPARE(readF64(vectorReply, 21), 4.0); QCOMPARE(readF64(vectorReply, 29), 5.0); vectorClient->disconnectFromHost(); QTRY_COMPARE(vectorClient->state(), QAbstractSocket::UnconnectedState);
     QTcpSocket* matchClient = connectClient(server, this); matchClient->write(frame("get", "device")); QVERIFY(matchClient->waitForBytesWritten(1000)); const QByteArray matchingReply = readReply(matchClient, 5 + 14 * 8); QCOMPARE(uchar(matchingReply.at(0)), uchar(1)); QCOMPARE(readU32(matchingReply, 1), uint32_t(14)); QCOMPARE(matchingReply.mid(5, 14), QByteArray("device::state\0", 14)); matchClient->disconnectFromHost(); QTRY_COMPARE(matchClient->state(), QAbstractSocket::UnconnectedState);
-    QTcpSocket* absentClient = connectClient(server, this); absentClient->write(frame("get", "absent")); QVERIFY(absentClient->waitForBytesWritten(1000)); const QByteArray absentReply = readReply(absentClient, 5); QCOMPARE(absentReply, QByteArray("\0\0\0\0\0", 5)); absentClient->disconnectFromHost(); QTRY_COMPARE(absentClient->state(), QAbstractSocket::UnconnectedState); clear(data);
+    QTcpSocket* absentClient = connectClient(server, this); absentClient->write(frame("get", "absent")); QVERIFY(absentClient->waitForBytesWritten(1000)); const QByteArray absentReply = readReply(absentClient, 5); QCOMPARE(absentReply, QByteArray("\0\0\0\0\0", 5)); absentClient->disconnectFromHost(); QTRY_COMPARE(absentClient->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client, vectorClient, matchClient, absentClient})); clear(data);
 }
 
 void RemoteControlContractTests::TCP_005_fragmentationAndCoalescedFrames() {
@@ -214,14 +247,14 @@ void RemoteControlContractTests::TCP_005_fragmentationAndCoalescedFrames() {
     client->write(first.mid(4)); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1);
     client->write(frame("set", "one", f64(11.0)) + frame("set", "two", f64(12.0))); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 3);
     QCOMPARE(spy.at(0).at(1).toString(), QString("one")); QCOMPARE(spy.at(1).at(1).toString(), QString("one")); QCOMPARE(spy.at(2).at(1).toString(), QString("two")); QCOMPARE(data["one"]->GetAsDouble(), 1.0); QCOMPARE(data["two"]->GetAsDouble(), 2.0);
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); clear(data);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client})); clear(data);
 }
 
 void RemoteControlContractTests::TCP_006_unknownCommandNullDataAndNoTimeoutReply() {
     RemoteControlServer server(nullptr); QSignalSpy spy(&server, &RemoteControlServer::MessageSender); QTcpSocket* client = connectClient(server, this);
     client->write(frame("get", "none")); QVERIFY(client->waitForBytesWritten(1000)); QCOMPARE(readReply(client, 5), QByteArray("\0\0\0\0\0", 5));
     client->write(frame("bad", "none")); QVERIFY(client->waitForBytesWritten(1000)); QVERIFY(!client->waitForReadyRead(150)); QCOMPARE(spy.count(), 0);
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
 }
 
 void RemoteControlContractTests::TCP_007_disconnectRepeatedAndMultipleConnections() {
@@ -234,7 +267,7 @@ void RemoteControlContractTests::TCP_007_disconnectRepeatedAndMultipleConnection
     second->write(frame("set", "value", f64(10.0))); QVERIFY(second->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 10.0); QCOMPARE(data["value"]->GetAsDouble(), 7.0);
     QTcpSocket* third = connectClient(server, this); QTRY_COMPARE(acceptedSockets(server).size(), 2); QPointer<QTcpSocket> thirdServerSocket(acceptedSockets(server).last());
     third->write(frame("get", "value")); QVERIFY(third->waitForBytesWritten(1000)); const QByteArray reply = readReply(third, 13); QCOMPARE(readF64(reply, 5), 7.0);
-    second->disconnectFromHost(); third->disconnectFromHost(); QTRY_COMPARE(second->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(third->state(), QAbstractSocket::UnconnectedState);
+    second->disconnectFromHost(); third->disconnectFromHost(); QTRY_COMPARE(second->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(third->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {first, second, third}));
     QTRY_VERIFY(secondServerSocket.isNull()); QTRY_VERIFY(thirdServerSocket.isNull()); QTRY_COMPARE(acceptedSockets(server).size(), 0);
     clear(data);
 }
@@ -311,7 +344,7 @@ void RemoteControlContractTests::TCP_008_protocolByteBoundariesAndReplies() {
     QCOMPARE(client->write(unknown), qint64(unknown.size())); QVERIFY(client->waitForBytesWritten(1000));
     QVERIFY(!client->waitForReadyRead(150)); QCOMPARE(spy.count(), 2);
 
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 
@@ -335,7 +368,7 @@ void RemoteControlContractTests::TCP_009_twoConnectedClientsUseLatestAcceptedSoc
     QCOMPARE(readReply(clientB, 13), numericReply(3.0)); QVERIFY(!clientA->waitForReadyRead(150));
 
     clientA->disconnectFromHost(); clientB->disconnectFromHost();
-    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {clientA, clientB}));
     clear(data);
 }
 
@@ -357,7 +390,7 @@ void RemoteControlContractTests::TCP_010_fragmentStateIsDiscardedOnSecondConnect
     QCOMPARE(readReply(clientB, 13), numericReply(4.0)); QVERIFY(!clientA->waitForReadyRead(150));
 
     clientA->disconnectFromHost(); clientB->disconnectFromHost();
-    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {clientA, clientB}));
     clear(data);
 }
 
@@ -377,7 +410,7 @@ void RemoteControlContractTests::TCP_011_firstClientRequestsAfterSecondAcceptanc
     QCOMPARE(readReply(clientB, 13), numericReply(5.0)); QCOMPARE(spy.count(), 0);
 
     clientA->disconnectFromHost(); clientB->disconnectFromHost();
-    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {clientA, clientB}));
     clear(data);
 }
 
@@ -392,6 +425,7 @@ void RemoteControlContractTests::TCP_012_disconnectLifetimeAndFreshConnection() 
     QTcpSocket* fresh = connectClient(*server, this); QPointer<QTcpSocket> freshGuard(fresh);
     fresh->write(frame("get", "value")); QVERIFY(fresh->waitForBytesWritten(1000)); QCOMPARE(readReply(fresh, 13), numericReply(6.0));
     fresh->disconnectFromHost(); QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(finalizeRemoteServer(*server, {clientA, clientB, fresh}));
 
     clientA->deleteLater(); clientB->deleteLater(); fresh->deleteLater();
     QTRY_VERIFY(clientAGuard.isNull()); QTRY_VERIFY(clientBGuard.isNull()); QTRY_VERIFY(freshGuard.isNull());
@@ -412,6 +446,7 @@ void RemoteControlContractTests::TCP_013_qt6ErrorSignalMetaobjectAndNoLegacyWarn
     QVERIFY(!QtMessageCapture::contains("No such signal QTcpSocket::error(QAbstractSocket::SocketError)"));
     client->disconnectFromHost();
     QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(finalizeRemoteServer(server, {client}));
     QTRY_VERIFY(acceptedGuard.isNull());
     QTRY_COMPARE(acceptedSockets(server).size(), 0);
 }
@@ -429,6 +464,7 @@ void RemoteControlContractTests::TCP_014_serverSocketAfterClientDisconnect() {
     QTRY_VERIFY(!server.ConnectionState.GetFrameSplitter().Buffer.isEmpty());
     client->disconnectFromHost();
     QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(finalizeRemoteServer(server, {client}));
     QTRY_VERIFY(acceptedGuard.isNull());
     QCOMPARE(server.ConnectionState.GetCurrentSocket(), static_cast<QTcpSocket*>(nullptr));
     QVERIFY(server.ConnectionState.GetFrameSplitter().Buffer.isEmpty());
@@ -442,6 +478,7 @@ void RemoteControlContractTests::TCP_014_serverSocketAfterClientDisconnect() {
     QCOMPARE(readReply(fresh, 5), QByteArray("\0\0\0\0\0", 5));
     fresh->disconnectFromHost();
     QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(finalizeRemoteServer(server, {client, fresh}));
     QTRY_COMPARE(acceptedSockets(server).size(), 0);
 }
 
@@ -457,6 +494,7 @@ void RemoteControlContractTests::TCP_015_repeatedConnectionsAndServerSocketLifet
         serverSockets.append(accepted);
         client->disconnectFromHost();
         QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+        QVERIFY(finalizeRemoteServer(*server, {client}));
         QTRY_VERIFY(accepted.isNull());
         QTRY_COMPARE(acceptedSockets(*server).size(), 0);
         client->deleteLater();
@@ -467,6 +505,7 @@ void RemoteControlContractTests::TCP_015_repeatedConnectionsAndServerSocketLifet
     QPointer<QTcpSocket> pendingSocket(acceptedSockets(*server).last());
     pendingClient->disconnectFromHost();
     QTRY_COMPARE(pendingClient->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(finalizeRemoteServer(*server, {pendingClient}));
     delete server;
     for (const QPointer<QTcpSocket>& accepted : serverSockets) QTRY_VERIFY(accepted.isNull());
     QTRY_VERIFY(pendingSocket.isNull());
@@ -495,6 +534,7 @@ void RemoteControlContractTests::TCP_016_oldSocketDisconnectKeepsCurrentConnecti
     QCOMPARE(readReply(clientB, 13), numericReply(8.0));
     clientB->disconnectFromHost();
     QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(finalizeRemoteServer(server, {clientA, clientB}));
     QTRY_VERIFY(serverSocketBGuard.isNull());
     clear(data);
 }
@@ -588,7 +628,7 @@ void RemoteControlContractTests::TCP_022_structurallyInvalidFrameIsDiscardedAndC
 
     client->write(frame("get", "value")); QVERIFY(client->waitForBytesWritten(1000));
     QCOMPARE(readReply(client, 13), numericReply(4.0)); QCOMPARE(spy.count(), 0);
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 
@@ -608,7 +648,7 @@ void RemoteControlContractTests::TCP_023_invalidPrefixAbortsCurrentConnection() 
     QTcpSocket* fresh = connectClient(server, this);
     fresh->write(frame("get", "value")); QVERIFY(fresh->waitForBytesWritten(1000));
     QCOMPARE(readReply(fresh, 13), numericReply(5.0)); QCOMPARE(spy.count(), 0);
-    fresh->disconnectFromHost(); QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState);
+    fresh->disconnectFromHost(); QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {fresh}));
     clear(data);
 }
 
@@ -628,7 +668,7 @@ void RemoteControlContractTests::TCP_024_shortNumericSetIsDiscardedAndConnection
     QCOMPARE(data["value"]->GetAsDouble(), 2.0);
     client->write(frame("get", "value")); QVERIFY(client->waitForBytesWritten(1000));
     QCOMPARE(readReply(client, 13), numericReply(2.0));
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 
@@ -641,7 +681,7 @@ void RemoteControlContractTests::TCP_025_validUnknownCommandKeepsConnectionUsabl
     QCOMPARE(client->state(), QAbstractSocket::ConnectedState);
     client->write(frame("get", "value")); QVERIFY(client->waitForBytesWritten(1000));
     QCOMPARE(readReply(client, 13), numericReply(6.0)); QCOMPARE(spy.count(), 0);
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 
@@ -654,7 +694,7 @@ void RemoteControlContractTests::TCP_026_coalescedInvalidAndValidFramesRecoverIn
     QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(0).toString(), QString("set"));
     QCOMPARE(spy.at(0).at(1).toString(), QString("value")); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 11.0);
     QCOMPARE(data["value"]->GetAsDouble(), 7.0); QVERIFY(!client->waitForReadyRead(100));
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 
@@ -707,7 +747,7 @@ void RemoteControlContractTests::TCP_027_qStringAndStringListLegacyPayloads() {
 
     QCOMPARE(data["text"]->GetString(), QString("unchanged-text"));
     QCOMPARE(data["list"]->GetStringList(), QStringList({"unchanged-first", "unchanged-second"}));
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 
@@ -743,7 +783,7 @@ void RemoteControlContractTests::TCP_028_guiSelectionLegacyPayloads() {
 
     QCOMPARE(data["choice"]->GetGuiSelection().first, QString("a"));
     QCOMPARE(data["choice"]->GetGuiSelection().second, QStringList({"a", "b"}));
-    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState); QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 
