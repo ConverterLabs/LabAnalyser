@@ -99,3 +99,22 @@ as inactive internal enum values; no loader lease, persistent loader, QObject
 observation, Messenger connection handle or logical legacy removal exists yet.
 The separate path map remains deliberately in place so that the observed
 post-`RemoveDevices` path semantics stay unchanged.
+
+## 5E.3c1 successful-loader leases
+
+`PluginLeasePool` is an internal QObject child of the current
+`QCoreApplication`. It owns successful `QPluginLoader` instances exclusively
+through `std::unique_ptr`; individual loaders have no QObject parent and the
+pool never calls `unload()`. The pool is not a global mutable loader list and
+has no public application API.
+
+`LoadPlugin::readDevice()` now creates its loader with unique ownership and
+transfers it only after instance creation, `Platform_Fabric` cast,
+`GetInterface()` and the existing `AddDevice()`/lookup sequence all succeed.
+Duplicate names bypass loader creation as before. Missing, wrong-IID and
+QObject-only paths do not add a pool lease. The test-only lease-count probe is
+compiled only in `PluginLoaderContractTests`.
+
+This changes loader lifetime only. DeviceRegistry still registers every
+reachable device as `HostDelete`; no Legacy retain strategy, loader release,
+Messenger change or logical removal is active in 5E.3c1.

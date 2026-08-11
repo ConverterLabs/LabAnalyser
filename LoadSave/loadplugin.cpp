@@ -21,6 +21,7 @@
 
 
 #include "loadplugin.h"
+#include "PluginLeasePool.h"
 #include <QDebug>
 #include"../DataManagement/DataManagementSetClass.h"
 #include <QPluginLoader>
@@ -58,8 +59,8 @@ void LoadPlugin::readDevice()
                 if(!DCObj->GetDevice(Name))
                 {
                     QString filename =  reader.attributes().value("DevicePlugin").toString();
-                    QPluginLoader loader(filename);
-                    QObject *Plugin = loader.instance();
+                    std::unique_ptr<QPluginLoader> loader(new QPluginLoader(filename));
+                    QObject *Plugin = loader->instance();
                     if(Plugin)
                     {
                         Platform_Fabric *NewDevice = qobject_cast<Platform_Fabric *>(Plugin);
@@ -72,10 +73,13 @@ void LoadPlugin::readDevice()
                         DCObj->AddDevice(Name, m_devFileName, PI);
                         NewDeviceReg = DCObj->GetDevice(Name);
                         NewDeviceReg->GetObject()->setObjectName(Name);
+                        PluginLeasePool* leases = PluginLeasePool::ForCurrentApplication();
+                        if (leases)
+                            leases->Adopt(std::move(loader));
                     }
                     else
                     {
-                        Messenger->SendError("the xml-Device: " + filename + " couldn't be loaded! Reason: " + loader.errorString());
+                        Messenger->SendError("the xml-Device: " + filename + " couldn't be loaded! Reason: " + loader->errorString());
                     }
                 }
             }

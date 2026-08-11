@@ -153,6 +153,15 @@ Phase 5E.3b prepares but does not activate `RetainLegacyPlugin` and
 `PluginReleaseV2`: every reachable registration still uses `HostDelete`.
 There is no loader lease, Messenger connection storage or logical legacy-plugin
 removal in this structural slice.
+
+## Phase 5E.3c1 successful plugin-loader lifetime
+
+`LoadSave/PluginLeasePool` is an internal application-child owner for loaders
+that reached successful existing device registration. It uses unique ownership
+without assigning loaders a QObject parent and makes no explicit unload call.
+It is deliberately separate from `DeviceRegistry`: all active devices still
+use the legacy `HostDelete` strategy, and no Messenger connection or logical
+removal policy changed.
 ## Phase 4G.2a Project I/O export coordination
 
 `DataManagement/ProjectIoCoordinator` is a private, QObject-free operation

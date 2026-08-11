@@ -880,6 +880,19 @@ preparation only. Existing `DM_DEV_001..DM_DEV_004` and
 `PLUGIN_001..PLUGIN_011` therefore remain the applicable visible contracts;
 legacy logical removal, loader leases and Messenger disconnection are future
 approved hardening work.
+
+## Phase 5E.3c1 plugin loader leases
+
+`PLUGIN_012` establishes that one successful `LoadPlugin` registration adds
+one internal application-lifetime loader lease and that destruction of the
+local loader helper leaves the registered member fixture observable. A duplicate
+device name adds no lease. `PLUGIN_013` establishes no lease-count increase for
+wrong-IID, QObject-only and missing-DLL paths. The probe is test-target-only;
+it exposes no production API.
+
+This is loader-lifetime evidence only. The public `AddDevice()` path and all
+currently reachable registrations remain `HostDelete`; `RetainLegacyPlugin`,
+connection disconnection and logical plugin removal are not active yet.
 ## Phase 4G.2a ProjectIoCoordinator extraction
 
 `UIDataManagementSetClass::{ImportFromXml,Export2Xml,Export2Mat,Export2Hdf5}`

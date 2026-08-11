@@ -737,3 +737,18 @@ while the heap fixture was deleted exactly once by all three paths. The
 unchanged focused DataManagement and Plugin suites passed before this structural
 preparation is recorded: later activation requires separate legacy-removal
 characterization and an approved loader-lease strategy.
+
+## Phase 5E.3c1 successful plugin-loader leases
+
+**Completed 2026-08-11.** Successful existing plugin registrations transfer
+their uniquely owned `QPluginLoader` into an internal `PluginLeasePool` owned
+by the current application. The pool never explicitly unloads a loader and
+does not give loaders QObject parents. Transfer happens only after the existing
+successful instance/cast/interface/registration sequence; duplicate names and
+failed load/IID paths do not add leases.
+
+`PLUGIN_012` and `PLUGIN_013` join the unchanged plugin contracts. This is not
+the approved Legacy retain behavior yet: DeviceRegistry still uses only
+`HostDelete`, and no cleanup, Messenger connection, IID or plugin-interface
+semantics changed. The following slice must characterize and then activate
+logical Legacy removal separately.

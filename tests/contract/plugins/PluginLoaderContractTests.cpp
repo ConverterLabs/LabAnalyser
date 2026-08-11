@@ -4,6 +4,7 @@
 #include <QPluginLoader>
 #include <QPointer>
 #include "LoadSave/loadplugin.h"
+#include "LoadSave/PluginLeasePool.h"
 #include "DataManagement/DataManagementSetClass.h"
 
 class PluginLoaderContractTests : public QObject {
@@ -24,6 +25,8 @@ private slots:
     void PLUGIN_009_heapOwnedModelLoads();
     void PLUGIN_010_managerDestructionDoesNotCleanDevices();
     void PLUGIN_011_loaderRootLifetimeAfterLocalLoader();
+    void PLUGIN_012_successfulLoadTransfersOneLease();
+    void PLUGIN_013_failedLoadsDoNotTransferLease();
 };
 void PluginLoaderContractTests::PLUGIN_001_compatibleLoad(){ QObject parent; DataManagementSetClass manager(&parent); QSignalSpy errors(manager.GetMessenger(), &MessengerClass::ErrorWriter); auto* l=load(manager,xml(root+"/CompatiblePlugin/release/CompatiblePlugin.dll","DeviceA"),"deviceA.LAdev"); QVERIFY(l->GetNewDevice()); QCOMPARE(manager.GetDevice("DeviceA"),l->GetNewDevice()); QObject* object=l->GetNewDevice()->GetObject(); QCOMPARE(object->objectName(),QString("DeviceA")); QCOMPARE(object->property("test_getInterfaceCalls").toInt(),1); QCOMPARE(object->property("test_messenger").value<QObject*>(),static_cast<QObject*>(manager.GetMessenger())); QCOMPARE(errors.count(),0); }
 void PluginLoaderContractTests::PLUGIN_002_wrongIidRejected(){ QObject parent; DataManagementSetClass manager(&parent); QSignalSpy errors(manager.GetMessenger(), &MessengerClass::ErrorWriter); auto* l=load(manager,xml(root+"/WrongIidPlugin/release/WrongIidPlugin.dll","Bad"),"bad.LAdev"); QVERIFY(!l->GetNewDevice()); QVERIFY(!manager.GetDevice("Bad")); QCOMPARE(errors.count(),1); QVERIFY(errors.at(0).at(1).toString().contains("incompatible with Platform_Fabric")); }
@@ -126,6 +129,46 @@ void PluginLoaderContractTests::PLUGIN_011_loaderRootLifetimeAfterLocalLoader()
     QVERIFY(rootPointer);
     QVERIFY(devicePointer);
     QCOMPARE(interfacePointer->GetObject(), devicePointer.data());
+}
+
+void PluginLoaderContractTests::PLUGIN_012_successfulLoadTransfersOneLease()
+{
+    const int before = PluginLeasePool::LeaseCountForTesting();
+    QObject parent;
+    DataManagementSetClass manager(&parent);
+    auto* loader = load(manager,
+                        xml(root + "/MemberOwnedInterfacePlugin/release/MemberOwnedInterfacePlugin.dll", "Lease012"),
+                        "lease012.LAdev");
+    Platform_Interface* interfacePointer = loader->GetNewDevice();
+    QVERIFY(interfacePointer);
+    QPointer<QObject> object(interfacePointer->GetObject());
+    QVERIFY(object);
+    QCOMPARE(PluginLeasePool::LeaseCountForTesting(), before + 1);
+    delete loader;
+    QVERIFY(object);
+    QCOMPARE(manager.GetDevice("Lease012"), interfacePointer);
+
+    auto* duplicate = load(manager,
+                           xml(root + "/MemberOwnedInterfacePlugin/release/MemberOwnedInterfacePlugin.dll", "Lease012"),
+                           "lease012-duplicate.LAdev");
+    QVERIFY(!duplicate->GetNewDevice());
+    QCOMPARE(PluginLeasePool::LeaseCountForTesting(), before + 1);
+}
+
+void PluginLoaderContractTests::PLUGIN_013_failedLoadsDoNotTransferLease()
+{
+    const int before = PluginLeasePool::LeaseCountForTesting();
+    QObject parent;
+    DataManagementSetClass manager(&parent);
+    auto* wrong = load(manager, xml(root + "/WrongIidPlugin/release/WrongIidPlugin.dll", "LeaseBadIid"), "lease-bad-iid.LAdev");
+    QVERIFY(!wrong->GetNewDevice());
+    QCOMPARE(PluginLeasePool::LeaseCountForTesting(), before);
+    auto* plain = load(manager, xml(root + "/QObjectOnlyPlugin/release/QObjectOnlyPlugin.dll", "LeasePlain"), "lease-plain.LAdev");
+    QVERIFY(!plain->GetNewDevice());
+    QCOMPARE(PluginLeasePool::LeaseCountForTesting(), before);
+    auto* missing = load(manager, xml(root + "/missing-lease.dll", "LeaseMissing"), "lease-missing.LAdev");
+    QVERIFY(!missing->GetNewDevice());
+    QCOMPARE(PluginLeasePool::LeaseCountForTesting(), before);
 }
 QTEST_MAIN(PluginLoaderContractTests)
 #include "PluginLoaderContractTests.moc"
