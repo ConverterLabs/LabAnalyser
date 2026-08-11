@@ -80,7 +80,7 @@ production baseline and exclusions; it is not a repository-wide gate.
    pending. A small anonymized externally supplied experiment corpus is now
    characterized, but full historical UI/plugin/custom-data compatibility is
    still intentionally unverified.
-4. Isolate pure/core logic from GUI and infrastructure — pending.
+4. Isolate identified pure/core logic from GUI and infrastructure — completed.
 5. Ownership/lifetime, undefined behavior, error handling, and security hardening — pending.
 6. Build-system and dependency modernization — pending.
 7. Subsystem-by-subsystem refactoring with differential verification — pending.
@@ -96,6 +96,19 @@ production baseline and exclusions; it is not a repository-wide gate.
   or remote CI confirmation.
 - Plugin ABI, XML, binary TCP framing, libmatio/HDF5 output, and UI object names are compatibility-critical.
 - Build dependencies are machine-installed rather than locked/reproduced by the repository.
+
+## Milestone 4 completion
+
+**Completed 2026-08-11.** The identified behavior-preserving internal
+isolation slices for DataManagement, project I/O and remote control are
+complete. Public facades and their Qt/API, plugin IID and `InterfaceData` ABI
+boundaries remain unchanged. The evidence, scope limits and Milestone-5
+handover are consolidated in `MILESTONE_4_ISOLATION_REPORT.md`.
+
+This does not claim full GUI independence. `LoadForms()` has no repository
+implementation, and no speculative core/GUI abstraction was introduced. The
+remaining ownership, safety and behavior decisions are Milestone-5 work; build
+system and dependency modernization remain Milestone-6 work.
 
 ## Milestone 3A completion
 

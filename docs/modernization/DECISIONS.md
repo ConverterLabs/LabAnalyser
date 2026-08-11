@@ -80,3 +80,16 @@ registry bookkeeping; widget signal routing, plugin/device ownership and GUI/IO
 orchestration are independent later slices. This preserves public APIs, signal
 order, plugin ABI/IID and file-format behavior while creating a testable core
 without MainWindow dependencies.
+
+## ADR-008: Do not introduce speculative core/GUI abstractions after Milestone 4
+
+**Date:** 2026-08-11
+**Status:** accepted
+
+The completed Milestone-4 helpers isolate only responsibilities with observed
+contracts and a bounded rollback path. No additional core/GUI abstraction is
+introduced merely to pursue the target architecture: `UIDataManagementSetClass`
+continues to own its documented QObject, MainWindow, state and signal/status
+responsibilities, while `LoadForms()` remains blocked because it has no
+repository implementation. A later boundary requires a demonstrated dependency
+or test benefit, characterization evidence and its own approved slice.

@@ -44,6 +44,13 @@ adapters, network transport/protocol, and plugin-loading adapter while retaining
 the existing qmake build until CMake parity is demonstrated.  No such refactoring
 is part of this audit.
 
+## Milestone 4 isolation closure
+
+The identified internal boundaries for DataManagement, project I/O and remote
+control are complete without replacing their public Qt facades or asserting a
+full GUI-independent core. The scope, compatibility evidence and explicit
+Milestone-5 handover are summarized in `MILESTONE_4_ISOLATION_REPORT.md`.
+
 ## Phase 4A DataManagement refactoring direction (planned only)
 
 `DataManagementClass` currently combines value registries, raw mapper/device
