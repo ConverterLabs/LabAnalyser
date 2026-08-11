@@ -110,6 +110,21 @@ implementation, and no speculative core/GUI abstraction was introduced. The
 remaining ownership, safety and behavior decisions are Milestone-5 work; build
 system and dependency modernization remain Milestone-6 work.
 
+## Milestone 5A.1 remote-control socket characterization
+
+**Completed 2026-08-11 without production changes.** `TCP_013` confirms the
+Qt-6 `errorOccurred(QAbstractSocket::SocketError)` meta-signal and captures the
+existing invalid legacy `error(...)` connection warning. `TCP_014..TCP_015`
+record that accepted sockets are `QTcpServer` children, remain after disconnect
+and are destroyed with the server. `TCP_016` is deliberately unimplemented:
+real socket-error delivery is not deterministic under the current connection.
+
+The two separate approval-required decisions are a typed Qt-6 error-signal
+repair with an explicit observable error policy, and whether disconnected
+accepted sockets remain until server destruction or are released by controlled
+`deleteLater()`. See `REMOTE_CONTROL_HARDENING_5A.md`; neither decision was
+implemented in 5A.1.
+
 ## Milestone 3A completion
 
 DataManagement characterization is complete for the safely isolated manager,

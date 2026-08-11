@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <QTcpSocket>
+#include <QTcpServer>
 #include <QPointer>
 #include <QElapsedTimer>
 #include <QEventLoop>
@@ -7,7 +8,11 @@
 #include <cstring>
 #include <cstdint>
 
+// Test-only seam: exposes the private QTcpServer member solely to observe its
+// QObject-owned accepted sockets. Production headers and targets are unchanged.
+#define private public
 #include "RemoteControl/RemoteControlServer.h"
+#undef private
 #include "RemoteControl/RemoteControlFrameSplitter.h"
 
 Q_DECLARE_METATYPE(InterfaceData)
@@ -80,6 +85,27 @@ QByteArray vectorReply(const std::vector<double>& time, const std::vector<double
     for (double value : data) result += f64(value);
     return result;
 }
+
+QStringList capturedQtMessages;
+QtMessageHandler previousQtMessageHandler = nullptr;
+
+class QtMessageCapture {
+public:
+    QtMessageCapture() { capturedQtMessages.clear(); previousQtMessageHandler = qInstallMessageHandler(handler); }
+    ~QtMessageCapture() { qInstallMessageHandler(previousQtMessageHandler); }
+
+    static bool contains(const QString& part) {
+        for (const QString& message : capturedQtMessages) if (message.contains(part)) return true;
+        return false;
+    }
+
+private:
+    static void handler(QtMsgType, const QMessageLogContext&, const QString& message) { capturedQtMessages.append(message); }
+};
+
+QList<QTcpSocket*> acceptedSockets(RemoteControlServer& server) {
+    return server.tcpServer.findChildren<QTcpSocket*>();
+}
 }
 
 class RemoteControlContractTests : public QObject {
@@ -98,6 +124,9 @@ private slots:
     void TCP_010_fragmentStateIsDiscardedOnSecondConnection();
     void TCP_011_firstClientRequestsAfterSecondAcceptance();
     void TCP_012_disconnectLifetimeAndFreshConnection();
+    void TCP_013_qt6ErrorSignalMetaobjectAndWarning();
+    void TCP_014_serverSocketAfterClientDisconnect();
+    void TCP_015_repeatedConnectionsAndServerSocketLifetime();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -334,6 +363,61 @@ void RemoteControlContractTests::TCP_012_disconnectLifetimeAndFreshConnection() 
     QTRY_VERIFY(clientAGuard.isNull()); QTRY_VERIFY(clientBGuard.isNull()); QTRY_VERIFY(freshGuard.isNull());
     delete server; QTRY_VERIFY(serverGuard.isNull());
     clear(data);
+}
+
+void RemoteControlContractTests::TCP_013_qt6ErrorSignalMetaobjectAndWarning() {
+    QTcpSocket socket;
+    QCOMPARE(socket.metaObject()->indexOfSignal("error(QAbstractSocket::SocketError)"), -1);
+    QVERIFY(socket.metaObject()->indexOfSignal("errorOccurred(QAbstractSocket::SocketError)") >= 0);
+
+    QtMessageCapture capture;
+    RemoteControlServer server(nullptr);
+    QTcpSocket* client = connectClient(server, this);
+    QTRY_COMPARE(acceptedSockets(server).size(), 1);
+    QVERIFY(QtMessageCapture::contains("No such signal QTcpSocket::error(QAbstractSocket::SocketError)"));
+    client->disconnectFromHost();
+    QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+}
+
+void RemoteControlContractTests::TCP_014_serverSocketAfterClientDisconnect() {
+    RemoteControlServer server(nullptr);
+    QTcpSocket* client = connectClient(server, this);
+    QTRY_COMPARE(acceptedSockets(server).size(), 1);
+    QTcpSocket* accepted = acceptedSockets(server).first();
+    QPointer<QTcpSocket> acceptedGuard(accepted);
+    QCOMPARE(accepted->parent(), static_cast<QObject*>(&server.tcpServer));
+
+    client->disconnectFromHost();
+    QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    QTRY_COMPARE(accepted->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(!acceptedGuard.isNull());
+
+    QTcpSocket* fresh = connectClient(server, this);
+    QTRY_COMPARE(acceptedSockets(server).size(), 2);
+    QCOMPARE(acceptedSockets(server).last()->parent(), static_cast<QObject*>(&server.tcpServer));
+    fresh->disconnectFromHost();
+    QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState);
+}
+
+void RemoteControlContractTests::TCP_015_repeatedConnectionsAndServerSocketLifetime() {
+    auto* server = new RemoteControlServer(nullptr);
+    QList<QPointer<QTcpSocket>> serverSockets;
+
+    for (int cycle = 0; cycle < 3; ++cycle) {
+        QTcpSocket* client = connectClient(*server, this);
+        QTRY_COMPARE(acceptedSockets(*server).size(), cycle + 1);
+        QPointer<QTcpSocket> accepted(acceptedSockets(*server).last());
+        QCOMPARE(accepted->parent(), static_cast<QObject*>(&server->tcpServer));
+        serverSockets.append(accepted);
+        client->disconnectFromHost();
+        QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+        QTRY_COMPARE(accepted->state(), QAbstractSocket::UnconnectedState);
+        QVERIFY(!accepted.isNull());
+        client->deleteLater();
+    }
+
+    delete server;
+    for (const QPointer<QTcpSocket>& accepted : serverSockets) QTRY_VERIFY(accepted.isNull());
 }
 
 void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {
