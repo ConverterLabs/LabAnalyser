@@ -28,6 +28,8 @@ public:
     // malformed framing separately from a structurally valid unknown command.
     static DecodedFrame DecodeValidatedFrame(const QByteArray& frame);
     static bool HasNumericSetPayload(const DecodedFrame& frame);
+    // Preserve every payload byte except one actual final NUL terminator.
+    static QByteArray RemoveOptionalTrailingNul(const QByteArray& payload);
 
     // Legacy server decoder. Retained unchanged until the server delegation
     // slice adopts DecodeValidatedFrame().

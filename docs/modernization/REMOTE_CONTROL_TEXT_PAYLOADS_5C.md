@@ -52,7 +52,7 @@ and padding. Embedded NULs are retained by the set conversion but truncate the
 get representation. This phase does not change encoding or claim a UTF-8
 protocol contract.
 
-## History and proposed later correction
+## History and approved QString/QStringList correction
 
 The Git history contains no specification that `payloadLength` always includes
 a NUL terminator. The 2021 initial implementation (`5767435`) passed the full
@@ -63,16 +63,26 @@ protocol extraction preserved that behavior. This is therefore an
 unversioned, inconsistent legacy implementation rather than demonstrated wire
 intent.
 
-The planned, not-yet-implemented correction for String and QStringList is a
-private pure helper that retains all payload bytes and removes exactly one byte
-only when the actual final byte is NUL. It must retain Latin-1 decoding, frame
-format, get replies and the single-element QStringList behavior. GuiSelection
-is intentionally excluded pending its own approval because normalizing a bare
-`b` would make the membership check mutate the selected value.
+**5C.2b is an explicitly approved behavior correction.**
+`RemoteControlProtocol::RemoveOptionalTrailingNul()` is a pure helper that
+returns a new byte array, preserves its input and removes exactly one byte only
+when that actual final byte is NUL. `RemoteControlServer` uses it only for the
+QString and QStringList `set` branches. Therefore empty payloads remain empty,
+nonterminated `A` and `AB` remain complete, embedded NULs remain data, and
+`A 00 00` retains the first trailing NUL. Conversion remains
+`QString::fromLatin1()` and QStringList remains a newly built list containing
+exactly one element. TCP_027 carries the same vectors from the baseline commit
+`3244b4f` with their approved new values; TCP_029 directly proves helper
+purity and all trailing-NUL cases.
+
+GuiSelection is intentionally excluded: it still calls `left(size - 1)` and
+then performs the existing membership check. Thus TCP_028 remains unchanged:
+bare `b` does not select `b`, while `b 00` does. Get replies, framing, native
+byte order and the existing get/set asymmetry are also unchanged.
 
 ## Evidence
 
-The focused RemoteControl build and full `RemoteControlContractTests` run
-completed with exit code 0: 29 test functions (`TCP_001..TCP_028` and the
-legacy splitter test), reported as 31 passed, 0 failed in 4180 ms. No
-production file changed in this phase.
+The baseline characterization in `3244b4f` completed with exit code 0. The
+5C.2b focused verification records the new approved QString/QStringList
+semantics separately; no compatibility claim is made for GuiSelection or get
+symmetry.

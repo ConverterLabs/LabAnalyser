@@ -100,12 +100,12 @@ void RemoteControlServer::HeaderReceived()
                         }
                         else if (Data_.IsString())
                         {
-                            QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
+                            QString TS = QString::fromLatin1(RemoteControlProtocol::RemoveOptionalTrailingNul(decoded.Payload));
                             Data_.SetData(TS);
                         }
                         else if (Data_.IsStringList())
                         {
-                            QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
+                            QString TS = QString::fromLatin1(RemoteControlProtocol::RemoveOptionalTrailingNul(decoded.Payload));
                             QStringList SL;
                             SL.append(TS);
                             Data_.SetData(SL);

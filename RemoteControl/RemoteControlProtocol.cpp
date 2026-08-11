@@ -70,6 +70,13 @@ bool RemoteControlProtocol::HasNumericSetPayload(const DecodedFrame& frame)
             && frame.Payload.size() >= int(sizeof(double));
 }
 
+QByteArray RemoteControlProtocol::RemoveOptionalTrailingNul(const QByteArray& payload)
+{
+    if (!payload.isEmpty() && payload.endsWith('\0'))
+        return payload.left(payload.size() - 1);
+    return payload;
+}
+
 RemoteControlProtocol::DecodedFrame RemoteControlProtocol::DecodeCompleteFrame(const QByteArray& frame)
 {
     DecodedFrame result;

@@ -162,7 +162,7 @@ No public RemoteControl API, signal or slot changed. The native host byte order
 remains the compatibility contract. Reply-size limits and payload-semantic
 defects remain explicitly open; see `REMOTE_CONTROL_FRAME_HARDENING_5B.md`.
 
-## Milestone 5C.2a TCP text-payload characterization
+## Milestone 5C.2 String/QStringList text-payload correction
 
 **Completed 2026-08-11 without production changes.** `TCP_027` establishes
 the current byte-for-byte final-payload-byte loss for QString and the existing
@@ -172,11 +172,13 @@ interacts with GuiSelection membership: bare `b` remains unchanged, while
 `b\0` selects `b`. The 2021 and 2025 history is inconsistent and supplies no
 versioned evidence that `payloadLength` always includes a terminator.
 
-The proposed, not-yet-approved String/StringList correction removes exactly
-one actual trailing NUL and otherwise preserves all payload bytes with the
-existing Latin-1 conversion. GuiSelection remains deliberately outside that
-change because a bare valid choice would become a new observable selection
-mutation. Get remains asymmetric and unchanged. See
+**5C.2b is explicitly approved and implemented.** QString and QStringList set
+payloads now preserve every declared byte except one actual final NUL. Latin-1
+conversion and the one-element QStringList mapping remain unchanged. TCP_027
+uses the baseline vectors from `3244b4f` with the approved results and TCP_029
+directly covers helper purity. GuiSelection deliberately remains on the legacy
+`left(size - 1)` and membership path documented by TCP_028; bare `b` therefore
+still does not select `b`. Get remains asymmetric and unchanged. See
 `REMOTE_CONTROL_TEXT_PAYLOADS_5C.md`.
 
 ## Milestone 3A completion

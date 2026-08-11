@@ -915,3 +915,14 @@ state and MainWindow/UI routing. Contract mapping remains unchanged:
 untested coordinator path. XML writer/reader, loader and plugin-interface
 implementations remain their existing compatibility boundaries; legacy fixture
 integrity and temporary-only round-trip targets remain required evidence.
+
+## Phase 5C.2b remote text payload correction
+
+The TCP remote-control table's 5C.2a baseline note is superseded for QString
+and QStringList by the explicitly approved 5C.2b change. `TCP_027` now proves
+that their `set` payloads retain every byte except one actual final NUL;
+`TCP_029` directly proves that the pure Protocol helper preserves its input,
+retains embedded NULs and removes no more than one trailing NUL. Both branches
+still emit exactly one `set` event and QStringList still contains one element.
+`TCP_028` remains unchanged: GuiSelection continues to use legacy shortening
+and membership semantics. Get-reply asymmetry remains open.

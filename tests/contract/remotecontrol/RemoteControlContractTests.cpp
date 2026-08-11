@@ -153,6 +153,7 @@ private slots:
     void TCP_026_coalescedInvalidAndValidFramesRecoverInOrder();
     void TCP_027_qStringAndStringListLegacyPayloads();
     void TCP_028_guiSelectionLegacyPayloads();
+    void TCP_029_optionalTrailingNulHelper();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -189,8 +190,8 @@ void RemoteControlContractTests::TCP_002_numericSetSignalAndGetBytes() {
 void RemoteControlContractTests::TCP_003_stringListAndSelectionContracts() {
     std::map<QString, ToFormMapper*> data; data["text"] = text("old"); data["list"] = list({"first", "second"}); data["choice"] = selection("a", {"a", "b"});
     RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender); QTcpSocket* client = connectClient(server, this);
-    client->write(frame("set", "text", "new")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetString(), QString("ne")); QCOMPARE(data["text"]->GetString(), QString("old"));
-    client->write(frame("set", "list", "only")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 2); QCOMPARE(spy.at(1).at(2).value<InterfaceData>().GetStringList(), QStringList({"onl"}));
+    client->write(frame("set", "text", "new")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetString(), QString("new")); QCOMPARE(data["text"]->GetString(), QString("old"));
+    client->write(frame("set", "list", "only")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 2); QCOMPARE(spy.at(1).at(2).value<InterfaceData>().GetStringList(), QStringList({"only"}));
     client->write(frame("set", "choice", "b")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 3); QCOMPARE(spy.at(2).at(2).value<InterfaceData>().GetGuiSelection().first, QString("a"));
     client->write(frame("set", "choice", "missing")); QVERIFY(client->waitForBytesWritten(1000)); QTRY_COMPARE(spy.count(), 4); QCOMPARE(spy.at(3).at(2).value<InterfaceData>().GetGuiSelection().first, QString("a"));
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
@@ -407,9 +408,12 @@ void RemoteControlContractTests::TCP_013_qt6ErrorSignalMetaobjectAndNoLegacyWarn
     RemoteControlServer server(nullptr);
     QTcpSocket* client = connectClient(server, this);
     QTRY_COMPARE(acceptedSockets(server).size(), 1);
+    QPointer<QTcpSocket> acceptedGuard(acceptedSockets(server).first());
     QVERIFY(!QtMessageCapture::contains("No such signal QTcpSocket::error(QAbstractSocket::SocketError)"));
     client->disconnectFromHost();
     QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    QTRY_VERIFY(acceptedGuard.isNull());
+    QTRY_COMPARE(acceptedSockets(server).size(), 0);
 }
 
 void RemoteControlContractTests::TCP_014_serverSocketAfterClientDisconnect() {
@@ -662,8 +666,8 @@ void RemoteControlContractTests::TCP_027_qStringAndStringListLegacyPayloads() {
     };
     const std::vector<PayloadCase> cases = {
         {"empty", QByteArray(), QByteArray()},
-        {"one-byte", QByteArray("A", 1), QByteArray()},
-        {"multiple-bytes", QByteArray("AB", 2), QByteArray("A", 1)},
+        {"one-byte", QByteArray("A", 1), QByteArray("A", 1)},
+        {"multiple-bytes", QByteArray("AB", 2), QByteArray("AB", 2)},
         {"one-trailing-nul", QByteArray("AB\0", 3), QByteArray("AB", 2)},
         {"embedded-and-trailing-nul", QByteArray("A\0B\0", 4), QByteArray("A\0B", 3)},
         {"two-trailing-nuls", QByteArray("A\0\0", 3), QByteArray("A\0", 2)},
@@ -741,6 +745,23 @@ void RemoteControlContractTests::TCP_028_guiSelectionLegacyPayloads() {
     QCOMPARE(data["choice"]->GetGuiSelection().second, QStringList({"a", "b"}));
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
     clear(data);
+}
+
+void RemoteControlContractTests::TCP_029_optionalTrailingNulHelper() {
+    const std::vector<QByteArray> payloads = {
+        QByteArray(), QByteArray("A", 1), QByteArray("A\0", 2),
+        QByteArray("A\0\0", 3), QByteArray("A\0B", 3)
+    };
+    const std::vector<QByteArray> expected = {
+        QByteArray(), QByteArray("A", 1), QByteArray("A", 1),
+        QByteArray("A\0", 2), QByteArray("A\0B", 3)
+    };
+    QCOMPARE(payloads.size(), expected.size());
+    for (size_t index = 0; index < payloads.size(); ++index) {
+        const QByteArray original = payloads[index];
+        QCOMPARE(RemoteControlProtocol::RemoveOptionalTrailingNul(payloads[index]), expected[index]);
+        QCOMPARE(payloads[index], original);
+    }
 }
 
 void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {
