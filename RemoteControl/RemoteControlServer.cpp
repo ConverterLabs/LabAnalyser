@@ -22,6 +22,8 @@
 #include "RemoteControlServer.h"
 #include "RemoteControlProtocol.h"
 
+#include <cstring>
+
 RemoteControlServer::RemoteControlServer(std::map<QString, ToFormMapper *> *DataContainerI)
 {
     this->DataContainer = DataContainerI;
@@ -53,149 +55,161 @@ void RemoteControlServer::acceptConnection()
 
 void RemoteControlServer::HeaderReceived()
 {
-    while (ConnectionState.GetCurrentSocket()->bytesAvailable())
+    QTcpSocket* socket = ConnectionState.GetCurrentSocket();
+    if (!socket)
+        return;
+
+    while (socket->bytesAvailable())
     {
-        ConnectionState.GetFrameSplitter().Append(ConnectionState.GetCurrentSocket()->readAll());
+        ConnectionState.GetFrameSplitter().Append(socket->readAll());
         QByteArray Data;
-        while (ConnectionState.GetFrameSplitter().TakeCompleteFrame(&Data))
+        while (true)
         {
-            const RemoteControlProtocol::DecodedFrame decoded = RemoteControlProtocol::DecodeCompleteFrame(Data);
-            uint32_t DataSize = decoded.TotalSize;
-
-            int DataPointer = 0;
-            while (DataPointer < DataSize)
+            const RemoteControlFrameSplitter::FrameResult frameResult = ConnectionState.GetFrameSplitter().TakeFrame(&Data);
+            if (frameResult == RemoteControlFrameSplitter::FrameResult::Incomplete)
+                return;
+            if (frameResult == RemoteControlFrameSplitter::FrameResult::InvalidPrefix)
             {
-                char *DataArrayStart = &((Data.data())[DataPointer]);
-                uint32_t LengthID = *((uint32_t *)&DataArrayStart[4 + 3]);
-                uint32_t LengthofData = *((uint32_t *)&DataArrayStart[3 + 8]);
-                ReceivedID = decoded.Id;
+                QTcpSocket* currentSocket = ConnectionState.GetCurrentSocket();
+                if (currentSocket)
+                    currentSocket->abort();
+                return;
+            }
 
-                if (decoded.CommandType == RemoteControlProtocol::Command::Set)
+            const RemoteControlProtocol::DecodedFrame decoded = RemoteControlProtocol::DecodeValidatedFrame(Data);
+            if (decoded.Status == RemoteControlProtocol::DecodeStatus::Invalid)
+                continue;
+
+            ReceivedID = decoded.Id;
+
+            if (decoded.CommandType == RemoteControlProtocol::Command::Set)
+            {
+                if (this->DataContainer)
                 {
-                    if (this->DataContainer)
+                    auto it = this->DataContainer->find(ReceivedID);
+                    if (it != this->DataContainer->end())
                     {
-                        auto it = this->DataContainer->find(ReceivedID);
-                        if (it != this->DataContainer->end())
+                        InterfaceData Data_ = *((*(this->DataContainer))[ReceivedID]);
+                        if (Data_.IsNumeric())
                         {
-                            InterfaceData Data_ = *((*(this->DataContainer))[ReceivedID]);
-                            if (Data_.IsNumeric())
-                                Data_.SetDataKeepType(*((double *)&DataArrayStart[15 + LengthID]));
-                            else if (Data_.IsString())
-                            {
-                                QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
-                                Data_.SetData(TS);
-                            }
-                            else if (Data_.IsStringList())
-                            {
-                                QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
-                                QStringList SL;
-                                SL.append(TS);
-                                Data_.SetData(SL);
-                            }
-                            else if (Data_.IsGuiSelection())
-                            {
-                                auto Sel = Data_.GetGuiSelection();
-                                QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
-                                Sel.first = TS;
-                                if (Sel.second.contains(TS))
-                                    Data_.SetData(Sel);
-                            }
-                            else if (Data_.IsStringList())
-                            {
-                            }
-                            emit MessageSender("set", ReceivedID, Data_);
+                            if (!RemoteControlProtocol::HasNumericSetPayload(decoded))
+                                continue;
+                            double value = 0.0;
+                            std::memcpy(&value, decoded.Payload.constData(), sizeof(value));
+                            Data_.SetDataKeepType(value);
                         }
+                        else if (Data_.IsString())
+                        {
+                            QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
+                            Data_.SetData(TS);
+                        }
+                        else if (Data_.IsStringList())
+                        {
+                            QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
+                            QStringList SL;
+                            SL.append(TS);
+                            Data_.SetData(SL);
+                        }
+                        else if (Data_.IsGuiSelection())
+                        {
+                            auto Sel = Data_.GetGuiSelection();
+                            QString TS = QString::fromLatin1(decoded.Payload.left(decoded.Payload.size() - 1));
+                            Sel.first = TS;
+                            if (Sel.second.contains(TS))
+                                Data_.SetData(Sel);
+                        }
+                        else if (Data_.IsStringList())
+                        {
+                        }
+                        emit MessageSender("set", ReceivedID, Data_);
                     }
                 }
-                if (decoded.CommandType == RemoteControlProtocol::Command::Get)
+            }
+            if (decoded.CommandType == RemoteControlProtocol::Command::Get)
+            {
+                QByteArray DataOut = RemoteControlProtocol::EncodeEmptyReply();
+
+                if (this->DataContainer)
                 {
-                    QByteArray DataOut = RemoteControlProtocol::EncodeEmptyReply();
-
-                    if (this->DataContainer)
+                    auto it = this->DataContainer->find(ReceivedID);
+                    if (it != this->DataContainer->end())
                     {
-                        auto it = this->DataContainer->find(ReceivedID);
-                        if (it != this->DataContainer->end())
+                        InterfaceData Data_ = *((*(this->DataContainer))[ReceivedID]);
+                        if (Data_.IsNumeric())
                         {
-                            InterfaceData Data_ = *((*(this->DataContainer))[ReceivedID]);
-                            if (Data_.IsNumeric())
-                            {
-                                DataOut = RemoteControlProtocol::EncodeNumericReply(Data_.GetAsDouble());
-                            }
-                            else if (Data_.IsString() || Data_.IsStringList())
-                            {
-                                DataOut = RemoteControlProtocol::EncodeStringReply(Data_.GetString());
-                            }
-                            else if (Data_.IsGuiSelection())
-                            {
-                                DataOut = RemoteControlProtocol::EncodeStringReply(Data_.GetGuiSelection().first);
-                            }
-                            else if (Data_.IsPairOfVectorOfDoubles())
-                            {
-                                auto pointerPair = Data_.GetPointerPair();  // Store result to ensure consistency
-                                if (pointerPair.first && pointerPair.second) {
-                                    std::vector<double> Time;
-                                    std::vector<double> MeasuredDataOut;
-
-                                    auto TP = pointerPair.first;
-                                    auto DP = pointerPair.second;
-
-                                    if (TP && !TP->empty()) {
-                                        Time.insert(Time.end(), TP->begin(), TP->end());
-                                    } else {
-                                        Time.push_back(0.0);
-                                    }
-
-                                    if (DP && !DP->empty()) {
-                                        MeasuredDataOut.insert(MeasuredDataOut.end(), DP->begin(), DP->end());
-                                    } else {
-                                        MeasuredDataOut.push_back(0.0);
-                                    }
-
-                                    DataOut = RemoteControlProtocol::EncodeVectorReply(Time, MeasuredDataOut);
-                                }
-                                else
-                                {
-                                    DataOut = RemoteControlProtocol::EncodeEmptyReply();
-                                }
-                            }
-                            ConnectionState.GetCurrentSocket()->write(DataOut);
+                            DataOut = RemoteControlProtocol::EncodeNumericReply(Data_.GetAsDouble());
                         }
-                        else
+                        else if (Data_.IsString() || Data_.IsStringList())
                         {
+                            DataOut = RemoteControlProtocol::EncodeStringReply(Data_.GetString());
+                        }
+                        else if (Data_.IsGuiSelection())
+                        {
+                            DataOut = RemoteControlProtocol::EncodeStringReply(Data_.GetGuiSelection().first);
+                        }
+                        else if (Data_.IsPairOfVectorOfDoubles())
+                        {
+                            auto pointerPair = Data_.GetPointerPair();  // Store result to ensure consistency
+                            if (pointerPair.first && pointerPair.second) {
+                                std::vector<double> Time;
+                                std::vector<double> MeasuredDataOut;
 
-                            // create a string  with all keys that conaint ReceivedID and separate them by |
-                            QString Keys;
-                            for (auto it = this->DataContainer->begin(); it != this->DataContainer->end(); it++)
-                            {
-                                if (it->first.contains(ReceivedID))
-                                {
-                                    Keys.append(it->first);
-                                    Keys.append("|");
+                                auto TP = pointerPair.first;
+                                auto DP = pointerPair.second;
+
+                                if (TP && !TP->empty()) {
+                                    Time.insert(Time.end(), TP->begin(), TP->end());
+                                } else {
+                                    Time.push_back(0.0);
                                 }
 
-                            }
-                            // if string != empty remove last |
-                            if (Keys.size())
-                                Keys.remove(Keys.size() - 1, 1);
+                                if (DP && !DP->empty()) {
+                                    MeasuredDataOut.insert(MeasuredDataOut.end(), DP->begin(), DP->end());
+                                } else {
+                                    MeasuredDataOut.push_back(0.0);
+                                }
 
-                            // check if there are any keys
-                            if (Keys.size())
-                            {
-                                DataOut = RemoteControlProtocol::EncodeStringReply(Keys);
+                                DataOut = RemoteControlProtocol::EncodeVectorReply(Time, MeasuredDataOut);
                             }
                             else
                             {
                                 DataOut = RemoteControlProtocol::EncodeEmptyReply();
                             }
-                            ConnectionState.GetCurrentSocket()->write(DataOut);
                         }
                     }
                     else
                     {
-                        ConnectionState.GetCurrentSocket()->write(DataOut);
+
+                        // create a string  with all keys that conaint ReceivedID and separate them by |
+                        QString Keys;
+                        for (auto it = this->DataContainer->begin(); it != this->DataContainer->end(); it++)
+                        {
+                            if (it->first.contains(ReceivedID))
+                            {
+                                Keys.append(it->first);
+                                Keys.append("|");
+                            }
+
+                        }
+                        // if string != empty remove last |
+                        if (Keys.size())
+                            Keys.remove(Keys.size() - 1, 1);
+
+                        // check if there are any keys
+                        if (Keys.size())
+                        {
+                            DataOut = RemoteControlProtocol::EncodeStringReply(Keys);
+                        }
+                        else
+                        {
+                            DataOut = RemoteControlProtocol::EncodeEmptyReply();
+                        }
                     }
                 }
-                DataPointer += 15 + LengthID + LengthofData;
+                QTcpSocket* currentSocket = ConnectionState.GetCurrentSocket();
+                if (!currentSocket)
+                    return;
+                currentSocket->write(DataOut);
             }
         }
     }

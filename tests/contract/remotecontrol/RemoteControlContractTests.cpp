@@ -139,6 +139,11 @@ private slots:
     void TCP_019_frameSplitterBuffersPlausiblePartialFrame();
     void TCP_020_frameSplitterMaxSizeBoundary();
     void TCP_021_protocolStructuralValidation();
+    void TCP_022_structurallyInvalidFrameIsDiscardedAndConnectionRecovers();
+    void TCP_023_invalidPrefixAbortsCurrentConnection();
+    void TCP_024_shortNumericSetIsDiscardedAndConnectionRecovers();
+    void TCP_025_validUnknownCommandKeepsConnectionUsable();
+    void TCP_026_coalescedInvalidAndValidFramesRecoverInOrder();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -550,6 +555,87 @@ void RemoteControlContractTests::TCP_021_protocolStructuralValidation() {
     const RemoteControlProtocol::DecodedFrame shortNumeric = RemoteControlProtocol::DecodeValidatedFrame(frame("set", "id", QByteArray(7, '\0')));
     QCOMPARE(shortNumeric.Status, RemoteControlProtocol::DecodeStatus::Valid);
     QVERIFY(!RemoteControlProtocol::HasNumericSetPayload(shortNumeric));
+}
+
+void RemoteControlContractTests::TCP_022_structurallyInvalidFrameIsDiscardedAndConnectionRecovers() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(4.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* client = connectClient(server, this);
+    QByteArray invalid = frame("set", "value", f64(8.0)); invalid[20] = 'x';
+    client->write(invalid); QVERIFY(client->waitForBytesWritten(1000));
+    QVERIFY(!client->waitForReadyRead(150)); QCOMPARE(spy.count(), 0);
+    QCOMPARE(client->state(), QAbstractSocket::ConnectedState);
+
+    client->write(frame("get", "value")); QVERIFY(client->waitForBytesWritten(1000));
+    QCOMPARE(readReply(client, 13), numericReply(4.0)); QCOMPARE(spy.count(), 0);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_023_invalidPrefixAbortsCurrentConnection() {
+    const QList<uint32_t> invalidSizes = {0, 15, RemoteControlFrameSplitter::MaxFrameSize + 1};
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(5.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+
+    for (uint32_t size : invalidSizes) {
+        QTcpSocket* client = connectClient(server, this);
+        client->write(u32(size)); QVERIFY(client->waitForBytesWritten(1000));
+        QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+        QCOMPARE(spy.count(), 0); QVERIFY(server.ConnectionState.GetFrameSplitter().Buffer.isEmpty());
+        QVERIFY(!client->waitForReadyRead(50));
+    }
+
+    QTcpSocket* fresh = connectClient(server, this);
+    fresh->write(frame("get", "value")); QVERIFY(fresh->waitForBytesWritten(1000));
+    QCOMPARE(readReply(fresh, 13), numericReply(5.0)); QCOMPARE(spy.count(), 0);
+    fresh->disconnectFromHost(); QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_024_shortNumericSetIsDiscardedAndConnectionRecovers() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(2.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* client = connectClient(server, this);
+
+    for (int size = 0; size < int(sizeof(double)); ++size) {
+        client->write(frame("set", "value", QByteArray(size, '\0'))); QVERIFY(client->waitForBytesWritten(1000));
+        QVERIFY(!client->waitForReadyRead(50)); QCOMPARE(spy.count(), 0); QCOMPARE(data["value"]->GetAsDouble(), 2.0);
+        QCOMPARE(client->state(), QAbstractSocket::ConnectedState);
+    }
+
+    client->write(frame("set", "value", f64(9.0))); QVERIFY(client->waitForBytesWritten(1000));
+    QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 9.0);
+    QCOMPARE(data["value"]->GetAsDouble(), 2.0);
+    client->write(frame("get", "value")); QVERIFY(client->waitForBytesWritten(1000));
+    QCOMPARE(readReply(client, 13), numericReply(2.0));
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_025_validUnknownCommandKeepsConnectionUsable() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(6.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* client = connectClient(server, this);
+    client->write(frame("bad", "value")); QVERIFY(client->waitForBytesWritten(1000));
+    QVERIFY(!client->waitForReadyRead(150)); QCOMPARE(spy.count(), 0);
+    QCOMPARE(client->state(), QAbstractSocket::ConnectedState);
+    client->write(frame("get", "value")); QVERIFY(client->waitForBytesWritten(1000));
+    QCOMPARE(readReply(client, 13), numericReply(6.0)); QCOMPARE(spy.count(), 0);
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_026_coalescedInvalidAndValidFramesRecoverInOrder() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(7.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* client = connectClient(server, this);
+    QByteArray invalid = frame("set", "value", f64(1.0)); invalid[20] = 'x';
+    client->write(invalid + frame("set", "value", f64(11.0))); QVERIFY(client->waitForBytesWritten(1000));
+    QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(spy.at(0).at(1).toString(), QString("value")); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 11.0);
+    QCOMPARE(data["value"]->GetAsDouble(), 7.0); QVERIFY(!client->waitForReadyRead(100));
+    client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
 }
 
 void RemoteControlContractTests::frameSplitterPreservesPartialRemainder() {

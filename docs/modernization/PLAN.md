@@ -129,9 +129,9 @@ repair with an explicit observable error policy beyond the existing no-op. The
 approved disconnected-socket `deleteLater()` policy is now implemented; see
 `REMOTE_CONTROL_HARDENING_5A.md` for its boundaries.
 
-## Milestone 5B.2a remote-control frame validation primitives
+## Milestone 5B.2 remote-control frame validation
 
-**Completed 2026-08-11.** The private QObject-free
+**Completed 2026-08-11.** 5B.2a added the private QObject-free
 `RemoteControlFrameSplitter::TakeFrame()` now distinguishes `Incomplete`,
 `Complete` and `InvalidPrefix` without unaligned reads. It bounds native
 `totalSize` to 16 bytes through 1 MiB and clears its direct-use buffer once on
@@ -139,13 +139,16 @@ an invalid prefix. `RemoteControlProtocol::DecodeValidatedFrame()` separately
 validates complete-frame structure with bounded `memcpy`, exact size sums and
 the required ID NUL; valid unknown commands remain distinguishable and ignored
 by the existing contract. `TCP_017..TCP_021` passed directly against these
-primitives.
+primitives. 5B.2b activates those primitives in `RemoteControlServer`:
+incomplete bytes remain buffered; invalid prefixes clear the splitter, abort
+the current socket and rely on the existing disconnect/deleteLater path; and
+complete structural-invalid or short numeric-set frames are dropped with no
+signal/reply while later complete frames can recover on the same connection.
+`TCP_022..TCP_026` cover these server outcomes and exact recovery replies.
 
-This is deliberately not yet a server hardening change: `RemoteControlServer`
-continues to use `TakeCompleteFrame()` and `DecodeCompleteFrame()`. The next
-explicitly approved slice must delegate invalid-prefix handling to a current
-connection reset/close and structurally-invalid complete-frame discard with no
-signal or reply. See `REMOTE_CONTROL_FRAME_HARDENING_5B.md`.
+No public RemoteControl API, signal or slot changed. The native host byte order
+remains the compatibility contract. Reply-size limits and payload-semantic
+defects remain explicitly open; see `REMOTE_CONTROL_FRAME_HARDENING_5B.md`.
 
 ## Milestone 3A completion
 

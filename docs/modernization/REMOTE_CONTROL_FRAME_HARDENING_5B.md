@@ -1,11 +1,12 @@
 # Remote-control frame hardening 5B
 
-## 5B.2a validation primitives
+## 5B.2a primitives and 5B.2b server activation
 
-This explicitly approved first security slice adds private, QObject-free
-validation primitives only. `RemoteControlServer` still uses the legacy
-`TakeCompleteFrame()` and `DecodeCompleteFrame()` paths; no server socket,
-Messenger, mapper, payload or reply behavior changes in this commit.
+5B.2a added private, QObject-free validation primitives. 5B.2b is the
+explicitly approved server activation: `RemoteControlServer` now consumes only
+`TakeFrame()`/`DecodeValidatedFrame()` results. It does not alter native wire
+byte order, valid response bytes, Messenger routing, mapper/container semantics
+or the known valid String/StringList/Selection payload behavior.
 
 `RemoteControlFrameSplitter::TakeFrame()` returns one of:
 
@@ -15,10 +16,11 @@ Messenger, mapper, payload or reply behavior changes in this commit.
 | `Complete` | A complete frame whose native `uint32_t totalSize` is within bounds | One frame removed, later bytes preserved |
 | `InvalidPrefix` | `totalSize < 16` or `totalSize > 1,048,576` | Entire current buffer cleared |
 
-The clear is intentional: direct callers cannot loop repeatedly on the same
-invalid prefix. It is not yet the approved server action. The later server
-delegation must additionally discard the current connection after an
-`InvalidPrefix`.
+The clear is intentional: callers cannot loop repeatedly on the same invalid
+prefix. In the active server boundary, `InvalidPrefix` immediately calls
+`abort()` on the still-present current socket and returns. The existing
+`disconnected()` path remains solely responsible for `ResetIfCurrent()` and
+deferred QObject deletion.
 
 `RemoteControlProtocol::DecodeValidatedFrame()` reads all `uint32_t` fields
 with bounded `memcpy`, preserves native host byte order, and returns
@@ -26,9 +28,9 @@ with bounded `memcpy`, preserves native host byte order, and returns
 size equals `frame.size()`, `idLength >= 1`, the overflow-safe
 `15 + idLength + payloadLength` sum equals the declared size, and the last ID
 byte is NUL. A structurally valid unknown three-byte command is `Valid` with
-`Command::Unknown`, not `Invalid`. `HasNumericSetPayload()` makes the later
-minimum eight-byte numeric-set prerequisite available without using it in the
-server yet.
+`Command::Unknown`, not `Invalid`. `HasNumericSetPayload()` enforces the
+approved eight-byte numeric-set prerequisite before the server reads a
+`double` with `memcpy`.
 
 ## Direct safety evidence
 
@@ -39,21 +41,32 @@ server yet.
 | `TCP_019` | A plausible bounded partial frame remains buffered as `Incomplete`. |
 | `TCP_020` | Exactly 1 MiB is plausible without allocating a payload; 1 MiB + 1 is `InvalidPrefix`. |
 | `TCP_021` | Valid known and unknown commands are distinguished from zero ID length, missing ID NUL, declared-size mismatch, inconsistent sum and oversized field values; the prepared numeric-set check rejects a seven-byte payload. |
+| `TCP_022` | A complete structurally invalid frame produces no signal or reply; a following valid `get` on the same connection returns the existing exact bytes. |
+| `TCP_023` | Prefixes 0, 15 and 1 MiB + 1 close the current connection without signal or reply, clear frame state, and permit a fresh valid connection. |
+| `TCP_024` | Numeric `set` payloads 0--7 bytes are discarded without mutation, signal or reply; valid `set` and exact recovery `get` remain usable on that connection. |
+| `TCP_025` | A structurally valid unknown command remains ignored without signal/reply and leaves the connection usable. |
+| `TCP_026` | A coalesced complete structural-invalid frame is discarded; the following valid frame emits exactly one existing-order `set` signal. |
 
 The focused `RemoteControlContractTests` build and run both exited with code
-0. It now has 22 test functions (`TCP_001..TCP_021` plus the legacy
-frame-splitter test); Qt Test reports 24 passing lifecycle/test entries and no
-failures. The incremental Release compilation of `RemoteControlFrameSplitter`
-and `RemoteControlProtocol` also exited 0. Existing warnings in untouched
-`RemoteControlServer.cpp` remain outside this slice.
+0. It now has 27 test functions (`TCP_001..TCP_026` plus the legacy
+frame-splitter test). The incremental Release compilation is recorded for the
+affected remote-control sources. The only observed warning is the pre-existing
+unused `displayError` parameter; no unrelated cleanup was made.
 
-## Deferred server decision
+## Active server behavior and remaining limits
 
-The next approved server slice must delegate only after the direct primitive
-contract is stable: `InvalidPrefix` clears current state and closes the current
-connection; a complete structurally invalid frame is dropped with no
-`MessageSender` emission or reply while the connection stays open. It must not
-alter valid `TCP_001..TCP_016` bytes or the valid-unknown-command ignore
-contract. String/StringList loss, Selection/container mutation, independent
-multi-client sessions, rate limiting, authentication, TLS and protocol-version
-work remain outside 5B.2a.
+`Incomplete` leaves received bytes in the splitter and performs no response or
+signal. A complete structural-invalid frame is already bounded, is removed by
+the splitter, and is dropped with no response/signal while the connection stays
+open; later known frame boundaries from the same buffer remain processable.
+Before each reply write the server reads the current `QPointer` again and
+returns safely if it is absent. The old unaligned header and numeric-payload
+pointer casts in `HeaderReceived()` were removed; `uint32_t` fields are decoded
+by the protocol and a numeric `double` is copied only after the eight-byte
+check.
+
+The 1 MiB limit bounds frame buffering but does not yet limit otherwise valid
+reply construction or application-level payload contents. String/StringList
+last-byte loss, Selection/container mutation, independent multi-client
+sessions, rate limiting, authentication, TLS and protocol-version work remain
+outside 5B.
