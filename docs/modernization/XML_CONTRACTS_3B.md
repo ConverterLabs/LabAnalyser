@@ -29,17 +29,26 @@ provenance, unversioned-format status and anonymization rules are in
 | XML_006 | `UIDataManagementSetClass::LoadExperiment`, `SaveExperiment` and reader/writer composition | Read → write preserves the semantic experiment root, form identity and data-reference ID. |
 | XML_007 | `UIDataManagementSetClass::SaveExperiment`, `LoadExperiment` | Caller retains the same inverted boolean error convention for writable, valid and absent paths. |
 | XML_008 | `xmlexperimentwriter::writeFigureWindows` | Real subplot window rows/columns and geometry are serialized. |
+| XML_FIG_001 | `XmlExperimentReader::CreateFigureWindow` | A 1x2 `Window` with exactly two `PlotWidgetName` elements creates two plots and preserves their parent/registry mapping, geometry and requested names. |
+| XML_FIG_002 | `CreateFigureWindow` | Fewer names than created plots are accepted; named plots are renamed and remaining plots retain their generated names. |
+| XML_FIG_003 | `CreateFigureWindow` | No names are accepted; all generated plot names remain. |
+| XML_FIG_004 | `CreateFigureWindow`, `read` | A 1x1 window with a second name is rejected safely: `read()` returns `true`, while the first rename and created figure remain. `errorString()` is historically empty. |
+| XML_FIG_005 | `CreateFigureWindow`, `MainWindow::CreateSubPlotWindow` | Safe 0x0, 0xN, negative and nonnumeric dimensions create an empty registered figure without plot widgets; oversized/allocation-sensitive dimensions remain excluded. |
+| XML_FIG_006 | `CreateFigureWindow` | Unknown children between valid names are skipped; the valid names retain their input order. |
+| XML_FIG_007 | `readExperiment`, `CreateFigureWindows` | With two figures, an excess name in the second leaves the first complete and the second partially renamed, reports parser error and prevents later sections from being processed. |
 | XML_LEGACY_001 | `XmlExperimentReader::read`, `readTab`, `LoadForm`, `readDevices`, `LoadDevice` | Smallest external historic fixture: missing UI and deliberately missing historic plugin yield the observed messages and parser error result without a crash; committed XML/device hashes remain unchanged. |
 | XML_LEGACY_002 | `XmlExperimentReader::LoadForm`, `LoadDevice` relative-path handling | External fixture with a two-parent relative path: the test recreates its relative hierarchy in `QTemporaryDir`, observes all missing-UI and missing-plugin messages, and records the error return without loading a proprietary dependency. |
 | XML_LEGACY_003 | `readExperiment`, figure/window and connection traversal | Largest external fixture reaches the reader without a crash; its observed parser-error and empty facade form/device/container state are asserted. |
 | XML_LEGACY_004 | reader/writer composition on external XML | The smallest fixture is read, written to a temporary file, and read again semantically. The first read reports the unresolved external dependency; the written partial state reads successfully with the same empty form/container state and canonical top-level section order. Byte equality is intentionally not asserted. |
 | XML_LEGACY_005 | XML reader -> `.LAdev` -> `UIDataManagementSetClass::LoadPlugin` boundary | A temporary copy alone replaces `DevicePlugin` with the runtime-built compatible fixture. The XML and committed descriptor hashes remain unchanged; the device is registered under the anonymized name and missing-form messages remain the only errors. |
 
-`CreateFigureWindows` and `CreateFigureWindow` are inspected but not executed
-with arbitrary fixture geometry: the implementation indexes the discovered
-plot-widget list without checking its length. A malformed or incompatible
-`PlotWidgetName` count can therefore access outside the list; this is a defect
-candidate, not a required behavior.
+`XML_FIG_001..XML_FIG_007` use temporary XML files and the real offscreen
+MainWindow/subplot graph. They use per-window object/registry deltas rather
+than global plot counters and deterministically close each created figure.
+The pre-fix source indexed the discovered plot-widget list without checking
+its length; this could access outside the list and the outer `catch (...)`
+could not reliably protect against undefined behavior. The dangerous baseline
+was not executed in-process.
 
 ## Defect candidates / observed legacy behavior
 
@@ -51,7 +60,13 @@ candidate, not a required behavior.
   out; the relative-device `FilenameT` also shadows the outer variable.
 - Reader and writer require the exact `UIDataManagementSetClass →
   MainWindow(objectName=LabAnalyser)` parent hierarchy.
-- `CreateFigureWindow` has no bounds check while consuming `PlotWidgetName`.
+- **Approved 5F.2 safety change:** before indexing a discovered plot, the
+  reader rejects an extra `PlotWidgetName` with the deterministic parser text
+  `Figure window contains more PlotWidgetName elements than created PlotWidgets.`
+  and returns from the window. This preserves the historic `true == error`
+  reader convention. Already-created figures, geometry, registrations and
+  earlier renames remain (no rollback); fewer names remain valid and leave
+  generated names in place.
 
 ## Remaining untestable paths
 
@@ -66,6 +81,10 @@ candidate, not a required behavior.
   absence is verified as an expected external dependency rather than hidden by
   synthetic substitutes. Full historical form/widget restoration therefore
   remains unverified.
+- Rows/columns still use the historic permissive `toInt()` conversion.
+  Oversized dimensions/allocation failure, negative layout behavior beyond the
+  safe empty-grid vectors, and any rollback of partial figure state remain
+  intentionally outside this focused safety fix.
 
 ## Executed evidence
 

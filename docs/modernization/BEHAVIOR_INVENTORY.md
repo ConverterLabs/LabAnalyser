@@ -11,7 +11,7 @@ IDs and characterization vectors before modifying it.
 | Startup/UI | `main.cpp`; `mainwindow.*`; `About.ui`; `mainwindow.ui` | Application startup, Qt object names, menus/actions, docks, dynamic forms, project lifecycle. | — | mapped, unverified |
 | Data management | `DataManagementClass.*`, `DataManagementSetClass.*`, `DataMessengerClass.*`, `mapper.h` | ID/container registration, alias/min-max, plot/form/device registries, `SetData` and signal ordering. Pointer ownership and lifetime require characterization. | — | mapped, unverified |
 | Plugin API | `plugins/platforminterface.h`, `InterfaceDataType.*`, `LoadSave/loadplugin.*` | Binary plugin ABI, `EchoInterface_iid`, `GetInterface`, `GetSymbol`, messages, XML plugin path/error behavior. | — | mapped, unverified |
-| Experiment XML | `LoadSave/xmlexperimentreader.*`, `xmlexperimentwriter.*`; `UIDataManagementSetClass::{LoadExperiment,SaveExperiment}` | Read/write `Experiment` elements (Tabs, Devices, Widgets, State, FigureWindows, Connections), relative paths and Qt dock state. Reader/writer use `false` for success; unknown XML is skipped. `errorString()` is empty after parse errors; malformed figure widget counts risk unchecked indexing. | `contract/XmlExperimentContractTests::{XML_001..XML_008}` | baseline characterized; plugin-binary and historic-file corpus unverified |
+| Experiment XML | `LoadSave/xmlexperimentreader.*`, `xmlexperimentwriter.*`; `UIDataManagementSetClass::{LoadExperiment,SaveExperiment}` | Read/write `Experiment` elements (Tabs, Devices, Widgets, State, FigureWindows, Connections), relative paths and Qt dock state. Reader/writer use `false` for success; unknown XML is skipped. `errorString()` is empty after parse errors. Excess `PlotWidgetName` elements now deterministically raise a parser error before list indexing; fewer names retain generated names and partial state is intentionally not rolled back. | `contract/XmlExperimentContractTests::{XML_001..XML_008, XML_FIG_001..XML_FIG_007}` | baseline characterized; legacy fixture corpus covered; oversized figure/allocation and broader malformed geometry remain unsafe exclusions |
 | Parameter XML | `Import/parameterloader.*`, `Export/exportinputs2xml.*`; `UIDataManagementSetClass::{ImportFromXml,Export2Xml}` | Inverted error booleans; ID/value-only persistence; malformed-file, conversion, duplicate and repeated-load behavior; XML forwarding. | `contract/ParameterContractTests::{PARAM_001..PARAM_009}` | baseline characterized; metadata persistence absent; broader UI export paths unverified |
 | MAT export | `Export/Export2Mat.*`; `UIDataManagementSetClass::Export2Mat` | MAT v5 schema, scalar/vector double data, UTF-8 characters, overwrite/error behavior. | `contract/MatExportContractTests::{MAT_001..MAT_008}` | baseline characterized; allocation-failure, HDF5 and matrix/rank-3 sources unverified |
 | HDF5 export | `Export/export2highfive.*`; `UIDataManagementSetClass::Export2Hdf5` | HighFive file truncation; `Timestamp`; `::` to `/` paths; numeric/scalar, vector and string data; direct file errors throw while UI catches and returns `false`. Null manager/second vector pointer are unsafe paths. | `contract/Hdf5ExportContractTests::{HDF5_001..HDF5_006}` | baseline characterized; test-only UI return seam; permission/allocation faults and real UI construction unverified |
@@ -130,6 +130,13 @@ substitution. They do not claim compatibility of the historical plugin or its
 custom data; absent historical UI files remain explicit external dependencies.
 The focused XML suite passed 15 checks and the 12-project central runner passed
 on 2026-08-10.
+
+`XML_FIG_001..XML_FIG_007` map the real MainWindow-backed figure reader. They
+cover exact, fewer and absent names; unknown child skipping; safe empty grids;
+and the approved excess-name parser failure with retained partial state. The
+exact parser text is not observable through public `errorString()`, which
+remains empty. Oversized dimensions, allocation failure and rollback after a
+partial figure remain documented dangerous exclusions.
 
 ## Parameter XML 3C characterization
 

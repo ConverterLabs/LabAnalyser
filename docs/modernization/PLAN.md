@@ -225,7 +225,8 @@ refactoring or coverage gate was introduced.
 ## Phase 3B completion
 
 LoadSave experiment XML is characterized by the real-application contract suite
-`XML_001` through `XML_008` and the anonymized external-corpus vectors
+`XML_001` through `XML_008`, the figure-window safety vectors `XML_FIG_001`
+through `XML_FIG_007`, and the anonymized external-corpus vectors
 `XML_LEGACY_001` through `XML_LEGACY_005`. The suite is part of the documented qmake runner
 and covers small valid/legacy-shaped fixtures, semantic read/write behavior,
 UTF-8, unknown and optional content, malformed/missing files, UI caller return
@@ -234,8 +235,10 @@ no coverage threshold was enabled. The legacy vectors preserve three real
 experiment structures, expected missing UI/plugin dependency handling and a
 temporary compatible-plugin replacement boundary. Proprietary plugin/custom
 data behavior, full historical UI restoration, deterministic permission denial,
-and malformed figure-window widget-count handling remain explicit follow-up
-risks.
+and oversized/allocation-sensitive figure dimensions remain explicit follow-up
+risks. The approved 5F.2 fix now rejects excess `PlotWidgetName` elements with
+a parser error before indexing the created plot list; fewer names remain
+compatible and existing partial figure state is intentionally not rolled back.
 
 On 2026-08-10 the XML suite passed 15 checks and the full 12-project qmake
 runner passed after the three anonymized fixtures were added. No XML production
@@ -802,3 +805,16 @@ manager bindings, XML or signals outside that unsafe input. `DW_018` covers
 floating, signed and unsigned updates, absence of manager/value signals, and
 subsequent signal usability. The unsafe baseline division/cast was documented
 without executing undefined behavior in-process.
+
+## Phase 5F.2 XML FigureWindow name-bound hardening
+
+**Explicitly approved and implemented.** `XmlExperimentReader::CreateFigureWindow()`
+now checks the discovered PlotWidget count before every `PlotWidgetName` index
+access. An excess name raises the deterministic parser error `Figure window
+contains more PlotWidgetName elements than created PlotWidgets.` and preserves
+the established `true == error` result. `XML_FIG_001..XML_FIG_007` cover exact,
+fewer and absent names, unknown children, safe empty grids and the retained
+partial state of a multiwindow error. This is a narrow OOB prevention change:
+no XML format, writer, dimension normalization, allocation limit or rollback
+semantics changed. Oversized dimensions and partial-state rollback remain
+open hardening risks.

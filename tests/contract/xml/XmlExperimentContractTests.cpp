@@ -4,12 +4,14 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QPointer>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 
 #include "mainwindow.h"
 #include "DataManagement/UIDataManagementSetClass.h"
 #include "DataManagement/DataMessengerClass.h"
+#include "DropWidgets/Plots/PlotWidget.h"
 #include "LoadSave/xmlexperimentreader.h"
 #include "LoadSave/xmlexperimentwriter.h"
 
@@ -96,6 +98,50 @@ QStringList directElementNames(const QDomElement& parent)
         names << element.tagName();
     return names;
 }
+
+QString figureWindowXml(const QString& rows, const QString& columns,
+                        const QStringList& names, bool addUnknownChild = false)
+{
+    QString result = QStringLiteral("<Window Rows=\"") + rows
+        + QStringLiteral("\" Cols=\"") + columns
+        + QStringLiteral("\" PosX=\"17\" PosY=\"29\" Width=\"321\" Height=\"123\">");
+    for (int index = 0; index < names.size(); ++index) {
+        if (addUnknownChild && index == 1)
+            result += QStringLiteral("<UnknownFigureChild/> ");
+        result += QStringLiteral("<PlotWidgetName>") + names.at(index)
+            + QStringLiteral("</PlotWidgetName>");
+    }
+    return result + QStringLiteral("</Window>");
+}
+
+QString writeFigureExperiment(QTemporaryDir& directory, const QString& figureWindows,
+                              const QString& trailingSections = QString())
+{
+    const QString path = directory.filePath(QStringLiteral("figure-contract.xml"));
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return QString();
+    const QString document = QStringLiteral("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                                            "<Experiment><FigureWindows>")
+        + figureWindows + QStringLiteral("</FigureWindows>") + trailingSections
+        + QStringLiteral("</Experiment>");
+    if (file.write(document.toUtf8()) < 0)
+        return QString();
+    return path;
+}
+
+QList<QPointer<SubPlotMainWindow>> closeFigures(MainWindow& window)
+{
+    QList<QPointer<SubPlotMainWindow>> figures;
+    const QList<SubPlotMainWindow*> liveFigures = window.findChildren<SubPlotMainWindow*>();
+    for (SubPlotMainWindow* figure : liveFigures) {
+        figures << figure;
+        figure->close();
+    }
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QCoreApplication::processEvents();
+    return figures;
+}
 }
 
 class XmlExperimentContractTests final : public QObject
@@ -111,6 +157,13 @@ private slots:
     void XML_006_readerWriterSemanticRoundTrip();
     void XML_007_uiDataManagementSaveLoadConventions();
     void XML_008_figureWindowStateIsPersisted();
+    void XML_FIG_001_exactPlotNameCount();
+    void XML_FIG_002_fewerPlotNamesKeepGeneratedNames();
+    void XML_FIG_003_noPlotNamesKeepGeneratedNames();
+    void XML_FIG_004_excessPlotNamesRaiseParserErrorAfterPartialState();
+    void XML_FIG_005_emptyAndNonPositiveGridsRemainSafe();
+    void XML_FIG_006_unknownFigureChildIsSkipped();
+    void XML_FIG_007_laterSectionsStopAfterExcessName();
     void XML_LEGACY_001_smallestRealFixtureWithMissingDependencies();
     void XML_LEGACY_002_realFixtureWithMissingDependencies();
     void XML_LEGACY_003_largestRealFixtureWithMissingDependencies();
@@ -264,6 +317,175 @@ void XmlExperimentContractTests::XML_008_figureWindowStateIsPersisted()
     QCOMPARE(figureElement.attribute("Cols"), QString("2"));
     QCOMPARE(figureElement.attribute("Width"), QString("321"));
     QCOMPARE(figureElement.attribute("Height"), QString("123"));
+}
+
+void XmlExperimentContractTests::XML_FIG_001_exactPlotNameCount()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString path = writeFigureExperiment(directory,
+        figureWindowXml("1", "2", {"Plot#701", "Plot#702"}));
+    QVERIFY(!path.isEmpty());
+
+    MainWindow window;
+    XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+    QVERIFY(!reader.read(path));
+    const QList<SubPlotMainWindow*> figures = window.findChildren<SubPlotMainWindow*>();
+    QCOMPARE(figures.size(), 1);
+    const QList<PlotWidget*> plots = figures.constFirst()->findChildren<PlotWidget*>();
+    QCOMPARE(plots.size(), 2);
+    QCOMPARE(plots.at(0)->objectName(), QString("Plot#701"));
+    QCOMPARE(plots.at(1)->objectName(), QString("Plot#702"));
+    QCOMPARE(window.GetLogic()->GetPlotByName("Plot#701"), static_cast<QObject*>(plots.at(0)));
+    QCOMPARE(window.GetLogic()->GetPlotByName("Plot#702"), static_cast<QObject*>(plots.at(1)));
+    QCOMPARE(window.GetLogic()->GetPlotWindowRowsCols(figures.constFirst()->objectName()).first, 1);
+    QCOMPARE(window.GetLogic()->GetPlotWindowRowsCols(figures.constFirst()->objectName()).second, 2);
+    const auto closed = closeFigures(window);
+    for (const QPointer<SubPlotMainWindow>& figure : closed)
+        QVERIFY(figure.isNull());
+}
+
+void XmlExperimentContractTests::XML_FIG_002_fewerPlotNamesKeepGeneratedNames()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString path = writeFigureExperiment(directory,
+        figureWindowXml("1", "2", {"Plot#711"}));
+    QVERIFY(!path.isEmpty());
+
+    MainWindow window;
+    XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+    QVERIFY(!reader.read(path));
+    const QList<SubPlotMainWindow*> figures = window.findChildren<SubPlotMainWindow*>();
+    QCOMPARE(figures.size(), 1);
+    const QList<PlotWidget*> plots = figures.constFirst()->findChildren<PlotWidget*>();
+    QCOMPARE(plots.size(), 2);
+    QCOMPARE(plots.at(0)->objectName(), QString("Plot#711"));
+    QVERIFY(!plots.at(1)->objectName().isEmpty());
+    QVERIFY(plots.at(1)->objectName() != QString("Plot#711"));
+    QCOMPARE(window.GetLogic()->GetPlotByName(plots.at(1)->objectName()), static_cast<QObject*>(plots.at(1)));
+    const auto closed = closeFigures(window);
+    for (const QPointer<SubPlotMainWindow>& figure : closed)
+        QVERIFY(figure.isNull());
+}
+
+void XmlExperimentContractTests::XML_FIG_003_noPlotNamesKeepGeneratedNames()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString path = writeFigureExperiment(directory, figureWindowXml("1", "2", {}));
+    QVERIFY(!path.isEmpty());
+
+    MainWindow window;
+    XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+    QVERIFY(!reader.read(path));
+    const QList<SubPlotMainWindow*> figures = window.findChildren<SubPlotMainWindow*>();
+    QCOMPARE(figures.size(), 1);
+    const QList<PlotWidget*> plots = figures.constFirst()->findChildren<PlotWidget*>();
+    QCOMPARE(plots.size(), 2);
+    QVERIFY(!plots.at(0)->objectName().isEmpty());
+    QVERIFY(!plots.at(1)->objectName().isEmpty());
+    QVERIFY(plots.at(0)->objectName() != plots.at(1)->objectName());
+    const auto closed = closeFigures(window);
+    for (const QPointer<SubPlotMainWindow>& figure : closed)
+        QVERIFY(figure.isNull());
+}
+
+void XmlExperimentContractTests::XML_FIG_004_excessPlotNamesRaiseParserErrorAfterPartialState()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString path = writeFigureExperiment(directory,
+        figureWindowXml("1", "1", {"Plot#721", "Plot#722"}));
+    QVERIFY(!path.isEmpty());
+
+    MainWindow window;
+    XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+    QVERIFY(reader.read(path));
+    // errorString() is historically empty; read() is the observable parser-error boundary.
+    QCOMPARE(reader.errorString(), QString());
+    const QList<SubPlotMainWindow*> figures = window.findChildren<SubPlotMainWindow*>();
+    QCOMPARE(figures.size(), 1);
+    const QList<PlotWidget*> plots = figures.constFirst()->findChildren<PlotWidget*>();
+    QCOMPARE(plots.size(), 1);
+    QCOMPARE(plots.constFirst()->objectName(), QString("Plot#721"));
+    QCOMPARE(window.GetLogic()->GetPlotByName("Plot#721"), static_cast<QObject*>(plots.constFirst()));
+    const auto closed = closeFigures(window);
+    for (const QPointer<SubPlotMainWindow>& figure : closed)
+        QVERIFY(figure.isNull());
+}
+
+void XmlExperimentContractTests::XML_FIG_005_emptyAndNonPositiveGridsRemainSafe()
+{
+    const QList<QPair<QString, QString>> grids = {
+        {"0", "0"}, {"0", "2"}, {"-1", "2"}, {"not-a-number", "also-not-a-number"}
+    };
+    for (const QPair<QString, QString>& grid : grids) {
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+        const QString path = writeFigureExperiment(directory, figureWindowXml(grid.first, grid.second, {}));
+        QVERIFY(!path.isEmpty());
+        MainWindow window;
+        XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+        QVERIFY(!reader.read(path));
+        const QList<SubPlotMainWindow*> figures = window.findChildren<SubPlotMainWindow*>();
+        QCOMPARE(figures.size(), 1);
+        QCOMPARE(figures.constFirst()->findChildren<PlotWidget*>().size(), 0);
+        const auto closed = closeFigures(window);
+        for (const QPointer<SubPlotMainWindow>& figure : closed)
+            QVERIFY(figure.isNull());
+    }
+}
+
+void XmlExperimentContractTests::XML_FIG_006_unknownFigureChildIsSkipped()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString path = writeFigureExperiment(directory,
+        figureWindowXml("1", "2", {"Plot#731", "Plot#732"}, true));
+    QVERIFY(!path.isEmpty());
+
+    MainWindow window;
+    XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+    QVERIFY(!reader.read(path));
+    const QList<SubPlotMainWindow*> figures = window.findChildren<SubPlotMainWindow*>();
+    QCOMPARE(figures.size(), 1);
+    const QList<PlotWidget*> plots = figures.constFirst()->findChildren<PlotWidget*>();
+    QCOMPARE(plots.size(), 2);
+    QCOMPARE(plots.at(0)->objectName(), QString("Plot#731"));
+    QCOMPARE(plots.at(1)->objectName(), QString("Plot#732"));
+    const auto closed = closeFigures(window);
+    for (const QPointer<SubPlotMainWindow>& figure : closed)
+        QVERIFY(figure.isNull());
+}
+
+void XmlExperimentContractTests::XML_FIG_007_laterSectionsStopAfterExcessName()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString uiPath = copyFixture(fixturePath("embedded-form.ui"), directory, "after-figure.ui");
+    QVERIFY(!uiPath.isEmpty());
+    const QString figures = figureWindowXml("1", "1", {"Plot#741"})
+        + figureWindowXml("1", "1", {"Plot#742", "Plot#743"});
+    const QString tabs = QStringLiteral("<Tabs><Form Name=\"after-figure\"><AbsPath>")
+        + uiPath + QStringLiteral("</AbsPath></Form></Tabs>");
+    const QString path = writeFigureExperiment(directory, figures, tabs);
+    QVERIFY(!path.isEmpty());
+
+    MainWindow window;
+    XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+    QSignalSpy formLoads(&reader, &XmlExperimentReader::LoadFormFromXML);
+    QVERIFY(formLoads.isValid());
+    QVERIFY(reader.read(path));
+    QCOMPARE(formLoads.count(), 0);
+    QCOMPARE(window.GetLogic()->GetFormFileCount(), 0);
+    const QList<SubPlotMainWindow*> windows = window.findChildren<SubPlotMainWindow*>();
+    QCOMPARE(windows.size(), 2);
+    QCOMPARE(windows.at(0)->findChildren<PlotWidget*>().constFirst()->objectName(), QString("Plot#741"));
+    QCOMPARE(windows.at(1)->findChildren<PlotWidget*>().constFirst()->objectName(), QString("Plot#742"));
+    const auto closed = closeFigures(window);
+    for (const QPointer<SubPlotMainWindow>& figure : closed)
+        QVERIFY(figure.isNull());
 }
 
 void XmlExperimentContractTests::XML_LEGACY_001_smallestRealFixtureWithMissingDependencies()

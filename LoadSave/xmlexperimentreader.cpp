@@ -236,6 +236,10 @@ void XmlExperimentReader::CreateFigureWindow()
            if(reader.name() ==  QString("PlotWidgetName"))
             {
                 auto NewName = reader.readElementText();
+                if (itt_counter >= PlotWidgetFound.size()) {
+                    reader.raiseError("Figure window contains more PlotWidgetName elements than created PlotWidgets.");
+                    return;
+                }
                 DCObj->RenamePlotPointer(PlotWidgetFound[itt_counter]->objectName(), NewName);
                 PlotWidgetFound[itt_counter]->setObjectName(NewName);
                 itt_counter++;
