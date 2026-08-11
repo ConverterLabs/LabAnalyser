@@ -136,9 +136,9 @@ exactly one `MessageSender` emission.
 
 `DeviceRegistry` is a private normal-C++ helper owned as a registry object by
 `DataManagementClass` through its existing private-deleter/`unique_ptr` pattern.
-It holds only the two legacy ordered maps: device name to raw
-`Platform_Interface*`, and device name to path. The public facade delegates
-device registration, lookup, listing and cleanup unchanged.
+It holds private device records (raw `Platform_Interface*`, descriptor path and
+an internal cleanup strategy) plus the retained legacy path map. The public
+facade delegates device registration, lookup, listing and cleanup unchanged.
 
 The helper deliberately preserves the old cleanup policy rather than
 strengthening it: accepted interfaces are deleted on `CloseDevice`,
@@ -148,6 +148,11 @@ destruction adds no new sweep of raw plugin interfaces. It owns neither a
 QObject returned from `Platform_Interface::GetObject()` nor a `QPluginLoader`.
 Plugin loading, Messenger, XML, GUI and interface/IID headers remain outside
 this slice.
+
+Phase 5E.3b prepares but does not activate `RetainLegacyPlugin` and
+`PluginReleaseV2`: every reachable registration still uses `HostDelete`.
+There is no loader lease, Messenger connection storage or logical legacy-plugin
+removal in this structural slice.
 ## Phase 4G.2a Project I/O export coordination
 
 `DataManagement/ProjectIoCoordinator` is a private, QObject-free operation

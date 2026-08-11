@@ -67,3 +67,35 @@ the heap fixture then produced exactly one fixture destructor observation; and
 the local `QPluginLoader` scope did not invalidate the member fixture root or
 device in this Qt 6.9.2/MSYS2 run. No member-owned interface was passed to
 `CloseDevice()` or `RemoveDevices()`.
+
+## 5E.2b isolated cleanup diagnosis
+
+The temporary process-isolated harness used the real `QPluginLoader` /
+`Platform_Fabric::GetInterface()` boundary and the real `DataManagementClass`
+and `DeviceRegistry`; it was removed after the diagnosis. Heap fixture paths
+were repeatable and exited successfully: `CloseDevice`, `RemoveDevices` and
+`CloseProjectLogic` each caused exactly one fixture destructor observation.
+`RemoveDevices` retained one path, while `CloseProjectLogic` removed it.
+
+For the member fixture, all five isolated runs of each explicit cleanup path
+ended with `0xC0000374` immediately after the pre-cleanup marker. A diagnostic
+gdb run stopped in `RtlFreeHeap`. This establishes that host deletion of a
+member-owned legacy interface is unsafe; it is not a required behavior.
+
+An explicit `unload()` after host cleanup of the heap fixture and after
+manager-only destruction of the member fixture succeeded in the isolated
+models. In the isolated unload-with-registry-alias case the plugin-root
+`QPointer` became null while the observed heap `GetObject()` QPointer remained
+non-null; the retained registry alias was intentionally never dereferenced.
+This is evidence against unloading a plugin with registered legacy interfaces.
+
+## 5E.3b structural preparation
+
+`DeviceRegistry` now stores active interface records with a private
+`CleanupStrategy`. The public `AddDevice()` path always creates
+`HostDelete` records, and every current production registration still reaches
+only that strategy. `RetainLegacyPlugin` and `PluginReleaseV2` are present only
+as inactive internal enum values; no loader lease, persistent loader, QObject
+observation, Messenger connection handle or logical legacy removal exists yet.
+The separate path map remains deliberately in place so that the observed
+post-`RemoveDevices` path semantics stay unchanged.

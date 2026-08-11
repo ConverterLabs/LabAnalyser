@@ -6,7 +6,7 @@ Platform_Interface* DeviceRegistry::Find(QString name) const
 {
     auto it = Devices.find(name);
     if (it != Devices.end())
-        return it->second;
+        return it->second.interface;
     return nullptr;
 }
 
@@ -20,9 +20,33 @@ QString DeviceRegistry::Path(QString name) const
 
 void DeviceRegistry::Add(QString name, QString path, Platform_Interface* device)
 {
-    if (!Devices[name]) {
-        Devices[name] = device;
+    AddWithCleanupStrategy(name, path, device, CleanupStrategy::HostDelete);
+}
+
+void DeviceRegistry::AddWithCleanupStrategy(QString name, QString path,
+                                             Platform_Interface* device,
+                                             CleanupStrategy cleanup)
+{
+    if (!Devices[name].interface) {
+        Devices[name] = { device, path, cleanup };
         DevicePaths[name] = path;
+    }
+}
+
+void DeviceRegistry::Cleanup(DeviceRecord& record)
+{
+    if (!record.interface)
+        return;
+
+    switch (record.cleanup) {
+    case CleanupStrategy::HostDelete:
+        delete record.interface;
+        break;
+    case CleanupStrategy::RetainLegacyPlugin:
+    case CleanupStrategy::PluginReleaseV2:
+        // Prepared only: no current registration path can create either
+        // strategy. Do not delete an interface with unproven ownership.
+        break;
     }
 }
 
@@ -30,7 +54,7 @@ void DeviceRegistry::Close(QString name)
 {
     auto it = Devices.find(name);
     if (it != Devices.end()) {
-        delete it->second;
+        Cleanup(it->second);
         Devices.erase(it);
         DevicePaths.erase(name);
     }
@@ -39,8 +63,7 @@ void DeviceRegistry::Close(QString name)
 void DeviceRegistry::RemoveDevices()
 {
     for (auto entry : Devices)
-        if (entry.second)
-            delete entry.second;
+        Cleanup(entry.second);
     Devices.clear();
 }
 

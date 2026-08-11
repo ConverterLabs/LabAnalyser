@@ -31,7 +31,24 @@ public:
     QList<QString> Paths() const;
 
 private:
-    std::map<QString, Platform_Interface*> Devices;
+    enum class CleanupStrategy {
+        HostDelete,
+        RetainLegacyPlugin,
+        PluginReleaseV2
+    };
+
+    struct DeviceRecord {
+        Platform_Interface* interface = nullptr;
+        QString descriptorPath;
+        CleanupStrategy cleanup = CleanupStrategy::HostDelete;
+    };
+
+    void AddWithCleanupStrategy(QString name, QString path,
+                                Platform_Interface* device,
+                                CleanupStrategy cleanup);
+    void Cleanup(DeviceRecord& record);
+
+    std::map<QString, DeviceRecord> Devices;
     std::map<QString, QString> DevicePaths;
 };
 

@@ -864,6 +864,22 @@ interface. Focused file metrics are `DataManagementClass.cpp` 94.44% lines,
 96.47% executed branches, 55.29% taken branches and 86.56% calls; and
 `DeviceRegistry.cpp` 93.55% lines, 83.33% executed branches, 75.00% taken
 branches and 100.00% calls. They are not project coverage.
+
+## Phase 5E plugin cleanup strategy preparation
+
+`PLUGIN_008..PLUGIN_011` and the isolated 5E.2b harness distinguish test-only
+member- and heap-owned plugin-interface models. The member model deterministically
+fails with heap corruption when passed to any existing explicit host-delete
+path; heap cleanup succeeds exactly once in the same paths. These findings do
+not define a third-party plugin allocation contract.
+
+`DeviceRegistry` now keeps a private `DeviceRecord` and `CleanupStrategy`, but
+all reachable registrations including public `AddDevice()` are still
+`HostDelete`. `RetainLegacyPlugin` and `PluginReleaseV2` are inactive internal
+preparation only. Existing `DM_DEV_001..DM_DEV_004` and
+`PLUGIN_001..PLUGIN_011` therefore remain the applicable visible contracts;
+legacy logical removal, loader leases and Messenger disconnection are future
+approved hardening work.
 ## Phase 4G.2a ProjectIoCoordinator extraction
 
 `UIDataManagementSetClass::{ImportFromXml,Export2Xml,Export2Mat,Export2Hdf5}`

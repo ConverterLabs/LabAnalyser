@@ -720,3 +720,20 @@ The focused evidence is green: portable fixture build exit code 0 and
 `PluginLoaderContractTests` exit code 0 with 13 Qt Test checks. The manager
 destruction observation is deliberately narrow: it is not proof that explicit
 device cleanup or arbitrary plugin unloading is safe.
+
+## Phase 5E.3b device cleanup strategy preparation
+
+**Completed 2026-08-11.** `DeviceRegistry` now internally records each active
+device as raw interface pointer, descriptor path and private cleanup strategy.
+The unchanged public `AddDevice()` always selects `HostDelete`, as do every
+currently reachable production registration and explicit cleanup path.
+`RetainLegacyPlugin` and `PluginReleaseV2` are intentionally inactive enum
+values only; this slice adds no loader persistence, Messenger connection
+tracking or logical legacy removal.
+
+The preceding isolated diagnosis found deterministic `0xC0000374` heap
+corruption when a member-owned fixture reaches any existing host-delete path,
+while the heap fixture was deleted exactly once by all three paths. The
+unchanged focused DataManagement and Plugin suites passed before this structural
+preparation is recorded: later activation requires separate legacy-removal
+characterization and an approved loader-lease strategy.
