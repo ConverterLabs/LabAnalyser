@@ -264,3 +264,34 @@ padding and coalesced-reply vectors. No network byte order, UTF-8 conversion,
 format normalization or new dangerous-frame validation was introduced. The
 string/StringList trailing-byte loss, container non-mutation, one-byte
 selection behavior and invalid Qt-6 error-signal connection remain unchanged.
+
+## 4H.3a connection-state characterization record
+
+**Completed 2026-08-11.** `TCP_009` through `TCP_012` characterize the current
+single-current-socket implementation without introducing a session object.
+After B is accepted, an otherwise valid request written by already connected A
+causes no `MessageSender` emission and no reply to either client. A valid B
+request is processed normally and a B `get` reply is written to B in order.
+This is observed legacy behavior, not independent multi-client support.
+
+An A fragment buffered before B connects is cleared by B acceptance. B's full
+request is processed; the later A remainder neither emits a message nor mixes
+with B's data. A subsequent B `get` remains byte-exact. The same latest-socket
+behavior applies when A writes complete `set` and `get` frames only after B has
+been accepted: neither operation is processed, while B can still request data.
+
+Two test-client `QPointer`s remain non-null after orderly disconnect and become
+null after their test-owned `deleteLater()` cleanup. A fresh connection after
+both disconnects processes a complete request. The server can then be
+destroyed and its `QPointer` becomes null. Accepted server-side sockets remain
+private to `RemoteControlServer`; their Qt ownership/deletion timing cannot be
+observed safely through the public surface and is still an ownership blocker.
+
+Before 4H.3 implementation, the only safe missing vectors are simultaneous
+client timing variants and server-side accepted-socket destruction timing. Do
+not test or implement independent sessions yet: that would change the
+characterized latest-accepted-socket behavior. Null/stale server socket access,
+OS socket failures, backpressure, port exhaustion and malformed frames remain
+dangerous exclusions. The String/StringList trailing-byte loss, container
+non-mutation, one-byte selection behavior and invalid Qt-6 error-signal
+connection remain unchanged defect candidates.

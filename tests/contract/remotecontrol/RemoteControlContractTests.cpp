@@ -94,6 +94,10 @@ private slots:
     void TCP_006_unknownCommandNullDataAndNoTimeoutReply();
     void TCP_007_disconnectRepeatedAndMultipleConnections();
     void TCP_008_protocolByteBoundariesAndReplies();
+    void TCP_009_twoConnectedClientsUseLatestAcceptedSocket();
+    void TCP_010_fragmentStateIsDiscardedOnSecondConnection();
+    void TCP_011_firstClientRequestsAfterSecondAcceptance();
+    void TCP_012_disconnectLifetimeAndFreshConnection();
     void frameSplitterPreservesPartialRemainder();
 };
 
@@ -245,6 +249,90 @@ void RemoteControlContractTests::TCP_008_protocolByteBoundariesAndReplies() {
     QVERIFY(!client->waitForReadyRead(150)); QCOMPARE(spy.count(), 2);
 
     client->disconnectFromHost(); QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_009_twoConnectedClientsUseLatestAcceptedSocket() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(3.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* clientA = connectClient(server, this);
+    QCoreApplication::processEvents();
+    QTcpSocket* clientB = connectClient(server, this);
+    QCoreApplication::processEvents();
+
+    clientA->write(frame("set", "value", f64(10.0))); QVERIFY(clientA->waitForBytesWritten(1000));
+    QCoreApplication::processEvents(); QCOMPARE(spy.count(), 0);
+    clientB->write(frame("set", "value", f64(20.0))); QVERIFY(clientB->waitForBytesWritten(1000));
+    QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(1).toString(), QString("value"));
+    QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 20.0);
+
+    clientA->write(frame("get", "value")); QVERIFY(clientA->waitForBytesWritten(1000));
+    QVERIFY(!clientA->waitForReadyRead(150)); QVERIFY(!clientB->waitForReadyRead(150));
+    clientB->write(frame("get", "value")); QVERIFY(clientB->waitForBytesWritten(1000));
+    QCOMPARE(readReply(clientB, 13), numericReply(3.0)); QVERIFY(!clientA->waitForReadyRead(150));
+
+    clientA->disconnectFromHost(); clientB->disconnectFromHost();
+    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_010_fragmentStateIsDiscardedOnSecondConnection() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(4.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* clientA = connectClient(server, this);
+    const QByteArray partial = frame("set", "value", f64(10.0));
+    clientA->write(partial.left(8)); QVERIFY(clientA->waitForBytesWritten(1000));
+    QCoreApplication::processEvents(); QCOMPARE(spy.count(), 0);
+
+    QTcpSocket* clientB = connectClient(server, this);
+    clientB->write(frame("set", "value", f64(20.0))); QVERIFY(clientB->waitForBytesWritten(1000));
+    QTRY_COMPARE(spy.count(), 1); QCOMPARE(spy.at(0).at(2).value<InterfaceData>().GetAsDouble(), 20.0);
+
+    clientA->write(partial.mid(8)); QVERIFY(clientA->waitForBytesWritten(1000));
+    QCoreApplication::processEvents(); QCOMPARE(spy.count(), 1);
+    clientB->write(frame("get", "value")); QVERIFY(clientB->waitForBytesWritten(1000));
+    QCOMPARE(readReply(clientB, 13), numericReply(4.0)); QVERIFY(!clientA->waitForReadyRead(150));
+
+    clientA->disconnectFromHost(); clientB->disconnectFromHost();
+    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_011_firstClientRequestsAfterSecondAcceptance() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(5.0);
+    RemoteControlServer server(&data); QSignalSpy spy(&server, &RemoteControlServer::MessageSender);
+    QTcpSocket* clientA = connectClient(server, this);
+    QCoreApplication::processEvents();
+    QTcpSocket* clientB = connectClient(server, this);
+    QCoreApplication::processEvents();
+
+    clientA->write(frame("set", "value", f64(30.0)) + frame("get", "value"));
+    QVERIFY(clientA->waitForBytesWritten(1000)); QCoreApplication::processEvents();
+    QCOMPARE(spy.count(), 0); QVERIFY(!clientA->waitForReadyRead(150)); QVERIFY(!clientB->waitForReadyRead(150));
+
+    clientB->write(frame("get", "value")); QVERIFY(clientB->waitForBytesWritten(1000));
+    QCOMPARE(readReply(clientB, 13), numericReply(5.0)); QCOMPARE(spy.count(), 0);
+
+    clientA->disconnectFromHost(); clientB->disconnectFromHost();
+    QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState);
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_012_disconnectLifetimeAndFreshConnection() {
+    std::map<QString, ToFormMapper*> data; data["value"] = numeric(6.0);
+    auto* server = new RemoteControlServer(&data); QPointer<RemoteControlServer> serverGuard(server);
+    QTcpSocket* clientA = connectClient(*server, this); QPointer<QTcpSocket> clientAGuard(clientA);
+    QTcpSocket* clientB = connectClient(*server, this); QPointer<QTcpSocket> clientBGuard(clientB);
+    clientA->disconnectFromHost(); QTRY_COMPARE(clientA->state(), QAbstractSocket::UnconnectedState); QVERIFY(!clientAGuard.isNull());
+    clientB->disconnectFromHost(); QTRY_COMPARE(clientB->state(), QAbstractSocket::UnconnectedState); QVERIFY(!clientBGuard.isNull());
+
+    QTcpSocket* fresh = connectClient(*server, this); QPointer<QTcpSocket> freshGuard(fresh);
+    fresh->write(frame("get", "value")); QVERIFY(fresh->waitForBytesWritten(1000)); QCOMPARE(readReply(fresh, 13), numericReply(6.0));
+    fresh->disconnectFromHost(); QTRY_COMPARE(fresh->state(), QAbstractSocket::UnconnectedState);
+
+    clientA->deleteLater(); clientB->deleteLater(); fresh->deleteLater();
+    QTRY_VERIFY(clientAGuard.isNull()); QTRY_VERIFY(clientBGuard.isNull()); QTRY_VERIFY(freshGuard.isNull());
+    delete server; QTRY_VERIFY(serverGuard.isNull());
     clear(data);
 }
 
