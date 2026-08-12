@@ -1,0 +1,60 @@
+#ifndef DROPWIDGETINDICATORBINDING_H
+#define DROPWIDGETINDICATORBINDING_H
+
+#include "CreateID.h"
+#include "DropWidgetBinding.h"
+
+#include <QtGui/qevent.h>
+#include <QtWidgets/qinputdialog.h>
+
+// Shared legacy drop transaction for the three Designer LED adapters.  The
+// caller retains its own static bit counter and concrete SetState operation;
+// this helper only removes their byte-for-byte duplicated manager sequence.
+namespace DropWidgetIndicatorBinding
+{
+template <typename Indicator>
+inline void BindFromDrop(Indicator* indicator, QDropEvent* event, uint32_t& bit, uint32_t& bitCounter)
+{
+    indicator->disconnect();
+    QObject::connect(indicator, SIGNAL(customContextMenuRequested(QPoint)), indicator, SLOT(contextMenu(QPoint)));
+    DropWidgetBinding::ConnectRequestUpdate(indicator, SIGNAL(RequestUpdate()));
+
+    const QString id = CreateID(event->source());
+    MainWindow* mainWindow = GetMainWindow();
+    DataManagementSetClass* manager = mainWindow->GetLogic();
+    ToFormMapper* container = manager->GetContainer(id);
+
+    // The legacy adapters query the type before the actual type predicates.
+    // Keep that lookup order even though the textual result is unused.
+    container->GetDataType();
+
+    if (container->IsBool())
+    {
+        bit = 0;
+        indicator->SetState(container->GetBool());
+    }
+    else if (container->IsUnsigedNumber())
+    {
+        bool ok = false;
+        const int selectedBit = QInputDialog::getInt(indicator,
+                                                     QObject::tr("Index of Bit to be set"),
+                                                     QObject::tr("Index of Bit to be set (zero based):"),
+                                                     bitCounter, 0, 63, 1, &ok);
+        bitCounter = selectedBit + 1;
+        if (bitCounter > 63)
+            bitCounter = 0;
+        if (ok)
+            bit = selectedBit;
+
+        indicator->SetState((container->GetUnsignedData() & (1ULL << bit)) != 0);
+    }
+
+    indicator->setToolTip(id + ":" + QString::number(bit));
+    indicator->setToolTipDuration(2000);
+    manager->AddElementToContainerEntry(indicator->objectName(), id,
+                                        indicator->metaObject()->className(), indicator);
+    mainWindow->ChangeForSaveDetected = true;
+}
+}
+
+#endif // DROPWIDGETINDICATORBINDING_H

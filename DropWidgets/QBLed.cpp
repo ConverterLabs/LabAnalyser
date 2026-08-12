@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
+#include "DropWidgetIndicatorBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -78,40 +79,7 @@ void QBLed::dragEnterEvent(QDragEnterEvent *event)
 
 void QBLed::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
-
-    QString ID =  CreateID(event->source());
-    auto MW = GetMainWindow();
-
-    QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
-
-    if(MW->GetLogic()->GetContainer(ID)->IsBool())
-    {
-        this->bit = 0;
-        this->SetState(MW->GetLogic()->GetContainer(ID)->GetBool());
-    }
-    else if(MW->GetLogic()->GetContainer(ID)->IsUnsigedNumber())
-    {
-       bool ok;
-       int i = QInputDialog::getInt(this, tr("Index of Bit to be set"),
-                                      tr("Index of Bit to be set (zero based):"), bitcounter, 0, 63, 1, &ok);
-       bitcounter = i+1;
-       if(bitcounter > 63)
-           bitcounter =0;
-       if (ok)
-            this->bit = i;
-
-       this->SetState((bool) (MW->GetLogic()->GetContainer(ID)->GetUnsignedData() & (1ULL<<this->bit)));
-    }
-
-    this->setToolTip(ID + ":" + QString::number(this->bit));
-    this->setToolTipDuration(2000);
-
-
-    MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-    MW->ChangeForSaveDetected = true;
+    DropWidgetIndicatorBinding::BindFromDrop(this, event, bit, bitcounter);
 }
 
 void QBLed::SetVariantData(ToFormMapper Data)
