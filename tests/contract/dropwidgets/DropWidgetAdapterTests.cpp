@@ -64,6 +64,7 @@ private slots:
     void DW_025_missing_container_lookup_leaves_drop_targets_unchanged();
     void DW_026_invalid_lineedit_drop_preserves_existing_binding();
     void DW_027_table_xml_ignores_incomplete_rows();
+    void DW_028_indicator_drop_rejects_missing_container();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -305,6 +306,34 @@ void DropWidgetAdapterTests::DW_027_table_xml_ignores_incomplete_rows()
     QCOMPARE(attributes.size(), size_t(1));
     QCOMPARE(attributes.front().first, QString("Connected_ID0"));
     QCOMPARE(attributes.front().second, QString("DW27::bound"));
+}
+
+void DropWidgetAdapterTests::DW_028_indicator_drop_rejects_missing_container()
+{
+    QMimeData foreign;
+    QDropEvent invalidDrop(QPointF(1, 1), Qt::CopyAction, &foreign,
+                           Qt::LeftButton, Qt::NoModifier);
+
+    QBLed blink;
+    QLed led;
+    QTSLed traffic;
+    blink.SetBit(3);
+    led.SetBit(4);
+    traffic.SetBit(5);
+    blink.setToolTip("blink-bound");
+    led.setToolTip("led-bound");
+    traffic.setToolTip("traffic-bound");
+
+    blink.dropEvent(&invalidDrop);
+    led.dropEvent(&invalidDrop);
+    traffic.dropEvent(&invalidDrop);
+
+    QCOMPARE(blink.GetBit(), uint32_t(3));
+    QCOMPARE(led.GetBit(), uint32_t(4));
+    QCOMPARE(traffic.GetBit(), uint32_t(5));
+    QCOMPARE(blink.toolTip(), QString("blink-bound"));
+    QCOMPARE(led.toolTip(), QString("led-bound"));
+    QCOMPARE(traffic.toolTip(), QString("traffic-bound"));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

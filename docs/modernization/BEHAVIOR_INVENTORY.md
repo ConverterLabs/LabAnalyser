@@ -254,6 +254,10 @@ covered only by the established integration paths.
 vertical-header items are ignored safely, while existing header attributes use
 their current row-numbered key and value. No missing binding is synthesized.
 
+`DW_028` maps the shared QBLed/QLed/QTSLed missing-container guard: a rejected
+foreign drop preserves bit and presentation state. Valid bool/unsigned LED
+binding remains on its established path.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

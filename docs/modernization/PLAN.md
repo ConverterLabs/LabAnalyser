@@ -371,6 +371,9 @@ manager `set` route (`DW_026`).
 `QTableWidgeD::SaveToXML` also skips incomplete rows without a vertical-header
 item rather than dereferencing null (`DW_027`); existing row/header XML output
 is unchanged.
+The shared LED drop helper now rejects missing mapper lookups before
+disconnecting or dereferencing them (`DW_028`), preserving valid LED bit/dialog
+contracts.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

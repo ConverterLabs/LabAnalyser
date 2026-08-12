@@ -360,3 +360,12 @@ keeps its existing `Connected_ID<row>` key and value. The former null-header
 path was established by source inspection and is not executed as an in-process
 crash contract. This does not synthesize missing table bindings or alter the
 historical reverse row traversal.
+
+### Indicator missing-container hardening (2026-08-12)
+
+The shared `DropWidgetIndicatorBinding` now validates the resolved mapper
+before its first type dereference or connection reset. `DW_028` proves that a
+foreign drop leaves QBLed, QLed and QTSLed bit values and presentation intact.
+The previous null-mapper dereference is documented by source inspection rather
+than executed as a crash test. Existing bool/unsigned initialization, bit-index
+dialog and valid LED binding behavior are unchanged.

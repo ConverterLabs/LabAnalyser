@@ -17,6 +17,8 @@ inline void InitializeState(QWidget* parent, ToFormMapper* container, uint32_t& 
                             uint32_t& bitCounter, const QString& title,
                             const QString& prompt, StateSetter setState)
 {
+    if (!container)
+        return;
     if (container->IsBool())
     {
         bit = 0;
@@ -44,13 +46,15 @@ inline void BindFromDrop(Indicator* indicator, QDropEvent* event, uint32_t& bit,
     if (!mainWindow)
         return;
 
-    indicator->disconnect();
-    QObject::connect(indicator, SIGNAL(customContextMenuRequested(QPoint)), indicator, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(indicator, SIGNAL(RequestUpdate()));
-
     const QString id = CreateID(event->source());
     DataManagementSetClass* manager = mainWindow->GetLogic();
     ToFormMapper* container = manager->GetContainer(id);
+    if (!container)
+        return;
+
+    indicator->disconnect();
+    QObject::connect(indicator, SIGNAL(customContextMenuRequested(QPoint)), indicator, SLOT(contextMenu(QPoint)));
+    DropWidgetBinding::ConnectRequestUpdate(indicator, SIGNAL(RequestUpdate()));
 
     // The legacy adapters query the type before the actual type predicates.
     // Keep that lookup order even though the textual result is unused.
