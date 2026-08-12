@@ -21,6 +21,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <memory>
 #include "DataManagement/mapper.h"
 #include "plugins/platforminterface.h"
 #include "UIFunctions/SubPlotMainWindow.h"
@@ -65,6 +66,7 @@ class MainWindow;
 }
 
 class QSimpleUpdater;
+class MainWindowOutputLog;
 
 
 class MainWindow : public QMainWindow
@@ -171,6 +173,7 @@ private:
     QSystemTrayIcon* icon;
     QAction* restore;
     UIDataManagementSetClass *ExtendedDataManagement;
+    std::unique_ptr<MainWindowOutputLog> OutputLog;
     bool isloading = false;
 
 };

@@ -1014,3 +1014,10 @@ not alter plot naming, numbering or non-null lookup semantics.
 The explicit `DataManagementSetClass::UpdateRequest(ID)` overload now applies
 the same approved missing-ID no-op boundary as its sender-based counterpart;
 valid explicit requests retain the existing `get` dispatch.
+
+## MainWindow internal presentation isolation
+
+`MainWindowOutputLog` now isolates the duplicated Error/Info/Notification
+output formatting behind a private non-QObject helper. The public slots, HTML,
+10,000-character trim, output block limit, conditional autoscroll and existing
+Error/Notification dock-raise behavior are preserved by GUI_013 and GUI_018.

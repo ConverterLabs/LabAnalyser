@@ -27,6 +27,7 @@
 #include "qstringlist.h"
 #include  "DropWidgets/Plots/PlotWidget.h"
 #include "UIFunctions/SubPlotMainWindow.h"
+#include "UIFunctions/MainWindowOutputLog.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -156,6 +157,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( ui->OutputText, SIGNAL( customContextMenuRequested( QPoint ) ), this, SLOT( OutputTextMenu( QPoint ) ) );
     //ui->OutputText->setWordWrapMode(QTextOption::WrapAnywhere);
     ui->OutputText->setMaximumBlockCount(100);
+    OutputLog.reset(new MainWindowOutputLog(ui->OutputText, ui->OutputDock));
 
     ParseInputArguments();
 
@@ -417,6 +419,7 @@ void MainWindow::closeEvent ( QCloseEvent * event )
 MainWindow::~MainWindow()
 {
     delete Remote;
+    OutputLog.reset();
     delete ui;
 }
 
@@ -1352,106 +1355,17 @@ void MainWindow::ErrorWriter(const QString &ID, const QString Data)
         return;
     }
 
-    QTime time = QTime::currentTime();
-    QString line =time.toString("hh:mm:ss") % " " % ID % ":&nbsp;&nbsp;&nbsp; ";
-    QString line2 =Data;
-
-    if(line2.size()>10000)
-    {
-        line2 = line2.left(1000);
-        line2.prepend("<font color=\"Red\"><b> WARNING: The Data was trimmed by LabAnalyser, because of its size. It might be due to a babbling idiot.</b></font><br>");
-    }
-    line2.prepend("<br>");
-    QTextCursor cursor = ui->OutputText->textCursor();
-    QString alertHtml = "<font color=\"Red\">";
-    QString endHtml = "</font> ";
-    line = alertHtml % "<b>" % line;
-    line = line % "</b>" %  endHtml;
-    const bool atBottom = ui->OutputText->verticalScrollBar()->value() == ui->OutputText->verticalScrollBar()->maximum();
-    QTextDocument* doc = ui->OutputText->document();
-    QTextCursor tcursor(doc);
-    tcursor.movePosition(QTextCursor::End);
-    tcursor.beginEditBlock();
-    tcursor.insertHtml(line);
-    tcursor.insertHtml(alertHtml%line2%endHtml);
-    tcursor.insertBlock();
-
-    tcursor.endEditBlock();
-    if (atBottom) {
-       QScrollBar* bar =  ui->OutputText->verticalScrollBar();
-       bar->setValue(bar->maximum());
-    }
-    ui->OutputDock->raise();
+    OutputLog->Append(MainWindowOutputLog::Kind::Error, ID, Data);
 }
 
 void MainWindow::InfoWriter(const QString &ID, const QString Data)
 {
-
-    QTime time = QTime::currentTime();
-    QString line =time.toString("hh:mm:ss") % " " % ID % ":&nbsp;&nbsp;&nbsp; ";
-    QString line2 =Data;
-
-    if(line2.size()>10000)
-    {
-        line2 = line2.left(1000);
-        line2.prepend("<font color=\"Red\"><b> WARNING: The Data was trimmed by LabAnalyser, because of its size. It might be due to a babbling idiot.</b></font><br>");
-    }
-    line2.prepend("<br>");
-    QString infoHtml = "<font color=\"Black\">";
-    QString endHtml = "</font>";
-    line = infoHtml% "<b>" % line;
-    line = line% "</b>" % endHtml;
-    const bool atBottom = ui->OutputText->verticalScrollBar()->value() == ui->OutputText->verticalScrollBar()->maximum();
-    QTextDocument* doc = ui->OutputText->document();
-    QTextCursor tcursor(doc);
-    tcursor.movePosition(QTextCursor::End);
-    tcursor.beginEditBlock();
-    tcursor.insertHtml(line);
-    tcursor.insertHtml(infoHtml%line2%endHtml);
-    tcursor.insertBlock();
-    tcursor.endEditBlock();
-    if (atBottom)
-    {
-       QScrollBar* bar =  ui->OutputText->verticalScrollBar();
-       bar->setValue(bar->maximum());
-    }
-
+    OutputLog->Append(MainWindowOutputLog::Kind::Info, ID, Data);
 }
 
 void MainWindow::NotificationWriter(const QString &ID, const QString Data)
 {
-
-
-    QTime time = QTime::currentTime();
-    QString line =time.toString("hh:mm:ss") % " " % ID % ":&nbsp;&nbsp;&nbsp; ";
-    QString line2 =Data;
-    if(line2.size()>10000)
-    {
-        line2 = line2.left(1000);
-        line2.prepend("<font color=\"Red\"><b> WARNING: The Data was trimmed by LabAnalyser, because of its size. It might be due to a babbling idiot.</b></font><br>");
-    }
-    line2.prepend("<br>");
-
-    QTextCursor cursor = ui->OutputText->textCursor();
-    QString notifyHtml = "<font color=\"DarkBlue\">";
-    QString endHtml = "</font>";
-    line = notifyHtml % "<b>" % line;
-    line = line% "</b>" % endHtml;
-    const bool atBottom = ui->OutputText->verticalScrollBar()->value() == ui->OutputText->verticalScrollBar()->maximum();
-    QTextDocument* doc = ui->OutputText->document();
-    QTextCursor tcursor(doc);
-    tcursor.movePosition(QTextCursor::End);
-    tcursor.beginEditBlock();
-    tcursor.insertHtml(line);
-    tcursor.insertHtml(notifyHtml%line2%endHtml);
-    tcursor.insertBlock();
-
-    tcursor.endEditBlock();
-    if (atBottom) {
-       QScrollBar* bar =  ui->OutputText->verticalScrollBar();
-       bar->setValue(bar->maximum());
-    }
-    ui->OutputDock->raise();
+    OutputLog->Append(MainWindowOutputLog::Kind::Notification, ID, Data);
 }
 
 

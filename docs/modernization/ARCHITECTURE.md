@@ -269,6 +269,14 @@ to retire old internal readers only after semantic parity is demonstrated with
 `XML_LEGACY_001..XML_LEGACY_005`; fixture SHA-256 bytes and `.gitattributes`
 protection remain immutable.
 
+## MainWindow internal presentation boundaries
+
+`UIFunctions/MainWindowOutputLog` is a private, QObject-free presentation
+helper. `MainWindow::{ErrorWriter,InfoWriter,NotificationWriter}` remain the
+unchanged Qt slots and delegate the existing HTML, trim, autoscroll and
+OutputDock-raise behavior to it through non-owning UI pointers. It owns neither
+the widgets nor application state.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the
