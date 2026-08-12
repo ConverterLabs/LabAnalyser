@@ -23,6 +23,7 @@
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -74,9 +75,7 @@ void QLabelD::EditText()
 
 void QLabelD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+    DropWidgetDropBinding::ResetConnections(this);
 
     QString ID =  CreateID(event->source());
     this->setText(ID);

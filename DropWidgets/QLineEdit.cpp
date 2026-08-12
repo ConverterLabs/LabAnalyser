@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -79,9 +80,7 @@ void QLineEditD::dragMoveEvent(QDragMoveEvent *de)
 
 void QLineEditD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+    DropWidgetDropBinding::ResetConnections(this);
 
 
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());

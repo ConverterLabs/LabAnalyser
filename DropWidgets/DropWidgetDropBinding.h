@@ -19,11 +19,16 @@ struct Context
     DataManagementSetClass* manager;
 };
 
-inline Context Prepare(QWidget* widget, QDropEvent* event)
+inline void ResetConnections(QObject* widget)
 {
     widget->disconnect();
     QObject::connect(widget, SIGNAL(customContextMenuRequested(QPoint)), widget, SLOT(contextMenu(QPoint)));
     DropWidgetBinding::ConnectRequestUpdate(widget, SIGNAL(RequestUpdate()));
+}
+
+inline Context Prepare(QWidget* widget, QDropEvent* event)
+{
+    ResetConnections(widget);
 
     const QString id = CreateID(event->source());
     widget->setToolTip(id);

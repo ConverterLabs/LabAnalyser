@@ -22,6 +22,7 @@
 #include "QListView.h"
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -96,9 +97,7 @@ void QListViewD::dropEvent(QDropEvent *event)
             QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
             if(Type.compare("QStringList")==0)
             {
-                this->disconnect();
-                connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-                DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+                DropWidgetDropBinding::ResetConnections(this);
 
                 QString ID =  CreateID(event->source());
                 this->setToolTip(ID);
