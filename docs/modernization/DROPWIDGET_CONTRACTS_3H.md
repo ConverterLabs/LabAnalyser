@@ -405,3 +405,12 @@ Baseline `DW_032` established that `QListViewD::DeleteEntry()` emitted
 `DeleteAllEntries()` on an already empty model. The same test confirms that
 real selected-row deletion and clearing a populated list still emit exactly one
 event each with the existing list result.
+
+### Null mapper output hardening (2026-08-12)
+
+`DW_033` covers the concrete adapter `GetVariantData(ToFormMapper*)` methods
+that write data: line edit, double spinbox, button, combo, list, checkbox,
+slider and spinbox. A null output mapper is now a no-op and preserves widget
+state; the existing real-mapper conversion and signal contracts remain
+unchanged. The previous direct dereference is recorded from source inspection,
+not exercised as undefined behavior.

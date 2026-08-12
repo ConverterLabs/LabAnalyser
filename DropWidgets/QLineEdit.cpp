@@ -131,6 +131,8 @@ void QLineEditD::SetVariantData(ToFormMapper Data)
 
 void QLineEditD::GetVariantData(ToFormMapper *Data)
 {
+    if (!Data)
+        return;
     Data->SetData(text());
 }
 

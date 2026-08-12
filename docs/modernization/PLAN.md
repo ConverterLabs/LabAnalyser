@@ -384,6 +384,8 @@ type-admission rule before a binding reset (`DW_031`), so incompatible mappers
 preserve prior valid presentation and routing.
 `QListViewD` now treats missing selection and an already empty model as no-op
 delete actions without `NewEntry` (`DW_032`); actual removals retain one event.
+Concrete adapter `GetVariantData` implementations now treat null output mappers
+as safe no-ops (`DW_033`), without changing real-mapper conversion semantics.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

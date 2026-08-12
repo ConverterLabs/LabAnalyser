@@ -115,6 +115,8 @@ void QComboBoxD::SetVariantData(ToFormMapper Data)
 
 void QComboBoxD::GetVariantData(ToFormMapper *Data)
 {
+    if (!Data)
+        return;
     GuiSelection Sel = Data->GetGuiSelection();
     Sel.first = currentText();
     Data->SetData(Sel);

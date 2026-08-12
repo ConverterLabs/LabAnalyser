@@ -70,6 +70,7 @@ private slots:
     void DW_030_common_drop_context_rejects_missing_container();
     void DW_031_common_drop_context_type_admission();
     void DW_032_list_mutation_ignores_empty_selection();
+    void DW_033_variant_output_rejects_null_mapper();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -451,6 +452,39 @@ void DropWidgetAdapterTests::DW_032_list_mutation_ignores_empty_selection()
     list.DeleteAllEntries();
     QCOMPARE(changed.count(), 2);
     QCOMPARE(list.model->rowCount(), 0);
+}
+
+void DropWidgetAdapterTests::DW_033_variant_output_rejects_null_mapper()
+{
+    QLineEditD line;
+    line.setText("line");
+    QDoubleSpinBoxD doubleSpin;
+    doubleSpin.setValue(2.5);
+    QPushButtonD button;
+    button.setDown(true);
+    QComboBoxD combo;
+    combo.addItem("one");
+    QListViewD list;
+    list.model->setStringList({"one"});
+    QCheckBoxD check;
+    check.setChecked(true);
+    QSliderD slider;
+    slider.setValue(37);
+    QSpinBoxD spin;
+    spin.setValue(3);
+
+    for (VariantDropWidget* widget : QList<VariantDropWidget*> {
+             &line, &doubleSpin, &button, &combo, &list, &check, &slider, &spin })
+        widget->GetVariantData(nullptr);
+
+    QCOMPARE(line.text(), QString("line"));
+    QCOMPARE(doubleSpin.value(), 2.5);
+    QVERIFY(button.isDown());
+    QCOMPARE(combo.currentText(), QString("one"));
+    QCOMPARE(list.model->stringList(), QStringList({"one"}));
+    QVERIFY(check.isChecked());
+    QCOMPARE(slider.value(), 37);
+    QCOMPARE(spin.value(), 3);
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

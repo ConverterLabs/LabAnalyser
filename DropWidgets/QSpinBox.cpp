@@ -94,6 +94,8 @@ void QSpinBoxD::SetVariantData(ToFormMapper Data)
 
 void QSpinBoxD::GetVariantData(ToFormMapper *Data)
 {
+    if (!Data)
+        return;
     Data->SetDataKeepType(value());
 }
 

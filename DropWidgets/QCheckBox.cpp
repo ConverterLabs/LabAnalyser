@@ -124,6 +124,8 @@ void QCheckBoxD::SetVariantData(ToFormMapper Data)
 
 void QCheckBoxD::GetVariantData(ToFormMapper *Data)
 {
+    if (!Data)
+        return;
 
     if(Data->IsBool())
     {

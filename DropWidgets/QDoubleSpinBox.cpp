@@ -92,6 +92,8 @@ void QDoubleSpinBoxD::SetVariantData(ToFormMapper Data)
 
 void QDoubleSpinBoxD::GetVariantData(ToFormMapper *Data)
 {
+     if (!Data)
+         return;
      Data->SetDataKeepType(value());
 }
 
