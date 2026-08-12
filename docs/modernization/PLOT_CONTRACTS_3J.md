@@ -115,3 +115,6 @@ before manager/data access; regular manager-backed updates are unchanged.
 
 `PLOT_018` invokes wheel-range synchronization without a MainWindow. The
 unmanaged widget is a no-op; normal multi-plot synchronization is unchanged.
+
+`PLOT_019` calls the public binding-cleanup hook without a manager. It leaves
+the local graph model unchanged and avoids a manager dereference.

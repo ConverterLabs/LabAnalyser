@@ -966,3 +966,6 @@ context without changing normal manager-backed updates.
 
 `PLOT_018` protects wheel synchronization against an absent MainWindow;
 managed peer-plot range synchronization remains unchanged.
+
+`PLOT_019` protects the public manager-binding cleanup hook against absent
+MainWindow context; normal manager cleanup remains unchanged.

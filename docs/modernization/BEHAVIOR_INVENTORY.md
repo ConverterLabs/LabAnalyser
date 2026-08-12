@@ -1174,3 +1174,6 @@ manager context is a no-op, protecting timer-driven execution.
 
 `PlotWidget::mouseWheelDone` is mapped to `PLOT_018`: without a MainWindow it
 does not traverse peer plots.
+
+`PlotWidget::ClearAllGraphs` is mapped to `PLOT_019`: without a manager it
+does not remove local graphs or dereference an absent manager.

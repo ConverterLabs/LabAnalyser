@@ -1193,6 +1193,9 @@ void PlotWidget::ClearScopeCursors()
 void PlotWidget::ClearAllGraphs()
 {
     MainWindow *MW = this->MainWindow_p;
+    if (!MW || !MW->GetLogic())
+        return;
+
     MW->GetLogic()->DeletePlotPointer(this->objectName());
 
     for(int k = 0; k < graphCount();k++)
