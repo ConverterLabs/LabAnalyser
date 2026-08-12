@@ -108,6 +108,7 @@ HEADERS  += mainwindow.h\
             CustomWidgets/QTSLedIndicator.h \
             DropWidgets/CreateID.h \
             DropWidgets/DropWidget.h \
+            DropWidgets/DropWidgetUpdate.h \
             DropWidgets/DropWidgets.h \
             DropWidgets/DropWidget.h \
             DropWidgets/DropWidgetsUiLoader.h \

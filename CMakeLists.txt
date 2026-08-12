@@ -44,6 +44,7 @@ target_link_libraries(LabAnalyserQCustomPlot PUBLIC Qt6::Core Qt6::Gui Qt6::Widg
 set(LABANALYSER_CORE_SOURCES
     DropWidgets/CreateID.cpp
     DropWidgets/DropWidgetsUiLoader.cpp
+    DropWidgets/DropWidgetUpdate.h
     DropWidgets/Plots/FFTPlotWidget.cpp
     DropWidgets/Plots/PlotMeasurements.cpp
     DropWidgets/Plots/PlotWidget.cpp

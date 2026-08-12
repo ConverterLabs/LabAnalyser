@@ -21,6 +21,7 @@
 
 #include "QProgressBar.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -107,7 +108,7 @@ void QProgressBarD::dropEvent(QDropEvent *event)
 
 void QProgressBarD::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
 
     if(Data.IsFloatingPointNumber())
          setValue((int)Data.GetFloatingPointData());
@@ -115,7 +116,7 @@ void QProgressBarD::SetVariantData(ToFormMapper Data)
         setValue((int)Data.GetSignedData());
     else if(Data.IsUnsigedNumber())
         setValue((int)Data.GetUnsignedData());
-    blockSignals(false);
+    });
 
 }
 

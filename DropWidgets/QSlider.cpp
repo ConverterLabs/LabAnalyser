@@ -21,6 +21,7 @@
 
 #include "QSlider.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -136,10 +137,8 @@ void QSliderD::SetVariantData(ToFormMapper Data)
 {
     //TODO Minmax übernehmen
     //HIer weiter
-    blockSignals(true);
-
-    if(Data.IsEditable())
-    {
+    ApplyDropWidgetUpdate(this, [&]{
+    if(Data.IsEditable()) {
         auto MW = GetMainWindow();
         if(ConnectedID.size())
             if(MW->GetLogic()->ElementExists(ConnectedID))
@@ -167,8 +166,7 @@ void QSliderD::SetVariantData(ToFormMapper Data)
             int valueC = (int) round((value - MinMax.first)/(MinMax.second-MinMax.first)*100.0);
             setValue((int)valueC );
         }
-    }
-    blockSignals(false);
+    }});
 
 
 

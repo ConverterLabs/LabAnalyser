@@ -21,6 +21,7 @@
 
 #include "QDoubleSpinBox.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -112,14 +113,14 @@ void QDoubleSpinBoxD::dropEvent(QDropEvent *event)
 
 void QDoubleSpinBoxD::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
       if(Data.IsFloatingPointNumber())
            setValue(Data.GetFloatingPointData());
       else if(Data.IsUnsigedNumber())
          setValue((double) Data.GetUnsignedData());
       else if (Data.IsSigedNumber() )
           setValue((double) Data.GetSignedData());
-      blockSignals(false);
+      });
 
 }
 
