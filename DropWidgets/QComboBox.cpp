@@ -21,6 +21,7 @@
 
 #include "QComboBox.h"
 #include "CreateID.h"
+#include "DropWidgetBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -28,7 +29,7 @@ QComboBoxD::QComboBoxD(QWidget *parent):QComboBox(parent)
 {
      this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
         return;
 }
@@ -87,7 +88,7 @@ void QComboBoxD::dropEvent(QDropEvent *event)
 {
     this->disconnect();
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
     QString ID =  CreateID(event->source());
     this->setToolTip(ID);
@@ -110,7 +111,7 @@ void QComboBoxD::dropEvent(QDropEvent *event)
 
         MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
         MW->ChangeForSaveDetected = true;
-        connect(this, SIGNAL(currentIndexChanged(int)),GetMainWindow()->GetLogic(),SLOT(SendNewValue()));
+        DropWidgetBinding::ConnectValueChanged(this, SIGNAL(currentIndexChanged(int)), GetMainWindow()->GetLogic());
     }
     catch(...)
     {
@@ -161,6 +162,6 @@ bool QComboBoxD::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes,
 void QComboBoxD::ConnectToID(DataManagementSetClass* DM, QString ID)
 {
     setToolTip(ID);
-    connect(this, SIGNAL(currentIndexChanged(int)), DM, SLOT(SendNewValue()));
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(currentIndexChanged(int)), DM);
     RequestUpdate();
 }

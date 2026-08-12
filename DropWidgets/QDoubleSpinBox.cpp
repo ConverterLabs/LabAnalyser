@@ -21,6 +21,7 @@
 
 #include "QDoubleSpinBox.h"
 #include "CreateID.h"
+#include "DropWidgetBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -29,7 +30,7 @@ QDoubleSpinBoxD::QDoubleSpinBoxD(QWidget *parent):QDoubleSpinBox(parent)
 {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
         return;
 }
@@ -93,7 +94,7 @@ void QDoubleSpinBoxD::dropEvent(QDropEvent *event)
 {
     this->disconnect();
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
     QString ID =  CreateID(event->source());
     this->setToolTip(ID);
@@ -107,7 +108,7 @@ void QDoubleSpinBoxD::dropEvent(QDropEvent *event)
 
     MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
     MW->ChangeForSaveDetected = true;
-    connect(this, SIGNAL(valueChanged(double)), MW->GetLogic(),SLOT(SendNewValue()) );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(double)), MW->GetLogic());
     emit RequestUpdate();
 }
 
@@ -145,6 +146,6 @@ bool QDoubleSpinBoxD::SaveToXML(std::vector<std::pair<QString, QString>> &Attrib
 void QDoubleSpinBoxD::ConnectToID(DataManagementSetClass* DM, QString ID)
 {
     setToolTip(ID);
-    connect(this, SIGNAL(valueChanged(double)), DM, SLOT(SendNewValue()) );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(double)), DM);
     RequestUpdate();
 }

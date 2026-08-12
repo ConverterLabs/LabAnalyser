@@ -111,6 +111,7 @@ add_executable(DropWidgetAdapterTests
     ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementClass.cpp
     ${PROJECT_SOURCE_DIR}/DataManagement/DataMessengerClass.cpp
     ${PROJECT_SOURCE_DIR}/DropWidgets/CreateID.cpp
+    ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetBinding.cpp
     ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetsUiLoader.cpp
     ${PROJECT_SOURCE_DIR}/TreeWidgetCustomDrop.cpp
     ${PROJECT_SOURCE_DIR}/DropWidgets/QBLed.cpp

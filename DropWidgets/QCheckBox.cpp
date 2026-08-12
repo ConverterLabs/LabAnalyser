@@ -21,6 +21,7 @@
 
 #include "QCheckBox.h"
 #include "CreateID.h"
+#include "DropWidgetBinding.h"
 #include "../mainwindow.h"
 
 uint32_t QCheckBoxD::bitcounter = 0;
@@ -28,7 +29,7 @@ QCheckBoxD::QCheckBoxD(QWidget *parent, bool show_label):QCheckBox(parent), m_sh
 {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
     return;
 }
 
@@ -94,7 +95,7 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
     disconnect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
 
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
     QString ID =  CreateID(event->source());
     this->setToolTip(ID);
@@ -129,7 +130,7 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
     this->setText(label);
 
     MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-    connect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()) );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(clicked(bool)), MW->GetLogic());
     MW->ChangeForSaveDetected = true;
 }
 
@@ -152,7 +153,7 @@ void QCheckBoxD::SetVariantData(ToFormMapper Data)
 
     }
      repaint();
-     connect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()) );
+     DropWidgetBinding::ConnectValueChanged(this, SIGNAL(clicked(bool)), MW->GetLogic());
 
 }
 
@@ -205,6 +206,6 @@ void QCheckBoxD::ConnectToID(DataManagementSetClass* DM, QString ID)
     if(m_show_label == false)
         label.clear();
     setText(label);
-    connect(this, SIGNAL(clicked(bool)), DM, SLOT(SendNewValue()) );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(clicked(bool)), DM);
     RequestUpdate();
 }

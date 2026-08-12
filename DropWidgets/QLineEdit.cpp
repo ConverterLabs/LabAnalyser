@@ -21,6 +21,7 @@
 
 #include "QLineEdit.h"
 #include "CreateID.h"
+#include "DropWidgetBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -37,7 +38,7 @@ QLineEditD::QLineEditD(QWidget *parent):QLineEdit(parent)
 {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
     return;
 }
@@ -101,7 +102,7 @@ void QLineEditD::dropEvent(QDropEvent *event)
 {
     this->disconnect();
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
 
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
@@ -134,8 +135,8 @@ void QLineEditD::dropEvent(QDropEvent *event)
                MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ToolTip,this->metaObject()->className(),this);
                MW->ChangeForSaveDetected = true;
                if(!(this->isReadOnly()))
-               connect(this, SIGNAL(editingFinished()), MW->GetLogic(),SLOT(SendNewValue()) );
-               connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+               DropWidgetBinding::ConnectValueChanged(this, SIGNAL(editingFinished()), MW->GetLogic());
+               DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
                emit RequestUpdate();
 
@@ -175,6 +176,6 @@ bool QLineEditD::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes,
 void QLineEditD::ConnectToID(DataManagementSetClass* DM, QString ID)
 {
     setToolTip(ID);
-    connect(this, SIGNAL(editingFinished()), DM, SLOT(SendNewValue()) );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(editingFinished()), DM);
     RequestUpdate();
 }

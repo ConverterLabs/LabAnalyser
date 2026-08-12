@@ -52,6 +52,7 @@ LIBS += -lmatio
 SOURCES += main.cpp\
         DropWidgets/CreateID.cpp \
         DropWidgets/DropWidgetsUiLoader.cpp \
+        DropWidgets/DropWidgetBinding.cpp \
         DropWidgets/Plots/FFTPlotWidget.cpp \
         DropWidgets/Plots/PlotMeasurements.cpp \
         DropWidgets/Plots/PlotWidget.cpp \
@@ -108,6 +109,7 @@ HEADERS  += mainwindow.h\
             CustomWidgets/QTSLedIndicator.h \
             DropWidgets/CreateID.h \
             DropWidgets/DropWidget.h \
+            DropWidgets/DropWidgetBinding.h \
             DropWidgets/DropWidgetUpdate.h \
             DropWidgets/DropWidgets.h \
             DropWidgets/DropWidget.h \

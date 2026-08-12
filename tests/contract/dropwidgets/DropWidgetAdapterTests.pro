@@ -15,6 +15,7 @@ SOURCES += DropWidgetAdapterTests.cpp TestMainWindowSeam.cpp PlotWidgetLinkSeam.
     $$REPOSITORY_ROOT/DataManagement/DataManagementClass.cpp \
     $$REPOSITORY_ROOT/DataManagement/DataMessengerClass.cpp \
     $$REPOSITORY_ROOT/DropWidgets/CreateID.cpp \
+    $$REPOSITORY_ROOT/DropWidgets/DropWidgetBinding.cpp \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetsUiLoader.cpp $$REPOSITORY_ROOT/TreeWidgetCustomDrop.cpp \
     $$REPOSITORY_ROOT/DropWidgets/QBLed.cpp $$REPOSITORY_ROOT/DropWidgets/QCheckBox.cpp \
     $$REPOSITORY_ROOT/DropWidgets/QComboBox.cpp $$REPOSITORY_ROOT/DropWidgets/QDoubleSpinBox.cpp \
@@ -45,6 +46,7 @@ HEADERS += $$REPOSITORY_ROOT/mainwindow.h \
     $$REPOSITORY_ROOT/DropWidgets/QPushButton.h $$REPOSITORY_ROOT/DropWidgets/QSlider.h \
     $$REPOSITORY_ROOT/DropWidgets/QSpinBox.h $$REPOSITORY_ROOT/DropWidgets/QTableWidgeD.h \
     $$REPOSITORY_ROOT/DropWidgets/QTSLed.h \
+    $$REPOSITORY_ROOT/DropWidgets/DropWidgetBinding.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetsUiLoader.h $$REPOSITORY_ROOT/TreeWidgetCustomDrop.h \
     $$REPOSITORY_ROOT/CustomWidgets/QBLedIndicator.h $$REPOSITORY_ROOT/CustomWidgets/QLedIndicator.h \
     $$REPOSITORY_ROOT/CustomWidgets/QTSLedIndicator.h
