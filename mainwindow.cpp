@@ -724,12 +724,10 @@ void MainWindow::on_actionLoadPlugin_triggered()
             else
             {
                 bool ChildFound = 0;
-                int ChildIndex = 0;
                 for (int i = 0; i < CurrentItem->childCount() && !ChildFound; i++)
                 {
                     if(CurrentItem->child(i)->text(0).compare(Parts[j]) == 0)
                     {
-                        ChildIndex = i;
                         CurrentItem = (TreeWidgetItem*)CurrentItem->child(i);
                         ChildFound = true;
                     }
@@ -1190,13 +1188,11 @@ void MainWindow::HighLightConnection(QString ID)
 {
     QStringList Parts = ID.split("::");
     QTreeWidgetItem *CurrentItem = NULL;
-    QTreeWidgetItem *LastItem = NULL;
     QTreeWidget *SelTreeWidget = NULL;
     QDockWidget *SelDockWidget = NULL;
 
     for(int r = 0; r < 3 ; r++)
     {
-        LastItem = NULL;
         if(r== 0)
         {
             SelTreeWidget = ui->ParameterTreeWidget;
@@ -1236,7 +1232,6 @@ void MainWindow::HighLightConnection(QString ID)
                 {
                     if(CurrentItem->child(i)->text(0).compare(Parts[j]) == 0)
                     {
-                        LastItem  = CurrentItem;
                         CurrentItem = CurrentItem->child(i);
                         found++;
                     }
@@ -1251,7 +1246,7 @@ void MainWindow::HighLightConnection(QString ID)
     }
 }
 
-void MainWindow::RemoveConnection(QString ID)
+void MainWindow::RemoveConnection(QString)
 {
 }
 
@@ -1424,7 +1419,7 @@ void MainWindow::on_actionSave_Parameter_Set_triggered()
 }
 
 
-void MainWindow::on_ParameterTreeWidget_customContextMenuRequested(const QPoint &pos)
+void MainWindow::on_ParameterTreeWidget_customContextMenuRequested(const QPoint &)
 {
 
 }
