@@ -296,6 +296,10 @@ on the existing MainWindow facade and UIDataManagement boundary so legacy
 Designer class names, form registration and XML loading semantics remain
 unchanged; it is not a new public loader API.
 
+`UIFunctions/MainWindowTreeModel` is a non-QObject projection helper for the
+three explorer trees. It owns neither items nor docks: the widgets retain Qt
+ownership, while MainWindow supplies the tree/dock boundary and manager routing.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

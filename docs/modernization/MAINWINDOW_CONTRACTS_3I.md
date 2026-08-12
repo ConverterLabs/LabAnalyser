@@ -324,6 +324,12 @@ the same GUI_006–008/015 and legacy XML vectors preserve naming, loader errors
 partial unknown-widget loading, CWD mutation, registration, skip flags and
 dock lifecycle.
 
+`MainWindowTreeModel` now owns the private explorer-tree projection operations
+for add/remove/highlight, including the historical numeric-first item ordering.
+GUI_014 retains the observed publish, update and highlight vectors. The private
+remove entry has no direct caller in the current production graph and remains
+an explicitly unexercised legacy forwarding path.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.

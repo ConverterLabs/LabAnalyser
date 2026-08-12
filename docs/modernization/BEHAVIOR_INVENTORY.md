@@ -647,6 +647,11 @@ payload contracts.
 coverage for its legacy form, CWD, error, registration and dynamic-dock
 behavior.
 
+`MainWindowTreeModel` contains the private add/remove/highlight tree projection
+logic and its historical numeric-first item ordering. GUI_014 covers add and
+highlight through the public MainWindow slots; the private remove forwarding
+path has no current production caller and remains documented as unexercised.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 

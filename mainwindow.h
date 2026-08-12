@@ -31,22 +31,7 @@
 #include <QAction>
 
 
-class TreeWidgetItem : public QTreeWidgetItem {
-  public:
-  TreeWidgetItem(QTreeWidget* parent = NULL):QTreeWidgetItem(parent){}
-  private:
-  bool operator<(const QTreeWidgetItem &other)const {
-     int column = treeWidget()->sortColumn();
-     bool ok = true;
-     text(column).toInt(&ok);
-     if(ok)
-          other.text(column).toInt(&ok);
-     if(ok)
-          return text(column).toInt(&ok) <  other.text(column).toInt(&ok);
-     else
-          return text(column) < other.text(column);
-  }
-};
+class QTreeWidgetItem;
 
 class MyUrlHandler : public QObject
 {

@@ -1066,6 +1066,9 @@ menu, retaining all existing alias and multi-selection behavior.
 the public MainWindow slot and legacy XML/UI contracts remain unchanged and
 are covered by the existing GUI and XML vectors.
 
+`MainWindowTreeModel` isolates private explorer-tree add/remove/highlight
+projection while MainWindow retains manager routing and widget ownership.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

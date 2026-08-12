@@ -33,6 +33,7 @@
 #include "UIFunctions/MainWindowTreeViewState.h"
 #include "UIFunctions/MainWindowSubplotDialog.h"
 #include "UIFunctions/MainWindowFormLoader.h"
+#include "UIFunctions/MainWindowTreeModel.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -548,8 +549,6 @@ void MainWindow::on_actionLoadPlugin_triggered()
 
  void MainWindow::AddElementToWidget(QString ID, InterfaceData Data)
  {
-    QStringList Parts = ID.split("::");
-    TreeWidgetItem *CurrentItem = nullptr;
     QTreeWidget *SelTreeWidget = nullptr;
 
     if(Data.GetType().compare("Parameter")==0)
@@ -564,61 +563,7 @@ void MainWindow::on_actionLoadPlugin_triggered()
     {
         SelTreeWidget = ui->StateTreeWidget;
     }
-        for(int j = 0; j < Parts.size() && SelTreeWidget;j++)
-        {
-            int topCount =  SelTreeWidget->topLevelItemCount();
-
-            //Check element already exists
-            if(j == 0)
-            {
-                for (int i = 0; i < topCount; i++)
-                {
-                    QTreeWidgetItem *item = SelTreeWidget->topLevelItem(i);
-                    if(item->text(0).compare(Parts[j])==0)
-                    {
-                       CurrentItem = (TreeWidgetItem*)(item);
-                    }                    
-                }
-                if(!CurrentItem)
-                {
-                    CurrentItem = new TreeWidgetItem;
-                    CurrentItem->setText(0,Parts[j]);
-                    SelTreeWidget->addTopLevelItem(CurrentItem);
-                }
-            }
-            else
-            {
-                bool ChildFound = 0;
-                for (int i = 0; i < CurrentItem->childCount() && !ChildFound; i++)
-                {
-                    if(CurrentItem->child(i)->text(0).compare(Parts[j]) == 0)
-                    {
-                        CurrentItem = (TreeWidgetItem*)CurrentItem->child(i);
-                        ChildFound = true;
-                    }
-                }
-                if(!ChildFound)
-                {
-                    TreeWidgetItem *NewChild = new TreeWidgetItem;
-                    NewChild->setText(0,Parts[j]);
-                    if(j == Parts.size()-1)
-                    {
-                         NewChild->setText(1,Data.GetDataType());
-                         NewChild->setText(2,Data.GetStateDependency());
-                    }
-                    CurrentItem->addChild(NewChild);
-                    CurrentItem = NewChild;
-                }
-                else
-                {
-                    if(j == Parts.size()-1)
-                    {
-                         CurrentItem->setText(1,Data.GetDataType());
-                         CurrentItem->setText(2,Data.GetStateDependency());
-                    }
-                }
-            }
-        }      
+    MainWindowTreeModel::AddElement(SelTreeWidget, ID.split("::"), Data);
  }
 
  void MainWindow::PublishStart()
@@ -633,64 +578,8 @@ void MainWindow::on_actionLoadPlugin_triggered()
 
  void MainWindow::RemoveElementFromWidget(QString ID)
  {
-    QStringList Parts = ID.split("::");
-    QTreeWidgetItem *CurrentItem = nullptr;
-    QTreeWidgetItem *LastItem = nullptr;
-    QTreeWidget *SelTreeWidget = nullptr;
-
-    for(int r = 0; r < 3 ; r++)
-    {
-        LastItem = nullptr;
-        if(r== 0)
-            SelTreeWidget = ui->ParameterTreeWidget;
-        else if (r == 1)
-            SelTreeWidget = ui->DataTreeWidget;
-        else if(r==2)
-            SelTreeWidget = ui->StateTreeWidget;
-
-        int found = 0;
-        CurrentItem = nullptr;
-        for(int j = 0; j < Parts.size() && SelTreeWidget;j++)
-        {
-            if(!CurrentItem)
-            {
-                int topCount =  SelTreeWidget->topLevelItemCount();
-                for (int i = 0; i < topCount; i++)
-                {
-                    QTreeWidgetItem *item = SelTreeWidget->topLevelItem(i);
-                    if(item->text(0).compare(Parts[j])==0)
-                    {
-                        CurrentItem = item;
-                        found++;
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < CurrentItem->childCount(); i++)
-                {
-                    if(CurrentItem->child(i)->text(0).compare(Parts[j]) == 0)
-                    {
-                        LastItem  = CurrentItem;
-                        CurrentItem = CurrentItem->child(i);
-                        found++;
-                    }
-                }
-            }
-        }
-        if(found == Parts.size() )
-        {
-            if(LastItem)
-            {
-                LastItem->removeChild(CurrentItem);
-            }
-            else
-                SelTreeWidget->removeItemWidget(CurrentItem,0);
-
-            delete CurrentItem;
-        }
-    }
-
+    MainWindowTreeModel::RemoveElement({ui->ParameterTreeWidget, ui->DataTreeWidget,
+                                        ui->StateTreeWidget}, ID.split("::"));
  }
 
 void MainWindow::on_actionSave_Experiment_triggered()
@@ -1051,64 +940,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 
 void MainWindow::HighLightConnection(QString ID)
 {
-    QStringList Parts = ID.split("::");
-    QTreeWidgetItem *CurrentItem = NULL;
-    QTreeWidget *SelTreeWidget = NULL;
-    QDockWidget *SelDockWidget = NULL;
-
-    for(int r = 0; r < 3 ; r++)
-    {
-        if(r== 0)
-        {
-            SelTreeWidget = ui->ParameterTreeWidget;
-            SelDockWidget = ui->ParameterDock;
-        }
-        else if (r == 1)
-        {
-            SelTreeWidget = ui->DataTreeWidget;
-            SelDockWidget = ui->DataDock;
-        }
-        else if(r==2)
-        {
-            SelDockWidget = ui->StateDock;
-            SelTreeWidget = ui->StateTreeWidget;
-        }
-
-        int found = 0;
-        CurrentItem = NULL;
-        for(int j = 0; j < Parts.size() && SelTreeWidget;j++)
-        {
-            if(!CurrentItem)
-            {
-                int topCount =  SelTreeWidget->topLevelItemCount();
-                for (int i = 0; i < topCount; i++)
-                {
-                    QTreeWidgetItem *item = SelTreeWidget->topLevelItem(i);
-                    if(item->text(0).compare(Parts[j])==0)
-                    {
-                        CurrentItem = item;
-                        found++;
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < CurrentItem->childCount(); i++)
-                {
-                    if(CurrentItem->child(i)->text(0).compare(Parts[j]) == 0)
-                    {
-                        CurrentItem = CurrentItem->child(i);
-                        found++;
-                    }
-                }
-            }
-        }
-        if(found == Parts.size() )
-        {
-            SelDockWidget->raise();
-            SelTreeWidget->setCurrentItem(CurrentItem,QItemSelectionModel::ClearAndSelect);
-        }
-    }
+    MainWindowTreeModel::Highlight({{ui->ParameterTreeWidget, ui->ParameterDock},
+                                    {ui->DataTreeWidget, ui->DataDock},
+                                    {ui->StateTreeWidget, ui->StateDock}}, ID.split("::"));
 }
 
 void MainWindow::RemoveConnection(QString)
