@@ -1130,6 +1130,9 @@ return an empty pair, and a numbered plot can be renamed without a numeric
 `DM_SAFE_005` maps missing Min/Max IDs: setters do not insert or mutate a
 container, getters return `(0, 0)`, and existing inverted ranges remain stored.
 
+`DM_SAFE_006` maps a parentless DataManagementClass: its CloseProject signal
+still emits once without attempting an invalid parent connection.
+
 Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See

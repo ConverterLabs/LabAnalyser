@@ -147,6 +147,7 @@ private slots:
     void DM_SAFE_003_null_widget_boundaries_do_not_create_or_dereference_bindings();
     void DM_SAFE_004_registry_boundary_inputs_are_safe();
     void DM_SAFE_005_missing_minmax_container_is_safe();
+    void DM_SAFE_006_parentless_manager_close_signal_is_safe();
     void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
     void DM_REG_002_skipFormFlags_override_and_project_cleanup();
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
@@ -752,6 +753,15 @@ void DataManagementCharacterizationTests::DM_SAFE_005_missing_minmax_container_i
     manager.AddContainerElement("present", "double", "Parameter", "");
     manager.SetMinMaxValue("present", 9.0, -3.0);
     QCOMPARE(manager.MinMaxValue("present"), std::make_pair(9.0, -3.0));
+}
+
+void DataManagementCharacterizationTests::DM_SAFE_006_parentless_manager_close_signal_is_safe()
+{
+    DataManagementClass manager(nullptr);
+    QSignalSpy closed(&manager, &DataManagementClass::CloseProject);
+
+    QVERIFY(QMetaObject::invokeMethod(&manager, "CloseProject", Qt::DirectConnection));
+    QCOMPARE(closed.count(), 1);
 }
 
 void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()

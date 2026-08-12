@@ -34,7 +34,8 @@
 
 DataManagementClass::DataManagementClass(QObject* parent): QObject(parent), Registry(new DataRegistry), Containers(new ContainerStore), Bindings(new WidgetBindingRegistry), Devices(new DeviceRegistry)
 {
-    connect(this, SIGNAL(CloseProject()),this->parent(),SLOT(CloseProject()));
+    if (this->parent())
+        connect(this, SIGNAL(CloseProject()), this->parent(), SLOT(CloseProject()));
 }
 
 void DataManagementClass::DataRegistryDeleter::operator()(DataRegistry* registry) const

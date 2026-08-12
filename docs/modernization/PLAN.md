@@ -999,3 +999,6 @@ boundaries without changing valid form or numbered-plot behavior.
 
 `DM_SAFE_005` makes missing DataManagement Min/Max IDs non-mutating and
 returns a neutral `(0, 0)` pair while retaining current valid range semantics.
+
+`DM_SAFE_006` avoids the invalid constructor connection for parentless manager
+instances while retaining the public CloseProject signal.
