@@ -1774,13 +1774,15 @@ void PlotWidget::UpdateGraphs(QString ID, bool force)
             }
 
             // Validate data consistency
-            if (!XData.second || !YData.second)
+            if (!XData.first || !XData.second || !YData.first || !YData.second)
                 return;
 
-            if (XData.second->size() != YData.second->size())
+            if (XData.first->empty() || XData.second->empty() ||
+                YData.first->empty() || YData.second->empty())
                 return;
 
-            if (XData.first->size() != YData.first->size())
+            if (XData.second->size() != YData.second->size() ||
+                XData.first->size() != YData.first->size())
                 return;
 
             // Check matching first and last elements
