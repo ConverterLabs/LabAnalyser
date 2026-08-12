@@ -55,10 +55,8 @@ void QLineEditD::contextMenu(QPoint pos)
 void QLineEditD::RemoveConnection()
 {
 
-    this->setToolTip("");
-    this->setToolTipDuration(0);
-    MainWindow *MW = GetMainWindow();
-    MW->GetLogic()->DeleteEntryOfObject(this);
+    DropWidgetDropBinding::ClearConnectionPresentation(this);
+    DropWidgetDropBinding::RemoveManagerBinding(this);
     this->setText("");
 }
 

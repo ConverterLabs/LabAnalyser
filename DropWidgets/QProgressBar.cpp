@@ -54,10 +54,8 @@ void QProgressBarD::contextMenu(QPoint pos)
 void QProgressBarD::RemoveConnection()
 {
 
-    this->setToolTip("");
-    this->setToolTipDuration(0);
-    MainWindow *MW = GetMainWindow();
-    MW->GetLogic()->DeleteEntryOfObject(this);
+    DropWidgetDropBinding::ClearConnectionPresentation(this);
+    DropWidgetDropBinding::RemoveManagerBinding(this);
 }
 
 void QProgressBarD::dragEnterEvent(QDragEnterEvent *event)

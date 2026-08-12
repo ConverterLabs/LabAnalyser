@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetDragSource.h"
 #include "DropWidgetIndicatorBinding.h"
 #include "DropWidgetUpdate.h"
@@ -52,12 +53,9 @@ void QBLed::contextMenu(QPoint pos)
 void QBLed::RemoveConnection()
 {
 
-    this->setToolTip("");
-    this->setToolTipDuration(0);
+    DropWidgetDropBinding::ClearConnectionPresentation(this);
     this->SetState(0);
-
-    MainWindow *MW = GetMainWindow();
-    MW->GetLogic()->DeleteEntryOfObject(this);
+    DropWidgetDropBinding::RemoveManagerBinding(this);
 }
 
 

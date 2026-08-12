@@ -35,6 +35,18 @@ inline void ResetContextConnections(QObject* widget, DataManagementSetClass* man
     DropWidgetBinding::ConnectRequestUpdate(widget, SIGNAL(RequestUpdate()));
 }
 
+inline void ClearConnectionPresentation(QWidget* widget)
+{
+    widget->setToolTip("");
+    widget->setToolTipDuration(0);
+}
+
+inline void RemoveManagerBinding(QWidget* widget)
+{
+    MainWindow* mainWindow = GetMainWindow();
+    mainWindow->GetLogic()->DeleteEntryOfObject(widget);
+}
+
 inline Context Prepare(QWidget* widget, QDropEvent* event)
 {
     ResetConnections(widget);

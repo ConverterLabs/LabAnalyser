@@ -45,10 +45,8 @@ void QComboBoxD::contextMenu(QPoint pos)
 void QComboBoxD::RemoveConnection()
 {
 
-    this->setToolTip("");
-    this->setToolTipDuration(0);
-    MainWindow *MW = GetMainWindow();
-    MW->GetLogic()->DeleteEntryOfObject(this);
+    DropWidgetDropBinding::ClearConnectionPresentation(this);
+    DropWidgetDropBinding::RemoveManagerBinding(this);
     this->clear();
 }
 

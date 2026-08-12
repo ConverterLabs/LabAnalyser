@@ -46,10 +46,8 @@ void QCheckBoxD::contextMenu(QPoint pos)
 void QCheckBoxD::RemoveConnection()
 {
 
-    this->setToolTip("");
-    this->setToolTipDuration(0);
-    MainWindow *MW = GetMainWindow();
-    MW->GetLogic()->DeleteEntryOfObject(this);
+    DropWidgetDropBinding::ClearConnectionPresentation(this);
+    DropWidgetDropBinding::RemoveManagerBinding(this);
     this->setChecked(0);
     setText("CheckBox");
 }

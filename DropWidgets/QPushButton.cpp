@@ -106,10 +106,8 @@ void QPushButtonD::contextMenu(QPoint pos)
 void QPushButtonD::RemoveConnection()
 {
 
-    this->setToolTip("");
-    this->setToolTipDuration(0);
-    MainWindow *MW = GetMainWindow();
-    MW->GetLogic()->DeleteEntryOfObject(this);
+    DropWidgetDropBinding::ClearConnectionPresentation(this);
+    DropWidgetDropBinding::RemoveManagerBinding(this);
     this->setText("");
 }
 

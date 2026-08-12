@@ -47,10 +47,8 @@ void QSpinBoxD::contextMenu(QPoint pos)
 void QSpinBoxD::RemoveConnection()
 {
 
-    this->setToolTip("");
-    this->setToolTipDuration(0);
-    MainWindow *MW = GetMainWindow();
-    MW->GetLogic()->DeleteEntryOfObject(this);
+    DropWidgetDropBinding::ClearConnectionPresentation(this);
+    DropWidgetDropBinding::RemoveManagerBinding(this);
     this->setValue(0);
 }
 
