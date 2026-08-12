@@ -39,6 +39,7 @@ $ScriptRootPath = if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) {
 } else {
     $PSScriptRoot
 }
+$ProjectRootPath = Split-Path -Parent $ScriptRootPath
 
 function Get-FullPath {
     param([Parameter(Mandatory)][string]$Path)
@@ -47,7 +48,7 @@ function Get-FullPath {
         return [System.IO.Path]::GetFullPath($Path)
     }
 
-    return [System.IO.Path]::GetFullPath((Join-Path $ScriptRootPath $Path))
+    return [System.IO.Path]::GetFullPath((Join-Path $ProjectRootPath $Path))
 }
 
 function Convert-ToQMakePath {
@@ -96,7 +97,7 @@ function Assert-File {
 function Assert-CleanTargetIsSafe {
     param([Parameter(Mandatory)][string]$Path)
 
-    $projectRoot = (Get-FullPath $ScriptRootPath).TrimEnd('\') + '\'
+    $projectRoot = (Get-FullPath $ProjectRootPath).TrimEnd('\') + '\'
     $target = (Get-FullPath $Path).TrimEnd('\') + '\'
 
     if (-not $target.StartsWith($projectRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -119,15 +120,15 @@ function Invoke-Native {
 
 $Msys2Root = Get-FullPath $Msys2Root
 if ([string]::IsNullOrWhiteSpace($ProjectFile)) {
-    $ProjectFile = Join-Path $ScriptRootPath 'LabAnalyser.pro'
+    $ProjectFile = Join-Path $ProjectRootPath 'LabAnalyser.pro'
 }
 $ProjectFile = Get-FullPath $ProjectFile
 if ([string]::IsNullOrWhiteSpace($BuildDir)) {
-    $BuildDir = Join-Path $ScriptRootPath "build\msys2-mingw64-$Configuration"
+    $BuildDir = Join-Path $ProjectRootPath "build\msys2-mingw64-$Configuration"
 }
 $BuildDir = Get-FullPath $BuildDir
 if ([string]::IsNullOrWhiteSpace($DeployDir)) {
-    $DeployDir = Join-Path $ScriptRootPath "dist\LabAnalyser-$Configuration"
+    $DeployDir = Join-Path $ProjectRootPath "dist\LabAnalyser-$Configuration"
 }
 $DeployDir = Get-FullPath $DeployDir
 if ([string]::IsNullOrWhiteSpace($Hdf5LibDir)) {
@@ -224,7 +225,7 @@ try {
     $exePath = Join-Path $exeDir 'LabAnalyser.exe'
     Assert-File -Path $exePath -Description 'build output'
 
-    $connectorSourceDir = Join-Path $ScriptRootPath 'MatlabRemoteConnector'
+    $connectorSourceDir = Join-Path $ProjectRootPath 'src\MatlabRemoteConnector'
     $connectorBuildDir = Join-Path $BuildDir 'matlab-connector'
     $connectorConfiguration = if ($Configuration -eq 'release') { 'Release' } else { 'Debug' }
     Invoke-Native -Exe $cmake -Arguments @(
