@@ -321,6 +321,10 @@ MainWindow retains loading deferral and all user-facing save/close decisions.
 for the three explorer trees. It owns no QAction behavior, manager state or
 dialog: MainWindow remains the QObject slot receiver and mutation boundary.
 
+`MainWindowOutputLog` additionally owns the private standard-output-menu plus
+Clear Output construction. It remains non-owning with respect to the output
+widget and dock.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

@@ -5,6 +5,7 @@
 
 class QDockWidget;
 class QPlainTextEdit;
+class QPoint;
 
 class MainWindowOutputLog
 {
@@ -13,6 +14,7 @@ public:
 
     MainWindowOutputLog(QPlainTextEdit* output, QDockWidget* outputDock);
     void Append(Kind kind, const QString& id, const QString& data);
+    static void ShowContextMenu(QPlainTextEdit& output, const QPoint& position);
 
 private:
     QPlainTextEdit* Output;

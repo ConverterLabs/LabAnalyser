@@ -354,6 +354,10 @@ Parameter, State and Data tree selections. GUI_016 and GUI_019–021 preserve
 action availability, routing, alias behavior and the historical State-menu
 popup anchor; MainWindow retains the slots and all mutation/dialog behavior.
 
+`MainWindowOutputLog` also owns the existing output context-menu construction.
+GUI_013 continues to cover the Clear Output action and no output, menu or
+ownership behavior is changed.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.

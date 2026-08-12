@@ -1089,6 +1089,9 @@ Save/Discard/Cancel routing; GUI_006/007/011 preserve the lifecycle contract.
 MainWindow retains sender-dependent slots, dialogs and all manager mutation;
 GUI_016 and GUI_019–021 preserve the valid-selection contracts.
 
+`MainWindowOutputLog` now also isolates standard output-menu and Clear Output
+construction; GUI_013 preserves the output-context behavior.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

@@ -179,20 +179,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::OutputTextMenu( QPoint p )
 {
-    // Start with the standard menu.
-     QMenu * pMenu = ui->OutputText->createStandardContextMenu();
-     QAction * pAction;
-
-     pMenu->addSeparator();
-     pAction = new QAction( "Clear Output", pMenu );
-     connect( pAction, SIGNAL( triggered() ), ui->OutputText, SLOT( clear() ) );
-     pMenu->addAction( pAction );
-
-     // Show the menu.
-     QPoint q = ui->OutputText->mapToGlobal( p );
-     pMenu->exec( q );
-
-     delete pMenu;
+    MainWindowOutputLog::ShowContextMenu(*ui->OutputText, p);
 }
 
 

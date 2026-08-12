@@ -672,6 +672,9 @@ dock cleanup; loading deferral and dialog decisions remain MainWindow behavior.
 GUI_016 and GUI_019–021 cover action availability, alias routing and device
 removal; mutation, dialogs and sender-dependent slots remain MainWindow.
 
+`MainWindowOutputLog` also constructs the output context menu. GUI_013 covers
+its existing Clear Output action through MainWindow's unchanged slot.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 

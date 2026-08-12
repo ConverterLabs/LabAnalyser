@@ -1,6 +1,8 @@
 #include "MainWindowOutputLog.h"
 
 #include <QDockWidget>
+#include <QAction>
+#include <QMenu>
 #include <QPlainTextEdit>
 #include <QScrollBar>
 #include <QTextCursor>
@@ -10,6 +12,17 @@
 MainWindowOutputLog::MainWindowOutputLog(QPlainTextEdit* output, QDockWidget* outputDock)
     : Output(output), OutputDock(outputDock)
 {
+}
+
+void MainWindowOutputLog::ShowContextMenu(QPlainTextEdit& output, const QPoint& position)
+{
+    QMenu* menu = output.createStandardContextMenu();
+    menu->addSeparator();
+    QAction* clearAction = new QAction("Clear Output", menu);
+    QObject::connect(clearAction, &QAction::triggered, &output, &QPlainTextEdit::clear);
+    menu->addAction(clearAction);
+    menu->exec(output.mapToGlobal(position));
+    delete menu;
 }
 
 void MainWindowOutputLog::Append(Kind kind, const QString& id, const QString& data)
