@@ -1040,3 +1040,21 @@ path remains usable for a subsequent direct value change. Normal non-equal
 bounds retain the existing rounding vector (`7.5` in `0..100` maps to `8`).
 The unsafe pre-fix division/cast is documented from source and static-analysis
 evidence and was not executed as an in-process behavior contract.
+
+## Milestone 5 package A crash/null boundaries
+
+`DM_SAFE_001` maps `DataManagementSetClass::{SendNewValue,UpdateRequest,SetData}`
+for absent sender, empty/unknown IDs and unknown widgets: all are safe no-ops
+without signal or lookup insertion. `DM_SAFE_002` maps `MessengerClass` with
+missing parent hierarchy, null device registration and null statusbar; normal
+CloseProject notification/close ordering remains unchanged where the full
+application hierarchy exists. `DM_SAFE_003` maps null QObject arguments at
+DataManagement binding/lookup/removal boundaries and a stored null form pointer.
+`GUI_SAFE_001` maps senderless RemoveDevice/dock slots plus empty/top-level
+ChangeMinMaxValue selections as no-ops; `GUI_016` and `GUI_019..021` retain
+the valid action routes.
+
+Nonnull stale raw widget pointers are deliberately not treated as safe: the
+historical object-name registry has no QObject lifetime tracking, so a robust
+fix needs a separately approved ownership/binding change. See
+`CRASH_NULL_SAFETY_5A.md`.

@@ -818,3 +818,23 @@ partial state of a multiwindow error. This is a narrow OOB prevention change:
 no XML format, writer, dimension normalization, allocation limit or rollback
 semantics changed. Oversized dimensions and partial-state rollback remain
 open hardening risks.
+
+## Milestone 5 package A: crash and null safety
+
+**Completed locally; remote package checkpoint pending.** The small commits
+`a3f0bea`, `d62e37e`, `9dc011b`, `0760d11` and `9def039` add only approved
+no-op guards for senderless DataManagement slots, unknown/missing manager
+inputs, absent Messenger hierarchy, null QObject bindings and invalid
+MainWindow action selections. `DM_SAFE_001..003` and `GUI_SAFE_001` preserve
+normal sender, Messenger and valid GUI-action contracts while preventing the
+former direct dereferences. The scoped details and explicit stale raw-pointer
+exclusion are in `CRASH_NULL_SAFETY_5A.md`.
+
+The unresolved nonnull stale `FormP` boundary is not safely detectable under
+the historical name-keyed, raw-pointer binding contract. It remains Milestone
+5 ownership work; this package deliberately does not introduce automatic
+binding cleanup, object-name migration, QObject ownership or new visible
+errors. The one non-clean central runner was resumed once in its existing build
+tree after the external 120-second limit, but neither invocation completed the
+full graph; no compiler or test failure was observed before the second limit.
+GitHub CI is the pending complete package validation.
