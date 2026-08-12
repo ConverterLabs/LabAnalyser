@@ -937,9 +937,12 @@ void MainWindow::CloseProject(void)
 
       while(this->GetLogic()->GetFormFileCount())
       {
-        QDockWidget* DW =  this->findChild<QDockWidget*>(this->GetLogic()->GetFormFileEntry(0).first);
+        const QString formName = this->GetLogic()->GetFormFileEntry(0).first;
+        QDockWidget* DW = this->findChild<QDockWidget*>(formName);
         if(DW)
             DW->close();
+        else
+            this->GetLogic()->RemoveFormFile(formName);
         delete DW;
       }
 

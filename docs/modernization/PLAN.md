@@ -1040,6 +1040,10 @@ CWD behavior and dynamic-dock semantics remain unchanged.
 `GUI_SAFE_004` adds only null guards for direct dock-cleanup/event-filter
 entry, without changing normal dynamic-dock lifecycle behavior.
 
+`GUI_SAFE_005` makes `CloseProject()` discard a form-registry entry with no
+matching dock through the existing manager facade, instead of looping over the
+same null lookup. Existing live dock close semantics remain unchanged.
+
 The focused MainWindow package is complete for output presentation, tree-ID
 derivation, publish-view state and narrow null/path guards. Dynamic docks,
 project routing, dialogs, command-line parsing and figure lifecycle remain

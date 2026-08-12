@@ -295,6 +295,11 @@ view state. `GUI_022` covers the latter, while GUI_013/018 cover output and
 the existing GUI action tests cover tree-ID consumers. `GUI_SAFE_002..004`
 cover null figure/dock and extensionless form-path guards.
 
+`GUI_SAFE_005` covers a registry entry whose named dock no longer exists.
+`CloseProject()` removes that orphaned record through the existing manager
+facade instead of repeatedly looking up a null dock. Normal live dock close
+and registry cleanup routing remain unchanged.
+
 Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
 plot/figure creation, command-line handling and dialogs. They each combine
 MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;

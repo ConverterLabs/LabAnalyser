@@ -82,6 +82,7 @@ private slots:
     void GUI_SAFE_002_null_figure_deletion_is_a_noop();
     void GUI_SAFE_003_extensionless_form_path_is_rejected_safely();
     void GUI_SAFE_004_null_dock_cleanup_is_a_noop();
+    void GUI_SAFE_005_orphaned_form_record_close_project_is_safe();
     void cleanup();
     void cleanupTestCase();
 
@@ -1294,6 +1295,19 @@ void MainWindowIntegrationTests::GUI_SAFE_004_null_dock_cleanup_is_a_noop()
     const int forms = window.GetLogic()->GetFormFileCount();
     window.dockWidget_destroyed(nullptr);
     QCOMPARE(window.GetLogic()->GetFormFileCount(), forms);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_005_orphaned_form_record_close_project_is_safe()
+{
+    MainWindow window;
+    window.GetLogic()->AddFormFile({"GUI_SAFE_005_orphan", "missing-form.ui"});
+    QCOMPARE(window.GetLogic()->GetFormFileCount(), 1);
+
+    window.CloseProject();
+
+    QCOMPARE(window.GetLogic()->GetFormFileCount(), 0);
+    QCOMPARE(window.SavePath, QString());
+    QVERIFY(!window.ChangeForSaveDetected);
 }
 
 void MainWindowIntegrationTests::cleanup()

@@ -621,6 +621,11 @@ the working directory or form registry; normal `.ui` loading is unchanged.
 rejects a null event before touching it; normal dock close/destroy routing is
 unchanged.
 
+`GUI_SAFE_005` maps a form-registry entry without a corresponding dock.
+`MainWindow::CloseProject()` now removes the orphaned entry through the
+existing facade, preventing the source-evidenced repeated null lookup; normal
+live dock cleanup is unchanged.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target
