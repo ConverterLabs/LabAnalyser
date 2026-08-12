@@ -1039,3 +1039,9 @@ CWD behavior and dynamic-dock semantics remain unchanged.
 
 `GUI_SAFE_004` adds only null guards for direct dock-cleanup/event-filter
 entry, without changing normal dynamic-dock lifecycle behavior.
+
+The focused MainWindow package is complete for output presentation, tree-ID
+derivation, publish-view state and narrow null/path guards. Dynamic docks,
+project routing, dialogs, command-line parsing and figure lifecycle remain
+separate high-coupling work because they cross legacy XML/UI, QObject lifetime
+and user-visible workflow boundaries.

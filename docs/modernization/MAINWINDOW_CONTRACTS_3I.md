@@ -284,3 +284,19 @@ cancelled save/path/dirty-state mutations, unparented About ownership/title,
 direct-drag source limitation, Min/Max display rounding and inverted-range
 acceptance, delimiter-free multi-ID aliasing, immediate device removal without
 confirmation, and retained data containers after device removal.
+
+## MainWindow internal isolation follow-up
+
+The focused follow-up keeps all public MainWindow slots and UI object names in
+place while reducing repeated implementation detail. `MainWindowOutputLog`
+owns only output formatting; `MainWindowTreePath` owns only the legacy `::`
+tree-ID construction; and `MainWindowTreeViewState` owns only batch publish
+view state. `GUI_022` covers the latter, while GUI_013/018 cover output and
+the existing GUI action tests cover tree-ID consumers. `GUI_SAFE_002..004`
+cover null figure/dock and extensionless form-path guards.
+
+Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
+plot/figure creation, command-line handling and dialogs. They each combine
+MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;
+their existing risks remain documented rather than being moved behind an
+untested abstraction.
