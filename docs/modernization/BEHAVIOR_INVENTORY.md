@@ -1186,3 +1186,6 @@ manager context is rejected before the rename dialog.
 
 `PlotWidget::removeSelectedGraph` is mapped to `PLOT_022`: absent manager
 context leaves selected local graphs untouched.
+
+`PlotWidget::removeAllGraphs` is mapped to `PLOT_023`: absent manager context
+leaves the local graph model untouched.

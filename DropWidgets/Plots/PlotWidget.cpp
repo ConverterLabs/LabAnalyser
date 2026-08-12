@@ -1492,6 +1492,9 @@ void PlotWidget::ToggleMarker()
 void PlotWidget::removeAllGraphs()
 {
     MainWindow *MW = this->MainWindow_p;
+    if (!MW || !MW->GetLogic())
+        return;
+
     for(int k = 0; k < graphCount();k++)
     {
         MW->GetLogic()->DeleteEntryOfObject(graph(k)->ID(),this);

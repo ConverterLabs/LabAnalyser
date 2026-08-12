@@ -127,3 +127,6 @@ It does not open the rename dialog or change the graph name.
 
 `PLOT_022` invokes selected-graph removal without a manager. The selected
 local graph is retained; manager-backed removal remains covered by `PLOT_006`.
+
+`PLOT_023` invokes remove-all without a manager. Local graphs are retained;
+the regular manager-backed remove-all contract remains covered by `PLOT_006`.

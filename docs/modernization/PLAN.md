@@ -978,3 +978,6 @@ before UI or manager access.
 
 `PLOT_022` makes selected-graph removal a no-op without manager context;
 the existing manager-backed removal contract remains unchanged.
+
+`PLOT_023` makes remove-all a no-op without manager context; manager-backed
+graph and binding removal is unchanged.
