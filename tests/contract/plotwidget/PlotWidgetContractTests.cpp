@@ -40,6 +40,7 @@ private slots:
     void PLOT_012_null_plottable_click_is_a_noop();
     void PLOT_013_missing_manager_or_axis_container_is_a_noop();
     void PLOT_014_empty_legend_double_click_is_a_noop();
+    void PLOT_015_null_axis_double_click_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -396,6 +397,19 @@ void PlotWidgetContractTests::PLOT_014_empty_legend_double_click_is_a_noop()
                                       Q_ARG(QCPAbstractLegendItem*, nullptr)));
     QCOMPARE(plot.graphCount(), 1);
     QCOMPARE(graph(plot, 0)->name(), QString("D::Legend"));
+}
+
+void PlotWidgetContractTests::PLOT_015_null_axis_double_click_is_a_noop()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    const QString before = plot.xAxis->label();
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "axisLabelDoubleClick", Qt::DirectConnection,
+                                      Q_ARG(QCPAxis*, nullptr),
+                                      Q_ARG(QCPAxis::SelectablePart, QCPAxis::spAxisLabel)));
+    QCOMPARE(plot.xAxis->label(), before);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

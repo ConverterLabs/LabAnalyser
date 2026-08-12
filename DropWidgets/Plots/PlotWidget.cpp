@@ -1242,7 +1242,7 @@ void PlotWidget::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
 void PlotWidget::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 {
   // Set an axis label by double clicking on it
-  if (part == QCPAxis::spAxisLabel) // only react when the actual axis label is clicked, not tick label or axis backbone
+  if (axis && part == QCPAxis::spAxisLabel) // only react when the actual axis label is clicked, not tick label or axis backbone
   {
     bool ok;
     QString newLabel = QInputDialog::getText(this, "Plot", "New axis label:", QLineEdit::Normal, axis->label(), &ok);

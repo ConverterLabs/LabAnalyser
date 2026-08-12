@@ -101,3 +101,7 @@ backed graph creation is unchanged.
 `PLOT_014` invokes the existing legend-double-click slot through Qt's metaobject
 with no legend item. It preserves the graph model and name; non-plottable or
 null item inputs now return before the legacy dialog/alias route.
+
+`PLOT_015` calls `axisLabelDoubleClick()` through the metaobject with a null
+axis and label-selection part. It preserves the valid axis label; real axis
+dialog editing remains unchanged.
