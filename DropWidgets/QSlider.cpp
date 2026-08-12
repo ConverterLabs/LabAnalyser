@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetDataAccess.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
@@ -76,38 +77,29 @@ void QSliderD::dragMoveEvent(QDragMoveEvent *de)
 
 void QSliderD::dropEvent(QDropEvent *event)
 {
-               this->disconnect();
-                connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-                DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
-
-
-               QString ID =  CreateID(event->source());
-               this->setToolTip(ID);
-               this->setToolTipDuration(2000);
-               auto MW = GetMainWindow();
-               MW->GetLogic()->DeleteEntryOfObject(this);
+               const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
+               context.manager->DeleteEntryOfObject(this);
 
 
                // dot instead of comma
                QLocale::setDefault(QLocale::c());
 
-               MinMax = MW->GetLogic()->MinMaxValue(ID);
+               MinMax = context.manager->MinMaxValue(context.id);
                double MinValue = MinMax.first;
                double MaxValue = MinMax.second;
                if(MinMax.first == MinMax.second)
                {
                     MinValue = QInputDialog::getDouble(this, tr("Minimal Value of"),
-                                                        ID, 0,-2147483647, 2147483647,5);
+                                                        context.id, 0,-2147483647, 2147483647,5);
                     MaxValue = QInputDialog::getDouble(this, tr("Maximum Value of"),
-                                                        ID, 0,-2147483647, 2147483647,5);
-                   MW->GetLogic()->SetMinMaxValue(ID,MinValue,MaxValue);
+                                                        context.id, 0,-2147483647, 2147483647,5);
+                   context.manager->SetMinMaxValue(context.id,MinValue,MaxValue);
                }
 
-               MinMax = MW->GetLogic()->MinMaxValue(ID);
-               MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-               DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(int)), MW->GetLogic());
-               MW->ChangeForSaveDetected = true;
-               ConnectedID = ID;
+               MinMax = context.manager->MinMaxValue(context.id);
+               DropWidgetDropBinding::Register(this, context);
+               DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(int)), context.manager);
+               ConnectedID = context.id;
                emit RequestUpdate();
 
 

@@ -25,6 +25,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -71,23 +72,15 @@ void QDoubleSpinBoxD::dragEnterEvent(QDragEnterEvent *event)
 
 void QDoubleSpinBoxD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+    const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
 
-    QString ID =  CreateID(event->source());
-    this->setToolTip(ID);
-    this->setToolTipDuration(2000);
-    auto MW = GetMainWindow();
-
-    QString Type = MW->GetLogic()->GetContainer(ID)->GetDataType();
-    std::pair<double,double> MinMax = MW->GetLogic()->MinMaxValue(ID);
+    QString Type = context.manager->GetContainer(context.id)->GetDataType();
+    std::pair<double,double> MinMax = context.manager->MinMaxValue(context.id);
     this->setMinimum(MinMax.first);
     this->setMaximum(MinMax.second);
 
-    MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-    MW->ChangeForSaveDetected = true;
-    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(double)), MW->GetLogic());
+    DropWidgetDropBinding::Register(this, context);
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(double)), context.manager);
     emit RequestUpdate();
 }
 

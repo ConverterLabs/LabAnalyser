@@ -25,6 +25,7 @@
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -71,18 +72,8 @@ void QProgressBarD::dragEnterEvent(QDragEnterEvent *event)
 
 void QProgressBarD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
-
-    QString ID =  CreateID(event->source());
-    this->setToolTip(ID);
-    this->setToolTipDuration(2000);
-    auto MW = GetMainWindow();
-
-
-    MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-     MW->ChangeForSaveDetected = true;
+    const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
+    DropWidgetDropBinding::Register(this, context);
      emit RequestUpdate();
 }
 

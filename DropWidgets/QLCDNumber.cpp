@@ -25,6 +25,7 @@
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -70,16 +71,9 @@ void QLCDNumberD::dragEnterEvent(QDragEnterEvent *event)
 
 void QLCDNumberD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+    const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
 
-    QString ID =  CreateID(event->source());
-    this->setToolTip(ID);
-    this->setToolTipDuration(2000);
-    auto MW = GetMainWindow();
-
-    QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
+    QString Type = context.manager->GetContainer(context.id)->GetDataType();
 
     /*if(Type.compare("double")==0)
     {
@@ -94,8 +88,7 @@ void QLCDNumberD::dropEvent(QDropEvent *event)
         this->display((double) (GetMainWindow()->GetLogic()->GetContainer(ID)->GetFloat()));
     }*/
 
-    MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-     MW->ChangeForSaveDetected = true;
+    DropWidgetDropBinding::Register(this, context);
      emit RequestUpdate();
 
 }

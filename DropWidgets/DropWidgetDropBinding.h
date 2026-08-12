@@ -1,0 +1,43 @@
+#ifndef DROPWIDGETDROPBINDING_H
+#define DROPWIDGETDROPBINDING_H
+
+#include "CreateID.h"
+#include "DropWidgetBinding.h"
+
+#include <QtGui/qevent.h>
+#include <QtWidgets/qwidget.h>
+
+// Common legacy setup for adapters whose drop operation replaces all direct
+// connections and then binds exactly one source ID.  Special multi-selection,
+// label and checkbox contracts deliberately remain outside this helper.
+namespace DropWidgetDropBinding
+{
+struct Context
+{
+    QString id;
+    MainWindow* mainWindow;
+    DataManagementSetClass* manager;
+};
+
+inline Context Prepare(QWidget* widget, QDropEvent* event)
+{
+    widget->disconnect();
+    QObject::connect(widget, SIGNAL(customContextMenuRequested(QPoint)), widget, SLOT(contextMenu(QPoint)));
+    DropWidgetBinding::ConnectRequestUpdate(widget, SIGNAL(RequestUpdate()));
+
+    const QString id = CreateID(event->source());
+    widget->setToolTip(id);
+    widget->setToolTipDuration(2000);
+    MainWindow* mainWindow = GetMainWindow();
+    return { id, mainWindow, mainWindow->GetLogic() };
+}
+
+inline void Register(QWidget* widget, const Context& context)
+{
+    context.manager->AddElementToContainerEntry(widget->objectName(), context.id,
+                                                widget->metaObject()->className(), widget);
+    context.mainWindow->ChangeForSaveDetected = true;
+}
+}
+
+#endif // DROPWIDGETDROPBINDING_H

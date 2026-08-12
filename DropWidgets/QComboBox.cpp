@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -68,32 +69,24 @@ void QComboBoxD::dragEnterEvent(QDragEnterEvent *event)
 
 void QComboBoxD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+    const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
 
-    QString ID =  CreateID(event->source());
-    this->setToolTip(ID);
-    this->setToolTipDuration(2000);
-    auto MW = GetMainWindow();
-
-    QString Type = MW->GetLogic()->GetContainer(ID)->GetDataType();
+    QString Type = context.manager->GetContainer(context.id)->GetDataType();
 
     while(this->count())
         this->removeItem(0);
 
     try
     {
-        auto Sel = GetMainWindow()->GetLogic()->GetContainer(ID)->GetGuiSelection();
+        auto Sel = context.manager->GetContainer(context.id)->GetGuiSelection();
         for(int i = 0; i < Sel.second.size();i++)
         {
             this->addItem(Sel.second[i]);
         }
         this->setCurrentText(Sel.first);
 
-        MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-        MW->ChangeForSaveDetected = true;
-        DropWidgetBinding::ConnectValueChanged(this, SIGNAL(currentIndexChanged(int)), GetMainWindow()->GetLogic());
+        DropWidgetDropBinding::Register(this, context);
+        DropWidgetBinding::ConnectValueChanged(this, SIGNAL(currentIndexChanged(int)), context.manager);
     }
     catch(...)
     {

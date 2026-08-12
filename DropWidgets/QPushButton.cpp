@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetDropBinding.h"
 #include "../mainwindow.h"
 
 
@@ -57,23 +58,15 @@ void QPushButtonD::dragMoveEvent(QDragMoveEvent *de)
 
 void QPushButtonD::dropEvent(QDropEvent *event)
 {
-    this->disconnect();
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+    const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
 
-    QString ID =  CreateID(event->source());
-    this->setToolTip(ID);
-    this->setToolTipDuration(2000);
-    auto MW = GetMainWindow();
-
-    //this->setChecked(MW->GetLogic()->GetContainer(ID)->GetBool());
-    QStringList sp = ID.split("::");
+    //this->setChecked(context.manager->GetContainer(context.id)->GetBool());
+    QStringList sp = context.id.split("::");
     this->setText(sp.back());
 
-    MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
-    MW->ChangeForSaveDetected = true;
-    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(pressed()), MW->GetLogic(), Qt::DirectConnection);
-    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(released()), MW->GetLogic(), Qt::DirectConnection);
+    DropWidgetDropBinding::Register(this, context);
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(pressed()), context.manager, Qt::DirectConnection);
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(released()), context.manager, Qt::DirectConnection);
     connect(this, SIGNAL(pressed()), this, SLOT(StartTimeOut()),Qt::DirectConnection);
 
 }

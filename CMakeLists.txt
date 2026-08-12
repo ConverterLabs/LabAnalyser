@@ -48,6 +48,7 @@ set(LABANALYSER_CORE_SOURCES
     DropWidgets/DropWidgetConnectionMenu.cpp
     DropWidgets/DropWidgetConnectionMenu.h
     DropWidgets/DropWidgetDataAccess.h
+    DropWidgets/DropWidgetDropBinding.h
     DropWidgets/DropWidgetDragSource.h
     DropWidgets/DropWidgetIndicatorBinding.h
     DropWidgets/DropWidgetTableCells.cpp
