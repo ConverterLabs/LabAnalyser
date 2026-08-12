@@ -854,3 +854,21 @@ The package does not claim rendering, gestures, valid cursor readout/history,
 context workflows, non-finite FFT policy, large resource limits or real
 allocator failure behavior. Those remain distinct hardening risks; GitHub CI
 is the next full package checkpoint.
+
+## Milestone 5 package C: network and persistence hardening
+
+**Completed locally; remote package checkpoint pending.** `c69ffd3` bounds
+encoded remote `get` replies to 1 MiB, with checked `quint64` arithmetic before
+allocation/conversion and current-socket abort/recovery rather than a partial
+or empty success response. `TCP_030..TCP_031` preserve valid reply bytes and
+cover the direct limit plus loopback recovery. The XML dimension slice adds
+`XmlFigureDimensions` before figure creation: rows/columns are integral
+`0..32`, their product is at most 256, and invalid values retain reader
+`true == error` with deterministic text and no created figure. `XML_FIG_008`
+covers direct and real-reader boundaries; zero-sized legacy grids remain valid.
+
+No arbitrary parameter/XML file-size cap was introduced because no further
+narrow, format-neutral integer/allocation guard was evidenced. Existing
+PlotWidgetName partial-state behavior, XML format, native TCP byte order,
+valid replies and legacy fixtures remain unchanged. GitHub CI is the remaining
+package checkpoint; local focused RemoteControl and XML suites passed.

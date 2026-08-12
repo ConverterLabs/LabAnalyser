@@ -70,3 +70,16 @@ reply construction or application-level payload contents. String/StringList
 last-byte loss, Selection/container mutation, independent multi-client
 sessions, rate limiting, authentication, TLS and protocol-version work remain
 outside 5B.
+
+## Package C: encoded reply bound
+
+`c69ffd3` extends the same private protocol boundary to outbound `get`
+responses. `MaxEncodedReplySize` is 1 MiB including the legacy five-byte
+type/count header. Checked `quint64` arithmetic rejects a reply before any
+allocation, narrowing conversion or partial socket write. The server then
+aborts the current socket and emits neither a reply nor a Messenger event; its
+normal disconnect cleanup permits a fresh connection. Existing native-order
+reply bytes at or below the limit are unchanged. `TCP_030` directly covers the
+maximum padded reply and overflow-safe rejection; `TCP_031` covers loopback
+abort and recovery. This does not introduce pagination, an input-format
+change, a payload semantic change or an application-level reply policy.
