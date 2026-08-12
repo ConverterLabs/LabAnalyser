@@ -82,14 +82,15 @@ void QPushButtonD::TimeOut()
         QTimer::singleShot(100, this, SLOT(TimeOut()));
     else
     {
-        if(GetMainWindow()->GetLogic()->GetContainer(this)->IsBool() == 0)
-            if(GetMainWindow()->GetLogic()->GetContainer(this)->GetBool())
+        ToFormMapper* container = GetMainWindow()->GetLogic()->GetContainer(this);
+        if(container->IsBool() == 0)
+            if(container->GetBool())
             {
                 QTimer::singleShot(100, this, SLOT(TimeOut()));
                 this->released();
             }
-        if(GetMainWindow()->GetLogic()->GetContainer(this)->IsUnsigedNumber())
-            if(GetMainWindow()->GetLogic()->GetContainer(this)->GetUnsignedData())
+        if(container->IsUnsigedNumber())
+            if(container->GetUnsignedData())
             {
                 QTimer::singleShot(100, this, SLOT(TimeOut()));
                 this->released();
