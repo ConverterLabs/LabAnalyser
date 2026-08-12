@@ -1032,3 +1032,7 @@ retains the existing Parameter/Data sorting asymmetry relative to State.
 
 `GUI_SAFE_002` adds the narrow missing-Figure and null-tree-item guards without
 altering normal figure registry deletion or export selection semantics.
+
+`GUI_SAFE_003` makes the public extensionless form path use the existing
+corrupt-form error channel before legacy filename indexing; valid form paths,
+CWD behavior and dynamic-dock semantics remain unchanged.

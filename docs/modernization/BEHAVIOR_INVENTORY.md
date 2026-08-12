@@ -613,6 +613,10 @@ tree ownership and data-manager semantics remain in `MainWindow`.
 collection likewise ignores null item pointers; valid figure deletion and
 selection-derived IDs remain unchanged.
 
+`GUI_SAFE_003` records the source-evidenced formerly unsafe extensionless form
+path. It now reports the existing `Corrupt Form File` error without changing
+the working directory or form registry; normal `.ui` loading is unchanged.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target

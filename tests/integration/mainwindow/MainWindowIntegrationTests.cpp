@@ -80,6 +80,7 @@ private slots:
     void GUI_SAFE_001_senderless_and_invalid_selection_actions_are_noops();
     void GUI_022_publish_tree_view_state_contract();
     void GUI_SAFE_002_null_figure_deletion_is_a_noop();
+    void GUI_SAFE_003_extensionless_form_path_is_rejected_safely();
     void cleanup();
     void cleanupTestCase();
 
@@ -1264,6 +1265,26 @@ void MainWindowIntegrationTests::GUI_SAFE_002_null_figure_deletion_is_a_noop()
     const int before = window.GetLogic()->GetPlotWindowsIncrementer();
     window.DeleteFigure(nullptr);
     QCOMPARE(window.GetLogic()->GetPlotWindowsIncrementer(), before);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_003_extensionless_form_path_is_rejected_safely()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString path = directory.filePath("extensionless-form");
+    QFile file(path);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.write("<ui version=\"4.0\"></ui>");
+    file.close();
+
+    MainWindow window;
+    QSignalSpy errors(window.GetLogic()->GetMessenger(), &MessengerClass::ErrorWriter);
+    const QString workingDirectory = QDir::currentPath();
+    window.LoadFormFromXML(path, "GUI_SAFE_003", false);
+    QCOMPARE(errors.count(), 1);
+    QCOMPARE(errors.at(0).at(1).toString(), QString("Corrupt Form File"));
+    QCOMPARE(window.GetLogic()->GetFormFileCount(), 0);
+    QCOMPARE(QDir::currentPath(), workingDirectory);
 }
 
 void MainWindowIntegrationTests::cleanup()

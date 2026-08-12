@@ -580,6 +580,11 @@ void MainWindow::LoadFormFromXML(QString UiFileName, QString LastFormName, bool 
     auto FilePartsI = UiFileName.split("/");
     auto FilePartsII = FilePartsI.at(FilePartsI.size()-1);
     auto FilePartsIII = FilePartsII.split(".");
+    if (FilePartsIII.size() < 2)
+    {
+        Error("Corrupt Form File");
+        return;
+    }
     auto FileNameS = FilePartsIII.at(FilePartsIII.size()-2);
 
     QWidget* tab = new QWidget();
