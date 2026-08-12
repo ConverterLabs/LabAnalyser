@@ -94,8 +94,9 @@ void MainWindowTreeModel::AddElement(QTreeWidget* tree, const QStringList& parts
             current = child;
         }
         if (index == parts.size() - 1) {
-            current->setText(1, data.GetDataType());
-            current->setText(2, data.GetStateDependency());
+            current->setText(1, data.GetString());
+            current->setText(2, data.GetDataType());
+            current->setText(3, data.GetStateDependency());
         }
     }
 }

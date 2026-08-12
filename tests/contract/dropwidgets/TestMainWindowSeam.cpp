@@ -65,6 +65,7 @@ void MainWindow::dockWidget_destroyed(QObject*) {}
 void MainWindow::RemoveConnection(QString) {}
 void MainWindow::TrayIconActivated(QSystemTrayIcon::ActivationReason) {}
 void MainWindow::AddElementToWidget(QString, InterfaceData) {}
+void MainWindow::UpdateElementValue(QString) {}
 void MainWindow::LoadFormFromXML(QString, QString, bool) {}
 void MainWindow::LoadFormFromXML(QString) {}
 void MainWindow::PublishFinished() {}

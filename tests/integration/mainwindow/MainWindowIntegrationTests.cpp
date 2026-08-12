@@ -688,14 +688,26 @@ void MainWindowIntegrationTests::GUI_014_nested_trees_messenger_updates_and_vali
     }
 
     QTreeWidget* parameterTree = window.findChild<QTreeWidget*>("ParameterTreeWidget");
+    QTreeWidget* dataTree = window.findChild<QTreeWidget*>("DataTreeWidget");
+    QVERIFY(parameterTree);
+    QVERIFY(dataTree);
+    QCOMPARE(parameterTree->headerItem()->text(1), QString("Current Value"));
+    QCOMPARE(parameterTree->headerItem()->text(2), QString("Data Type"));
+    QCOMPARE(dataTree->headerItem()->text(1), QString("Current Value"));
+    QCOMPARE(dataTree->headerItem()->text(2), QString("Data Type"));
     QTreeWidgetItem* gain = parameterTree->topLevelItem(0)->child(0)->child(0);
     QCOMPARE(gain->text(0), QString("Gain"));
-    QCOMPARE(gain->text(1), QString("double"));
+    QCOMPARE(gain->text(1), QString("1.5"));
+    QCOMPARE(gain->text(2), QString("double"));
+    QTreeWidgetItem* samples = dataTree->topLevelItem(0)->child(0)->child(0);
+    QCOMPARE(samples->text(0), QString("Samples"));
+    QCOMPARE(samples->text(1), QString("initial"));
+    QCOMPARE(samples->text(2), QString("QString"));
     InterfaceData update("double", "Parameter");
     update.SetData(2.5);
     manager->GetMessenger()->MessageReceiver("set", "Parameter::Group::Gain", update);
     QCOMPARE(manager->GetContainer("Parameter::Group::Gain")->GetDouble(), 2.5);
-    window.AddElementToWidget("Parameter::Group::Gain", update);
+    QCOMPARE(gain->text(1), QString("2.5"));
     QCOMPARE(parameterTree->topLevelItemCount(), 1);
     QCOMPARE(parameterTree->topLevelItem(0)->child(0)->childCount(), 1);
 

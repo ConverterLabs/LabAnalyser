@@ -45,7 +45,7 @@ void MainWindowTreeViewState::SetColumns(QTreeWidget* tree, QDockWidget* dock)
     if (!tree || !dock)
         return;
     const int width = dock->width();
-    tree->setColumnWidth(0, width * 0.6);
-    tree->setColumnWidth(1, width * 0.2);
-    tree->setColumnWidth(2, width * 0.1);
+    tree->setColumnWidth(0, width * 0.45);
+    tree->setColumnWidth(1, width * 0.3);
+    tree->setColumnWidth(2, width * 0.2);
 }

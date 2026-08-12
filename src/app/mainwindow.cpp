@@ -130,12 +130,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->StateDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockWidget_topLevelChanged(bool)));
 
     //Set Parameter Dock Header
+    ui->ParameterTreeWidget->setColumnCount(4);
     ui->ParameterTreeWidget->headerItem()->setText(0, "Item");
-    ui->ParameterTreeWidget->headerItem()->setText(1, "Data Type");
+    ui->ParameterTreeWidget->headerItem()->setText(1, "Current Value");
+    ui->ParameterTreeWidget->headerItem()->setText(2, "Data Type");
+    ui->ParameterTreeWidget->setColumnHidden(3, true);
 
 
+    ui->DataTreeWidget->setColumnCount(4);
     ui->DataTreeWidget->headerItem()->setText(0, "Item");
-    ui->DataTreeWidget->headerItem()->setText(1, "Data Type");
+    ui->DataTreeWidget->headerItem()->setText(1, "Current Value");
+    ui->DataTreeWidget->headerItem()->setText(2, "Data Type");
+    ui->DataTreeWidget->setColumnHidden(3, true);
 
     ui->DataTreeWidget->setAlternatingRowColors(true);
     ui->ParameterTreeWidget->setAlternatingRowColors(true);
@@ -160,6 +166,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //create the GUI Logic Object
     ExtendedDataManagement = new UIDataManagementSetClass(this);
 //    ExtendedDataManagement->SetMessenger(Messenger);
+    connect(ExtendedDataManagement->GetMessenger(), SIGNAL(NewDataReceived(QString)),
+            this, SLOT(UpdateElementValue(QString)));
 
     Remote = new RemoteControlServer(this->GetLogic()->GetContainerPointer());
     connect(Remote, SIGNAL(MessageSender(QString,QString,InterfaceData)),this->ExtendedDataManagement->GetMessenger(),SLOT(MessageTransmitter(QString,QString,InterfaceData)));
@@ -190,9 +198,13 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     //Resize the dockables when window resizes
     QMainWindow::resizeEvent(event);
     int Width = ui->ParameterDock->width();
-    ui->ParameterTreeWidget->setColumnWidth(0,Width*0.6);
-    ui->ParameterTreeWidget->setColumnWidth(1,Width*0.2);
-    ui->ParameterTreeWidget->setColumnWidth(2,Width*0.1);
+    ui->ParameterTreeWidget->setColumnWidth(0,Width*0.45);
+    ui->ParameterTreeWidget->setColumnWidth(1,Width*0.3);
+    ui->ParameterTreeWidget->setColumnWidth(2,Width*0.2);
+    Width = ui->DataDock->width();
+    ui->DataTreeWidget->setColumnWidth(0,Width*0.45);
+    ui->DataTreeWidget->setColumnWidth(1,Width*0.3);
+    ui->DataTreeWidget->setColumnWidth(2,Width*0.2);
 }
 
 
@@ -437,6 +449,17 @@ void MainWindow::on_actionLoadPlugin_triggered()
         SelTreeWidget = ui->StateTreeWidget;
     }
     MainWindowTreeModel::AddElement(SelTreeWidget, ID.split("::"), Data);
+ }
+
+ void MainWindow::UpdateElementValue(QString ID)
+ {
+   ToFormMapper* container = GetLogic()->GetContainer(ID);
+   if (!container)
+       return;
+   if (container->GetType().compare("Parameter") != 0
+           && container->GetType().compare("Data") != 0)
+       return;
+   AddElementToWidget(ID, *container);
  }
 
  void MainWindow::PublishStart()
@@ -838,5 +861,4 @@ void MainWindow::on_actionRemote_Connection_Port_2_triggered()
                                    QString("TCP Port: ") + QString::number(Remote->GetPort()),
                                    QMessageBox::Ok );
 }
-
 

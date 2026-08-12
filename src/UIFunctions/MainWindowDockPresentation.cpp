@@ -94,13 +94,14 @@ void MainWindowDockPresentation::HandleEvent(MainWindow& mainWindow, QObject* ob
     }
     if (dock->objectName().compare("ParameterDock") == 0 && event->type() == QEvent::Resize) {
         const int width = mainWindow.UI()->ParameterDock->width();
-        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(0, width * 0.6);
-        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(1, width * 0.2);
-        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(2, width * 0.1);
+        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(0, width * 0.45);
+        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(1, width * 0.3);
+        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(2, width * 0.2);
     }
     if (dock->objectName().compare("DataDock") == 0 && event->type() == QEvent::Resize) {
         const int width = mainWindow.UI()->DataTreeWidget->width();
-        mainWindow.UI()->DataTreeWidget->setColumnWidth(0, width * 0.6);
+        mainWindow.UI()->DataTreeWidget->setColumnWidth(0, width * 0.45);
         mainWindow.UI()->DataTreeWidget->setColumnWidth(1, width * 0.3);
+        mainWindow.UI()->DataTreeWidget->setColumnWidth(2, width * 0.2);
     }
 }

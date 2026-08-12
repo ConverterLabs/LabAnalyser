@@ -89,6 +89,7 @@ public slots:
     void RemoveConnection(QString);
     void TrayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void AddElementToWidget(QString ID, InterfaceData Data);
+    void UpdateElementValue(QString ID);
     void LoadFormFromXML(QString Path,QString LastFormName, bool skip = false);
     void LoadFormFromXML(QString UiFileName);
     void PublishFinished();
@@ -163,4 +164,3 @@ private:
     bool isloading = false;
 
 };
-
