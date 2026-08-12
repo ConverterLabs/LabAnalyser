@@ -330,6 +330,11 @@ GUI_014 retains the observed publish, update and highlight vectors. The private
 remove entry has no direct caller in the current production graph and remains
 an explicitly unexercised legacy forwarding path.
 
+`MainWindowFigureFactory` now contains only construction of the existing
+SubPlotMainWindow, PlotWidget grid and manager registrations. MainWindow keeps
+the public creation slots; GUI_012/017 and the PlotWidget contracts retain the
+observed valid dimensions, naming, routing and plot-registration behavior.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.

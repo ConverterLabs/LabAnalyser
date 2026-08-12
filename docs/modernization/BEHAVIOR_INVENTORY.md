@@ -652,6 +652,10 @@ logic and its historical numeric-first item ordering. GUI_014 covers add and
 highlight through the public MainWindow slots; the private remove forwarding
 path has no current production caller and remains documented as unexercised.
 
+`MainWindowFigureFactory` is the private figure/plot-grid construction boundary.
+GUI_012/017 and the PlotWidget contract suite continue to cover the public
+MainWindow creation routes and their valid registration behavior.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 

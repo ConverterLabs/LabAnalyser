@@ -1069,6 +1069,10 @@ are covered by the existing GUI and XML vectors.
 `MainWindowTreeModel` isolates private explorer-tree add/remove/highlight
 projection while MainWindow retains manager routing and widget ownership.
 
+`MainWindowFigureFactory` isolates the existing figure/plot-grid construction;
+public MainWindow slots, manager registrations and tested valid plot behavior
+remain unchanged.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

@@ -300,6 +300,11 @@ unchanged; it is not a new public loader API.
 three explorer trees. It owns neither items nor docks: the widgets retain Qt
 ownership, while MainWindow supplies the tree/dock boundary and manager routing.
 
+`UIFunctions/MainWindowFigureFactory` is a private construction boundary for
+the historical SubPlotMainWindow/PlotWidget grid. It owns no persistent state;
+Qt parents retain widget lifetime and the existing DataManagement facade retains
+plot/figure registry responsibility.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

@@ -34,6 +34,7 @@
 #include "UIFunctions/MainWindowSubplotDialog.h"
 #include "UIFunctions/MainWindowFormLoader.h"
 #include "UIFunctions/MainWindowTreeModel.h"
+#include "UIFunctions/MainWindowFigureFactory.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -479,49 +480,7 @@ void MainWindow::CreateFFTPlotWindow()
 
 SubPlotMainWindow* MainWindow::CreateSubPlotWindow(int rows, int cols, bool IsFFTPlot)
 {
-    //Create New Window
-    SubPlotMainWindow* MW = new SubPlotMainWindow(this,this);
-
-    QWidget* NW  = new QWidget();
-    QGridLayout *gridLayout1 = new QGridLayout(NW);
-    gridLayout1->setSpacing(0);
-    gridLayout1->setContentsMargins(0, 0, 0, 0);
-    gridLayout1->setObjectName(QStringLiteral("gridLayout"));
-    //Add the plot widgets
-    for(int i = 0; i <  rows; i++ )
-    {
-        for(int j = 0; j <  cols; j++ )
-        {
-            PlotWidget *PW = new PlotWidget(this, NW, MW->GetStatusBar(), IsFFTPlot);
-            //Create unique name
-            int Number = GetLogic()->GetUniquePlotNumber();
-            QString PlotName;          
-            PlotName = "Plot#";
-            PlotName.append(QString::number( Number + 1));
-            //Set Name
-            PW->setObjectName(PlotName);
-            //Add the plot to the logic map
-            GetLogic()->AddPlotPointer(PlotName, qobject_cast<QObject*>(PW),Number);
-            //add plot widget to layout
-            gridLayout1->addWidget(PW,i,j,1,1);
-        }
-    }
-
-    MW->setCentralWidget(NW);
-    MW->resize(600,400);
-
-    //Create unique name
-    QString FigureName("Figure#");
-    auto Wnumber = GetLogic()->GetPlotWindowsIncrementer();
-    FigureName.append(QString::number( Wnumber ));
-    MW->setObjectName(FigureName);
-    this->GetLogic()->AddPlotWindow(MW->objectName(),rows,cols, Wnumber);
-    QString FigureTitle("Figure ");
-    FigureTitle.append(QString::number( Wnumber + 1));
-    MW->setWindowTitle(FigureTitle);
-    //Save SubplotWindow and rows and cols to be able to save them
-    MW->show();
-    return MW;
+    return MainWindowFigureFactory::Create(*this, rows, cols, IsFFTPlot);
 }
 
 void MainWindow::LoadFormFromXML(QString Path)
