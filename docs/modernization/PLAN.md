@@ -930,3 +930,11 @@ separate, behavior-sensitive work.
 The shared DropWidget context-menu helper is also protected against an invalid
 standard-line-edit downcast (`DW_037`); non-line-edit callers retain generic
 menus and valid line edits retain Qt's standard menu.
+
+## PlotWidget follow-up: safe tree-drop admission
+
+`PLOT_009..010` add the bounded `PlotWidgetDropBinding` boundary. Empty or
+foreign events, missing manager context, unsupported tree items and XY plots
+now leave the graph model unchanged; valid direct and `Buffered` vector-data
+drops preserve existing graph and Shift-X-axis behavior. Further plot context,
+cursor, history, touch and raw graph-index paths remain separate work.

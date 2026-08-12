@@ -75,3 +75,14 @@ covered. Valid cursor readout, history retention and broad context-menu paths,
 rendering/gesture behavior, non-finite FFT policy and large resource limits
 remain open. **PlotWidget is not cleared for broad refactoring** until the
 remaining safe paths are characterized.
+
+## Plot drag/drop input hardening (2026-08-12)
+
+`PLOT_009` maps direct and historical `Buffered` tree-ID resolution for leaf
+`Data`/`vector<double>` containers, including null manager, branch and null
+output rejection. `PLOT_010` covers a foreign drop event as a no-op on an
+existing graph. `PlotWidgetDropBinding` centralizes only eligibility and ID
+resolution; it does not alter qcustomplot, valid graph creation, Shift X-axis
+behavior, data bytes or the historical buffered-ID spelling. Empty tree
+selection, missing MainWindow/manager, an XY plot and unsupported containers
+are rejected before index/dereference or graph update.

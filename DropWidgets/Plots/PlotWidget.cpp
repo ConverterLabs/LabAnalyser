@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "PlotWidget.h"
+#include "PlotWidgetDropBinding.h"
 #include "PlotMeasurements.h"
 #include "mainwindow.h"
 #include <fftw3.h>
@@ -2245,51 +2246,18 @@ void PlotWidget::ResetZoom()
 void PlotWidget::dragEnterEvent(QDragEnterEvent *event)
 {
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
-    if(!treeWidget || XYPlot())
+    if(!treeWidget || XYPlot() || !MainWindow_p || !MainWindow_p->GetLogic())
     {
         return;
     }
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
-   // auto si = treeWidget->parent();
-
-    MainWindow *MW = this->MainWindow_p;
+    if (selectedItems.isEmpty())
+        return;
 
     QString id;
-    auto sit = selectedItems[0];
-    while(sit)
-    {
-        id.insert(0,sit->text( 0 ));
-        sit = sit->parent();
-        if(sit)
-            id.insert(0,"::");
-    }
-
-    if (selectedItems[0]->childCount() == 0 &&
-        MW->GetLogic()->GetContainer(id)->GetType().compare("Data")==0 &&
-        MW->GetLogic()->GetContainer(id)->GetDataType().compare("vector<double>")==0)
+    if (PlotWidgetDropBinding::ResolveSupportedItem(MainWindow_p->GetLogic(),
+                                                    selectedItems.first(), &id))
         event->acceptProposedAction();
-    else
-    {
-        QList<QString> SplitList  = id.split("::");
-        id.clear();
-        for(int i = 0; i < SplitList.size();i++)
-        {
-            id.append(SplitList[i]);
-            if(i < SplitList.size() - 1)
-            {
-                id.append("::");
-            }
-            if(i == 0)
-            {
-                id.append("Buffered::");
-            }
-        }
-        if(MW->GetLogic()->GetContainer(id))
-            if (selectedItems[0]->childCount() == 0 &&
-                MW->GetLogic()->GetContainer(id)->GetType().compare("Data")==0 &&
-                MW->GetLogic()->GetContainer(id)->GetDataType().compare("vector<double>")==0)
-                event->acceptProposedAction();
-    }
 
 }
 
@@ -2401,63 +2369,31 @@ void PlotWidget::AddCustomGraph(QString id, bool skip_register)
 void PlotWidget::dropEvent(QDropEvent *event)
 {
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
+    if (!treeWidget || XYPlot() || !MainWindow_p || !MainWindow_p->GetLogic())
+        return;
+
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
-
     MainWindow *MW = this->MainWindow_p;
+    bool addedGraph = false;
 
-    QString id;
-    int number = 0;
-
-    for(auto sit :selectedItems )
+    for (QTreeWidgetItem* item : selectedItems)
     {
-        id.clear();
-        while(sit)
+        QString id;
+        if (PlotWidgetDropBinding::ResolveSupportedItem(MW->GetLogic(), item, &id))
         {
-            id.insert(0,sit->text( 0 ));
-            sit = sit->parent();
-            if(sit)
-                id.insert(0,"::");
-        }
-
-        if (!(selectedItems[number]->childCount() == 0 &&
-            MW->GetLogic()->GetContainer(id)->GetType().compare("Data")==0 &&
-            MW->GetLogic()->GetContainer(id)->GetDataType().compare("vector<double>")==0))
-        {
-            QList<QString> SplitList  = id.split("::");
-            id.clear();
-            for(int i = 0; i < SplitList.size();i++)
+            AddCustomGraph(id);
+            addedGraph = true;
+            if(QApplication::keyboardModifiers() & Qt::ShiftModifier && this->graphCount() == 2 &&  !__isFFT)
             {
-                id.append(SplitList[i]);
-                if(i < SplitList.size() - 1)
-                {
-                    id.append("::");
-                }
-                if(i == 0)
-                {
-                    id.append("Buffered::");
-                }
+                graph(0)->setSelected(false);
+                graph(1)->setSelected(true);
+                SetAsXAxis();
             }
         }
-        if(MW->GetLogic()->GetContainer(id))
-        {
-            if ((selectedItems[number]->childCount() == 0 &&
-                MW->GetLogic()->GetContainer(id)->GetType().compare("Data")==0 &&
-                MW->GetLogic()->GetContainer(id)->GetDataType().compare("vector<double>")==0))
-            {
-                AddCustomGraph(id);
-                if(QApplication::keyboardModifiers() & Qt::ShiftModifier && this->graphCount() == 2 &&  !__isFFT)
-                {
-                    graph(0)->setSelected(false);
-                    graph(1)->setSelected(true);
-                    SetAsXAxis();
-                }
-            }
-         }
-        //Get Data
-        number++;
     }
 
-    UpdateGraphs("", true);
+    if (addedGraph)
+        UpdateGraphs("", true);
 
 }
 

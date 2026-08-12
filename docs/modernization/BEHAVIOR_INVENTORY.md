@@ -1138,3 +1138,12 @@ entry path and status-message behavior remain outside this narrow alignment.
 `DropWidgetConnectionMenu::Show` is mapped to `DW_037`: a true standard-menu
 option uses a standard menu only for a real `QLineEdit`; all other widgets use
 the existing generic owned menu, and a null widget is ignored.
+
+## PlotWidget tree-drop boundary
+
+`PlotWidget::{dragEnterEvent,dropEvent}` are mapped to `PLOT_009..010`.
+Only leaf `Data` containers with `vector<double>` payloads, including the
+historical `Buffered` fallback ID, can add a graph. Foreign/empty-source drops,
+missing context, XY plots and unsupported items are no-ops; valid graph and
+Shift-axis routes retain their existing contracts. qcustomplot is vendored and
+outside the modified boundary.

@@ -10,6 +10,7 @@
 
 #include "DataManagement/DataMessengerClass.h"
 #include "DropWidgets/Plots/FFTPlotWidget.h"
+#include "DropWidgets/Plots/PlotWidgetDropBinding.h"
 #include "DropWidgets/Plots/PlotWidget.h"
 #include "mainwindow.h"
 
@@ -33,6 +34,8 @@ private slots:
     void PLOT_006_connect_to_id_and_safe_cleanup();
     void PLOT_007_quality_criteria_zero_frequency_has_bounded_indices();
     void PLOT_008_cursor_controls_are_safe_without_graphs();
+    void PLOT_009_drop_item_resolution_is_bounded_and_type_checked();
+    void PLOT_010_foreign_drop_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -284,6 +287,49 @@ void PlotWidgetContractTests::PLOT_008_cursor_controls_are_safe_without_graphs()
     QVERIFY(QMetaObject::invokeMethod(&plot, "ClearScopeCursors", Qt::DirectConnection));
     QVERIFY(QMetaObject::invokeMethod(&plot, "ToggleCursors", Qt::DirectConnection, Q_ARG(bool, false)));
     QCOMPARE(plot.graphCount(), 0);
+}
+
+void PlotWidgetContractTests::PLOT_009_drop_item_resolution_is_bounded_and_type_checked()
+{
+    MainWindow window;
+    QTreeWidget tree;
+    QTreeWidgetItem root(&tree, QStringList("Direct"));
+    QTreeWidgetItem leaf(&root, QStringList("Signal"));
+    QTreeWidgetItem branch(&root, QStringList("Group"));
+    QTreeWidgetItem nested(&branch, QStringList("Nested"));
+    QString resolved;
+
+    publish(window, "Direct::Signal", data({0.0, 1.0}, {2.0, 3.0}));
+    QVERIFY(PlotWidgetDropBinding::ResolveSupportedItem(window.GetLogic(), &leaf, &resolved));
+    QCOMPARE(resolved, QString("Direct::Signal"));
+    QVERIFY(!PlotWidgetDropBinding::ResolveSupportedItem(window.GetLogic(), &root, &resolved));
+    QVERIFY(!PlotWidgetDropBinding::ResolveSupportedItem(window.GetLogic(), &nested, nullptr));
+    QVERIFY(!PlotWidgetDropBinding::ResolveSupportedItem(nullptr, &leaf, &resolved));
+
+    QTreeWidgetItem bufferedRoot(&tree, QStringList("Buffered"));
+    QTreeWidgetItem bufferedLeaf(&bufferedRoot, QStringList("Signal"));
+    publish(window, "Buffered::Buffered::Signal", data({0.0, 1.0}, {4.0, 5.0}));
+    QVERIFY(PlotWidgetDropBinding::ResolveSupportedItem(window.GetLogic(), &bufferedLeaf, &resolved));
+    QCOMPARE(resolved, QString("Buffered::Buffered::Signal"));
+    QCOMPARE(PlotWidgetDropBinding::BufferedId(QString("Buffered::Signal")),
+             QString("Buffered::Buffered::Signal"));
+}
+
+void PlotWidgetContractTests::PLOT_010_foreign_drop_is_a_noop()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    publish(window, "D::A", data({0.0, 1.0}, {1.0, 2.0}));
+    plot.AddCustomGraph("D::A");
+    QCOMPARE(plot.graphCount(), 1);
+
+    QMimeData foreign;
+    QDropEvent event(QPointF(1.0, 1.0), Qt::CopyAction, &foreign,
+                     Qt::LeftButton, Qt::NoModifier);
+    plot.dropEvent(&event);
+    QCOMPARE(plot.graphCount(), 1);
+    QCOMPARE(graph(plot, 0)->ID(), QString("D::A"));
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()
