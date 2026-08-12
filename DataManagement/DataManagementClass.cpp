@@ -369,14 +369,22 @@ int DataManagementClass::GetPlotWindowsIncrementer()
 }
 
 void DataManagementClass::SetMinMaxValue(QString ID, double Min, double Max)
-{   
-    this->GetContainer(ID)->MaxValue  = Max;
-    this->GetContainer(ID)->MinValue  = Min;
+{
+    ToFormMapper* container = GetContainer(ID);
+    if (!container)
+        return;
+
+    container->MaxValue  = Max;
+    container->MinValue  = Min;
 }
 
 std::pair<double, double> DataManagementClass::MinMaxValue(QString ID)
 {
-    return std::pair<double, double>(this->GetContainer(ID)->MinValue,this->GetContainer(ID)->MaxValue);
+    ToFormMapper* container = GetContainer(ID);
+    if (!container)
+        return std::pair<double, double>();
+
+    return std::pair<double, double>(container->MinValue, container->MaxValue);
 }
 
 bool DataManagementClass::IsObjectLinked(QObject* Obj)

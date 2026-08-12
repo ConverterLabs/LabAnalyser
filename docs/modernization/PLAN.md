@@ -996,3 +996,6 @@ legacy file dialog.
 
 `DM_SAFE_004` hardens DataRegistry form-index and malformed plot-rename
 boundaries without changing valid form or numbered-plot behavior.
+
+`DM_SAFE_005` makes missing DataManagement Min/Max IDs non-mutating and
+returns a neutral `(0, 0)` pair while retaining current valid range semantics.

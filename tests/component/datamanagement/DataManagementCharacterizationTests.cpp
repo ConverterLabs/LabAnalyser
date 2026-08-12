@@ -146,6 +146,7 @@ private slots:
     void DM_SAFE_002_messenger_without_optional_parent_boundaries_is_safe();
     void DM_SAFE_003_null_widget_boundaries_do_not_create_or_dereference_bindings();
     void DM_SAFE_004_registry_boundary_inputs_are_safe();
+    void DM_SAFE_005_missing_minmax_container_is_safe();
     void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
     void DM_REG_002_skipFormFlags_override_and_project_cleanup();
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
@@ -736,6 +737,21 @@ void DataManagementCharacterizationTests::DM_SAFE_004_registry_boundary_inputs_a
     QCOMPARE(manager.GetPlotByName("plot-object"), &plot);
     manager.DeletePlotPointer("renamed-plot");
     QCOMPARE(manager.PlotCount(), 0);
+}
+
+void DataManagementCharacterizationTests::DM_SAFE_005_missing_minmax_container_is_safe()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    const int beforeCount = manager.GetContainerCount();
+
+    manager.SetMinMaxValue("missing", -3.0, 9.0);
+    QCOMPARE(manager.MinMaxValue("missing"), std::make_pair(0.0, 0.0));
+    QCOMPARE(manager.GetContainerCount(), beforeCount);
+
+    manager.AddContainerElement("present", "double", "Parameter", "");
+    manager.SetMinMaxValue("present", 9.0, -3.0);
+    QCOMPARE(manager.MinMaxValue("present"), std::make_pair(9.0, -3.0));
 }
 
 void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()

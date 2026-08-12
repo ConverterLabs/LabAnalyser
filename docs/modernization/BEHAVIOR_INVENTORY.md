@@ -1127,6 +1127,9 @@ the valid action routes.
 return an empty pair, and a numbered plot can be renamed without a numeric
 `#` suffix while retaining its stored number for internal bookkeeping.
 
+`DM_SAFE_005` maps missing Min/Max IDs: setters do not insert or mutate a
+container, getters return `(0, 0)`, and existing inverted ranges remain stored.
+
 Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See
