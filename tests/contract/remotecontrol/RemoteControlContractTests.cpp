@@ -205,9 +205,12 @@ void RemoteControlContractTests::TCP_001_lifecyclePortAndLoopback() {
     QTcpSocket client;
     client.connectToHost(QHostAddress::LocalHost, quint16(server->GetPort()));
     QTRY_COMPARE(client.state(), QAbstractSocket::ConnectedState);
+    QTRY_COMPARE(acceptedSockets(*server).size(), 1);
+    QPointer<QTcpSocket> acceptedGuard(acceptedSockets(*server).first());
     QPointer<RemoteControlServer> guard(server);
     delete server;
     QTRY_VERIFY(guard.isNull());
+    QTRY_VERIFY(acceptedGuard.isNull());
     QTRY_VERIFY(client.state() == QAbstractSocket::UnconnectedState);
     clear(data);
 }
