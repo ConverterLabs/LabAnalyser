@@ -1062,6 +1062,10 @@ MainWindow retains accepted figure creation and legacy plot registration.
 `GUI_SAFE_008` assigns transient data-alias actions to their transient context
 menu, retaining all existing alias and multi-selection behavior.
 
+CloseProject now uses a non-owning QPointer around the historical explicit dock
+delete, preventing a second deletion if the existing close handling already
+destroyed that dock.
+
 The focused MainWindow package is complete for output presentation, tree-ID
 derivation, publish-view state and narrow null/path guards. Dynamic docks,
 project routing, dialogs, command-line parsing and figure lifecycle remain

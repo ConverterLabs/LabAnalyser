@@ -21,6 +21,7 @@
 
 #include <QTime>
 #include <QList>
+#include <QPointer>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -915,10 +916,14 @@ void MainWindow::CloseProject(void)
         const QString formName = this->GetLogic()->GetFormFileEntry(0).first;
         QDockWidget* DW = this->findChild<QDockWidget*>(formName);
         if(DW)
+        {
+            QPointer<QDockWidget> dock(DW);
             DW->close();
+            if (dock)
+                delete dock;
+        }
         else
             this->GetLogic()->RemoveFormFile(formName);
-        delete DW;
       }
 
       while (this->ui->ParameterTreeWidget->topLevelItemCount())

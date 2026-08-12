@@ -642,6 +642,9 @@ remain mapped to GUI_012.
 with the existing temporary menu; GUI_016/020 retain their visible routing and
 payload contracts.
 
+CloseProject's existing live-dock vectors additionally cover its guarded
+post-close deletion: an already-destroyed dock is not deleted twice.
+
 GUI_009/012 also cover post-`exec()` dialog lifetime: parentless About and
 Subplot dialogs no longer remain as hidden top-level objects after their
 existing modal workflows complete.

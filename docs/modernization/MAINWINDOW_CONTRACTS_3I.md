@@ -322,6 +322,11 @@ creation paths.
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.
 
+The existing CloseProject vectors also cover a QPointer guard around the
+historical explicit dock deletion: a dock already removed by its own close
+handling is not deleted a second time; live-dock close and registry behavior
+remain unchanged.
+
 Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
 plot/figure creation, command-line handling and dialogs. They each combine
 MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;
