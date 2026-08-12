@@ -617,6 +617,10 @@ selection-derived IDs remain unchanged.
 path. It now reports the existing `Corrupt Form File` error without changing
 the working directory or form registry; normal `.ui` loading is unchanged.
 
+`GUI_SAFE_004` maps direct null dock cleanup as a no-op. The event filter also
+rejects a null event before touching it; normal dock close/destroy routing is
+unchanged.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target

@@ -1054,6 +1054,8 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::dockWidget_destroyed(QObject* Sen)
 {
+    if (!Sen)
+        return;
     QObject *SenderOC = Sen;
     auto cti = (SenderOC->findChildren<PlotWidget*>());
     for(int i = 0; i < cti.size(); i++)
@@ -1151,6 +1153,9 @@ void MainWindow::dockWidget_topLevelChanged(bool isFloating){
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+
+  if (!event)
+      return false;
 
   QDockWidget* DW = qobject_cast<QDockWidget*>(obj);
   if(DW)

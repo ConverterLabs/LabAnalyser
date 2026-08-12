@@ -1036,3 +1036,6 @@ altering normal figure registry deletion or export selection semantics.
 `GUI_SAFE_003` makes the public extensionless form path use the existing
 corrupt-form error channel before legacy filename indexing; valid form paths,
 CWD behavior and dynamic-dock semantics remain unchanged.
+
+`GUI_SAFE_004` adds only null guards for direct dock-cleanup/event-filter
+entry, without changing normal dynamic-dock lifecycle behavior.

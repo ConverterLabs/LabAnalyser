@@ -81,6 +81,7 @@ private slots:
     void GUI_022_publish_tree_view_state_contract();
     void GUI_SAFE_002_null_figure_deletion_is_a_noop();
     void GUI_SAFE_003_extensionless_form_path_is_rejected_safely();
+    void GUI_SAFE_004_null_dock_cleanup_is_a_noop();
     void cleanup();
     void cleanupTestCase();
 
@@ -1285,6 +1286,14 @@ void MainWindowIntegrationTests::GUI_SAFE_003_extensionless_form_path_is_rejecte
     QCOMPARE(errors.at(0).at(1).toString(), QString("Corrupt Form File"));
     QCOMPARE(window.GetLogic()->GetFormFileCount(), 0);
     QCOMPARE(QDir::currentPath(), workingDirectory);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_004_null_dock_cleanup_is_a_noop()
+{
+    MainWindow window;
+    const int forms = window.GetLogic()->GetFormFileCount();
+    window.dockWidget_destroyed(nullptr);
+    QCOMPARE(window.GetLogic()->GetFormFileCount(), forms);
 }
 
 void MainWindowIntegrationTests::cleanup()
