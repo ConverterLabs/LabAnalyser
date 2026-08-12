@@ -149,6 +149,8 @@ bool DataManagementClass::ElementExists(QString ElementName)
 
 void DataManagementClass::AddElementToContainerEntry(QString ElementName, QString ContainerID, QString ClassName, QObject* object)
 {
+    if (!object)
+        return;
     //Check if map element exists
     ToFormMapper* DataC = GetContainer(ContainerID);
     if(DataC)
@@ -179,11 +181,15 @@ QString DataManagementClass::GetContainerID(QString ElementName)
 QString DataManagementClass::GetContainerID(QObject* Object)
 {
     //Check if map element exists
+    if (!Object)
+        return QString();
     return Bindings->Find(Object->objectName());
 }
 
 ToFormMapper* DataManagementClass::GetContainer(QObject* Object)
 {
+    if (!Object)
+        return nullptr;
     return Containers->LookupOrInsert(GetContainerID(Object->objectName()));
 }
 
@@ -194,6 +200,8 @@ ToFormMapper* DataManagementClass::GetContainer(QString ContainerID)
 
 InterfaceData DataManagementClass::GetInterfaceData(QObject* Object)
 {
+    if (!Object)
+        return InterfaceData();
     ToFormMapper* Element = Containers->LookupOrInsert(GetContainerID(Object->objectName()));
     InterfaceData Data(Element->GetDataType(),Element->GetType());
     Data.SetDataRaw(Element->GetData());
@@ -203,6 +211,8 @@ InterfaceData DataManagementClass::GetInterfaceData(QObject* Object)
 
 QString DataManagementClass::GetObjectType(QObject* Object)
 {
+    if (!Object)
+        return QString();
     ToFormMapper* Element = Containers->LookupOrInsert(GetContainerID(Object->objectName()));
     QString FormType;
     for(int i = 0; i <Element->Objects.size();i++)
@@ -215,6 +225,8 @@ QString DataManagementClass::GetObjectType(QObject* Object)
 
 void DataManagementClass::DeleteEntryOfObject(QString id, QObject* Object)
 {
+    if (!Object)
+        return;
     ToFormMapper* DataC = Containers->LookupOrInsert(id);
     if(DataC)
     {
@@ -231,6 +243,8 @@ void DataManagementClass::DeleteEntryOfObject(QString id, QObject* Object)
 void DataManagementClass::DeleteEntryOfObject(QObject* Object)
 {
     //Check if map element exists
+    if (!Object)
+        return;
     QString id;
     if(Bindings->Take(Object->objectName(), &id))
     {
@@ -368,6 +382,8 @@ std::pair<double, double> DataManagementClass::MinMaxValue(QString ID)
 bool DataManagementClass::IsObjectLinked(QObject* Obj)
 {
     //Check if the object is linked
+    if (!Obj)
+        return false;
     return Bindings->Contains(Obj->objectName());
 }
 

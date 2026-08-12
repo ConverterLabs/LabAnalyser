@@ -144,6 +144,7 @@ private slots:
     void DM_010_setOwnershipAndRepeatedDataFlow();
     void DM_SAFE_001_senderless_and_unknown_setter_slots_are_noops();
     void DM_SAFE_002_messenger_without_optional_parent_boundaries_is_safe();
+    void DM_SAFE_003_null_widget_boundaries_do_not_create_or_dereference_bindings();
     void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
     void DM_REG_002_skipFormFlags_override_and_project_cleanup();
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
@@ -683,6 +684,31 @@ void DataManagementCharacterizationTests::DM_SAFE_002_messenger_without_optional
     QCOMPARE(notifications.count(), 1);
     QCOMPARE(notifications.at(0).at(0).toString(), QString("LabAnalyser"));
     QCOMPARE(closed.count(), 1);
+}
+
+void DataManagementCharacterizationTests::DM_SAFE_003_null_widget_boundaries_do_not_create_or_dereference_bindings()
+{
+    QObject owner;
+    owner.setObjectName("LabAnalyser");
+    DataManagementSetClass manager(&owner);
+    manager.AddContainerElement("parameter", "double", "Parameter", "");
+    const int beforeContainers = manager.GetContainerCount();
+
+    // Null widget pointers were previously dereferenced by facade helpers.
+    // Do not exercise that unsafe baseline; null input now has no binding side effect.
+    manager.AddElementToContainerEntry("null-widget", "parameter", "ProbeDropWidget", nullptr);
+    QCOMPARE(manager.GetContainerCount(), beforeContainers);
+    QCOMPARE(manager.GetContainerID(static_cast<QObject*>(nullptr)), QString());
+    QCOMPARE(manager.GetContainer(static_cast<QObject*>(nullptr)), nullptr);
+    QCOMPARE(manager.GetObjectType(nullptr), QString());
+    QVERIFY(!manager.IsObjectLinked(nullptr));
+    manager.DeleteEntryOfObject(QString("parameter"), nullptr);
+    manager.DeleteEntryOfObject(static_cast<QObject*>(nullptr));
+    QVERIFY(manager.GetContainer("parameter") != nullptr);
+    QCOMPARE(manager.GetContainer("parameter")->Objects.size(), size_t(0));
+
+    manager.SetData(QString("parameter"));
+    QCOMPARE(manager.GetContainerCount(), beforeContainers);
 }
 
 void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()

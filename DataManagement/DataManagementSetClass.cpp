@@ -58,6 +58,8 @@ void DataManagementSetClass::SetData(const QString &ID)
     //Go through all elements of the container
     for(auto i = 0; i < Ele->Objects.size(); i++)
     {
+        if (!Ele->Objects[i].FormP)
+            continue;
         auto DCObj = dynamic_cast<VariantDropWidget*>(Ele->Objects[i].FormP);
 		if(DCObj)
 		{
