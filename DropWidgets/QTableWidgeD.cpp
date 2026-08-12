@@ -261,7 +261,7 @@ void QTableWidgeD::dropEvent(QDropEvent *event)
         QString VText = ID0;
         VText.remove(VText.size()-2,2);
 
-        CreateRow(VText, event->pos());
+        CreateRow(VText, event->position().toPoint());
 
     }
 

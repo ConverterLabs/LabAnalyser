@@ -69,25 +69,8 @@ void QLCDNumberD::dragEnterEvent(QDragEnterEvent *event)
 void QLCDNumberD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
-    ToFormMapper* container = context.manager->GetContainer(context.id);
-
-    QString Type = container->GetDataType();
-
-    /*if(Type.compare("double")==0)
-    {
-        this->display((GetMainWindow()->GetLogic()->GetContainer(ID)->GetDouble()));
-    }
-    else if(Type.compare("int")==0)
-    {
-        this->display((double) GetMainWindow()->GetLogic()->GetContainer(ID)->GetInt());
-    }
-    else if(Type.compare("float")==0)
-    {
-        this->display((double) (GetMainWindow()->GetLogic()->GetContainer(ID)->GetFloat()));
-    }*/
-
     DropWidgetDropBinding::Register(this, context);
-     emit RequestUpdate();
+    emit RequestUpdate();
 
 }
 
