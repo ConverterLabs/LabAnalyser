@@ -72,6 +72,7 @@ private slots:
     void DW_032_list_mutation_ignores_empty_selection();
     void DW_033_variant_output_rejects_null_mapper();
     void DW_034_combo_output_rejects_incompatible_mapper();
+    void DW_035_indicator_type_admission_rejects_incompatible_mapper();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -506,6 +507,35 @@ void DropWidgetAdapterTests::DW_034_combo_output_rejects_incompatible_mapper()
     selection.SetData(GuiSelection("one", {"one", "two"}));
     combo.GetVariantData(&selection);
     QCOMPARE(selection.GetGuiSelection().first, QString("two"));
+}
+
+void DropWidgetAdapterTests::DW_035_indicator_type_admission_rejects_incompatible_mapper()
+{
+    ToFormMapper boolean = mapper("bool");
+    boolean.SetData(true);
+    ToFormMapper unsignedNumber = mapper("uint32_t");
+    unsignedNumber.SetData(uint32_t(1));
+    ToFormMapper signedNumber = mapper("int32_t");
+    signedNumber.SetData(int32_t(1));
+    ToFormMapper selection = mapper("GuiSelection");
+    selection.SetData(GuiSelection("one", {"one"}));
+
+    QVERIFY(DropWidgetIndicatorBinding::SupportsIndicator(&boolean));
+    QVERIFY(DropWidgetIndicatorBinding::SupportsIndicator(&unsignedNumber));
+    QVERIFY(!DropWidgetIndicatorBinding::SupportsIndicator(&signedNumber));
+    QVERIFY(!DropWidgetIndicatorBinding::SupportsIndicator(&selection));
+    QVERIFY(!DropWidgetIndicatorBinding::SupportsIndicator(nullptr));
+
+    uint32_t bit = 4;
+    uint32_t counter = 9;
+    bool state = true;
+    QWidget parent;
+    DropWidgetIndicatorBinding::InitializeState(&parent, &signedNumber, bit, counter,
+                                                 "title", "prompt",
+                                                 [&state](bool value) { state = value; });
+    QCOMPARE(bit, uint32_t(4));
+    QCOMPARE(counter, uint32_t(9));
+    QVERIFY(state);
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

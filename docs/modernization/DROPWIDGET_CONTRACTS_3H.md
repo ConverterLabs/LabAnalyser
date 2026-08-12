@@ -423,3 +423,12 @@ combo selection remain unchanged, while a real GuiSelection receives the
 current text. The historical `InterfaceData::SetData(QString)` constructor-path
 conversion is outside this slice and is deliberately compared as a prior-state
 difference rather than normalized.
+
+### Indicator type admission hardening (2026-08-12)
+
+`DropWidgetIndicatorBinding::SupportsIndicator` now makes the historical
+bool/unsigned admission explicit before a LED or checkbox changes its binding.
+`DW_035` verifies bool and unsigned acceptance plus signed and GuiSelection
+rejection, including unchanged bit/counter/state through the direct initializer
+path. The tests use real stored variant types because the legacy InterfaceData
+predicates classify that value rather than an advisory DataType string.

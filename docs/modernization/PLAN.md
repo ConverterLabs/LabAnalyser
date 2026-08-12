@@ -388,6 +388,8 @@ Concrete adapter `GetVariantData` implementations now treat null output mappers
 as safe no-ops (`DW_033`), without changing real-mapper conversion semantics.
 QComboBoxD additionally rejects incompatible non-GuiSelection output mappers
 before conversion (`DW_034`); the valid GuiSelection path is unchanged.
+The shared indicator/checkbox helper now admits only actual bool or unsigned
+mapper variants before rebinding (`DW_035`).
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

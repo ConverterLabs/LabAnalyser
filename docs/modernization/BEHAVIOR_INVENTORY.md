@@ -283,6 +283,9 @@ Real mapper output contracts are unchanged.
 `DW_034` covers QComboBoxD output type admission: non-GuiSelection output
 mappers remain untouched, while the current text still writes to GuiSelection.
 
+`DW_035` maps the shared indicator admission boundary: only actual bool or
+unsigned mapper variants can rebind QBLed/QLed/QTSLed or QCheckBoxD.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

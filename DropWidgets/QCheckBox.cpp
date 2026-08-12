@@ -74,7 +74,7 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
     auto MW = mainWindow;
 
     ToFormMapper* container = MW->GetLogic()->GetContainer(ID);
-    if (!container)
+    if (!DropWidgetIndicatorBinding::SupportsIndicator(container))
         return;
     DropWidgetDropBinding::ResetContextConnections(this, MW->GetLogic());
     this->setToolTip(ID);

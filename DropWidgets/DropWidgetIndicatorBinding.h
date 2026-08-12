@@ -12,12 +12,17 @@
 // this helper only removes their byte-for-byte duplicated manager sequence.
 namespace DropWidgetIndicatorBinding
 {
+inline bool SupportsIndicator(ToFormMapper* container)
+{
+    return container && (container->IsBool() || container->IsUnsigedNumber());
+}
+
 template <typename StateSetter>
 inline void InitializeState(QWidget* parent, ToFormMapper* container, uint32_t& bit,
                             uint32_t& bitCounter, const QString& title,
                             const QString& prompt, StateSetter setState)
 {
-    if (!container)
+    if (!SupportsIndicator(container))
         return;
     if (container->IsBool())
     {
@@ -49,7 +54,7 @@ inline void BindFromDrop(Indicator* indicator, QDropEvent* event, uint32_t& bit,
     const QString id = CreateID(event->source());
     DataManagementSetClass* manager = mainWindow->GetLogic();
     ToFormMapper* container = manager->GetContainer(id);
-    if (!container)
+    if (!SupportsIndicator(container))
         return;
 
     indicator->disconnect();
