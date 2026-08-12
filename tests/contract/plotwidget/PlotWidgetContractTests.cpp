@@ -52,6 +52,7 @@ private slots:
     void PLOT_024_unmanaged_highlight_action_is_a_noop();
     void PLOT_025_missing_plot_offset_leaves_graph_unchanged();
     void PLOT_026_xy_reset_ignores_unbound_graphs();
+    void PLOT_027_unmanaged_pdf_export_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -581,6 +582,15 @@ void PlotWidgetContractTests::PLOT_026_xy_reset_ignores_unbound_graphs()
     QCOMPARE(plot.xAxis->range().upper, originalX.upper);
     QCOMPARE(plot.yAxis->range().lower, originalY.lower);
     QCOMPARE(plot.yAxis->range().upper, originalY.upper);
+}
+
+void PlotWidgetContractTests::PLOT_027_unmanaged_pdf_export_is_a_noop()
+{
+    QWidget host;
+    PlotWidget plot(nullptr, &host, nullptr);
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "SaveToPdf", Qt::DirectConnection));
+    QCOMPARE(plot.graphCount(), 0);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

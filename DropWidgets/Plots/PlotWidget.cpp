@@ -1624,6 +1624,8 @@ void PlotWidget::graphClicked(QCPAbstractPlottable *plottable)
 
 void PlotWidget::SaveToPdf(void)
 {
+  if (!MainWindow_p)
+      return;
 
   // Open a file dialog for the user to choose a filename for the PDF
 

@@ -990,3 +990,6 @@ and retains existing graph data.
 
 `PLOT_026` prevents XY reset range calculation without complete nonempty graph
 data; valid XY range semantics remain unchanged.
+
+`PLOT_027` rejects PDF export without MainWindow context before opening the
+legacy file dialog.

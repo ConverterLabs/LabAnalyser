@@ -139,3 +139,6 @@ optional offset pointer. Graph data remain unchanged and the update returns.
 
 `PLOT_026` runs XY reset with two graph objects lacking X/Y data. Axis ranges
 remain unchanged and the min/max calculation is not entered.
+
+`PLOT_027` invokes PDF export without MainWindow context. No dialog or file
+operation is started.

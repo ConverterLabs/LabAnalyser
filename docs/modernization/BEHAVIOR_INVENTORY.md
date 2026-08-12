@@ -1198,3 +1198,6 @@ offset state rejects the entire update before graph mutation.
 
 `PlotWidget::ResetZoom` is mapped to `PLOT_026`: an XY model with unbound or
 empty graph data is a no-op.
+
+`PlotWidget::SaveToPdf` is mapped to `PLOT_027`: export requires MainWindow
+context and is otherwise a no-op before dialog/file handling.
