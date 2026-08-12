@@ -155,3 +155,42 @@ add_executable(PlotWidgetContractTests ${PROJECT_SOURCE_DIR}/tests/contract/plot
 target_link_libraries(PlotWidgetContractTests PRIVATE LabAnalyserPlotTestCore)
 target_include_directories(PlotWidgetContractTests PRIVATE "${CMAKE_BINARY_DIR}/LabAnalyserPlotTestCore_autogen/include")
 labanalyser_setup_gui_test(PlotWidgetContractTests)
+
+# Runtime-built plugin fixtures intentionally stay below the CMake build tree.
+# They share the host Qt/architecture and preserve the qmake fixture layout so
+# existing contract XML can address them through one portable root variable.
+function(labanalyser_add_plugin_fixture target source)
+    add_library(${target} MODULE ${source})
+    set_target_properties(${target} PROPERTIES
+        PREFIX ""
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test-plugins/${target}/release"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test-plugins/${target}/release")
+    target_include_directories(${target} PRIVATE "${PROJECT_SOURCE_DIR}")
+    target_link_libraries(${target} PRIVATE Qt6::Core Qt6::Widgets)
+endfunction()
+
+labanalyser_add_plugin_fixture(CompatiblePlugin ${PROJECT_SOURCE_DIR}/tests/fixtures/plugins/source/compatible/CompatiblePlugin.cpp)
+labanalyser_add_plugin_fixture(WrongIidPlugin ${PROJECT_SOURCE_DIR}/tests/fixtures/plugins/source/wrong_iid/WrongIidPlugin.cpp)
+labanalyser_add_plugin_fixture(QObjectOnlyPlugin ${PROJECT_SOURCE_DIR}/tests/fixtures/plugins/source/qobject_only/QObjectOnlyPlugin.cpp)
+labanalyser_add_plugin_fixture(MemberOwnedInterfacePlugin ${PROJECT_SOURCE_DIR}/tests/fixtures/plugins/source/member_owned/MemberOwnedInterfacePlugin.cpp)
+labanalyser_add_plugin_fixture(HeapOwnedInterfacePlugin ${PROJECT_SOURCE_DIR}/tests/fixtures/plugins/source/heap_owned/HeapOwnedInterfacePlugin.cpp)
+
+add_executable(PluginLoaderContractTests
+    ${PROJECT_SOURCE_DIR}/tests/contract/plugins/PluginLoaderContractTests.cpp
+    ${PROJECT_SOURCE_DIR}/tests/contract/plugins/DataManagementSetClassTestSeam.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementSetClass.h
+    ${PROJECT_SOURCE_DIR}/LoadSave/loadplugin.cpp
+    ${PROJECT_SOURCE_DIR}/LoadSave/PluginLeasePool.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/ContainerStore.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/DataRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/DeviceRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/WidgetBindingRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/MessageDispatchPolicy.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementClass.cpp
+    ${PROJECT_SOURCE_DIR}/DataManagement/DataMessengerClass.cpp
+    ${PROJECT_SOURCE_DIR}/plugins/InterfaceDataType.cpp)
+target_compile_definitions(PluginLoaderContractTests PRIVATE LABANALYSER_PLUGIN_LEASE_TESTING)
+target_link_libraries(PluginLoaderContractTests PRIVATE
+    Qt6::Core Qt6::Widgets Qt6::UiTools Qt6::PrintSupport Qt6::OpenGL Qt6::OpenGLWidgets Qt6::Network Qt6::Test Boost::boost)
+labanalyser_setup_test(PluginLoaderContractTests)
+add_dependencies(PluginLoaderContractTests CompatiblePlugin WrongIidPlugin QObjectOnlyPlugin MemberOwnedInterfacePlugin HeapOwnedInterfacePlugin)
