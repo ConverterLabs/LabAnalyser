@@ -36,6 +36,7 @@
 #include "UIFunctions/MainWindowTreeModel.h"
 #include "UIFunctions/MainWindowFigureFactory.h"
 #include "UIFunctions/MainWindowDockPresentation.h"
+#include "UIFunctions/MainWindowTrayController.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -798,30 +799,18 @@ void MainWindow::RemoveConnection(QString)
 
 void MainWindow::on_actionMinimize_to_Tray_triggered()
 {
-    this->showMinimized();
-    hide();
-    restore->setEnabled(true);
+    MainWindowTrayController::MinimizeToTray(*this, *restore);
 }
 
 void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);
-    if(this->isVisible())
-    {
-        restore->setEnabled(false);
-    }
+    MainWindowTrayController::UpdateRestoreAction(*this, *restore);
 }
 
 void MainWindow::TrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-
-    if(reason == QSystemTrayIcon::DoubleClick)
-    {
-      this->show();
-      this->showNormal();
-      this->raise();
-      restore->setEnabled(false);
-    }
+    MainWindowTrayController::HandleActivation(*this, *restore, reason);
 }
 
 void MainWindow::ErrorWriter(const QString &ID, const QString Data)

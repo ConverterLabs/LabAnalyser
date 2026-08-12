@@ -107,6 +107,7 @@ SOURCES += main.cpp\
         UIFunctions/MainWindowTreeModel.cpp \
         UIFunctions/MainWindowFigureFactory.cpp \
         UIFunctions/MainWindowDockPresentation.cpp \
+        UIFunctions/MainWindowTrayController.cpp \
         UIFunctions/SubPlotMainWindow.cpp \
         TreeWidgetCustomDrop.cpp\
         CustomWidgets/QBLedIndicator.cpp \
@@ -122,6 +123,7 @@ HEADERS  += mainwindow.h\
             UIFunctions/MainWindowTreeModel.h \
             UIFunctions/MainWindowFigureFactory.h \
             UIFunctions/MainWindowDockPresentation.h \
+            UIFunctions/MainWindowTrayController.h \
             CustomWidgets/QBLedIndicator.h \
             CustomWidgets/QLedIndicator.h \
             CustomWidgets/QTSLedIndicator.h \

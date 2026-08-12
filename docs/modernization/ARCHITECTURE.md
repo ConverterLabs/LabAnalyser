@@ -309,6 +309,10 @@ plot/figure registry responsibility.
 dock floating, resize and event-filter presentation. MainWindow remains the
 QObject event-filter owner and retains all close/manager lifecycle routing.
 
+`UIFunctions/MainWindowTrayController` is a private, QObject-free presentation
+helper for minimise-to-tray, restore-action state and double-click restore.
+MainWindow retains the QSystemTrayIcon, public slots and window lifetime.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

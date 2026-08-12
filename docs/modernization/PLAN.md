@@ -1077,6 +1077,10 @@ remain unchanged.
 presentation, preserving GUI_004 and dynamic dock lifecycle behavior without
 normalizing the observed historical dock-name asymmetry.
 
+`MainWindowTrayController` isolates minimise/restore presentation mechanics
+while MainWindow retains QSystemTrayIcon ownership and the public
+action/slot contract; GUI_003 and GUI_013 remain the behavioral coverage.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

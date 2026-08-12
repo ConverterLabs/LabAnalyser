@@ -660,6 +660,10 @@ MainWindow creation routes and their valid registration behavior.
 event-filter presentation behavior. GUI_004 plus the dynamic-dock lifecycle
 vectors remain its contract; historical dock-name asymmetry is preserved.
 
+`MainWindowTrayController` is a private, non-owning tray presentation helper.
+GUI_003 and GUI_013 cover minimise, restore-action state and tray double-click
+restore through the unchanged MainWindow slots.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 
