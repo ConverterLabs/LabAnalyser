@@ -313,6 +313,10 @@ QObject event-filter owner and retains all close/manager lifecycle routing.
 helper for minimise-to-tray, restore-action state and double-click restore.
 MainWindow retains the QSystemTrayIcon, public slots and window lifetime.
 
+`UIFunctions/MainWindowProjectCleanup` is a private cleanup boundary for the
+existing figure, dynamic-form, explorer-tree and DataManagement close sequence.
+MainWindow retains loading deferral and all user-facing save/close decisions.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

@@ -107,6 +107,7 @@ set(LABANALYSER_CORE_SOURCES
     UIFunctions/MainWindowFigureFactory.cpp
     UIFunctions/MainWindowDockPresentation.cpp
     UIFunctions/MainWindowTrayController.cpp
+    UIFunctions/MainWindowProjectCleanup.cpp
     UIFunctions/SubPlotMainWindow.cpp
     TreeWidgetCustomDrop.cpp
     CustomWidgets/QBLedIndicator.cpp

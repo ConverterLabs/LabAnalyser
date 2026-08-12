@@ -37,6 +37,7 @@
 #include "UIFunctions/MainWindowFigureFactory.h"
 #include "UIFunctions/MainWindowDockPresentation.h"
 #include "UIFunctions/MainWindowTrayController.h"
+#include "UIFunctions/MainWindowProjectCleanup.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -620,41 +621,8 @@ void MainWindow::CloseProject(void)
 
     }
 
-      auto cti = (this->findChildren<SubPlotMainWindow*>());
-      for(SubPlotMainWindow* itt : cti)
-          itt->close();
-
-      while(this->GetLogic()->GetFormFileCount())
-      {
-        const QString formName = this->GetLogic()->GetFormFileEntry(0).first;
-        QDockWidget* DW = this->findChild<QDockWidget*>(formName);
-        if(DW)
-        {
-            QPointer<QDockWidget> dock(DW);
-            DW->close();
-            if (dock)
-                delete dock;
-        }
-        else
-            this->GetLogic()->RemoveFormFile(formName);
-      }
-
-      while (this->ui->ParameterTreeWidget->topLevelItemCount())
-      {
-          delete this->ui->ParameterTreeWidget->topLevelItem(0);
-      }
-      while (this->ui->DataTreeWidget->topLevelItemCount())
-      {
-          delete this->ui->DataTreeWidget->topLevelItem(0);
-      }
-      while (this->ui->StateTreeWidget->topLevelItemCount())
-      {
-          delete this->ui->StateTreeWidget->topLevelItem(0);
-      }
-      this->GetLogic()->CloseProjectLogic();
-      this->SavePath.clear();
-      this->ChangeForSaveDetected = false;
-      //Todo ChangeForSaveDetected
+    MainWindowProjectCleanup::Close(*this, *GetLogic(), *ui->ParameterTreeWidget,
+                                    *ui->DataTreeWidget, *ui->StateTreeWidget);
 }
 
 void MainWindow::on_Close_Project_triggered()

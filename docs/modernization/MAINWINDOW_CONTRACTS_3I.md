@@ -344,6 +344,11 @@ dock name asymmetry is intentionally preserved, not normalized in this slice.
 and tray-double-click presentation mechanics. GUI_003 and GUI_013 continue to
 exercise the unchanged public MainWindow action and slot behavior.
 
+`MainWindowProjectCleanup` contains the established non-dialog close sequence:
+figure close, dynamic-form dock cleanup, explorer-tree clearing and manager
+cleanup. The `isloading` deferral and all Save/Discard/Cancel routing remain
+in MainWindow. GUI_006/007/011 preserve this observable lifecycle.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.

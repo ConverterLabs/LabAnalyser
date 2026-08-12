@@ -664,6 +664,10 @@ vectors remain its contract; historical dock-name asymmetry is preserved.
 GUI_003 and GUI_013 cover minimise, restore-action state and tray double-click
 restore through the unchanged MainWindow slots.
 
+`MainWindowProjectCleanup` implements the established non-dialog project
+cleanup sequence. GUI_006/007/011 cover dynamic forms, cancellation and safe
+dock cleanup; loading deferral and dialog decisions remain MainWindow behavior.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 
