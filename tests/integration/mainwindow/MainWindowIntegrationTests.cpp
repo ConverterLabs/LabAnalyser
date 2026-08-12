@@ -85,6 +85,7 @@ private slots:
     void GUI_SAFE_005_orphaned_form_record_close_project_is_safe();
     void GUI_SAFE_006_output_context_actions_are_not_retained();
     void GUI_SAFE_007_failed_form_load_does_not_retain_a_toplevel_tab();
+    void GUI_SAFE_008_data_context_actions_are_not_retained();
     void cleanup();
     void cleanupTestCase();
 
@@ -1349,6 +1350,32 @@ void MainWindowIntegrationTests::GUI_SAFE_007_failed_form_load_does_not_retain_a
     QCOMPARE(errors.at(0).at(1).toString(), QString("Corrupt Form File"));
     QCOMPARE(window.GetLogic()->GetFormFileCount(), 0);
     QCOMPARE(QApplication::topLevelWidgets().size(), topLevelCount);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_008_data_context_actions_are_not_retained()
+{
+    MainWindow window;
+    const QString id("Data::GUI_SAFE_008::Value");
+    InterfaceData data("double", "Data");
+    data.SetData(1.0);
+    window.GetLogic()->GetMessenger()->MessageReceiver("publish", id, data);
+    QTreeWidget* tree = window.findChild<QTreeWidget*>("DataTreeWidget");
+    QVERIFY(tree);
+    QTreeWidgetItem* leaf = tree->topLevelItem(0)->child(0)->child(0);
+    QVERIFY(leaf);
+    tree->setCurrentItem(leaf, QItemSelectionModel::ClearAndSelect);
+    const int ownedActionCount = window.findChildren<QAction*>().size();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "contextMenuTreeWidgetData", Qt::DirectConnection,
+                                      Q_ARG(QPoint, QPoint(1, 1))));
+    QTRY_VERIFY(QApplication::activePopupWidget());
+    QMenu* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+    QVERIFY(menu);
+    QCOMPARE(menu->actions().size(), 1);
+    QCOMPARE(menu->actions().constFirst()->text(), QString("Set Alias"));
+    menu->close();
+    QTRY_VERIFY(!QApplication::activePopupWidget());
+    QTRY_COMPARE(window.findChildren<QAction*>().size(), ownedActionCount);
 }
 
 void MainWindowIntegrationTests::cleanup()

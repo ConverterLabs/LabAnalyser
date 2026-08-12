@@ -318,6 +318,10 @@ accept/reject behavior and resulting valid subplot creation remain unchanged.
 `CreateSubPlotWindow`; GUI_012 covers the unchanged cancellation and 2×3/1×2
 creation paths.
 
+`GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
+by the temporary data context menu. The existing valid alias action, ID and
+multi-selection behavior remain covered by GUI_016 and GUI_020.
+
 Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
 plot/figure creation, command-line handling and dialogs. They each combine
 MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;

@@ -270,11 +270,11 @@ void MainWindow::contextMenuTreeWidgetData(QPoint pos)
                     Ids.push_back(MainWindowTreePath::IdForItem(items.at(i)));
                 }
             }
-            QAction *SetAliasAction = new QAction;
+            QAction *SetAliasAction = new QAction(menu);
                 connect(SetAliasAction, &QAction::triggered, [=]{
                     SetAlias(GetLogic()->GetAlias(Ids));});
 
-            QAction *RemoveAliasAction = new QAction;
+            QAction *RemoveAliasAction = new QAction(menu);
                 connect(RemoveAliasAction, &QAction::triggered, [=]{
                     RemoveAlias(Ids);});
 

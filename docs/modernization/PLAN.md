@@ -1059,6 +1059,9 @@ valid-creation behavior.
 `MainWindowSubplotDialog` isolates the local dimension-selection UI while
 MainWindow retains accepted figure creation and legacy plot registration.
 
+`GUI_SAFE_008` assigns transient data-alias actions to their transient context
+menu, retaining all existing alias and multi-selection behavior.
+
 The focused MainWindow package is complete for output presentation, tree-ID
 derivation, publish-view state and narrow null/path guards. Dynamic docks,
 project routing, dialogs, command-line parsing and figure lifecycle remain

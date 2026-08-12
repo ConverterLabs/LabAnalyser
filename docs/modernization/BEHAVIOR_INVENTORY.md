@@ -638,6 +638,10 @@ The local subplot-size dialog is isolated in `MainWindowSubplotDialog`; its
 1–3 row and 1–4 column choices, modal rejection and MainWindow figure routing
 remain mapped to GUI_012.
 
+`GUI_SAFE_008` maps data-context-menu action ownership. Alias actions now end
+with the existing temporary menu; GUI_016/020 retain their visible routing and
+payload contracts.
+
 GUI_009/012 also cover post-`exec()` dialog lifetime: parentless About and
 Subplot dialogs no longer remain as hidden top-level objects after their
 existing modal workflows complete.
