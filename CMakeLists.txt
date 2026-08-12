@@ -99,6 +99,7 @@ set(LABANALYSER_CORE_SOURCES
     RemoteControl/RemoteControlProtocol.cpp
     RemoteControl/RemoteControlServer.cpp
     UIFunctions/MainWindowOutputLog.cpp
+    UIFunctions/MainWindowTreePath.cpp
     UIFunctions/SubPlotMainWindow.cpp
     TreeWidgetCustomDrop.cpp
     CustomWidgets/QBLedIndicator.cpp

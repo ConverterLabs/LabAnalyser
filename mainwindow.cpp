@@ -28,6 +28,7 @@
 #include  "DropWidgets/Plots/PlotWidget.h"
 #include "UIFunctions/SubPlotMainWindow.h"
 #include "UIFunctions/MainWindowOutputLog.h"
+#include "UIFunctions/MainWindowTreePath.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -262,16 +263,7 @@ void MainWindow::contextMenuTreeWidgetData(QPoint pos)
             {
                 if(items.at(i)->childCount()==0)
                 {
-                    auto sit = items.at(i);
-                    QString Name;
-                    while(sit)
-                    {
-                        Name.insert(0,sit->text( 0 ));
-                        sit = sit->parent();
-                        if(sit)
-                            Name.insert(0,"::");
-                    }
-                    Ids.push_back(Name);
+                    Ids.push_back(MainWindowTreePath::IdForItem(items.at(i)));
                 }
             }
             QAction *SetAliasAction = new QAction;
@@ -325,15 +317,7 @@ void MainWindow::ChangeMinMaxValue()
       QList<QTreeWidgetItem*> selectedItems = ui->ParameterTreeWidget->selectedItems();
       if (selectedItems.size() != 1 || !selectedItems[0] || selectedItems[0]->childCount() != 0)
           return;
-      QString ID;
-      auto sit = selectedItems[0];
-      while(sit)
-      {
-          ID.insert(0,sit->text( 0 ));
-          sit = sit->parent();
-          if(sit)
-              ID.insert(0,"::");
-      }
+      const QString ID = MainWindowTreePath::IdForItem(selectedItems[0]);
       if (!GetLogic()->GetContainer(ID))
           return;
       std::pair<double,double> MinMax = GetLogic()->MinMaxValue(ID);
@@ -1036,20 +1020,11 @@ void MainWindow::AddSelectedItems(QTreeWidgetItem* elemtent, QStringList &itt)
     {
         AddSelectedItems(elemtent->child(c), itt);
     }
-    QString ID;
-    auto sit = elemtent;
-    while(sit)
-    {
-        ID.insert(0,sit->text( 0 ));
-        sit = sit->parent();
-        if(sit)
-            ID.insert(0,"::");
-    }
+    const QString ID = MainWindowTreePath::IdForItem(elemtent);
     if(this->GetLogic()->GetContainer(ID))
     {
         itt.push_back(ID);
     }
-    ID.clear();
     itt.removeDuplicates();
 }
 

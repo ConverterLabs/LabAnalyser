@@ -1021,3 +1021,7 @@ valid explicit requests retain the existing `get` dispatch.
 output formatting behind a private non-QObject helper. The public slots, HTML,
 10,000-character trim, output block limit, conditional autoscroll and existing
 Error/Notification dock-raise behavior are preserved by GUI_013 and GUI_018.
+
+`MainWindowTreePath` now centralizes the unchanged `::` ID derivation used by
+data context actions, Min/Max editing and export selection traversal. It is a
+private value helper; tree ownership and manager lookups remain in MainWindow.

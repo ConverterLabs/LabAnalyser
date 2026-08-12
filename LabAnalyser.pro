@@ -100,6 +100,7 @@ SOURCES += main.cpp\
         RemoteControl/RemoteControlProtocol.cpp \
         RemoteControl/RemoteControlServer.cpp \
         UIFunctions/MainWindowOutputLog.cpp \
+        UIFunctions/MainWindowTreePath.cpp \
         UIFunctions/SubPlotMainWindow.cpp \
         TreeWidgetCustomDrop.cpp\
         CustomWidgets/QBLedIndicator.cpp \
@@ -108,6 +109,7 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h\
             UIFunctions/MainWindowOutputLog.h \
+            UIFunctions/MainWindowTreePath.h \
             CustomWidgets/QBLedIndicator.h \
             CustomWidgets/QLedIndicator.h \
             CustomWidgets/QTSLedIndicator.h \

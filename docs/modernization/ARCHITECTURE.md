@@ -277,6 +277,10 @@ unchanged Qt slots and delegate the existing HTML, trim, autoscroll and
 OutputDock-raise behavior to it through non-owning UI pointers. It owns neither
 the widgets nor application state.
 
+`UIFunctions/MainWindowTreePath` is a second private, QObject-free helper that
+preserves the historical leaf-to-root `::` ID representation used by MainWindow
+tree actions. It owns no tree item, selection, manager or GUI state.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the
