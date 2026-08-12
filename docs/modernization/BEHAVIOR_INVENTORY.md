@@ -1090,3 +1090,10 @@ remain explicit exclusions.
 `QBLed`, `QLed` and `QTSLed` now share their previously triplicated drop
 transaction through `DropWidgetIndicatorBinding`, while retaining the
 per-adapter indicator, static bit counter and legacy dialog/manager sequence.
+
+`DW_019` establishes a shared safe drag-source precondition for the regular
+single-leaf adapters: foreign, empty and top-level selections are rejected
+before a `selectedItems()[0]` access; a selected leaf stays eligible under the
+existing per-widget type rules. `DropWidgetDropBinding` centralizes the
+ordinary one-ID drop reset/tooltip/registration transaction. The exceptional
+checkbox, multi-selection and table paths remain separate by contract.

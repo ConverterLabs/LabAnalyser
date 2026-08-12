@@ -251,3 +251,12 @@ or unsigned bit dialog/counter update, initial state, tooltip, manager entry
 and dirty flag. The source-backed drag/drop path remains excluded from
 in-process characterization; existing adapter, MainWindow and XML contracts
 are the preservation evidence.
+
+`DW_019` covers the shared `DropWidgetDragSource` guard: a foreign source, no
+selection and a top-level tree item reject safely; a selected leaf retains the
+legacy eligible-source condition. The ordinary single-ID adapters use the
+private `DropWidgetDropBinding` transaction for their legacy disconnect,
+context-menu/request reconnect, ID/tooltip lookup and manager registration.
+Its deliberately excluded variants are `QCheckBoxD` (selective signal and
+label behavior), `QLineEditD`/`QListViewD` (multi-selection), and
+`QTableWidgeD` (dynamic row model).

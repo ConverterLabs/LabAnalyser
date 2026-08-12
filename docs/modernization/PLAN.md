@@ -943,3 +943,9 @@ The repeated LED drop transaction was subsequently isolated in private
 wrappers retain the existing manager lookup, bit-dialog, tooltip and mapping
 sequence. This is not a drag/drop behavior change; the source-backed event
 path remains an explicit contract gap.
+
+The current non-plot adapter pass also replaces the repeated unchecked first
+tree-selection access in the ordinary single-leaf adapters with a shared safe
+precondition and consolidates their one-ID drop setup. Empty/top-level/foreign
+selections are now no-ops; valid leaf/type rules and exceptional checkbox,
+multi-selection and table behavior remain unchanged.
