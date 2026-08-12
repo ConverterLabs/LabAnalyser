@@ -1183,3 +1183,6 @@ are rejected before dialog or axis access.
 
 `PlotWidget::legendDoubleClick` is mapped to `PLOT_021`: missing sender or
 manager context is rejected before the rename dialog.
+
+`PlotWidget::removeSelectedGraph` is mapped to `PLOT_022`: absent manager
+context leaves selected local graphs untouched.

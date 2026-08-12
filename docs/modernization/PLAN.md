@@ -975,3 +975,6 @@ legacy dialog; connected axis edits keep their existing route.
 
 `PLOT_021` likewise rejects senderless or unmanaged legend-edit requests
 before UI or manager access.
+
+`PLOT_022` makes selected-graph removal a no-op without manager context;
+the existing manager-backed removal contract remains unchanged.

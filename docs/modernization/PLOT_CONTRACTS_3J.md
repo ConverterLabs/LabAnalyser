@@ -124,3 +124,6 @@ does not open the dialog or mutate the axis; the normal signal route remains.
 
 `PLOT_021` invokes legend editing without a connected plot/manager context.
 It does not open the rename dialog or change the graph name.
+
+`PLOT_022` invokes selected-graph removal without a manager. The selected
+local graph is retained; manager-backed removal remains covered by `PLOT_006`.

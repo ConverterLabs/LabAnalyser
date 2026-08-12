@@ -1391,6 +1391,9 @@ void PlotWidget::addRandomGraph()
 
 void PlotWidget::removeSelectedGraph()
 {
+  if (!MainWindow_p || !MainWindow_p->GetLogic())
+      return;
+
   if (selectedGraphs().size() > 0)
   {
       for(int k = 0; k < selectedGraphs().size();k++)

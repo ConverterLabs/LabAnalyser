@@ -47,6 +47,7 @@ private slots:
     void PLOT_019_unmanaged_clear_bindings_is_a_noop();
     void PLOT_020_senderless_axis_edit_is_a_noop();
     void PLOT_021_senderless_legend_edit_is_a_noop();
+    void PLOT_022_unmanaged_selected_graph_removal_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -486,6 +487,18 @@ void PlotWidgetContractTests::PLOT_021_senderless_legend_edit_is_a_noop()
                                       Q_ARG(QCPLegend*, plot.legend),
                                       Q_ARG(QCPAbstractLegendItem*, item)));
     QCOMPARE(plotGraph->name(), QString("original"));
+}
+
+void PlotWidgetContractTests::PLOT_022_unmanaged_selected_graph_removal_is_a_noop()
+{
+    QWidget host;
+    PlotWidget plot(nullptr, &host, nullptr);
+    QCPGraph* plotGraph = plot.addGraph();
+    plotGraph->setSelected(true);
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "removeSelectedGraph", Qt::DirectConnection));
+    QCOMPARE(plot.graphCount(), 1);
+    QVERIFY(plotGraph->selected());
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()
