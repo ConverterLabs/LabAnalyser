@@ -80,6 +80,9 @@ void QPushButtonD::TimeOut()
     else
     {
         ToFormMapper* container = GetMainWindow()->GetLogic()->GetContainer(this);
+        if (!container)
+            return;
+
         if(container->IsBool() == 0)
             if(container->GetBool())
             {

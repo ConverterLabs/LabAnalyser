@@ -57,6 +57,7 @@ private slots:
     void DW_019_drag_source_rejects_empty_and_nonleaf_selection();
     void DW_020_shared_indicator_initialization_preserves_checkbox_state_contract();
     void DW_021_shared_tree_item_paths_preserve_multi_selection_ids();
+    void DW_022_unbound_button_timeout_is_safe_noop();
 };
 
 class ExposedTreeWidget : public TreeWidgetCustomDrop
@@ -156,6 +157,15 @@ void DropWidgetAdapterTests::DW_021_shared_tree_item_paths_preserve_multi_select
     QTreeWidgetItem branch(&root, QStringList("branch"));
     QTreeWidgetItem leaf(&branch, QStringList("leaf"));
     QCOMPARE(DropWidgetTreePath::IdForItem(&leaf), QString("root::branch::leaf"));
+}
+
+void DropWidgetAdapterTests::DW_022_unbound_button_timeout_is_safe_noop()
+{
+    QPushButtonD button;
+    button.setDown(false);
+    QSignalSpy released(&button, &QPushButton::released);
+    button.TimeOut();
+    QCOMPARE(released.count(), 0);
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()
