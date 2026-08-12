@@ -52,8 +52,9 @@ void QListViewD::dragEnterEvent(QDragEnterEvent *event)
     if(!treeWidget)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
+    DataManagementSetClass* manager = GetMainWindow()->GetLogic();
 
-    if(GetMainWindow()->GetLogic()->IsObjectLinked(this))
+    if(manager->IsObjectLinked(this))
     {
          event->acceptProposedAction();
     }
@@ -63,10 +64,11 @@ void QListViewD::dragEnterEvent(QDragEnterEvent *event)
         if (selectedItems[0]->childCount() == 0)
         {
             QString ID = CreateID(event->source());
-            QString DataType = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
-            QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetType();
+            ToFormMapper* container = manager->GetContainer(ID);
+            QString DataType = container->GetDataType();
+            QString Type = container->GetType();
 
-            if(GetMainWindow()->GetLogic()->GetContainer(ID)->IsStringList() && Type.compare("Parameter") == 0 )
+            if(container->IsStringList() && Type.compare("Parameter") == 0 )
                 event->acceptProposedAction();
             GetMainWindow()->GetStatusBar()->showMessage("This List is not linked to a List Parameter",2000);
         }
@@ -82,13 +84,15 @@ void QListViewD::dropEvent(QDropEvent *event)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
     auto MW = GetMainWindow();
+    DataManagementSetClass* manager = MW->GetLogic();
     for(int i = 0; i < selectedItems.size(); i++)
     {
             QString ID;
             if (selectedItems[i]->childCount() == 0)
             {
                 ID = DropWidgetTreePath::IdForItem(selectedItems[i]);
-            QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
+            ToFormMapper* container = manager->GetContainer(ID);
+            QString Type = container->GetDataType();
             if(Type.compare("QStringList")==0)
             {
                 DropWidgetDropBinding::ResetConnections(this);
@@ -96,10 +100,10 @@ void QListViewD::dropEvent(QDropEvent *event)
                 QString ID =  CreateID(event->source());
                 this->setToolTip(ID);
                 this->setToolTipDuration(2000);
-                model->setStringList((GetMainWindow()->GetLogic()->GetContainer(ID)->GetStringList()));
-                MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
+                model->setStringList(container->GetStringList());
+                manager->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
                  MW->ChangeForSaveDetected = true;
-                 DropWidgetBinding::ConnectValueChanged(this, SIGNAL(NewEntry()), MW->GetLogic());
+                 DropWidgetBinding::ConnectValueChanged(this, SIGNAL(NewEntry()), manager);
 
             }
             else

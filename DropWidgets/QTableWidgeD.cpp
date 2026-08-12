@@ -138,6 +138,7 @@ void QTableWidgeD::dragEnterEvent(QDragEnterEvent *event)
     if(!treeWidget)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
+    DataManagementSetClass* manager = GetMainWindow()->GetLogic();
 
 
     QStringList Ids = CreateIDs(event->source());
@@ -147,7 +148,7 @@ void QTableWidgeD::dragEnterEvent(QDragEnterEvent *event)
     bool accept = false;
     for(auto itt : Ids)
     {
-        if(GetMainWindow()->GetLogic()->GetContainer(itt)->IsNumeric())
+        if(manager->GetContainer(itt)->IsNumeric())
             accept = true;
         else
             accept = false;

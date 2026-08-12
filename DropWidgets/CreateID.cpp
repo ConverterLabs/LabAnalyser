@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "CreateID.h"
+#include "DropWidgetTreePath.h"
 
 
 MainWindow* GetMainWindow()
@@ -36,23 +37,13 @@ QString CreateID(QObject *Tree)
 {
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(Tree);
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
-    QString ToolTip;
     for(auto si : selectedItems)
     {
         if(si->childCount() == 0)
-        {
-            auto sit = si;
-            while(sit)
-            {
-                ToolTip.insert(0,sit->text( 0 ));
-                sit = sit->parent();
-                if(sit)
-                    ToolTip.insert(0,"::");
-            }
-        }
-        return ToolTip;
+            return DropWidgetTreePath::IdForItem(si);
+        return QString();
     }
-    return ToolTip;
+    return QString();
 }
 
 QStringList CreateIDs(QObject *Tree)
@@ -69,21 +60,11 @@ QStringList CreateIDs(QObject *Tree)
     }
 
 
-    QString ToolTip;
     for(auto si : selectedItems)
     {
         if(si->childCount() == 0)
         {
-            auto sit = si;
-            while(sit)
-            {
-                ToolTip.insert(0,sit->text( 0 ));
-                sit = sit->parent();
-                if(sit)
-                    ToolTip.insert(0,"::");
-            }
-            Ids.push_back(ToolTip);
-            ToolTip.clear();
+            Ids.push_back(DropWidgetTreePath::IdForItem(si));
         }
     }
     return Ids;
