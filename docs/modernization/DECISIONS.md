@@ -112,3 +112,22 @@ characterized exactly-once cleanup. No IID, `Platform_Interface`, or
 `InterfaceData` ABI changes. This deliberately permits Legacy plugin resources
 to survive to process end. A future optional V2 IID with plugin-side
 `ReleaseInterface()` remains a separate migration decision.
+
+## ADR-010: Observable compatibility, not internal structural compatibility
+
+**Date:** 2026-08-12
+**Status:** accepted
+
+Modernization may replace private classes, source layout, inheritance,
+internal signals, raw-pointer storage and implementation algorithms. Thin
+compatibility wrappers may retain historical Designer class names, Plugin-V1
+entry points, XML structures and TCP framing where those are observed external
+contracts. No private structural detail is retained merely for historical
+equivalence.
+
+Legacy `.LAexp` compatibility is an explicit exception to internal freedom:
+the three protected legacy fixtures and their `.LAdev` sidecars must load
+through the normal application path without migration, overwrite or byte
+change. Any future modern persistence model must use a named legacy-reader or
+adapter boundary until the existing legacy contracts have equivalent semantic
+test evidence.

@@ -29,6 +29,42 @@ Treat these as public contracts until proven otherwise:
 
 Never silently change a file format, plugin ABI/API, protocol, numerical convention, default, or user workflow. If modernization requires such a change, first document the proposed migration, compatibility layer, risks, and tests, then stop and ask for approval.
 
+## Legacy `.LAexp` compatibility boundary
+
+Internal architecture is deliberately *not* a compatibility target. Private
+classes, headers, files, directories, inheritance, raw-pointer maps and
+signal wiring may be replaced once the same observable contracts are proven.
+Only externally observed and persisted boundaries remain binding.
+
+The checked-in legacy experiment fixtures are a non-negotiable read
+compatibility contract:
+
+- `tests/fixtures/xml/legacy/legacy-small.LAexp`
+- `tests/fixtures/xml/legacy/legacy-multiform.LAexp`
+- `tests/fixtures/xml/legacy/legacy-2cells.LAexp`
+- their two `.LAdev` sidecars.
+
+They must load unchanged through the normal application path without migration.
+Section names and tolerated order, path resolution, form/device/figure/widget/
+connection/state semantics, and the referenced historical Designer class names
+remain compatible. Missing historic forms or plugins must keep their documented
+controlled error, return and partial-state behavior. Never overwrite, regenerate
+or auto-upgrade these inputs; preserve their SHA-256 values and the
+`.gitattributes` byte protection. Writers may emit the current format, but
+readers must continue to accept both current and legacy variants.
+
+New internals may use a clearly named `LegacyExperimentReader` or
+`LegacyExperimentAdapter` boundary to translate historical XML into a newer
+model. The old reader path may be removed only after the same fixtures load
+semantically equivalently through that compatibility boundary.
+
+For a package touching DropWidgets/Designer names, the UI loader,
+DataManagement registries, XML reader/writer, plugin loading, MainWindow/forms,
+or plot/figure creation, the package checkpoint must run the complete
+`XmlExperimentContractTests` (`XML_LEGACY_001..XML_LEGACY_005` included), the
+affected DropWidget/MainWindow suites, all five fixture SHA-256 checks, and the
+sensitivity/artifact scan.
+
 ## Non-negotiable rule: characterize before changing
 
 For every production function or cohesive behavior being modified:

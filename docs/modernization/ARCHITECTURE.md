@@ -251,3 +251,20 @@ boundaries: `LabAnalyserQCustomPlot` is internal vendored code,
 `LabAnalyserCore` is the application graph, and contract targets preserve
 existing narrow seams where qmake already used them. This is build-graph
 isolation only; it changes no production runtime architecture. See `CMAKE.md`.
+
+## Legacy experiment compatibility boundary
+
+The historical `.LAexp` format is an external persistence boundary, not a
+reason to retain the present internal architecture. Future core, GUI, plugin
+and plot replacements may be broad, provided the normal load path continues to
+accept the three byte-protected fixtures and their `.LAdev` sidecars without
+migration or rewrite. The compatibility scope includes XML sections and their
+tolerated order, paths, forms, devices, figures, widgets, connections, state,
+and the Designer class names referenced by legacy `.ui` forms. Missing historic
+dependencies retain their documented controlled failure and partial state.
+
+A future modern model must retain this through an explicit
+`LegacyExperimentReader` or `LegacyExperimentAdapter`. It is then permissible
+to retire old internal readers only after semantic parity is demonstrated with
+`XML_LEGACY_001..XML_LEGACY_005`; fixture SHA-256 bytes and `.gitattributes`
+protection remain immutable.

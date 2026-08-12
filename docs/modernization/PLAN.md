@@ -886,3 +886,23 @@ test failure, so this package does not claim a local green qmake runner.
 The existing qmake CI job is unchanged; a separate Windows MSYS2 CMake/CTest
 job is the remote package checkpoint. Debug, Linux, install/package and
 deployment parity remain Milestone-6 work.
+
+## Cross-cutting legacy `.LAexp` compatibility boundary
+
+**Binding from 2026-08-12.** Internal architecture is replaceable; observable
+and persisted contracts are not. The protected fixtures `legacy-small.LAexp`,
+`legacy-multiform.LAexp`, `legacy-2cells.LAexp` and their two `.LAdev` sidecars
+must remain byte-identical and load without migration through the normal
+application path. Their SHA-256 constants and `.gitattributes` byte protection
+are part of the contract. Existing section/order tolerance, path resolution,
+Designer widget names, form/device/figure/widget/connection/state semantics
+and controlled missing-dependency behavior remain mandatory.
+
+Packages touching DropWidgets, Designer names, UI loading, DataManagement,
+XML, plugin loading, MainWindow/forms or plot/figure creation must checkpoint
+the full XML suite including `XML_LEGACY_001..XML_LEGACY_005`, affected
+DropWidget/MainWindow suites, all five fixture hashes and sensitivity/artifact
+checks. A future `LegacyExperimentReader`/`LegacyExperimentAdapter` may bridge
+old documents to a new internal model; old reader code is removable only after
+that semantic parity is demonstrated. This does not require preservation of
+the old internal structure.
