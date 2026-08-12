@@ -309,6 +309,10 @@ clear behavior remain those covered by GUI_013.
 nor the temporary parentless tab created for loading. The existing corrupt-form
 message and valid dynamic-form path remain unchanged.
 
+GUI_009 and GUI_012 additionally verify that the synchronous About and
+Subplot-selection dialogs are released after `exec()`. Their titles, actions,
+accept/reject behavior and resulting valid subplot creation remain unchanged.
+
 Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
 plot/figure creation, command-line handling and dialogs. They each combine
 MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;

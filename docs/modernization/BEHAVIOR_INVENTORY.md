@@ -634,6 +634,10 @@ clear action contract.
 is released when the existing corrupt-form error route is taken; valid form
 loading and its CWD behavior are unchanged.
 
+GUI_009/012 also cover post-`exec()` dialog lifetime: parentless About and
+Subplot dialogs no longer remain as hidden top-level objects after their
+existing modal workflows complete.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target

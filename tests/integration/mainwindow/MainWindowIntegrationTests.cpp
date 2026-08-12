@@ -429,8 +429,7 @@ void MainWindowIntegrationTests::GUI_009_modal_actions_open_once_and_abort_witho
     QCOMPARE(aboutTriggered.count(), 1);
     QCOMPARE(aboutDialog.count, 1);
     QCOMPARE(aboutDialog.titles, QStringList({"Dialog"}));
-    QVERIFY(aboutDialog.lastDialog);
-    delete aboutDialog.lastDialog;
+    QVERIFY(aboutDialog.lastDialog.isNull());
 
     QAction* remote = window.findChild<QAction*>("actionRemote_Connection_Port_2");
     QVERIFY(remote);
@@ -534,6 +533,7 @@ void MainWindowIntegrationTests::GUI_012_subplot_action_cancel_valid_sizes_and_r
     QAction* action = window.findChild<QAction*>("actionCreate_Subplot");
     QVERIFY(action);
     const int initialFigures = window.findChildren<SubPlotMainWindow*>().size();
+    const int topLevelCount = QApplication::topLevelWidgets().size();
     auto triggerSubplot = [&](bool accept, const QString& rows, const QString& columns) {
         int dialogs = 0;
         QTimer dialogDriver;
@@ -566,6 +566,7 @@ void MainWindowIntegrationTests::GUI_012_subplot_action_cancel_valid_sizes_and_r
 
     QCOMPARE(triggerSubplot(false, QString(), QString()), 1);
     QCOMPARE(window.findChildren<SubPlotMainWindow*>().size(), initialFigures);
+    QCOMPARE(QApplication::topLevelWidgets().size(), topLevelCount);
 
     QCOMPARE(triggerSubplot(true, "2", "3"), 1);
     QList<SubPlotMainWindow*> figures = window.findChildren<SubPlotMainWindow*>();

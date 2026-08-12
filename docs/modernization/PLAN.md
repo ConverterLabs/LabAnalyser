@@ -1052,6 +1052,10 @@ without changing the visible clear action.
 existing corrupt-form route, preserving the existing error and valid load
 contracts while avoiding a retained hidden top-level widget.
 
+The existing GUI_009/012 modal contracts now also verify release of the local
+About and Subplot dialogs after `exec()`, without changing their dialog or
+valid-creation behavior.
+
 The focused MainWindow package is complete for output presentation, tree-ID
 derivation, publish-view state and narrow null/path guards. Dynamic docks,
 project routing, dialogs, command-line parsing and figure lifecycle remain
