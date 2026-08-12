@@ -1158,3 +1158,7 @@ change statusbar state; valid graph clicks retain the existing message.
 `PlotWidget::{AddCustomGraph,AddCustomXAxis}` are mapped to `PLOT_013` for
 missing manager/container and no-graph boundaries; these invalid routes leave
 the graph model and X-axis ID unchanged.
+
+`PlotWidget::legendDoubleClick` is mapped to `PLOT_014`: missing or
+non-plottable legend items are no-ops; the valid alias dialog route is
+unchanged and remains a separately controlled modal interaction.

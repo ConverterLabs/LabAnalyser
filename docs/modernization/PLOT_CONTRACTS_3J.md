@@ -97,3 +97,7 @@ preserves the statusbar text; a valid graph still reports its existing name.
 `PLOT_013` records no-op behavior for `AddCustomGraph()` without a manager and
 for `AddCustomXAxis()` without a graph or matching container. Valid manager
 backed graph creation is unchanged.
+
+`PLOT_014` invokes the existing legend-double-click slot through Qt's metaobject
+with no legend item. It preserves the graph model and name; non-plottable or
+null item inputs now return before the legacy dialog/alias route.

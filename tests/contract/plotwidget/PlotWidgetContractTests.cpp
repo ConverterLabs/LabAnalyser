@@ -39,6 +39,7 @@ private slots:
     void PLOT_011_senderless_selection_slot_is_a_noop();
     void PLOT_012_null_plottable_click_is_a_noop();
     void PLOT_013_missing_manager_or_axis_container_is_a_noop();
+    void PLOT_014_empty_legend_double_click_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -380,6 +381,21 @@ void PlotWidgetContractTests::PLOT_013_missing_manager_or_axis_container_is_a_no
                                       Q_ARG(QString, QString("Missing::Axis"))));
     QCOMPARE(managed.graphCount(), 0);
     QVERIFY(managed.XDataName().isEmpty());
+}
+
+void PlotWidgetContractTests::PLOT_014_empty_legend_double_click_is_a_noop()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    publish(window, "D::Legend", data({0.0, 1.0}, {1.0, 2.0}));
+    plot.AddCustomGraph("D::Legend");
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "legendDoubleClick", Qt::DirectConnection,
+                                      Q_ARG(QCPLegend*, plot.legend),
+                                      Q_ARG(QCPAbstractLegendItem*, nullptr)));
+    QCOMPARE(plot.graphCount(), 1);
+    QCOMPARE(graph(plot, 0)->name(), QString("D::Legend"));
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

@@ -953,3 +953,6 @@ valid user-originated selection synchronization remains unchanged.
 
 `PLOT_012` guards null plottable clicks while preserving the established
 statusbar message for a real graph.
+
+`PLOT_014` rejects empty/non-plottable legend items before the legacy alias
+dialog path; valid alias editing remains unchanged.

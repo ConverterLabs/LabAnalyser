@@ -1265,6 +1265,9 @@ void PlotWidget::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
   if (item) // only react if item was clicked (user could have clicked on border padding of legend where there is no item, then item is 0)
   {
     QCPPlottableLegendItem *plItem = qobject_cast<QCPPlottableLegendItem*>(item);
+    if (!plItem || !plItem->plottable())
+        return;
+
     bool ok;
     QString newName = QInputDialog::getText(this, "Set Alias", "New graph name:", QLineEdit::Normal, plItem->plottable()->name(), &ok);
     if (ok)
