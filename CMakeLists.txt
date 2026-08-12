@@ -96,6 +96,10 @@ set(LABANALYSER_CORE_SOURCES
     About.ui
     resources.qrc)
 
+# Subdirectories reuse this exact graph for the one established PlotWidget
+# test-only compile seam, so keep paths anchored at the repository root.
+list(TRANSFORM LABANALYSER_CORE_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+
 add_library(LabAnalyserCore STATIC ${LABANALYSER_CORE_SOURCES})
 target_include_directories(LabAnalyserCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${HIGHFIVE_INCLUDE_DIR}")
 target_compile_definitions(LabAnalyserCore PUBLIC
