@@ -66,6 +66,7 @@ private slots:
     void DW_027_table_xml_ignores_incomplete_rows();
     void DW_028_indicator_drop_rejects_missing_container();
     void DW_029_checkbox_drop_rejects_missing_container();
+    void DW_030_common_drop_context_rejects_missing_container();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -354,6 +355,52 @@ void DropWidgetAdapterTests::DW_029_checkbox_drop_rejects_missing_container()
     QCOMPARE(checkbox.text(), QString("bound checkbox"));
     QCOMPARE(checkbox.toolTip(), QString("checkbox-bound"));
     QVERIFY(checkbox.isChecked());
+}
+
+void DropWidgetAdapterTests::DW_030_common_drop_context_rejects_missing_container()
+{
+    QMimeData foreign;
+    QDropEvent invalidDrop(QPointF(1, 1), Qt::CopyAction, &foreign,
+                           Qt::LeftButton, Qt::NoModifier);
+
+    QComboBoxD combo;
+    combo.addItem("existing");
+    combo.setToolTip("combo-bound");
+    QDoubleSpinBoxD doubleSpin;
+    doubleSpin.setRange(-4.0, 9.0);
+    doubleSpin.setValue(2.5);
+    QLCDNumberD lcd;
+    lcd.display(17);
+    QProgressBarD progress;
+    progress.setValue(42);
+    QPushButtonD button;
+    button.setText("bound button");
+    QSliderD slider;
+    slider.setValue(37);
+    QSpinBoxD spin;
+    spin.setRange(-4, 9);
+    spin.setValue(3);
+
+    combo.dropEvent(&invalidDrop);
+    doubleSpin.dropEvent(&invalidDrop);
+    lcd.dropEvent(&invalidDrop);
+    progress.dropEvent(&invalidDrop);
+    button.dropEvent(&invalidDrop);
+    slider.dropEvent(&invalidDrop);
+    spin.dropEvent(&invalidDrop);
+
+    QCOMPARE(combo.count(), 1);
+    QCOMPARE(combo.itemText(0), QString("existing"));
+    QCOMPARE(combo.toolTip(), QString("combo-bound"));
+    QCOMPARE(doubleSpin.minimum(), -4.0);
+    QCOMPARE(doubleSpin.maximum(), 9.0);
+    QCOMPARE(doubleSpin.value(), 2.5);
+    QCOMPARE(progress.value(), 42);
+    QCOMPARE(button.text(), QString("bound button"));
+    QCOMPARE(slider.value(), 37);
+    QCOMPARE(spin.minimum(), -4);
+    QCOMPARE(spin.maximum(), 9);
+    QCOMPARE(spin.value(), 3);
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

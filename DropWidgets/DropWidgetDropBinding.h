@@ -17,8 +17,9 @@ struct Context
     QString id;
     MainWindow* mainWindow;
     DataManagementSetClass* manager;
+    ToFormMapper* container;
 
-    bool IsValid() const { return mainWindow && manager; }
+    bool IsValid() const { return mainWindow && manager && container; }
 };
 
 inline void ResetConnections(QObject* widget)
@@ -52,13 +53,17 @@ inline void RemoveManagerBinding(QWidget* widget)
 
 inline Context Prepare(QWidget* widget, QDropEvent* event)
 {
-    ResetConnections(widget);
-
     const QString id = CreateID(event->source());
+    MainWindow* mainWindow = GetMainWindow();
+    DataManagementSetClass* manager = mainWindow ? mainWindow->GetLogic() : nullptr;
+    ToFormMapper* container = manager ? manager->GetContainer(id) : nullptr;
+    if (!container)
+        return { id, mainWindow, manager, nullptr };
+
+    ResetConnections(widget);
     widget->setToolTip(id);
     widget->setToolTipDuration(2000);
-    MainWindow* mainWindow = GetMainWindow();
-    return { id, mainWindow, mainWindow ? mainWindow->GetLogic() : nullptr };
+    return { id, mainWindow, manager, container };
 }
 
 inline void Register(QWidget* widget, const Context& context)

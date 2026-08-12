@@ -262,6 +262,11 @@ binding remains on its established path.
 bit, checked state and presentation; its normal bool/unsigned binding remains
 unchanged.
 
+`DW_030` maps the common one-ID adapter boundary: QComboBoxD,
+QDoubleSpinBoxD, QLCDNumberD, QProgressBarD, QPushButtonD, QSliderD and
+QSpinBoxD now preserve prior state if no mapper resolves before binding reset.
+Their valid mapped-drop behavior is unchanged.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

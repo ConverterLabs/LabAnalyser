@@ -376,6 +376,9 @@ disconnecting or dereferencing them (`DW_028`), preserving valid LED bit/dialog
 contracts.
 QCheckBoxD now likewise validates the mapper before clearing an existing
 presentation/binding (`DW_029`); valid bool/unsigned behavior remains intact.
+The shared one-ID drop preparation validates mapper presence before resetting
+connections for the remaining combo/spin/LCD/progress/button/slider adapters
+(`DW_030`), preserving valid mapped-drop behavior.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

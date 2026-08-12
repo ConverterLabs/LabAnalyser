@@ -378,3 +378,12 @@ the checkbox bit, checked state, label and tooltip. The first run of this new
 test exposed the pre-existing reset-before-lookup ordering; moving only that
 reset after successful lookup fixed the confirmed regression. Valid bool and
 unsigned binding, including the existing bit-dialog path, remains unchanged.
+
+### Shared missing-container drop hardening (2026-08-12)
+
+`DropWidgetDropBinding::Prepare` resolves its mapper before resetting any
+connections or presentation. `DW_030` covers the resulting rejected-drop
+contract for QComboBoxD, QDoubleSpinBoxD, QLCDNumberD, QProgressBarD,
+QPushButtonD, QSliderD and QSpinBoxD: their established value/range/text state
+remains intact when no mapper can be resolved. Valid one-ID adapter drops
+retain their existing registration, signal and type-specific behavior.
