@@ -432,3 +432,12 @@ bool/unsigned admission explicit before a LED or checkbox changes its binding.
 rejection, including unchanged bit/counter/state through the direct initializer
 path. The tests use real stored variant types because the legacy InterfaceData
 predicates classify that value rather than an advisory DataType string.
+
+### QListView binding admission alignment (2026-08-12)
+
+`DW_036` records the list-specific admission boundary: only a `QStringList`
+container whose domain type is `Parameter` is eligible for list binding.
+`QListViewD` now shares that rule between drag-enter and the binding branch of
+drop handling. A directly delivered `State` string-list drop therefore follows
+the pre-existing non-binding list-entry path instead of bypassing the rejected
+drag admission. The existing status-message wording is unchanged.

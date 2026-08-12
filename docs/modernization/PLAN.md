@@ -918,3 +918,11 @@ narrow, format-neutral integer/allocation guard was evidenced. Existing
 PlotWidgetName partial-state behavior, XML format, native TCP byte order,
 valid replies and legacy fixtures remain unchanged. GitHub CI is the remaining
 package checkpoint; local focused RemoteControl and XML suites passed.
+
+## DropWidget follow-up: QListView admission alignment
+
+`DW_036` closes a direct-drop mismatch: list binding now uses the same
+Parameter-`QStringList` admission rule as drag enter. Plot widgets are outside
+this work. Global locale changes, table XML timer/ownership behavior, stale
+name-keyed bindings and the unconditional legacy list status message remain
+separate, behavior-sensitive work.

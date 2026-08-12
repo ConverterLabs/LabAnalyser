@@ -12,6 +12,7 @@
 #include "DropWidgets/DropWidgetBinding.h"
 #include "DropWidgets/DropWidgetDropBinding.h"
 #include "DropWidgets/DropWidgetIndicatorBinding.h"
+#include "DropWidgets/DropWidgetListBinding.h"
 #include "DropWidgets/DropWidgetTreePath.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
 #include "TreeWidgetCustomDrop.h"
@@ -73,6 +74,7 @@ private slots:
     void DW_033_variant_output_rejects_null_mapper();
     void DW_034_combo_output_rejects_incompatible_mapper();
     void DW_035_indicator_type_admission_rejects_incompatible_mapper();
+    void DW_036_list_binding_admits_only_parameter_string_lists();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -536,6 +538,21 @@ void DropWidgetAdapterTests::DW_035_indicator_type_admission_rejects_incompatibl
     QCOMPARE(bit, uint32_t(4));
     QCOMPARE(counter, uint32_t(9));
     QVERIFY(state);
+}
+
+void DropWidgetAdapterTests::DW_036_list_binding_admits_only_parameter_string_lists()
+{
+    ToFormMapper parameter("QStringList", "Parameter");
+    parameter.SetData(QStringList({"value"}));
+    ToFormMapper state("QStringList", "State");
+    state.SetData(QStringList({"value"}));
+    ToFormMapper scalar("double", "Parameter");
+    scalar.SetData(1.0);
+
+    QVERIFY(DropWidgetListBinding::SupportsParameterList(&parameter));
+    QVERIFY(!DropWidgetListBinding::SupportsParameterList(&state));
+    QVERIFY(!DropWidgetListBinding::SupportsParameterList(&scalar));
+    QVERIFY(!DropWidgetListBinding::SupportsParameterList(nullptr));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

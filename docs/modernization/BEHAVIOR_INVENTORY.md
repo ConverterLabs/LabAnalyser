@@ -1127,3 +1127,10 @@ Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See
 `CRASH_NULL_SAFETY_5A.md`.
+
+## DropWidget QListView admission boundary
+
+`QListViewD::{dragEnterEvent,dropEvent}` are mapped to `DW_036`: binding is
+limited to `Parameter` containers holding `QStringList`; missing, state-list
+and scalar containers are not list-binding candidates. The historical manual
+entry path and status-message behavior remain outside this narrow alignment.

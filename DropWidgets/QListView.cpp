@@ -23,6 +23,7 @@
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
 #include "DropWidgetDropBinding.h"
+#include "DropWidgetListBinding.h"
 #include "DropWidgetTreePath.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
@@ -70,9 +71,7 @@ void QListViewD::dragEnterEvent(QDragEnterEvent *event)
             ToFormMapper* container = manager->GetContainer(ID);
             if (!container)
                 return;
-            QString Type = container->GetType();
-
-            if(container->IsStringList() && Type.compare("Parameter") == 0 )
+            if (DropWidgetListBinding::SupportsParameterList(container))
                 event->acceptProposedAction();
             mainWindow->GetStatusBar()->showMessage("This List is not linked to a List Parameter",2000);
         }
@@ -100,8 +99,7 @@ void QListViewD::dropEvent(QDropEvent *event)
             ToFormMapper* container = manager->GetContainer(ID);
             if (!container)
                 continue;
-            QString Type = container->GetDataType();
-            if(Type.compare("QStringList")==0)
+            if (DropWidgetListBinding::SupportsParameterList(container))
             {
                 DropWidgetDropBinding::ResetConnections(this);
 
