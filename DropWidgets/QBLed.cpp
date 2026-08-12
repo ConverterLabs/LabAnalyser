@@ -21,6 +21,7 @@
 
 #include "QBLed.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 uint32_t QBLed::bitcounter = 0;
@@ -126,13 +127,13 @@ void QBLed::dropEvent(QDropEvent *event)
 
 void QBLed::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
     if(Data.IsBool())
         SetState(Data.GetBool());
     else if(Data.IsUnsigedNumber())
        SetState((bool) (Data.GetUnsignedData() & (1ULL<<GetBit())));
      repaint();
-     blockSignals(false);
+    });
 }
 
 

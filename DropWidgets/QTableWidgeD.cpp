@@ -21,6 +21,7 @@
 
 #include "QTableWidgeD.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 #include "QLineEdit.h"
 #include "QCheckBox.h"
@@ -331,7 +332,7 @@ void QTableWidgeD::SetVariantData(ToFormMapper Data)
 {
     //TODO Minmax übernehmen
     //HIer weiter
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
 
     if(Data.IsEditable())
     {
@@ -344,7 +345,7 @@ void QTableWidgeD::SetVariantData(ToFormMapper Data)
         else if(Data.IsUnsigedNumber())
            value =  (double)Data.GetUnsignedData();
     }
-    blockSignals(false);
+    });
 }
 
 void QTableWidgeD::GetVariantData(ToFormMapper *Data)

@@ -21,6 +21,7 @@
 
 #include "QTSLed.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -130,14 +131,14 @@ void QTSLed::dropEvent(QDropEvent *event)
 
 void QTSLed::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
 
     if(Data.IsBool())
         SetState(Data.GetBool());
     else if(Data.IsUnsigedNumber())
        SetState((bool) (Data.GetUnsignedData() & (1ULL<<GetBit())));
      repaint();
-     blockSignals(false);
+    });
 
 }
 

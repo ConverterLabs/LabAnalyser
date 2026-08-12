@@ -21,6 +21,7 @@
 
 #include "QLed.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -137,13 +138,13 @@ void QLed::contextMenu(QPoint pos)
 
 void QLed::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
     if(Data.IsBool())
         SetState(Data.GetBool());
     else if(Data.IsUnsigedNumber())
        SetState((bool) (Data.GetUnsignedData() & (1ULL<<GetBit())));
      repaint();
-     blockSignals(false);
+    });
 
 }
 
