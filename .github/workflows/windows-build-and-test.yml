@@ -20,6 +20,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
+          release: false
           update: true
           install: >-
             mingw-w64-x86_64-gcc
@@ -204,6 +205,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
+          release: false
           update: true
           install: >-
             mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-cmake
@@ -244,6 +246,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
+          release: false
           update: true
           install: >-
             mingw-w64-x86_64-gcc
