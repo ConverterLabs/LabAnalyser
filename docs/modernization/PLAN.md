@@ -363,6 +363,8 @@ The follow-up `DW_024` safety slice now makes that top-level lookup bounded:
 without a MainWindow, the non-plot adapter context helpers return null and
 affected operations are no-ops. It deliberately does not change stale-binding,
 object-name migration, locale or dynamic table-cell ownership semantics.
+The subsequent list/table guard treats a missing `ToFormMapper` as a rejected
+drag target without changing valid ID binding or table-row behavior.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

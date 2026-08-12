@@ -240,6 +240,11 @@ IDs, manager lookup is null and unbound cleanup/timeout paths are safe no-ops.
 No automatic stale-binding cleanup, object-name migration or table ownership
 semantics is implied by this guard.
 
+`DW_025` covers the safe missing-ID lookup boundary for list/table drag targets:
+no mapper means no acceptance or target mutation. The existing valid tree-drop
+and dynamic-cell contracts remain unchanged; the unavailable synthetic
+`QDropEvent::source()` branch is not claimed as a full drag-execution test.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

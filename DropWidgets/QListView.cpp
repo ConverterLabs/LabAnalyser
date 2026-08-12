@@ -68,7 +68,8 @@ void QListViewD::dragEnterEvent(QDragEnterEvent *event)
         {
             QString ID = CreateID(event->source());
             ToFormMapper* container = manager->GetContainer(ID);
-            QString DataType = container->GetDataType();
+            if (!container)
+                return;
             QString Type = container->GetType();
 
             if(container->IsStringList() && Type.compare("Parameter") == 0 )
@@ -97,6 +98,8 @@ void QListViewD::dropEvent(QDropEvent *event)
             {
                 ID = DropWidgetTreePath::IdForItem(selectedItems[i]);
             ToFormMapper* container = manager->GetContainer(ID);
+            if (!container)
+                continue;
             QString Type = container->GetDataType();
             if(Type.compare("QStringList")==0)
             {

@@ -144,7 +144,8 @@ void QTableWidgeD::dragEnterEvent(QDragEnterEvent *event)
     bool accept = false;
     for(auto itt : Ids)
     {
-        if(manager->GetContainer(itt)->IsNumeric())
+        ToFormMapper* container = manager->GetContainer(itt);
+        if(container && container->IsNumeric())
             accept = true;
         else
             accept = false;

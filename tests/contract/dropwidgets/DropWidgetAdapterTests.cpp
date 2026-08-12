@@ -60,6 +60,7 @@ private slots:
     void DW_021_shared_tree_item_paths_preserve_multi_selection_ids();
     void DW_022_unbound_button_timeout_is_safe_noop();
     void DW_023_remove_connection_preserves_widget_resets();
+    void DW_025_missing_container_lookup_leaves_drop_targets_unchanged();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -226,6 +227,32 @@ void DropWidgetAdapterTests::DW_024_missing_mainwindow_context_is_safe_noop()
     QSignalSpy released(&button, &QPushButton::released);
     button.TimeOut();
     QCOMPARE(released.count(), 0);
+}
+
+void DropWidgetAdapterTests::DW_025_missing_container_lookup_leaves_drop_targets_unchanged()
+{
+    auto* manager = GetMainWindow()->GetLogic();
+    QCOMPARE(manager->GetContainer("DW25::missing"), nullptr);
+
+    QListViewD list;
+    list.model->setStringList({"existing"});
+    QTableWidgeD table;
+    table.setRowCount(1);
+    table.setColumnCount(1);
+
+    QMimeData foreign;
+    QDragEnterEvent listEvent(QPoint(1, 1), Qt::CopyAction, &foreign,
+                              Qt::LeftButton, Qt::NoModifier);
+    QDragEnterEvent tableEvent(QPoint(1, 1), Qt::CopyAction, &foreign,
+                               Qt::LeftButton, Qt::NoModifier);
+    list.dragEnterEvent(&listEvent);
+    table.dragEnterEvent(&tableEvent);
+
+    QVERIFY(!listEvent.isAccepted());
+    QVERIFY(!tableEvent.isAccepted());
+    QCOMPARE(list.model->stringList(), QStringList({"existing"}));
+    QCOMPARE(table.rowCount(), 1);
+    QCOMPARE(table.columnCount(), 1);
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

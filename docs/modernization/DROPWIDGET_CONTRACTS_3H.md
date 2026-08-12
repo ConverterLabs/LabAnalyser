@@ -328,3 +328,14 @@ remains covered by the earlier `DW_001..DW_023` contracts and is unchanged.
 This is a narrow safety boundary only: it does not invent stale-QObject cleanup,
 object-name migration, a different table-cell ownership model, or a replacement
 for the legacy top-level MainWindow architecture.
+
+### Missing container lookup hardening (2026-08-12)
+
+`QListViewD` now rejects a selected ID whose manager lookup has no
+`ToFormMapper`; it leaves the list unchanged. `QTableWidgeD` similarly rejects
+the numeric drag-acceptance path when any selected ID has no mapper. `DW_025`
+records the public missing-ID lookup and unchanged list/table state for a
+foreign drag event. Qt does not expose a controllable `QDropEvent::source()`
+for a real tree drag without initiating interactive drag execution, so the
+source-dependent handler branch is protected by the direct null guards and is
+not represented as a synthetic mouse gesture contract.
