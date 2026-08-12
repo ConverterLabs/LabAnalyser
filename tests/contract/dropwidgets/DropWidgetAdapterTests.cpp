@@ -69,6 +69,7 @@ private slots:
     void DW_029_checkbox_drop_rejects_missing_container();
     void DW_030_common_drop_context_rejects_missing_container();
     void DW_031_common_drop_context_type_admission();
+    void DW_032_list_mutation_ignores_empty_selection();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -426,6 +427,30 @@ void DropWidgetAdapterTests::DW_031_common_drop_context_type_admission()
     QVERIFY(!DropWidgetDropBinding::SupportsGuiSelection(numericContext));
     QVERIFY(DropWidgetDropBinding::SupportsPushButton(booleanContext));
     QVERIFY(!DropWidgetDropBinding::SupportsPushButton(numericContext));
+}
+
+void DropWidgetAdapterTests::DW_032_list_mutation_ignores_empty_selection()
+{
+    QListViewD list;
+    QSignalSpy changed(&list, &QListViewD::NewEntry);
+
+    list.DeleteEntry();
+    QCOMPARE(changed.count(), 0);
+    QCOMPARE(list.model->rowCount(), 0);
+
+    list.DeleteAllEntries();
+    QCOMPARE(changed.count(), 0);
+    QCOMPARE(list.model->rowCount(), 0);
+
+    list.model->setStringList({"first", "second"});
+    list.setCurrentIndex(list.model->index(1, 0));
+    list.DeleteEntry();
+    QCOMPARE(changed.count(), 1);
+    QCOMPARE(list.model->stringList(), QStringList({"first"}));
+
+    list.DeleteAllEntries();
+    QCOMPARE(changed.count(), 2);
+    QCOMPARE(list.model->rowCount(), 0);
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

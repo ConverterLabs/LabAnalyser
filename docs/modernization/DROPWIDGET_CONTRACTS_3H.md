@@ -397,3 +397,11 @@ Consequently, incompatible existing mappers no longer reset a valid binding or
 presentation before QComboBoxD, numeric spin/LCD/progress/slider adapters or
 QPushButtonD reject them. Valid type rules, range behavior, message wiring and
 button state routing are unchanged.
+
+### Empty list mutation hardening (2026-08-12)
+
+Baseline `DW_032` established that `QListViewD::DeleteEntry()` emitted
+`NewEntry` despite no current model row. The approved no-op fix also suppresses
+`DeleteAllEntries()` on an already empty model. The same test confirms that
+real selected-row deletion and clearing a populated list still emit exactly one
+event each with the existing list result.

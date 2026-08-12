@@ -141,12 +141,17 @@ void QListViewD::contextMenu(QPoint pos)
 
 void QListViewD::DeleteEntry()
 {
-   model->removeRow(this->currentIndex().row());
+   const int row = this->currentIndex().row();
+   if (row < 0 || row >= model->rowCount())
+       return;
+   model->removeRow(row);
    emit NewEntry();
 }
 
 void QListViewD::DeleteAllEntries()
 {
+   if (!model->rowCount())
+       return;
    model->removeRows(0, model->rowCount());
    emit NewEntry();
 }

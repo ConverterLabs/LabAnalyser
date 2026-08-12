@@ -272,6 +272,10 @@ one-ID adapter resets/rebinds: numeric, GuiSelection and button contracts match
 their existing drag-enter rules. Incompatible mappers now leave prior bindings
 intact.
 
+`DW_032` maps QListViewD deletion boundaries: missing selection and an empty
+model are no-ops without `NewEntry`; real row removal and populated-list
+clearing retain one emission each.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not
