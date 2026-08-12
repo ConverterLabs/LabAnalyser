@@ -305,6 +305,10 @@ its temporary standard context menu. Repeated menu use no longer retains
 otherwise unreachable actions under `MainWindow`; the visible menu action and
 clear behavior remain those covered by GUI_013.
 
+`GUI_SAFE_007` verifies that a failed form load retains neither a form record
+nor the temporary parentless tab created for loading. The existing corrupt-form
+message and valid dynamic-form path remain unchanged.
+
 Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
 plot/figure creation, command-line handling and dialogs. They each combine
 MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;

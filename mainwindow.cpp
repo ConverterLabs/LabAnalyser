@@ -599,6 +599,7 @@ void MainWindow::LoadFormFromXML(QString UiFileName, QString LastFormName, bool 
 
     if(!formWidget)
     {
+        delete tab;
         Error("Corrupt Form File");
         return;
     }

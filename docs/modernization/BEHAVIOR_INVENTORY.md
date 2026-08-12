@@ -630,6 +630,10 @@ live dock cleanup is unchanged.
 action is owned by its transient menu, while GUI_013 retains the user-visible
 clear action contract.
 
+`GUI_SAFE_007` maps failed form-loader ownership: the temporary top-level tab
+is released when the existing corrupt-form error route is taken; valid form
+loading and its CWD behavior are unchanged.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target

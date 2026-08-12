@@ -84,6 +84,7 @@ private slots:
     void GUI_SAFE_004_null_dock_cleanup_is_a_noop();
     void GUI_SAFE_005_orphaned_form_record_close_project_is_safe();
     void GUI_SAFE_006_output_context_actions_are_not_retained();
+    void GUI_SAFE_007_failed_form_load_does_not_retain_a_toplevel_tab();
     void cleanup();
     void cleanupTestCase();
 
@@ -1333,6 +1334,20 @@ void MainWindowIntegrationTests::GUI_SAFE_006_output_context_actions_are_not_ret
 
     QCOMPARE(menus, 1);
     QCOMPARE(window.findChildren<QAction*>().size(), ownedActionCount);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_007_failed_form_load_does_not_retain_a_toplevel_tab()
+{
+    MainWindow window;
+    const int topLevelCount = QApplication::topLevelWidgets().size();
+    QSignalSpy errors(window.GetLogic()->GetMessenger(), &MessengerClass::ErrorWriter);
+
+    window.LoadFormFromXML(fixturePath("missing.ui"), "GUI_SAFE_007", false);
+
+    QCOMPARE(errors.count(), 1);
+    QCOMPARE(errors.at(0).at(1).toString(), QString("Corrupt Form File"));
+    QCOMPARE(window.GetLogic()->GetFormFileCount(), 0);
+    QCOMPARE(QApplication::topLevelWidgets().size(), topLevelCount);
 }
 
 void MainWindowIntegrationTests::cleanup()

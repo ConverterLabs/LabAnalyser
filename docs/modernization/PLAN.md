@@ -1048,6 +1048,10 @@ same null lookup. Existing live dock close semantics remain unchanged.
 repeated context-menu use from retaining action objects under `MainWindow`
 without changing the visible clear action.
 
+`GUI_SAFE_007` releases the temporary form tab when the loader follows its
+existing corrupt-form route, preserving the existing error and valid load
+contracts while avoiding a retained hidden top-level widget.
+
 The focused MainWindow package is complete for output presentation, tree-ID
 derivation, publish-view state and narrow null/path guards. Dynamic docks,
 project routing, dialogs, command-line parsing and figure lifecycle remain
