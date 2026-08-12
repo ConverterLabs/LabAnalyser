@@ -112,3 +112,6 @@ title. It is a no-op and does not enter the legacy title dialog.
 `PLOT_017` directly runs the timer target `UpdateGraphs(..., true)` on a
 PlotWidget without a MainWindow. It preserves the graph model and returns
 before manager/data access; regular manager-backed updates are unchanged.
+
+`PLOT_018` invokes wheel-range synchronization without a MainWindow. The
+unmanaged widget is a no-op; normal multi-plot synchronization is unchanged.

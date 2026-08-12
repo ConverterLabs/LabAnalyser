@@ -963,3 +963,6 @@ dialog path; valid alias editing remains unchanged.
 
 `PLOT_017` protects timer-driven `UpdateGraphs()` against absent manager
 context without changing normal manager-backed updates.
+
+`PLOT_018` protects wheel synchronization against an absent MainWindow;
+managed peer-plot range synchronization remains unchanged.

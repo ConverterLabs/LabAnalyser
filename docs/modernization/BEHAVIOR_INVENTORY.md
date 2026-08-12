@@ -1171,3 +1171,6 @@ no-op; valid title editing remains a separately controlled modal workflow.
 
 `PlotWidget::UpdateGraphs` is mapped to `PLOT_017`: absent MainWindow or
 manager context is a no-op, protecting timer-driven execution.
+
+`PlotWidget::mouseWheelDone` is mapped to `PLOT_018`: without a MainWindow it
+does not traverse peer plots.

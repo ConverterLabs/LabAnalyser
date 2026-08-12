@@ -2528,6 +2528,9 @@ void PlotWidget::mousePressEventII(QMouseEvent *mouse)
 
 void PlotWidget::mouseWheelDone()
 {
+    if (!MainWindow_p)
+        return;
+
     //if(qobject_cast<SubPlotMainWindow*>(this->SB->parent()))
     {
         QList<PlotWidget*> PlotWidgetFound = (this->MainWindow_p->findChildren<PlotWidget*>());
