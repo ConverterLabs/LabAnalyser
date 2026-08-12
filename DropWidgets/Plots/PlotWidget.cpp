@@ -49,8 +49,47 @@
 
 #define UseFFTW
 
+#ifdef LABANALYSER_PLOTWIDGET_TEST_SEAMS
+namespace PlotWidgetTestHooks
+{
 namespace
 {
+bool failFftwAllocation = false;
+bool failFftwPlanCreation = false;
+}
+
+void setFftwAllocationFailure(bool enabled)
+{
+    failFftwAllocation = enabled;
+}
+
+void setFftwPlanFailure(bool enabled)
+{
+    failFftwPlanCreation = enabled;
+}
+}
+#endif
+
+namespace
+{
+
+fftw_complex *allocateFftwComplexes(std::size_t count)
+{
+#ifdef LABANALYSER_PLOTWIDGET_TEST_SEAMS
+    if (PlotWidgetTestHooks::failFftwAllocation)
+        return nullptr;
+#endif
+    return static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex) * count));
+}
+
+fftw_plan createFftwPlan(int count, fftw_complex *input, fftw_complex *output)
+{
+#ifdef LABANALYSER_PLOTWIDGET_TEST_SEAMS
+    if (PlotWidgetTestHooks::failFftwPlanCreation)
+        return nullptr;
+#endif
+    return fftw_plan_dft_1d(count, input, output, FFTW_FORWARD, FFTW_ESTIMATE);
+}
 
 class FlexibleDoubleSpinBox : public QDoubleSpinBox
 {
@@ -2015,8 +2054,12 @@ void PlotWidget::CalculateFFT()
     int N = graphCount();
     for(int j = 0; j < graphCount(); j++)
     {
-        boost::shared_ptr<std::vector<double>> x(graph(j)->GetXDataPointer());
-        boost::shared_ptr<std::vector<double>> y(graph(j)->GetYDataPointer());
+        QCPGraph *currentGraph = graph(j);
+        if (!currentGraph)
+            continue;
+
+        boost::shared_ptr<std::vector<double>> x(currentGraph->GetXDataPointer());
+        boost::shared_ptr<std::vector<double>> y(currentGraph->GetYDataPointer());
 
         if(!x || !y)
             return;
@@ -2024,7 +2067,7 @@ void PlotWidget::CalculateFFT()
         if(x->size() != y->size())
             return;
 
-        if(x->size() == 0)
+        if(x->size() < 2)
             return;
 
         boost::shared_ptr<std::vector<double>> fft_x = boost::make_shared<std::vector<double>>();
@@ -2033,14 +2076,27 @@ void PlotWidget::CalculateFFT()
 
         fftw_complex *in, *out;
         fftw_plan p;
-        in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
-        out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * x->size());
+        in = allocateFftwComplexes(x->size());
+        if (!in)
+            return;
+        out = allocateFftwComplexes(x->size());
+        if (!out)
+        {
+            fftw_free(in);
+            return;
+        }
         for(int i = 0; i < x->size(); i++)
         {
             in[i][0] = y->at(i);
             in[i][1] = 0;
         }
-        p = fftw_plan_dft_1d(x->size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+        p = createFftwPlan(x->size(), in, out);
+        if (!p)
+        {
+            fftw_free(in);
+            fftw_free(out);
+            return;
+        }
         fftw_execute(p); /* repeat as needed */
 
         //Calculate Ts as mean of time difference

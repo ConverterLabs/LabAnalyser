@@ -12,6 +12,12 @@
 #include "DropWidgets/Plots/PlotWidget.h"
 #include "mainwindow.h"
 
+namespace PlotWidgetTestHooks
+{
+void setFftwAllocationFailure(bool enabled);
+void setFftwPlanFailure(bool enabled);
+}
+
 class PlotWidgetContractTests final : public QObject
 {
     Q_OBJECT
@@ -32,6 +38,8 @@ private slots:
     void FFT_006_messenger_update_recalculates_without_new_graph();
     void FFT_007_non_uniform_samples_use_mean_delta_t();
     void FFT_008_empty_and_mismatched_vectors_return_safely();
+    void FFT_009_zero_and_one_sample_do_not_create_fft_data();
+    void FFT_010_fftw_allocation_and_plan_failures_leave_plot_usable();
 
 private:
     static InterfaceData data(const std::vector<double>& time,
@@ -418,6 +426,64 @@ void PlotWidgetContractTests::FFT_008_empty_and_mismatched_vectors_return_safely
     QCOMPARE(mismatchPlot.graphCount(), 1);
     QVERIFY(!graph(mismatchPlot, 0)->GetXFFTPointer());
     QVERIFY(!graph(mismatchPlot, 0)->GetYFFTPointer());
+}
+
+void PlotWidgetContractTests::FFT_009_zero_and_one_sample_do_not_create_fft_data()
+{
+    MainWindow window;
+    QWidget host(&window);
+
+    PlotWidget emptyPlot(&window, &host, window.statusBar());
+    publish(window, "FFT::Zero", data({}, {}));
+    emptyPlot.AddCustomGraph("FFT::Zero", true);
+    toggleFrequency(emptyPlot);
+    QVERIFY(!graph(emptyPlot, 0)->GetXFFTPointer());
+    QVERIFY(!graph(emptyPlot, 0)->GetYFFTPointer());
+    QCOMPARE(graph(emptyPlot, 0)->GetXDataPointer()->size(), size_t(0));
+    QCOMPARE(graph(emptyPlot, 0)->GetYDataPointer()->size(), size_t(0));
+
+    PlotWidget singlePlot(&window, &host, window.statusBar());
+    publish(window, "FFT::Single", data({3.5}, {7.25}));
+    singlePlot.AddCustomGraph("FFT::Single", true);
+    toggleFrequency(singlePlot);
+    QVERIFY(!graph(singlePlot, 0)->GetXFFTPointer());
+    QVERIFY(!graph(singlePlot, 0)->GetYFFTPointer());
+    QCOMPARE(graph(singlePlot, 0)->GetXDataPointer()->at(0), 3.5);
+    QCOMPARE(graph(singlePlot, 0)->GetYDataPointer()->at(0), 7.25);
+}
+
+void PlotWidgetContractTests::FFT_010_fftw_allocation_and_plan_failures_leave_plot_usable()
+{
+    const std::vector<double> time{0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875};
+    const std::vector<double> values{0.0, std::sqrt(0.5), 1.0, std::sqrt(0.5), 0.0,
+                                     -std::sqrt(0.5), -1.0, -std::sqrt(0.5)};
+    MainWindow window;
+    QWidget host(&window);
+
+    PlotWidget allocationFailure(&window, &host, window.statusBar());
+    publish(window, "FFT::AllocationFailure", data(time, values));
+    allocationFailure.AddCustomGraph("FFT::AllocationFailure");
+    PlotWidgetTestHooks::setFftwAllocationFailure(true);
+    toggleFrequency(allocationFailure);
+    PlotWidgetTestHooks::setFftwAllocationFailure(false);
+    QVERIFY(!graph(allocationFailure, 0)->GetXFFTPointer());
+    QVERIFY(!graph(allocationFailure, 0)->GetYFFTPointer());
+
+    PlotWidget planFailure(&window, &host, window.statusBar());
+    publish(window, "FFT::PlanFailure", data(time, values));
+    planFailure.AddCustomGraph("FFT::PlanFailure");
+    PlotWidgetTestHooks::setFftwPlanFailure(true);
+    toggleFrequency(planFailure);
+    PlotWidgetTestHooks::setFftwPlanFailure(false);
+    QVERIFY(!graph(planFailure, 0)->GetXFFTPointer());
+    QVERIFY(!graph(planFailure, 0)->GetYFFTPointer());
+
+    PlotWidget usablePlot(&window, &host, window.statusBar());
+    publish(window, "FFT::AfterFailure", data(time, values));
+    usablePlot.AddCustomGraph("FFT::AfterFailure");
+    toggleFrequency(usablePlot);
+    QVERIFY(graph(usablePlot, 0)->GetXFFTPointer());
+    QVERIFY(std::fabs(graph(usablePlot, 0)->GetYFFTPointer()->at(3) - 1.0) < 1e-10);
 }
 
 int main(int argc, char** argv)

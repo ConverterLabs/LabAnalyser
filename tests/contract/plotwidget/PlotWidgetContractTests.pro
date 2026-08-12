@@ -23,6 +23,7 @@ RC_FILE = $$absolute_path($$RC_FILE, $$REPOSITORY_ROOT)
 TEMPLATE = app
 TARGET = PlotWidgetContractTests
 CONFIG += testcase console
+DEFINES += LABANALYSER_PLOTWIDGET_TEST_SEAMS
 SOURCES -= $$REPOSITORY_ROOT/main.cpp
 SOURCES += PlotWidgetContractTests.cpp
 INCLUDEPATH += $$REPOSITORY_ROOT
