@@ -45,9 +45,9 @@ endforeach()
 
 file(READ "${PACKAGE_DIR}/Get.m" get_source)
 foreach(required_text
-        "containers.Map('KeyType', 'char', 'ValueType', 'any')"
+        "results = struct('ID', {}, 'Time', {}, 'Data', {});"
         "strsplit(char(encodedIds), '|')"
-        "struct('x', time, 'y', value)"
+        "results(end + 1) = struct('ID', currentId, 'Time', time, 'Data', value);"
         "'IsConnected'")
     string(FIND "${get_source}" "${required_text}" position)
     if(position EQUAL -1)
