@@ -133,3 +133,6 @@ the regular manager-backed remove-all contract remains covered by `PLOT_006`.
 
 `PLOT_024` triggers the existing highlight context action on an unmanaged,
 selected graph. It is a no-op and retains graph selection/model state.
+
+`PLOT_025` replaces a manager container's vectors with a DataPair lacking its
+optional offset pointer. Graph data remain unchanged and the update returns.

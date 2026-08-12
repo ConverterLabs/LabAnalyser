@@ -984,3 +984,6 @@ graph and binding removal is unchanged.
 
 `PLOT_024` guards delayed execution of the highlight context action against
 missing MainWindow or a changed graph selection.
+
+`PLOT_025` treats a DataPair without its offset pointer as an incomplete update
+and retains existing graph data.

@@ -1840,8 +1840,8 @@ void PlotWidget::UpdateGraphs(QString ID, bool force)
             continue;
 
         DataPair dp = element->GetPointerPair();
-        if (!dp.first || !dp.second || dp.first->empty() || dp.second->empty())
-            continue;
+        if (!dp.first || !dp.second || !dp.third || dp.first->empty() || dp.second->empty())
+            return;
 
         if (i == 0)
             Tmin = *(dp.third);

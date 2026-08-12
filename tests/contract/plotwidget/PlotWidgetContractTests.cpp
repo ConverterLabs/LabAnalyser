@@ -50,6 +50,7 @@ private slots:
     void PLOT_022_unmanaged_selected_graph_removal_is_a_noop();
     void PLOT_023_unmanaged_remove_all_graphs_is_a_noop();
     void PLOT_024_unmanaged_highlight_action_is_a_noop();
+    void PLOT_025_missing_plot_offset_leaves_graph_unchanged();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -539,6 +540,29 @@ void PlotWidgetContractTests::PLOT_024_unmanaged_highlight_action_is_a_noop()
     QCOMPARE(plot.graphCount(), 1);
     QVERIFY(plotGraph->selected());
     menu->close();
+}
+
+void PlotWidgetContractTests::PLOT_025_missing_plot_offset_leaves_graph_unchanged()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    const QString id = QStringLiteral("Offset::Missing");
+    publish(window, id, data({0.0, 1.0}, {2.0, 3.0}, 0.25));
+    plot.AddCustomGraph(id);
+    QCPGraph* plotGraph = graph(plot, 0);
+    QCOMPARE(plotGraph->GetYDataPointer()->at(1), 3.0);
+
+    InterfaceData missingOffset("vector<double>", "Data");
+    missingOffset.SetData(DataPair(
+        boost::shared_ptr<std::vector<double>>(new std::vector<double>{0.0, 1.0}),
+        boost::shared_ptr<std::vector<double>>(new std::vector<double>{7.0, 8.0}),
+        boost::shared_ptr<double>()));
+    window.GetLogic()->GetMessenger()->MessageReceiver("set", id, missingOffset);
+    plot.UpdateGraphs(QString(), true);
+
+    QCOMPARE(plotGraph->GetYDataPointer()->at(0), 2.0);
+    QCOMPARE(plotGraph->GetYDataPointer()->at(1), 3.0);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

@@ -1192,3 +1192,6 @@ leaves the local graph model untouched.
 
 The plot highlight context action is mapped to `PLOT_024`: missing MainWindow
 or an empty graph selection is rejected when the action is triggered.
+
+`PlotWidget::UpdateGraphs` is also mapped to `PLOT_025`: incomplete DataPair
+offset state rejects the entire update before graph mutation.
