@@ -73,6 +73,21 @@ RemoteControlServer::RemoteControlServer(std::map<QString, ToFormMapper *> *Data
         ;
 }
 
+RemoteControlServer::~RemoteControlServer()
+{
+    ConnectionState.ResetCurrentSocket();
+
+    const QList<QTcpSocket*> sockets = tcpServer.findChildren<QTcpSocket*>(QString(), Qt::FindDirectChildrenOnly);
+    for (QTcpSocket* socket : sockets)
+    {
+        disconnect(socket, nullptr, this, nullptr);
+        socket->abort();
+        socket->deleteLater();
+        QCoreApplication::sendPostedEvents(socket, QEvent::DeferredDelete);
+    }
+    tcpServer.close();
+}
+
 void RemoteControlServer::acceptConnection()
 {
     // if(ConnectionState.GetCurrentSocket())
