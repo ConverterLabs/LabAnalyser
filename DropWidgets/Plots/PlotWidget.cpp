@@ -1743,6 +1743,9 @@ void PlotWidget::UpdateGraphs(QString ID, bool force)
     if (IsUpdateBlocked())
         return;
 
+    if (!MainWindow_p || !MainWindow_p->GetLogic())
+        return;
+
     DataPair XData, YData;
     int yIndex = 0;
 

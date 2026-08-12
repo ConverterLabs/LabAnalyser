@@ -42,6 +42,7 @@ private slots:
     void PLOT_014_empty_legend_double_click_is_a_noop();
     void PLOT_015_null_axis_double_click_is_a_noop();
     void PLOT_016_null_title_double_click_is_a_noop();
+    void PLOT_017_unmanaged_timer_update_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -424,6 +425,17 @@ void PlotWidgetContractTests::PLOT_016_null_title_double_click_is_a_noop()
                                       Q_ARG(QMouseEvent*, nullptr),
                                       Q_ARG(QCPPlotTitle*, nullptr)));
     QCOMPARE(plot.graphCount(), 0);
+}
+
+void PlotWidgetContractTests::PLOT_017_unmanaged_timer_update_is_a_noop()
+{
+    QWidget host;
+    PlotWidget plot(nullptr, &host, nullptr);
+    plot.addGraph();
+    QCOMPARE(plot.graphCount(), 1);
+
+    plot.UpdateGraphs(QString(), true);
+    QCOMPARE(plot.graphCount(), 1);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

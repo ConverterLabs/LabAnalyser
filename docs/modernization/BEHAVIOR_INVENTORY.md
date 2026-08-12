@@ -1168,3 +1168,6 @@ a no-op even when the selection part denotes an axis label.
 
 `PlotWidget::titleDoubleClick` is mapped to `PLOT_016`: a missing title is a
 no-op; valid title editing remains a separately controlled modal workflow.
+
+`PlotWidget::UpdateGraphs` is mapped to `PLOT_017`: absent MainWindow or
+manager context is a no-op, protecting timer-driven execution.

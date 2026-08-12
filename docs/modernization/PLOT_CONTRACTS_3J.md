@@ -108,3 +108,7 @@ dialog editing remains unchanged.
 
 `PLOT_016` invokes `titleDoubleClick()` through the metaobject with a null
 title. It is a no-op and does not enter the legacy title dialog.
+
+`PLOT_017` directly runs the timer target `UpdateGraphs(..., true)` on a
+PlotWidget without a MainWindow. It preserves the graph model and returns
+before manager/data access; regular manager-backed updates are unchanged.
