@@ -257,6 +257,28 @@ selection and a top-level tree item reject safely; a selected leaf retains the
 legacy eligible-source condition. The ordinary single-ID adapters use the
 private `DropWidgetDropBinding` transaction for their legacy disconnect,
 context-menu/request reconnect, ID/tooltip lookup and manager registration.
-Its deliberately excluded variants are `QCheckBoxD` (selective signal and
-label behavior), `QLineEditD`/`QListViewD` (multi-selection), and
+Its deliberately excluded variants are `QLineEditD`/`QListViewD`
+(multi-selection), and
 `QTableWidgeD` (dynamic row model).
+
+### Follow-up adapter consolidation (2026-08-12)
+
+`QCheckBoxD` now delegates only its shared bool/unsigned initial bit-state
+calculation to `DropWidgetIndicatorBinding::InitializeState`. Its selective
+context/update reset, label generation, `clicked(bool)` binding and its
+non-blocked update contract remain local. `DW_020` directly covers the shared
+bool initialization: it resets the bit, applies the state and leaves the
+counter unchanged without opening the unsigned-bit dialog.
+
+`DropWidgetTreePath::IdForItem` is the sole internal leaf-to-ID mapping for
+`CreateID`, `CreateIDs`, `QLineEditD` and `QListViewD`; `DW_021` establishes
+the nested `root::branch::leaf` result. `DropWidgetDragSource` also centralizes
+the existing first-leaf-to-container lookup used by all one-ID adapters. The
+multi-selection and dynamic-table paths deliberately keep their own selection
+semantics. No Plot source was changed.
+
+The follow-up checkpoint completed an incremental application build after one
+external 120-second interruption while continuing the same build tree, then
+ran `DropWidgetAdapterTests`, `MainWindowIntegrationTests` and
+`XmlExperimentContractTests` green (3/3). The five immutable legacy fixture
+hashes and their `-text` EOL protection remained unchanged.

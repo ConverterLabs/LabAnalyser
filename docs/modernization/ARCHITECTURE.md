@@ -272,7 +272,7 @@ protection remain immutable.
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the
-adapter implementations now share three internal mechanisms:
+adapter implementations now share internal mechanisms:
 `DropWidgetUpdate` for existing programmatic signal blocking,
 `DropWidgetBinding` for direct manager signal connections, and
 `DropWidgetDataAccess` for numeric/indicator/XML value conversion.
@@ -287,4 +287,9 @@ boundaries, not new UI or ABI contracts.
 transaction for `QBLed`, `QLed` and `QTSLed`: reconnect, ID lookup, bool/bit
 selection, tooltip and manager registration. Each concrete class retains its
 indicator type and static bit counter; no manager, dialog or ownership policy
-changed.
+changed. Its pure initial-state portion is also used by `QCheckBoxD`, whose
+special label and click-routing behavior remains local. `DropWidgetTreePath`
+owns the shared TreeItem-to-ID calculation, while `DropWidgetDragSource` owns
+the common first-selected-leaf admission and lookup for one-ID adapters.
+Multi-selection and table row contracts intentionally remain concrete-widget
+responsibilities.

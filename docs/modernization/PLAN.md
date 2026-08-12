@@ -342,8 +342,14 @@ manager/messenger forwarding and table-row binding. The normal qmake runner
 builds and runs the suite in temporary offscreen mode. The combined clean run
 was bounded solely by the 300-second execution limit after cleanup/rebuild;
 the immediate non-clean run completed that tree successfully, and fresh
-Release/Debug production builds plus file-specific gcov evidence passed. No
-production DropWidget source, MIME semantics or defect candidate was changed.
+Release/Debug production builds plus file-specific gcov evidence passed.
+Subsequent behavior-preserving adapter consolidation extracted only private
+connection, bit-state, TreeItem-ID and first-leaf container lookup helpers;
+the concrete Designer names, MIME semantics and defect candidates remain
+unchanged. `DW_019..DW_021` cover the new helper boundaries. The incremental
+application build completed by continuing the same build tree after one
+external 120-second limit, and focused DropWidget/MainWindow/XML CTest targets
+passed 3/3 with all protected legacy fixture hashes unchanged.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

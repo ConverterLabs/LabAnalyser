@@ -255,7 +255,11 @@ The suite is registered in `tests/run-tests-msys2.ps1` and uses offscreen Qt
 only for the runner process. The 2026-08-04 split clean verification, follow-up
 full runner, fresh Release/Debug builds and instrumented suite passed. Detailed
 per-file gcov values, all fixtures and the test-only seam boundary are recorded
-in `DROPWIDGET_CONTRACTS_3H.md`; no production DropWidget source was changed.
+in `DROPWIDGET_CONTRACTS_3H.md`. Subsequent behavior-preserving adapter
+consolidation retains the same Designer and manager contracts: `DW_019` covers
+the shared safe first-leaf source guard, `DW_020` covers the shared checkbox/LED
+bool-state initialization, and `DW_021` covers the shared nested TreeItem ID
+mapping used by `CreateID`, `CreateIDs`, `QLineEditD` and `QListViewD`.
 
 ## DropWidget isolated closure 3H.5b
 
@@ -627,7 +631,7 @@ hide still-open function-level detail. The concrete milestone-3 mappings are:
 | `mainwindow.*` | `GUI_001..GUI_021` | `main.cpp` itself, CLI arguments, native dialogs, desktop tray and unsafe selection/index paths are not executed. These are explicit exclusions, not passing evidence. |
 | DataManagement and UI manager | `DM_001..DM_010`, plus XML, parameter, export, plugin and GUI boundary IDs named above | `LoadForms` has no repository definition. Sender-less, absent-entry and raw-pointer paths remain unsafe exclusions; the remaining UI-manager surfaces are not yet a complete per-function map. |
 | Plugin API and loader | `PLUGIN_001..PLUGIN_011`; `XML_002..XML_004` for the XML path boundary | Member- and heap-owned test models establish only safe loading and manager-destruction observations. Third-party ABI/configuration, actual host-delete of member interfaces, retained-interface unload, null Messenger/null plugin return and OS loader/permission faults remain explicit exclusions. |
-| DropWidget adapters, indicators and loader | `DW_001..DW_017`; real-form boundaries `GUI_006..GUI_008` | Source-backed `QDrag::exec()` drops, complete interactive context paths, visual pixel appearance and dangerous null/index paths remain excluded. |
+| DropWidget adapters, indicators and loader | `DW_001..DW_021`; real-form boundaries `GUI_006..GUI_008` | Source-backed `QDrag::exec()` drops, complete interactive context paths, visual pixel appearance and dangerous null/index paths remain excluded. |
 | Tree and subplot lifecycle | `DW_009`, `GUI_005`, `GUI_012`, `GUI_017` | Tree source-dependent drops, malformed selections and plot content semantics remain unexecuted. |
 | Plot/FFT | `PLOT_001..PLOT_008`, `FFT_001..FFT_010`; separate PlotMeasurements unit suite | Zero/one sample FFT, test-only FFTW allocation/plan failure, empty XY and bounded zero-frequency quality indices are hardened. Valid cursor readout/context/history, rendering/gesture paths, non-finite FFT policy and real resource exhaustion remain open. |
 
