@@ -39,6 +39,7 @@
 #include "UIFunctions/MainWindowTrayController.h"
 #include "UIFunctions/MainWindowProjectCleanup.h"
 #include "UIFunctions/MainWindowContextMenus.h"
+#include "UIFunctions/MainWindowProjectActions.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -456,64 +457,17 @@ void MainWindow::on_actionLoadPlugin_triggered()
 
 void MainWindow::on_actionSave_Experiment_triggered()
 {
-    QString Path = QFileDialog::getSaveFileName(this,
-             tr("Save Experiment"), this->StdSavePath, tr("Expermiment Files (*.LAexp)"));
-
-    QFileInfo fi(Path);
-    this->StdSavePath = fi.absolutePath();
-
-    emit SaveExperiment(Path);
-
-    /*ExtendedDataManagement->SaveExperiment(Path);
-    this->SavePath = Path;
-    */
-    ChangeForSaveDetected = false;
-
+    MainWindowProjectActions::SaveExperiment(*this, StdSavePath, ChangeForSaveDetected,
+                                              [this](const QString& path) { emit SaveExperiment(path); });
 }
 
 void MainWindow::on_actionLoadExperiment_triggered()
 {
-
-    if( this->ChangeForSaveDetected )
-    {
-        auto answer = QMessageBox::Discard;
-        if(this->ChangeForSaveDetected)
-          answer =  QMessageBox::question(this, "Load other Project", "Save the actual Project?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-
-        if (QMessageBox::Save == answer)
-        {
-            auto UiFileName = QFileDialog::getSaveFileName(this,
-                                                           tr("Save Experiment"), this->StdSavePath, tr("Expermiment Files (*.LAexp)"));
-            QFileInfo fi(UiFileName);
-            this->StdSavePath = fi.absolutePath();
-
-            GetLogic()->SaveExperiment(UiFileName);
-
-        }
-        if (QMessageBox::Discard == answer)
-        {
-
-        }
-        else if (QMessageBox::Cancel == answer)
-            return;
-    }
-
-    auto Path = QFileDialog::getOpenFileName(this,
-             tr("Load Experiment"), this->StdSavePath, tr("Expermiment Files (*.LAexp)"));
-
-    if(!Path.size())
-        return;
-
-    CloseProject();
-
-    QFileInfo fi(Path);
-    this->StdSavePath = fi.absolutePath();
-    this->isloading = true;
-    if(!ExtendedDataManagement->LoadExperiment(Path))
-        this->SavePath = Path;
-    this->isloading = false;
-
-
+    MainWindowProjectActions::LoadExperiment(
+            *this, StdSavePath, SavePath, ChangeForSaveDetected, isloading,
+            [this] { CloseProject(); },
+            [this](const QString& path) { GetLogic()->SaveExperiment(path); },
+            [this](const QString& path) { return ExtendedDataManagement->LoadExperiment(path); });
 
 }
 
@@ -537,27 +491,11 @@ void MainWindow::CloseProject(void)
 
 void MainWindow::on_Close_Project_triggered()
 {
-    if(this->GetLogic()->GetFormFileCount())
-    {
-        auto answer = QMessageBox::Discard;
-        if(this->ChangeForSaveDetected)
-            answer =  QMessageBox::question(this, "Close Project", "Do you want to save the Project?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        if (QMessageBox::Save == answer)
-        {
-            auto UiFileName = QFileDialog::getSaveFileName(this,
-                                                           tr("Save Experiment"), this->StdSavePath, tr("Expermiment Files (*.LAexp)"));
-            ExtendedDataManagement->SaveExperiment(UiFileName);
-            CloseProject();
-        }
-        if (QMessageBox::Discard == answer)
-        {
-            CloseProject();
-        }
-    }
-    else
-         CloseProject();
-
-    ChangeForSaveDetected = false;
+    MainWindowProjectActions::CloseProjectWithPrompt(
+            *this, StdSavePath, ChangeForSaveDetected,
+            [this] { return GetLogic()->GetFormFileCount(); },
+            [this](const QString& path) { ExtendedDataManagement->SaveExperiment(path); },
+            [this] { CloseProject(); });
 }
 
 void MainWindow::AddSelectedItems(QTreeWidgetItem* elemtent, QStringList &itt)

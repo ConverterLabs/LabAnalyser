@@ -675,6 +675,10 @@ removal; mutation, dialogs and sender-dependent slots remain MainWindow.
 `MainWindowOutputLog` also constructs the output context menu. GUI_013 covers
 its existing Clear Output action through MainWindow's unchanged slot.
 
+`MainWindowProjectActions` contains private experiment Save/Load/Close dialog
+routing. GUI_009–011 cover the public slots' cancellation and path/state
+contracts; MainWindow retains signal emission, manager access and cleanup.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 

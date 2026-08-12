@@ -1092,6 +1092,10 @@ GUI_016 and GUI_019–021 preserve the valid-selection contracts.
 `MainWindowOutputLog` now also isolates standard output-menu and Clear Output
 construction; GUI_013 preserves the output-context behavior.
 
+`MainWindowProjectActions` isolates private experiment Save/Load/Close dialog
+routing while MainWindow keeps public slots, signals, loading state and manager
+ownership. GUI_009–011 preserve the observed cancellation and path contracts.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

@@ -325,6 +325,11 @@ dialog: MainWindow remains the QObject slot receiver and mutation boundary.
 Clear Output construction. It remains non-owning with respect to the output
 widget and dock.
 
+`UIFunctions/MainWindowProjectActions` is a private dialog-routing boundary
+for experiment Save, Load and prompted Close. It does not own the manager or
+state: MainWindow supplies callbacks, retains signals and owns loading and
+cleanup lifetime.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

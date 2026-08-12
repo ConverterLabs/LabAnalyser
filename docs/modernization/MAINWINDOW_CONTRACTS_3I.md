@@ -358,6 +358,11 @@ popup anchor; MainWindow retains the slots and all mutation/dialog behavior.
 GUI_013 continues to cover the Clear Output action and no output, menu or
 ownership behavior is changed.
 
+`MainWindowProjectActions` now isolates the existing Save, Load and prompted
+Close dialog orchestration. GUI_009–011 preserve cancellation, empty-path,
+SavePath, StdSavePath and ChangeForSaveDetected behavior. MainWindow remains
+the public slot, signal source and owner of loading state and project cleanup.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.
