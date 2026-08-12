@@ -21,6 +21,7 @@
 
 #include "QListView.h"
 #include "CreateID.h"
+#include "DropWidgetBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -32,7 +33,7 @@ QListViewD::QListViewD(QWidget *parent):QListView(parent)
      this->setModel(model);
      this->setContextMenuPolicy(Qt::CustomContextMenu);
      connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-     connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+     DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
       return;
 }
@@ -97,7 +98,7 @@ void QListViewD::dropEvent(QDropEvent *event)
             {
                 this->disconnect();
                 connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-                connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+                DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
                 QString ID =  CreateID(event->source());
                 this->setToolTip(ID);
@@ -105,7 +106,7 @@ void QListViewD::dropEvent(QDropEvent *event)
                 model->setStringList((GetMainWindow()->GetLogic()->GetContainer(ID)->GetStringList()));
                 MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
                  MW->ChangeForSaveDetected = true;
-                 connect(this, SIGNAL(NewEntry()), MW->GetLogic(),SLOT(SendNewValue()) );
+                 DropWidgetBinding::ConnectValueChanged(this, SIGNAL(NewEntry()), MW->GetLogic());
 
             }
             else
@@ -182,6 +183,6 @@ bool QListViewD::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes,
 void QListViewD::ConnectToID(DataManagementSetClass* DM, QString ID)
 {
     setToolTip(ID);
-    connect(this, SIGNAL(NewEntry()),DM , SLOT(SendNewValue()));
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(NewEntry()), DM);
     RequestUpdate();
 }

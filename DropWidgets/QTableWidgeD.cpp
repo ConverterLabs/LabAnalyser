@@ -21,6 +21,7 @@
 
 #include "QTableWidgeD.h"
 #include "CreateID.h"
+#include "DropWidgetBinding.h"
 #include "DropWidgetTableCells.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
@@ -38,7 +39,7 @@ QTableWidgeD::QTableWidgeD(QWidget *parent):QTableWidget(parent)
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
     this->verticalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this->verticalHeader(),
@@ -332,6 +333,6 @@ void QTableWidgeD::ConnectToID(DataManagementSetClass* DM, QString ID)
     setToolTip(ID);
     auto MW = GetMainWindow();
     QLocale::setDefault(QLocale::c());
-    connect(this, SIGNAL(valueChanged(int)), DM, SLOT(SendNewValue()) );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(int)), DM);
     RequestUpdate();
 }
