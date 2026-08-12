@@ -666,6 +666,12 @@ void DataManagementCharacterizationTests::DM_SAFE_002_messenger_without_optional
     QCOMPARE(parentlessNotification.count(), 0);
     QCOMPARE(parentlessClose.count(), 1);
 
+    DataManagementSetClass parentlessManager(nullptr);
+    QVERIFY(parentlessManager.GetMessenger());
+    QSignalSpy parentlessManagerClose(parentlessManager.GetMessenger(), &MessengerClass::CloseProject);
+    parentlessManager.GetMessenger()->MessageReceiver("CloseProject", "manual", InterfaceData());
+    QCOMPARE(parentlessManagerClose.count(), 1);
+
     QObject root;
     root.setObjectName("root");
     MessengerClass direct(&root, nullptr);

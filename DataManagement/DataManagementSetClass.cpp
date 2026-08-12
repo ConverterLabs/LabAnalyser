@@ -27,7 +27,8 @@
 
 DataManagementSetClass::DataManagementSetClass(QObject *parent) : DataManagementClass(parent)
 {
-    Q_ASSERT(parent->objectName()==  QString("LabAnalyser"));
+    if (parent)
+        Q_ASSERT(parent->objectName()==  QString("LabAnalyser"));
     MainWindow* MW = qobject_cast<MainWindow*>(this->parent());
     if(MW)
     {
