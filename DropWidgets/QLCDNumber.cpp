@@ -21,6 +21,7 @@
 
 #include "QLCDNumber.h"
 #include "CreateID.h"
+#include "DropWidgetDataAccess.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -123,12 +124,9 @@ void QLCDNumberD::dropEvent(QDropEvent *event)
 void QLCDNumberD::SetVariantData(ToFormMapper Data)
 {
     ApplyDropWidgetUpdate(this, [&]{
-    if(Data.IsFloatingPointNumber())
-        display(Data.GetFloatingPointData());
-    else if(Data.IsSigedNumber())
-       display((double)Data.GetSignedData());
-    else if(Data.IsUnsigedNumber())
-       display((double)Data.GetUnsignedData());
+    double value = 0.0;
+    if (DropWidgetDataAccess::TryReadNumeric(Data, &value))
+        display(value);
     });
 }
 

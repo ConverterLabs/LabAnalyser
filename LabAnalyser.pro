@@ -110,6 +110,7 @@ HEADERS  += mainwindow.h\
             DropWidgets/CreateID.h \
             DropWidgets/DropWidget.h \
             DropWidgets/DropWidgetBinding.h \
+            DropWidgets/DropWidgetDataAccess.h \
             DropWidgets/DropWidgetUpdate.h \
             DropWidgets/DropWidgets.h \
             DropWidgets/DropWidget.h \

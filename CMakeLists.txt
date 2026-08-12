@@ -45,6 +45,7 @@ set(LABANALYSER_CORE_SOURCES
     DropWidgets/CreateID.cpp
     DropWidgets/DropWidgetsUiLoader.cpp
     DropWidgets/DropWidgetBinding.cpp
+    DropWidgets/DropWidgetDataAccess.h
     DropWidgets/DropWidgetUpdate.h
     DropWidgets/DropWidgetBinding.h
     DropWidgets/Plots/FFTPlotWidget.cpp

@@ -47,6 +47,7 @@ HEADERS += $$REPOSITORY_ROOT/mainwindow.h \
     $$REPOSITORY_ROOT/DropWidgets/QSpinBox.h $$REPOSITORY_ROOT/DropWidgets/QTableWidgeD.h \
     $$REPOSITORY_ROOT/DropWidgets/QTSLed.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetBinding.h \
+    $$REPOSITORY_ROOT/DropWidgets/DropWidgetDataAccess.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetsUiLoader.h $$REPOSITORY_ROOT/TreeWidgetCustomDrop.h \
     $$REPOSITORY_ROOT/CustomWidgets/QBLedIndicator.h $$REPOSITORY_ROOT/CustomWidgets/QLedIndicator.h \
     $$REPOSITORY_ROOT/CustomWidgets/QTSLedIndicator.h

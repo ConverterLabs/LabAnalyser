@@ -21,6 +21,7 @@
 
 #include "QLed.h"
 #include "CreateID.h"
+#include "DropWidgetDataAccess.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -139,10 +140,9 @@ void QLed::contextMenu(QPoint pos)
 void QLed::SetVariantData(ToFormMapper Data)
 {
     ApplyDropWidgetUpdate(this, [&]{
-    if(Data.IsBool())
-        SetState(Data.GetBool());
-    else if(Data.IsUnsigedNumber())
-       SetState((bool) (Data.GetUnsignedData() & (1ULL<<GetBit())));
+    bool state = false;
+    if (DropWidgetDataAccess::TryReadIndicatorState(Data, GetBit(), &state))
+        SetState(state);
      repaint();
     });
 
@@ -155,21 +155,16 @@ void QLed::GetVariantData(ToFormMapper *Data)
 
 bool QLed::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text)
 {
-    for(auto itt: Attributes)
-    {
-        if(itt.first ==  QString("Bit"))
-            SetBit(itt.second.toUInt());
-    }
+    uint32_t bit = 0;
+    if (DropWidgetDataAccess::LoadBitAttribute(Attributes, &bit))
+        SetBit(bit);
     return true;
 
 }
 
 bool QLed::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text)
 {
-    std::pair<QString, QString> Attribut;
-    Attribut.first = "Bit";
-    Attribut.second = QString::number(GetBit());
-    Attributes.push_back(Attribut);
+    DropWidgetDataAccess::SaveBitAttribute(Attributes, GetBit());
 
     return true;
 }

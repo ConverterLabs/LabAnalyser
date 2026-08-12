@@ -21,6 +21,7 @@
 
 #include "QSlider.h"
 #include "CreateID.h"
+#include "DropWidgetDataAccess.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -145,23 +146,7 @@ void QSliderD::SetVariantData(ToFormMapper Data)
                 MinMax = MW->GetLogic()->MinMaxValue(ConnectedID);
 
         double value = 0.0;
-        bool hasNumericValue = false;
-        if(Data.IsFloatingPointNumber())
-        {
-             value = (Data.GetFloatingPointData());
-             hasNumericValue = true;
-        }
-        else if(Data.IsSigedNumber())
-        {
-            value =  (double)Data.GetSignedData();
-            hasNumericValue = true;
-        }
-        else if(Data.IsUnsigedNumber())
-        {
-           value =  (double)Data.GetUnsignedData();
-           hasNumericValue = true;
-        }
-        if(hasNumericValue && MinMax.first != MinMax.second)
+        if(DropWidgetDataAccess::TryReadNumeric(Data, &value) && MinMax.first != MinMax.second)
         {
             int valueC = (int) round((value - MinMax.first)/(MinMax.second-MinMax.first)*100.0);
             setValue((int)valueC );
