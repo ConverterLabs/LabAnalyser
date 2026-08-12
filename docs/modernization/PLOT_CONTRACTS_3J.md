@@ -31,6 +31,23 @@ the reproducible local entry point.
 | `FFT_007` | Existing nonuniform mean-delta-T rule: `{0,.1,.4,.6}` produces a 1.25-Hz grid. |
 | `FFT_008` | Empty and unequal vectors use the safe early return and leave FFT pointers unset. |
 
+## Milestone 5 numerical/plot hardening
+
+Work package B added narrow, behavior-preserving guards without touching
+vendored `qcustomplot` or valid FFT results. `FFT_009` proves that zero- and
+one-sample inputs retain their original time vectors and create no FFT vectors.
+`FFT_010` uses test-target-only `LABANALYSER_PLOTWIDGET_TEST_SEAMS` fault
+injection to fail each FFTW allocation and plan creation: no partial FFT
+vectors are adopted and a following ordinary FFT remains usable. The hooks are
+absent from normal application builds and add no public API.
+
+`PLOT_007` drives the existing frequency dialog to zero and verifies bounded
+quality-criteria indices. `PLOT_008` exercises cursor toggle/clear slots with
+no graphs; they leave the empty plot model unchanged. Empty XY data now returns
+before the existing first/last sample comparisons. Valid amplitudes, native
+FFTW bins, mean-delta-T, styles and time/frequency toggling remain covered by
+unchanged `FFT_002`--`FFT_007` vectors and tolerances.
+
 Analytic amplitudes use absolute tolerance `1e-10`; nonuniform frequency-grid
 checks use `1e-12`. These limits are specific to the small exact,
 double-precision FFTW vectors.
@@ -50,13 +67,11 @@ Already-observed instrumented suite results, not project coverage or a gate:
 - Repeated `AddCustomGraph` calls for one ID append duplicate graphs.
 - `ClearAllGraphs` removes manager registrations but not qcustomplot graphs;
   internal `removeAllGraphs` does both.
-- XY update reads first/last samples without an empty-vector guard.
-- FFT has no `fftw_malloc`/plan failure check; one sample reaches mean-delta-T
-  division over an empty vector.
+- Test seam failure handling is not an OS-memory-exhaustion or FFTW-internal
+  failure proof.
 
-Cursor, context-menu, history-bound and quality-criteria paths are still
-safely testable with valid graph/manager input but remain uncovered. Rendering,
-pixel output, mouse/wheel/box-zoom gestures, source-dependent drag/drop, PDF,
-null manager/graph paths, failed FFTW allocation/plan creation and unsafe index
-paths are excluded. **PlotWidget is not cleared for broad refactoring** until
-the safe cursor, context, history and quality-criteria contracts are covered.
+Only safe empty-model cursor controls and bounded zero-frequency quality are
+covered. Valid cursor readout, history retention and broad context-menu paths,
+rendering/gesture behavior, non-finite FFT policy and large resource limits
+remain open. **PlotWidget is not cleared for broad refactoring** until the
+remaining safe paths are characterized.

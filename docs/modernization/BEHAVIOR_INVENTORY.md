@@ -629,7 +629,7 @@ hide still-open function-level detail. The concrete milestone-3 mappings are:
 | Plugin API and loader | `PLUGIN_001..PLUGIN_011`; `XML_002..XML_004` for the XML path boundary | Member- and heap-owned test models establish only safe loading and manager-destruction observations. Third-party ABI/configuration, actual host-delete of member interfaces, retained-interface unload, null Messenger/null plugin return and OS loader/permission faults remain explicit exclusions. |
 | DropWidget adapters, indicators and loader | `DW_001..DW_017`; real-form boundaries `GUI_006..GUI_008` | Source-backed `QDrag::exec()` drops, complete interactive context paths, visual pixel appearance and dangerous null/index paths remain excluded. |
 | Tree and subplot lifecycle | `DW_009`, `GUI_005`, `GUI_012`, `GUI_017` | Tree source-dependent drops, malformed selections and plot content semantics remain unexecuted. |
-| Plot/FFT | `PLOT_001..PLOT_006`, `FFT_001..FFT_008`; separate PlotMeasurements unit suite | `ClearAllGraphs`, X-axis mapping, valid cursor/context/history/quality criteria, rendering/gesture paths and FFT resource-failure paths are either unexecuted or explicitly unsafe. |
+| Plot/FFT | `PLOT_001..PLOT_008`, `FFT_001..FFT_010`; separate PlotMeasurements unit suite | Zero/one sample FFT, test-only FFTW allocation/plan failure, empty XY and bounded zero-frequency quality indices are hardened. Valid cursor readout/context/history, rendering/gesture paths, non-finite FFT policy and real resource exhaustion remain open. |
 
 Thus all inspected subsystem scopes have at least a test-ID mapping or an
 explicit exclusion, but the inventory is not yet a complete one-row-per-public

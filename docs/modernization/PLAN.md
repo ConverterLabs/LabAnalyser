@@ -838,3 +838,19 @@ errors. The one non-clean central runner was resumed once in its existing build
 tree after the external 120-second limit, but neither invocation completed the
 full graph; no compiler or test failure was observed before the second limit.
 GitHub CI is the pending complete package validation.
+
+## Milestone 5 package B: numerical and plot hardening
+
+**Completed locally; remote package checkpoint pending.** Commits `9b01417`,
+`b0d3dbe`, `ad3aaa8` and `7a9431e` harden only degenerate PlotWidget and
+PlotMeasurements inputs: FFT inputs below two samples, test-only FFTW
+allocation/plan failure, zero-frequency quality indices, empty XY vectors and
+pure normalized-sample boundaries. Valid FFT amplitudes, bins, tolerances,
+styles, time/frequency toggling and qcustomplot remain unchanged. Focused
+offscreen PlotWidget evidence is 20 passing Qt Test entries; PlotMeasurements
+has 8 passing entries, both exit code 0. See `NUMERICAL_PLOT_HARDENING_5B.md`.
+
+The package does not claim rendering, gestures, valid cursor readout/history,
+context workflows, non-finite FFT policy, large resource limits or real
+allocator failure behavior. Those remain distinct hardening risks; GitHub CI
+is the next full package checkpoint.
