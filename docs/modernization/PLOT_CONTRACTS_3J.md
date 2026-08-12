@@ -130,3 +130,6 @@ local graph is retained; manager-backed removal remains covered by `PLOT_006`.
 
 `PLOT_023` invokes remove-all without a manager. Local graphs are retained;
 the regular manager-backed remove-all contract remains covered by `PLOT_006`.
+
+`PLOT_024` triggers the existing highlight context action on an unmanaged,
+selected graph. It is a no-op and retains graph selection/model state.

@@ -49,6 +49,7 @@ private slots:
     void PLOT_021_senderless_legend_edit_is_a_noop();
     void PLOT_022_unmanaged_selected_graph_removal_is_a_noop();
     void PLOT_023_unmanaged_remove_all_graphs_is_a_noop();
+    void PLOT_024_unmanaged_highlight_action_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -510,6 +511,34 @@ void PlotWidgetContractTests::PLOT_023_unmanaged_remove_all_graphs_is_a_noop()
 
     QVERIFY(QMetaObject::invokeMethod(&plot, "removeAllGraphs", Qt::DirectConnection));
     QCOMPARE(plot.graphCount(), 1);
+}
+
+void PlotWidgetContractTests::PLOT_024_unmanaged_highlight_action_is_a_noop()
+{
+    QWidget host;
+    PlotWidget plot(nullptr, &host, nullptr);
+    QCPGraph* plotGraph = plot.addGraph();
+    plotGraph->setSelected(true);
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "contextMenuRequest", Qt::DirectConnection,
+                                      Q_ARG(QPoint, QPoint(0, 0))));
+    QMenu* menu = plot.findChild<QMenu*>();
+    QVERIFY(menu);
+    QAction* highlight = nullptr;
+    for (QAction* action : menu->actions())
+    {
+        if (action->text() == QStringLiteral("Highlight Connection"))
+        {
+            highlight = action;
+            break;
+        }
+    }
+    QVERIFY(highlight);
+
+    highlight->trigger();
+    QCOMPARE(plot.graphCount(), 1);
+    QVERIFY(plotGraph->selected());
+    menu->close();
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

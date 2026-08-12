@@ -1189,3 +1189,6 @@ context leaves selected local graphs untouched.
 
 `PlotWidget::removeAllGraphs` is mapped to `PLOT_023`: absent manager context
 leaves the local graph model untouched.
+
+The plot highlight context action is mapped to `PLOT_024`: missing MainWindow
+or an empty graph selection is rejected when the action is triggered.

@@ -981,3 +981,6 @@ the existing manager-backed removal contract remains unchanged.
 
 `PLOT_023` makes remove-all a no-op without manager context; manager-backed
 graph and binding removal is unchanged.
+
+`PLOT_024` guards delayed execution of the highlight context action against
+missing MainWindow or a changed graph selection.

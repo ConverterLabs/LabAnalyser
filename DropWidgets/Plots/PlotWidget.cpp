@@ -1555,8 +1555,11 @@ if (graphCount() > 0)
         menu->addAction("Toggle Marker", this, SLOT(ToggleMarker()));
         menu->addSeparator();
         QAction *Highlight = new QAction;
-        connect(Highlight, &QAction::triggered, [=]{
-            MainWindow_p->HighLightConnection(selectedGraphs().at(0)->ID());});
+        connect(Highlight, &QAction::triggered, this, [this]{
+            const QList<QCPGraph*> graphs = selectedGraphs();
+            if (MainWindow_p && !graphs.isEmpty() && graphs.first())
+                MainWindow_p->HighLightConnection(graphs.first()->ID());
+        });
         Highlight->setText("Highlight Connection");
         menu->addAction(Highlight);
 
