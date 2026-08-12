@@ -387,3 +387,13 @@ contract for QComboBoxD, QDoubleSpinBoxD, QLCDNumberD, QProgressBarD,
 QPushButtonD, QSliderD and QSpinBoxD: their established value/range/text state
 remains intact when no mapper can be resolved. Valid one-ID adapter drops
 retain their existing registration, signal and type-specific behavior.
+
+### Shared type-before-rebind hardening (2026-08-12)
+
+The common one-ID drop context now remains read-only until each adapter has
+confirmed the same admission rule already used by its `dragEnterEvent`.
+`DW_031` directly maps numeric, GuiSelection and button type admission.
+Consequently, incompatible existing mappers no longer reset a valid binding or
+presentation before QComboBoxD, numeric spin/LCD/progress/slider adapters or
+QPushButtonD reject them. Valid type rules, range behavior, message wiring and
+button state routing are unchanged.

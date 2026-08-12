@@ -67,11 +67,9 @@ void QSpinBoxD::dragEnterEvent(QDragEnterEvent *event)
 void QSpinBoxD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
-    if (!context.IsValid())
+    if (!DropWidgetDropBinding::SupportsNumeric(context))
         return;
-    ToFormMapper* container = context.manager->GetContainer(context.id);
-
-    QString Type = container->GetDataType();
+    DropWidgetDropBinding::Activate(this, context);
     std::pair<double,double> MinMax = context.manager->MinMaxValue(context.id);
     this->setMinimum((int)MinMax.first);
     this->setMaximum((int)MinMax.second);

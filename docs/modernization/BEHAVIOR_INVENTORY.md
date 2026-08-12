@@ -267,6 +267,11 @@ QDoubleSpinBoxD, QLCDNumberD, QProgressBarD, QPushButtonD, QSliderD and
 QSpinBoxD now preserve prior state if no mapper resolves before binding reset.
 Their valid mapped-drop behavior is unchanged.
 
+`DW_031` covers the internal common type-admission predicates used before a
+one-ID adapter resets/rebinds: numeric, GuiSelection and button contracts match
+their existing drag-enter rules. Incompatible mappers now leave prior bindings
+intact.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

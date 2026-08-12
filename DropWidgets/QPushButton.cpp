@@ -56,8 +56,9 @@ void QPushButtonD::dragMoveEvent(QDragMoveEvent *de)
 void QPushButtonD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
-    if (!context.IsValid())
+    if (!DropWidgetDropBinding::SupportsPushButton(context))
         return;
+    DropWidgetDropBinding::Activate(this, context);
 
     //this->setChecked(context.manager->GetContainer(context.id)->GetBool());
     QStringList sp = context.id.split("::");

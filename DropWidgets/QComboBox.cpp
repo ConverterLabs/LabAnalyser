@@ -65,11 +65,11 @@ void QComboBoxD::dragEnterEvent(QDragEnterEvent *event)
 void QComboBoxD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
-    if (!context.IsValid())
+    if (!DropWidgetDropBinding::SupportsGuiSelection(context))
         return;
-    ToFormMapper* container = context.manager->GetContainer(context.id);
+    ToFormMapper* container = context.container;
 
-    QString Type = container->GetDataType();
+    DropWidgetDropBinding::Activate(this, context);
 
     while(this->count())
         this->removeItem(0);

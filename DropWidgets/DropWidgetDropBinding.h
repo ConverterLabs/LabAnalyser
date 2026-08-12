@@ -57,13 +57,35 @@ inline Context Prepare(QWidget* widget, QDropEvent* event)
     MainWindow* mainWindow = GetMainWindow();
     DataManagementSetClass* manager = mainWindow ? mainWindow->GetLogic() : nullptr;
     ToFormMapper* container = manager ? manager->GetContainer(id) : nullptr;
-    if (!container)
-        return { id, mainWindow, manager, nullptr };
-
-    ResetConnections(widget);
-    widget->setToolTip(id);
-    widget->setToolTipDuration(2000);
     return { id, mainWindow, manager, container };
+}
+
+inline bool SupportsNumeric(const Context& context)
+{
+    return context.IsValid() && (context.container->IsFloatingPointNumber()
+                                 || context.container->IsUnsigedNumber()
+                                 || context.container->IsSigedNumber());
+}
+
+inline bool SupportsGuiSelection(const Context& context)
+{
+    return context.IsValid() && context.container->IsGuiSelection();
+}
+
+inline bool SupportsPushButton(const Context& context)
+{
+    return context.IsValid() && (context.container->GetType().compare("State") == 0
+                                 || (context.container->GetType().compare("Parameter") == 0
+                                     && (context.container->IsBool() || context.container->IsUnsigedNumber())));
+}
+
+inline void Activate(QWidget* widget, const Context& context)
+{
+    if (!context.IsValid())
+        return;
+    ResetConnections(widget);
+    widget->setToolTip(context.id);
+    widget->setToolTipDuration(2000);
 }
 
 inline void Register(QWidget* widget, const Context& context)

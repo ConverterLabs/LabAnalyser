@@ -379,6 +379,9 @@ presentation/binding (`DW_029`); valid bool/unsigned behavior remains intact.
 The shared one-ID drop preparation validates mapper presence before resetting
 connections for the remaining combo/spin/LCD/progress/button/slider adapters
 (`DW_030`), preserving valid mapped-drop behavior.
+Those adapters now also validate their existing numeric, GuiSelection or button
+type-admission rule before a binding reset (`DW_031`), so incompatible mappers
+preserve prior valid presentation and routing.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

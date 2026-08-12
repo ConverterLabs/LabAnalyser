@@ -10,6 +10,7 @@
 #include "DropWidgets/CreateID.h"
 #include "DropWidgets/DropWidgetDragSource.h"
 #include "DropWidgets/DropWidgetBinding.h"
+#include "DropWidgets/DropWidgetDropBinding.h"
 #include "DropWidgets/DropWidgetIndicatorBinding.h"
 #include "DropWidgets/DropWidgetTreePath.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -67,6 +68,7 @@ private slots:
     void DW_028_indicator_drop_rejects_missing_container();
     void DW_029_checkbox_drop_rejects_missing_container();
     void DW_030_common_drop_context_rejects_missing_container();
+    void DW_031_common_drop_context_type_admission();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -401,6 +403,29 @@ void DropWidgetAdapterTests::DW_030_common_drop_context_rejects_missing_containe
     QCOMPARE(spin.minimum(), -4);
     QCOMPARE(spin.maximum(), 9);
     QCOMPARE(spin.value(), 3);
+}
+
+void DropWidgetAdapterTests::DW_031_common_drop_context_type_admission()
+{
+    auto* mainWindow = GetMainWindow();
+    auto* manager = mainWindow->GetLogic();
+    ToFormMapper numeric = mapper("double");
+    numeric.SetData(1.5);
+    ToFormMapper selection = mapper("GuiSelection");
+    selection.SetData(GuiSelection("one", {"one", "two"}));
+    ToFormMapper boolean = mapper("bool");
+    boolean.SetData(true);
+
+    const auto numericContext = DropWidgetDropBinding::Context {"numeric", mainWindow, manager, &numeric};
+    const auto selectionContext = DropWidgetDropBinding::Context {"selection", mainWindow, manager, &selection};
+    const auto booleanContext = DropWidgetDropBinding::Context {"boolean", mainWindow, manager, &boolean};
+
+    QVERIFY(DropWidgetDropBinding::SupportsNumeric(numericContext));
+    QVERIFY(!DropWidgetDropBinding::SupportsNumeric(selectionContext));
+    QVERIFY(DropWidgetDropBinding::SupportsGuiSelection(selectionContext));
+    QVERIFY(!DropWidgetDropBinding::SupportsGuiSelection(numericContext));
+    QVERIFY(DropWidgetDropBinding::SupportsPushButton(booleanContext));
+    QVERIFY(!DropWidgetDropBinding::SupportsPushButton(numericContext));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()
