@@ -117,6 +117,7 @@ HEADERS  += mainwindow.h\
             DropWidgets/DropWidgetDropBinding.h \
             DropWidgets/DropWidgetDragSource.h \
             DropWidgets/DropWidgetIndicatorBinding.h \
+            DropWidgets/DropWidgetTreePath.h \
             DropWidgets/DropWidgetTableCells.h \
             DropWidgets/DropWidgetUpdate.h \
             DropWidgets/DropWidgets.h \

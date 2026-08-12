@@ -54,6 +54,7 @@ HEADERS += $$REPOSITORY_ROOT/mainwindow.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetDropBinding.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetDragSource.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetIndicatorBinding.h \
+    $$REPOSITORY_ROOT/DropWidgets/DropWidgetTreePath.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetTableCells.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetsUiLoader.h $$REPOSITORY_ROOT/TreeWidgetCustomDrop.h \
     $$REPOSITORY_ROOT/CustomWidgets/QBLedIndicator.h $$REPOSITORY_ROOT/CustomWidgets/QLedIndicator.h \

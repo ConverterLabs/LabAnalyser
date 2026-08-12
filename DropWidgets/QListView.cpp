@@ -23,6 +23,7 @@
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
 #include "DropWidgetDropBinding.h"
+#include "DropWidgetTreePath.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -83,17 +84,10 @@ void QListViewD::dropEvent(QDropEvent *event)
     auto MW = GetMainWindow();
     for(int i = 0; i < selectedItems.size(); i++)
     {
-        QString ID;
-        if (selectedItems[i]->childCount() == 0)
-        {
-            auto sit = selectedItems[i];
-            while(sit)
+            QString ID;
+            if (selectedItems[i]->childCount() == 0)
             {
-                ID.insert(0,sit->text( 0 ));
-                sit = sit->parent();
-                if(sit)
-                    ID.insert(0,"::");
-            }
+                ID = DropWidgetTreePath::IdForItem(selectedItems[i]);
             QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
             if(Type.compare("QStringList")==0)
             {

@@ -9,6 +9,7 @@
 #include "DropWidgets/CreateID.h"
 #include "DropWidgets/DropWidgetDragSource.h"
 #include "DropWidgets/DropWidgetIndicatorBinding.h"
+#include "DropWidgets/DropWidgetTreePath.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
 #include "TreeWidgetCustomDrop.h"
 #include "DropWidgets/QBLed.h"
@@ -55,6 +56,7 @@ private slots:
     void DW_018_equal_slider_bounds_preserve_value();
     void DW_019_drag_source_rejects_empty_and_nonleaf_selection();
     void DW_020_shared_indicator_initialization_preserves_checkbox_state_contract();
+    void DW_021_shared_tree_item_paths_preserve_multi_selection_ids();
 };
 
 class ExposedTreeWidget : public TreeWidgetCustomDrop
@@ -141,6 +143,15 @@ void DropWidgetAdapterTests::DW_020_shared_indicator_initialization_preserves_ch
     QCOMPARE(bit, uint32_t(0));
     QCOMPARE(bitCounter, uint32_t(11));
     QVERIFY(state);
+}
+
+void DropWidgetAdapterTests::DW_021_shared_tree_item_paths_preserve_multi_selection_ids()
+{
+    QTreeWidget tree;
+    QTreeWidgetItem root(&tree, QStringList("root"));
+    QTreeWidgetItem branch(&root, QStringList("branch"));
+    QTreeWidgetItem leaf(&branch, QStringList("leaf"));
+    QCOMPARE(DropWidgetTreePath::IdForItem(&leaf), QString("root::branch::leaf"));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

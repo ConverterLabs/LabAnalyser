@@ -25,6 +25,7 @@
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDragSource.h"
 #include "DropWidgetDropBinding.h"
+#include "DropWidgetTreePath.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -94,15 +95,7 @@ void QLineEditD::dropEvent(QDropEvent *event)
         {
             for( int col = 0; col < 1; ++col )
             {
-                QString ToolTip;
-                auto sit = si;
-                while(sit)
-                {
-                    ToolTip.insert(0,sit->text( col ));
-                    sit = sit->parent();
-                    if(sit)
-                        ToolTip.insert(0,"::");
-                }
+                QString ToolTip = DropWidgetTreePath::IdForItem(si, col);
                this->setToolTip(ToolTip);
                this->setToolTipDuration(2000);
 
