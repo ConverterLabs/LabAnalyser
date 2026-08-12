@@ -32,6 +32,7 @@ private slots:
     void PLOT_005_ranges_xml_and_navigation_state();
     void PLOT_006_connect_to_id_and_safe_cleanup();
     void PLOT_007_quality_criteria_zero_frequency_has_bounded_indices();
+    void PLOT_008_cursor_controls_are_safe_without_graphs();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -271,6 +272,18 @@ void PlotWidgetContractTests::PLOT_007_quality_criteria_zero_frequency_has_bound
     QCOMPARE(plot.graphCount(), 1);
     QVERIFY(graph(plot, 0)->GetXFFTPointer());
     QVERIFY(QMetaObject::invokeMethod(&plot, "ShowQualityCriteria", Qt::DirectConnection));
+}
+
+void PlotWidgetContractTests::PLOT_008_cursor_controls_are_safe_without_graphs()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    QCOMPARE(plot.graphCount(), 0);
+    QVERIFY(QMetaObject::invokeMethod(&plot, "ToggleCursors", Qt::DirectConnection, Q_ARG(bool, true)));
+    QVERIFY(QMetaObject::invokeMethod(&plot, "ClearScopeCursors", Qt::DirectConnection));
+    QVERIFY(QMetaObject::invokeMethod(&plot, "ToggleCursors", Qt::DirectConnection, Q_ARG(bool, false)));
+    QCOMPARE(plot.graphCount(), 0);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()
