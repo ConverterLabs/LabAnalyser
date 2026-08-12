@@ -125,6 +125,10 @@ void DropWidgetAdapterTests::DW_019_drag_source_rejects_empty_and_nonleaf_select
     root.setSelected(false);
     leaf.setSelected(true);
     QVERIFY(DropWidgetDragSource::HasFirstSelectedLeaf(&tree));
+    const QString id("root::leaf");
+    GetMainWindow()->GetLogic()->AddContainerElement(id, "bool", "Parameter", "");
+    QCOMPARE(DropWidgetDragSource::ContainerForFirstSelectedLeaf(&tree),
+             GetMainWindow()->GetLogic()->GetContainer(id));
 }
 
 void DropWidgetAdapterTests::DW_020_shared_indicator_initialization_preserves_checkbox_state_contract()

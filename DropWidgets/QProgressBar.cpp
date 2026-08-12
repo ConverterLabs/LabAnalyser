@@ -62,10 +62,7 @@ void QProgressBarD::RemoveConnection()
 
 void QProgressBarD::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (!DropWidgetDragSource::HasFirstSelectedLeaf(event->source()))
-        return;
-
-    ToFormMapper* container = GetMainWindow()->GetLogic()->GetContainer(CreateID(event->source()));
+    ToFormMapper* container = DropWidgetDragSource::ContainerForFirstSelectedLeaf(event->source());
     if (container && (container->IsFloatingPointNumber() || container->IsUnsigedNumber() || container->IsSigedNumber()))
         event->acceptProposedAction();
 }

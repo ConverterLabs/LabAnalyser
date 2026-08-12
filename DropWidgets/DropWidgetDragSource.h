@@ -4,6 +4,8 @@
 #include <QtCore/qobject.h>
 #include <QtWidgets/qtreewidget.h>
 
+#include "CreateID.h"
+
 // The legacy adapters accept only the first selected leaf of a QTreeWidget.
 // Keep that selection rule while turning an empty selection into a safe reject
 // rather than indexing selectedItems()[0].
@@ -17,6 +19,14 @@ inline bool HasFirstSelectedLeaf(QObject* source)
 
     const QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
     return !selectedItems.isEmpty() && selectedItems.first()->childCount() == 0;
+}
+
+inline ToFormMapper* ContainerForFirstSelectedLeaf(QObject* source)
+{
+    if (!HasFirstSelectedLeaf(source))
+        return nullptr;
+
+    return GetMainWindow()->GetLogic()->GetContainer(CreateID(source));
 }
 }
 
