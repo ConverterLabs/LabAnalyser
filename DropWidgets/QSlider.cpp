@@ -72,6 +72,8 @@ void QSliderD::dragMoveEvent(QDragMoveEvent *de)
 void QSliderD::dropEvent(QDropEvent *event)
 {
                const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
+               if (!context.IsValid())
+                   return;
                context.manager->DeleteEntryOfObject(this);
 
 
@@ -108,8 +110,12 @@ void QSliderD::SetVariantData(ToFormMapper Data)
     if(Data.IsEditable()) {
         auto MW = GetMainWindow();
         if(ConnectedID.size())
+        {
+            if (!MW)
+                return;
             if(MW->GetLogic()->ElementExists(ConnectedID))
                 MinMax = MW->GetLogic()->MinMaxValue(ConnectedID);
+        }
 
         double value = 0.0;
         if(DropWidgetDataAccess::TryReadNumeric(Data, &value) && MinMax.first != MinMax.second)
@@ -152,6 +158,8 @@ void QSliderD::ConnectToID(DataManagementSetClass* DM, QString ID)
 {
     setToolTip(ID);
     auto MW = GetMainWindow();
+    if (!MW)
+        return;
     QLocale::setDefault(QLocale::c());
     ConnectedID = ID;
     MinMax = MW->GetLogic()->MinMaxValue(ID);

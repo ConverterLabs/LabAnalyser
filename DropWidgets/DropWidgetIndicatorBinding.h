@@ -40,12 +40,15 @@ inline void InitializeState(QWidget* parent, ToFormMapper* container, uint32_t& 
 template <typename Indicator>
 inline void BindFromDrop(Indicator* indicator, QDropEvent* event, uint32_t& bit, uint32_t& bitCounter)
 {
+    MainWindow* mainWindow = GetMainWindow();
+    if (!mainWindow)
+        return;
+
     indicator->disconnect();
     QObject::connect(indicator, SIGNAL(customContextMenuRequested(QPoint)), indicator, SLOT(contextMenu(QPoint)));
     DropWidgetBinding::ConnectRequestUpdate(indicator, SIGNAL(RequestUpdate()));
 
     const QString id = CreateID(event->source());
-    MainWindow* mainWindow = GetMainWindow();
     DataManagementSetClass* manager = mainWindow->GetLogic();
     ToFormMapper* container = manager->GetContainer(id);
 

@@ -68,6 +68,8 @@ void QProgressBarD::dragEnterEvent(QDragEnterEvent *event)
 void QProgressBarD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
+    if (!context.IsValid())
+        return;
     DropWidgetDropBinding::Register(this, context);
      emit RequestUpdate();
 }

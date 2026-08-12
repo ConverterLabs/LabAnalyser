@@ -8,6 +8,7 @@
 #include <QTimer>
 #include "DropWidgets/CreateID.h"
 #include "DropWidgets/DropWidgetDragSource.h"
+#include "DropWidgets/DropWidgetBinding.h"
 #include "DropWidgets/DropWidgetIndicatorBinding.h"
 #include "DropWidgets/DropWidgetTreePath.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -59,6 +60,7 @@ private slots:
     void DW_021_shared_tree_item_paths_preserve_multi_selection_ids();
     void DW_022_unbound_button_timeout_is_safe_noop();
     void DW_023_remove_connection_preserves_widget_resets();
+    void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
 class ExposedTreeWidget : public TreeWidgetCustomDrop
@@ -199,6 +201,31 @@ void DropWidgetAdapterTests::DW_023_remove_connection_preserves_widget_resets()
     slider.RemoveConnection();
     QCOMPARE(slider.value(), 0);
     QVERIFY(slider.toolTip().isEmpty());
+}
+
+void DropWidgetAdapterTests::DW_024_missing_mainwindow_context_is_safe_noop()
+{
+    const QWidgetList topLevelWidgets = QApplication::topLevelWidgets();
+    for (QWidget* widget : topLevelWidgets)
+        if (qobject_cast<MainWindow*>(widget))
+            delete widget;
+
+    QCOMPARE(GetMainWindow(), nullptr);
+    QVERIFY(!DropWidgetBinding::CurrentManager());
+
+    QObject foreignSource;
+    QCOMPARE(CreateID(&foreignSource), QString());
+    QVERIFY(CreateIDs(&foreignSource).isEmpty());
+
+    QLineEditD lineEdit;
+    lineEdit.setText("unchanged");
+    lineEdit.RemoveConnection();
+    QCOMPARE(lineEdit.text(), QString());
+
+    QPushButtonD button;
+    QSignalSpy released(&button, &QPushButton::released);
+    button.TimeOut();
+    QCOMPARE(released.count(), 0);
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()
@@ -448,6 +475,8 @@ int main(int argc, char** argv)
 {
     qputenv("QT_QPA_PLATFORM", "offscreen");
     QApplication app(argc, argv);
+    if (GetMainWindow())
+        return 2;
     DropWidgetAdapterTests tests;
     return QTest::qExec(&tests, argc, argv);
 }

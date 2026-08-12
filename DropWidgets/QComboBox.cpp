@@ -65,6 +65,8 @@ void QComboBoxD::dragEnterEvent(QDragEnterEvent *event)
 void QComboBoxD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
+    if (!context.IsValid())
+        return;
     ToFormMapper* container = context.manager->GetContainer(context.id);
 
     QString Type = container->GetDataType();
@@ -86,7 +88,8 @@ void QComboBoxD::dropEvent(QDropEvent *event)
     }
     catch(...)
     {
-        GetMainWindow()->Error("Incompatible Datatype deteced, please check plugin for error");
+        if (MainWindow* mainWindow = GetMainWindow())
+            mainWindow->Error("Incompatible Datatype deteced, please check plugin for error");
     }
 
 

@@ -7,16 +7,19 @@ namespace DropWidgetBinding
 {
 DataManagementSetClass* CurrentManager()
 {
-    return GetMainWindow()->GetLogic();
+    MainWindow* mainWindow = GetMainWindow();
+    return mainWindow ? mainWindow->GetLogic() : nullptr;
 }
 
 void ConnectRequestUpdate(QObject* source, const char* signal)
 {
-    QObject::connect(source, signal, CurrentManager(), SLOT(UpdateRequest()));
+    if (DataManagementSetClass* manager = CurrentManager())
+        QObject::connect(source, signal, manager, SLOT(UpdateRequest()));
 }
 
 void ConnectValueChanged(QObject* source, const char* signal, DataManagementSetClass* manager, Qt::ConnectionType type)
 {
-    QObject::connect(source, signal, manager, SLOT(SendNewValue()), type);
+    if (manager)
+        QObject::connect(source, signal, manager, SLOT(SendNewValue()), type);
 }
 }

@@ -56,6 +56,8 @@ void QPushButtonD::dragMoveEvent(QDragMoveEvent *de)
 void QPushButtonD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
+    if (!context.IsValid())
+        return;
 
     //this->setChecked(context.manager->GetContainer(context.id)->GetBool());
     QStringList sp = context.id.split("::");
@@ -79,7 +81,10 @@ void QPushButtonD::TimeOut()
         QTimer::singleShot(100, this, SLOT(TimeOut()));
     else
     {
-        ToFormMapper* container = GetMainWindow()->GetLogic()->GetContainer(this);
+        MainWindow* mainWindow = GetMainWindow();
+        if (!mainWindow)
+            return;
+        ToFormMapper* container = mainWindow->GetLogic()->GetContainer(this);
         if (!container)
             return;
 

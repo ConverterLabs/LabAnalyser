@@ -11,16 +11,19 @@ namespace DropWidgetConnectionMenu
 {
 void Show(QWidget* widget, const QPoint& position, const Options& options)
 {
+    MainWindow* mainWindow = GetMainWindow();
+    if (!mainWindow)
+        return;
+
     QMenu* menu = options.standardLineEditMenu
             ? static_cast<QLineEdit*>(widget)->createStandardContextMenu()
             : new QMenu(widget);
     if (options.deleteOnClose)
         menu->setAttribute(Qt::WA_DeleteOnClose);
 
-    const QString connection = GetMainWindow()->GetLogic()->GetContainerID(widget);
+    const QString connection = mainWindow->GetLogic()->GetContainerID(widget);
     if (!connection.isEmpty())
     {
-        MainWindow* mainWindow = GetMainWindow();
         if (options.separatorBeforeHighlight)
             menu->addSeparator();
         QAction* highlight = new QAction;
@@ -37,6 +40,6 @@ void Show(QWidget* widget, const QPoint& position, const Options& options)
 
     menu->popup(widget->mapToGlobal(position));
     if (options.markChanged)
-        GetMainWindow()->ChangeForSaveDetected = true;
+        mainWindow->ChangeForSaveDetected = true;
 }
 }

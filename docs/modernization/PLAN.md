@@ -359,6 +359,10 @@ The non-plot adapter hardening checkpoint additionally makes an unbound
 `RemoveConnection` presentation/manager-removal sequence. The global
 MainWindow lookup, global locale mutation and dynamic table-cell ownership are
 explicit later hardening slices; no guessed behavioral normalization was made.
+The follow-up `DW_024` safety slice now makes that top-level lookup bounded:
+without a MainWindow, the non-plot adapter context helpers return null and
+affected operations are no-ops. It deliberately does not change stale-binding,
+object-name migration, locale or dynamic table-cell ownership semantics.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

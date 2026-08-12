@@ -17,6 +17,8 @@ struct Context
     QString id;
     MainWindow* mainWindow;
     DataManagementSetClass* manager;
+
+    bool IsValid() const { return mainWindow && manager; }
 };
 
 inline void ResetConnections(QObject* widget)
@@ -44,7 +46,8 @@ inline void ClearConnectionPresentation(QWidget* widget)
 inline void RemoveManagerBinding(QWidget* widget)
 {
     MainWindow* mainWindow = GetMainWindow();
-    mainWindow->GetLogic()->DeleteEntryOfObject(widget);
+    if (mainWindow)
+        mainWindow->GetLogic()->DeleteEntryOfObject(widget);
 }
 
 inline Context Prepare(QWidget* widget, QDropEvent* event)
@@ -55,11 +58,13 @@ inline Context Prepare(QWidget* widget, QDropEvent* event)
     widget->setToolTip(id);
     widget->setToolTipDuration(2000);
     MainWindow* mainWindow = GetMainWindow();
-    return { id, mainWindow, mainWindow->GetLogic() };
+    return { id, mainWindow, mainWindow ? mainWindow->GetLogic() : nullptr };
 }
 
 inline void Register(QWidget* widget, const Context& context)
 {
+    if (!context.IsValid())
+        return;
     context.manager->AddElementToContainerEntry(widget->objectName(), context.id,
                                                 widget->metaObject()->className(), widget);
     context.mainWindow->ChangeForSaveDetected = true;

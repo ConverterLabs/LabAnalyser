@@ -234,6 +234,12 @@ MainWindow lookup, global C-locale assignment during slider/table binding, and
 real-form table-cell ownership remain explicit exclusions rather than assumed
 safe contracts.
 
+`DW_024` now characterizes the missing-MainWindow boundary after the regular
+host-backed checks: `GetMainWindow()` returns null, foreign sources produce no
+IDs, manager lookup is null and unbound cleanup/timeout paths are safe no-ops.
+No automatic stale-binding cleanup, object-name migration or table ownership
+semantics is implied by this guard.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

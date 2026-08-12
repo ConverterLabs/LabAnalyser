@@ -64,6 +64,8 @@ void QTableWidgeD::contextMenu(QPoint pos)
 void QTableWidgeD::RemoveSelectedRows()
 {
     MainWindow *MW = GetMainWindow();
+    if (!MW)
+        return;
 
     QItemSelectionModel *selections = this->selectionModel();
     QModelIndexList selected = selections->selectedRows();
@@ -109,6 +111,8 @@ void QTableWidgeD::RemoveConnection()
     this->setToolTip("");
     this->setToolTipDuration(0);
     MainWindow *MW = GetMainWindow();
+    if (!MW)
+        return;
 
 
     for(auto i = 0; i < this->rowCount();i++)
@@ -127,7 +131,10 @@ void QTableWidgeD::dragEnterEvent(QDragEnterEvent *event)
     if(!treeWidget)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
-    DataManagementSetClass* manager = GetMainWindow()->GetLogic();
+    MainWindow* mainWindow = GetMainWindow();
+    if (!mainWindow)
+        return;
+    DataManagementSetClass* manager = mainWindow->GetLogic();
 
 
     QStringList Ids = CreateIDs(event->source());
@@ -170,6 +177,8 @@ void QTableWidgeD::dragMoveEvent(QDragMoveEvent *de)
 void QTableWidgeD::CreateRow( QString VText, QPoint Pos)
 {
     auto MW = GetMainWindow();
+    if (!MW)
+        return;
 
     size_t columns = 0;
     QString ID0 = VText + "::";
@@ -235,6 +244,8 @@ void QTableWidgeD::CreateRow( QString VText, QPoint Pos)
 void QTableWidgeD::dropEvent(QDropEvent *event)
 {
     auto MW = GetMainWindow();
+    if (!MW)
+        return;
 
 
     QStringList IDs =  CreateIDs(event->source());
@@ -277,6 +288,8 @@ void QTableWidgeD::SetVariantData(ToFormMapper Data)
     if(Data.IsEditable())
     {
         auto MW = GetMainWindow();
+        if (!MW)
+            return;
         double value;
         if(Data.IsFloatingPointNumber())
              value = (Data.GetFloatingPointData());
@@ -322,6 +335,8 @@ void QTableWidgeD::ConnectToID(DataManagementSetClass* DM, QString ID)
 {
     setToolTip(ID);
     auto MW = GetMainWindow();
+    if (!MW)
+        return;
     QLocale::setDefault(QLocale::c());
     DropWidgetBinding::ConnectValueChanged(this, SIGNAL(valueChanged(int)), DM);
     RequestUpdate();

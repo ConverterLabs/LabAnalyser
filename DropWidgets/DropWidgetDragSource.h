@@ -26,7 +26,8 @@ inline ToFormMapper* ContainerForFirstSelectedLeaf(QObject* source)
     if (!HasFirstSelectedLeaf(source))
         return nullptr;
 
-    return GetMainWindow()->GetLogic()->GetContainer(CreateID(source));
+    MainWindow* mainWindow = GetMainWindow();
+    return mainWindow ? mainWindow->GetLogic()->GetContainer(CreateID(source)) : nullptr;
 }
 }
 

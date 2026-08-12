@@ -68,8 +68,8 @@ void QLabelD::EditText()
     QString input = QInputDialog::getText(this, tr("Edit"),tr("Label Text"),QLineEdit::Normal, this->text());
     if(input.size())
     this->setText(input);
-      auto MW = GetMainWindow();
-    MW->ChangeForSaveDetected = true;
+    if (MainWindow* mainWindow = GetMainWindow())
+        mainWindow->ChangeForSaveDetected = true;
 }
 
 
@@ -79,8 +79,8 @@ void QLabelD::dropEvent(QDropEvent *event)
 
     QString ID =  CreateID(event->source());
     this->setText(ID);
-      auto MW = GetMainWindow();
-    MW->ChangeForSaveDetected = true;
+    if (MainWindow* mainWindow = GetMainWindow())
+        mainWindow->ChangeForSaveDetected = true;
 
 }
 

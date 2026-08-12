@@ -66,12 +66,15 @@ void QCheckBoxD::dragEnterEvent(QDragEnterEvent *event)
 
 void QCheckBoxD::dropEvent(QDropEvent *event)
 {
-    DropWidgetDropBinding::ResetContextConnections(this, GetMainWindow()->GetLogic());
+    MainWindow* mainWindow = GetMainWindow();
+    if (!mainWindow)
+        return;
+    DropWidgetDropBinding::ResetContextConnections(this, mainWindow->GetLogic());
 
     QString ID =  CreateID(event->source());
     this->setToolTip(ID);
     this->setToolTipDuration(2000);
-    auto MW = GetMainWindow();
+    auto MW = mainWindow;
 
     ToFormMapper* container = MW->GetLogic()->GetContainer(ID);
     DropWidgetIndicatorBinding::InitializeState(this, container, bit, bitcounter,
@@ -96,6 +99,8 @@ void QCheckBoxD::SetVariantData(ToFormMapper Data)
 {
     //DO NOT BLOCK SIGNALS !!!
     auto MW = GetMainWindow();
+    if (!MW)
+        return;
     disconnect(this, SIGNAL(clicked(bool)), MW->GetLogic(),SLOT(SendNewValue()));
     if(Data.IsBool())
     {

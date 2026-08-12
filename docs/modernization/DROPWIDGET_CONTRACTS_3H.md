@@ -313,3 +313,18 @@ MainWindow. Changing any of those would change global-state, lifetime or
 cross-form behavior and requires a separately characterized hardening slice.
 The CMake application build and focused DropWidget/MainWindow/XML tests passed
 3/3; no `DropWidgets/Plots` or legacy fixture file changed.
+
+### Missing MainWindow context hardening (2026-08-12)
+
+`GetMainWindow()` now searches the current top-level widget list safely and
+returns `nullptr` when no `MainWindow` exists. The non-plot adapter helpers and
+their direct context consumers treat that missing context as a no-op rather
+than indexing the top-level list or dereferencing a null result. `DW_024`
+destroys the test host after all regular adapter checks and verifies the empty
+context, foreign drag source ID helpers, unbound line-edit cleanup and button
+timeout path. Valid MainWindow-backed drag, binding, signal and locale behavior
+remains covered by the earlier `DW_001..DW_023` contracts and is unchanged.
+
+This is a narrow safety boundary only: it does not invent stale-QObject cleanup,
+object-name migration, a different table-cell ownership model, or a replacement
+for the legacy top-level MainWindow architecture.

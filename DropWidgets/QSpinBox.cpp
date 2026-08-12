@@ -67,6 +67,8 @@ void QSpinBoxD::dragEnterEvent(QDragEnterEvent *event)
 void QSpinBoxD::dropEvent(QDropEvent *event)
 {
     const DropWidgetDropBinding::Context context = DropWidgetDropBinding::Prepare(this, event);
+    if (!context.IsValid())
+        return;
     ToFormMapper* container = context.manager->GetContainer(context.id);
 
     QString Type = container->GetDataType();

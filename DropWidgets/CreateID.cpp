@@ -25,17 +25,19 @@
 
 MainWindow* GetMainWindow()
 {
-    int i = 0;
-    MainWindow *MW = qobject_cast<MainWindow*>( QApplication::topLevelWidgets().at(i++));
-    while(!MW)
-         MW = qobject_cast<MainWindow*>( QApplication::topLevelWidgets().at(i++));
-    return MW;
+    const QWidgetList topLevelWidgets = QApplication::topLevelWidgets();
+    for (QWidget* widget : topLevelWidgets)
+        if (MainWindow* mainWindow = qobject_cast<MainWindow*>(widget))
+            return mainWindow;
+    return nullptr;
 }
 
 //Create ID of an element
 QString CreateID(QObject *Tree)
 {
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(Tree);
+    if (!treeWidget)
+        return QString();
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
     for(auto si : selectedItems)
     {
@@ -51,6 +53,8 @@ QStringList CreateIDs(QObject *Tree)
     QStringList Ids;
 
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(Tree);
+    if (!treeWidget)
+        return Ids;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
 
     for(int k = 0; k < selectedItems.count(); k++)

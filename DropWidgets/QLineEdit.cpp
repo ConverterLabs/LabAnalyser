@@ -97,6 +97,8 @@ void QLineEditD::dropEvent(QDropEvent *event)
 
 
                MainWindow *MW = GetMainWindow();
+               if (!MW)
+                   return;
                MW->GetLogic()->DeleteEntryOfObject(this);
                MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ToolTip,this->metaObject()->className(),this);
                MW->ChangeForSaveDetected = true;

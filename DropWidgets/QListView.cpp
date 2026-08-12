@@ -52,7 +52,10 @@ void QListViewD::dragEnterEvent(QDragEnterEvent *event)
     if(!treeWidget)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
-    DataManagementSetClass* manager = GetMainWindow()->GetLogic();
+    MainWindow* mainWindow = GetMainWindow();
+    if (!mainWindow)
+        return;
+    DataManagementSetClass* manager = mainWindow->GetLogic();
 
     if(manager->IsObjectLinked(this))
     {
@@ -70,7 +73,7 @@ void QListViewD::dragEnterEvent(QDragEnterEvent *event)
 
             if(container->IsStringList() && Type.compare("Parameter") == 0 )
                 event->acceptProposedAction();
-            GetMainWindow()->GetStatusBar()->showMessage("This List is not linked to a List Parameter",2000);
+            mainWindow->GetStatusBar()->showMessage("This List is not linked to a List Parameter",2000);
         }
     }
 }
@@ -84,6 +87,8 @@ void QListViewD::dropEvent(QDropEvent *event)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
     auto MW = GetMainWindow();
+    if (!MW)
+        return;
     DataManagementSetClass* manager = MW->GetLogic();
     for(int i = 0; i < selectedItems.size(); i++)
     {
