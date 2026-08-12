@@ -42,6 +42,7 @@
 
 #include "QTimer"
 
+class MainWindow;
 
 //Create Spezial Widgets which have drag and drop functionality
 class QTableWidgeD : public QTableWidget, public VariantDropWidget
@@ -72,5 +73,6 @@ Q_SIGNALS:
 
 private:
     void CreateRow( QString ID0, QPoint Pos = QPoint(-1,-1));
+    void RemoveBindingsInRow(int row, MainWindow* mainWindow);
 };
 

@@ -350,6 +350,10 @@ unchanged. `DW_019..DW_021` cover the new helper boundaries. The incremental
 application build completed by continuing the same build tree after one
 external 120-second limit, and focused DropWidget/MainWindow/XML CTest targets
 passed 3/3 with all protected legacy fixture hashes unchanged.
+The remaining QTable cleanup duplication was consolidated behind a private
+per-row operation; focused adapter and incremental application checks passed.
+Its MainWindow-owned dynamic-cell lookup remains an explicit later ownership
+hardening risk rather than a behavior change in this package.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

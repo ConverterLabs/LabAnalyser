@@ -74,20 +74,7 @@ void QTableWidgeD::RemoveSelectedRows()
     {
         int i = selected[ii].row();
         DelRows.push_back(i);
-        for(auto j = 0; j < this->columnCount(); j++)
-        {
-            if(this->cellWidget(i,j))
-            {
-                auto widgetList = this->cellWidget(i,j)->children();
-                for(auto itt: widgetList)
-                {
-                        QObject* FoundObject = MW->findChild<QObject*>(itt->objectName());
-                        if(FoundObject)
-                            MW->GetLogic()->DeleteEntryOfObject(FoundObject);
-
-                }
-            }
-        }
+        RemoveBindingsInRow(i, MW);
     }
 
     std::sort(DelRows.begin(), DelRows.end() );
@@ -99,6 +86,23 @@ void QTableWidgeD::RemoveSelectedRows()
 
 }
 
+void QTableWidgeD::RemoveBindingsInRow(int row, MainWindow* mainWindow)
+{
+    for (auto column = 0; column < columnCount(); ++column)
+    {
+        QWidget* cell = cellWidget(row, column);
+        if (!cell)
+            continue;
+
+        for (QObject* child : cell->children())
+        {
+            QObject* foundObject = mainWindow->findChild<QObject*>(child->objectName());
+            if (foundObject)
+                mainWindow->GetLogic()->DeleteEntryOfObject(foundObject);
+        }
+    }
+}
+
 void QTableWidgeD::RemoveConnection()
 {
 
@@ -108,22 +112,7 @@ void QTableWidgeD::RemoveConnection()
 
 
     for(auto i = 0; i < this->rowCount();i++)
-    {
-        for(auto j = 0; j < this->columnCount(); j++)
-        {
-            if(this->cellWidget(i,j))
-            {
-                auto widgetList = this->cellWidget(i,j)->children();
-                for(auto itt: widgetList)
-                {
-                        QObject* FoundObject = MW->findChild<QObject*>(itt->objectName());
-                        if(FoundObject)
-                            MW->GetLogic()->DeleteEntryOfObject(FoundObject);
-                }
-            }
-
-        }
-    }
+        RemoveBindingsInRow(i, MW);
     this->setRowCount(0);
     this->setColumnCount(0);
 

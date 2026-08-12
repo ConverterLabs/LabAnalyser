@@ -282,3 +282,16 @@ external 120-second interruption while continuing the same build tree, then
 ran `DropWidgetAdapterTests`, `MainWindowIntegrationTests` and
 `XmlExperimentContractTests` green (3/3). The five immutable legacy fixture
 hashes and their `-text` EOL protection remained unchanged.
+
+### Table cleanup consolidation (2026-08-12)
+
+`QTableWidgeD::RemoveSelectedRows` and `RemoveConnection` now share the same
+private per-row binding-removal operation. It preserves the historical order:
+find each cell child through the owning `MainWindow`, remove its manager entry,
+then remove selected rows or clear the complete table. Existing `DW_010` and
+`DW_013` remain the direct evidence for row removal, XML-created cells and the
+Clear Table action; the focused adapter suite and incremental application build
+passed. A multiple-row isolated fixture is not a safe replacement for the real
+form/MainWindow ownership graph because table-cell cleanup deliberately uses
+that global lookup. This global ownership dependence remains a documented
+MainWindow-bound risk rather than a new lifetime contract.

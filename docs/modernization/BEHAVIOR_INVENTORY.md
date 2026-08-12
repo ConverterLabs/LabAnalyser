@@ -221,6 +221,12 @@ cell editor; the test therefore initializes the real typed values before
 characterizing the valid binding path. The 2-second internal `QTimer` delay is
 production behavior; the test does not sleep.
 
+`QTableWidgeD` now shares its private per-row manager-binding removal between
+selected-row deletion and full-table clearing. The MainWindow-owned
+`findChild` lookup and resulting dynamic-cell lifetime dependence are retained;
+multiple isolated-row cleanup is therefore not treated as a safe standalone
+ownership contract.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not
