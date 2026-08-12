@@ -12,6 +12,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 option(LABANALYSER_BUILD_TESTS "Build LabAnalyser CTest targets" ON)
+option(LABANALYSER_BUILD_MATLAB_CONNECTOR "Build the Windows MATLAB TCP connector" ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Xml UiTools PrintSupport OpenGL OpenGLWidgets)
 find_package(PkgConfig REQUIRED)
@@ -133,6 +134,9 @@ target_link_libraries(LabAnalyser PRIVATE LabAnalyserCore)
 target_include_directories(LabAnalyser PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/LabAnalyserCore_autogen/include")
 
 include(CTest)
+if(WIN32 AND LABANALYSER_BUILD_MATLAB_CONNECTOR)
+    add_subdirectory(MatlabRemoteConnector)
+endif()
 if(BUILD_TESTING AND LABANALYSER_BUILD_TESTS)
     add_subdirectory(tests/cmake)
 endif()

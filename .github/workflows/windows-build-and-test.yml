@@ -127,6 +127,18 @@ jobs:
             'libmatio-*.dll',
             'libfftw3-*.dll'
           )
+          $requiredMatlabFiles = @(
+            'Connect.m',
+            'Disconnect.m',
+            'ExReceive.m',
+            'ExSendDouble.m',
+            'ExSendString.m',
+            'Get.m',
+            'Set.m',
+            'TCPClient.dll',
+            'TCPClient.h',
+            'TestRemote.m'
+          )
           if (-not (Test-Path -LiteralPath $deployDir -PathType Container)) {
             throw "Deployment directory was not created: $deployDir"
           }
@@ -135,6 +147,19 @@ jobs:
             if ($null -eq $match) {
               throw "Required deployment runtime file is missing: $pattern"
             }
+          }
+          $matlabPackageDir = Join-Path $deployDir 'LabAnalyser\+LabAnalyser'
+          if (-not (Test-Path -LiteralPath $matlabPackageDir -PathType Container)) {
+            throw "MATLAB package directory is missing: $matlabPackageDir"
+          }
+          $actualMatlabFiles = @(
+            Get-ChildItem -LiteralPath $matlabPackageDir -File |
+              Sort-Object Name |
+              Select-Object -ExpandProperty Name
+          )
+          $expectedMatlabFiles = @($requiredMatlabFiles | Sort-Object)
+          if (Compare-Object -ReferenceObject $expectedMatlabFiles -DifferenceObject $actualMatlabFiles) {
+            throw "MATLAB package contents differ. Expected: $($expectedMatlabFiles -join ', '); actual: $($actualMatlabFiles -join ', ')"
           }
           Get-ChildItem -LiteralPath $deployDir -Recurse -File | Select-Object FullName, Length | Format-Table -AutoSize
 

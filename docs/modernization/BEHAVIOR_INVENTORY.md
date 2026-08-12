@@ -15,7 +15,7 @@ IDs and characterization vectors before modifying it.
 | Parameter XML | `Import/parameterloader.*`, `Export/exportinputs2xml.*`; `UIDataManagementSetClass::{ImportFromXml,Export2Xml}` | Inverted error booleans; ID/value-only persistence; malformed-file, conversion, duplicate and repeated-load behavior; XML forwarding. | `contract/ParameterContractTests::{PARAM_001..PARAM_009}` | baseline characterized; metadata persistence absent; broader UI export paths unverified |
 | MAT export | `Export/Export2Mat.*`; `UIDataManagementSetClass::Export2Mat` | MAT v5 schema, scalar/vector double data, UTF-8 characters, overwrite/error behavior. | `contract/MatExportContractTests::{MAT_001..MAT_008}` | baseline characterized; allocation-failure, HDF5 and matrix/rank-3 sources unverified |
 | HDF5 export | `Export/export2highfive.*`; `UIDataManagementSetClass::Export2Hdf5` | HighFive file truncation; `Timestamp`; `::` to `/` paths; numeric/scalar, vector and string data; direct file errors throw while UI catches and returns `false`. Null manager/second vector pointer are unsafe paths. | `contract/Hdf5ExportContractTests::{HDF5_001..HDF5_006}` | baseline characterized; test-only UI return seam; permission/allocation faults and real UI construction unverified |
-| TCP remote control | `RemoteControl/RemoteControlServer.*`, private `RemoteControlConnectionState.*`, `RemoteControlFrameSplitter.*` and `RemoteControlProtocol.*` | Loopback port fallback; native binary framing; `set`/`get` bytes, signals, fragmentation, disconnect, current-socket behavior and safe decode/response byte vectors. `TCP_001..TCP_008` cover lifecycle, command/response bytes, safe fragmentation and reconnect; TCP_007 now waits for observed accepted sockets and an empty server child list before fixture destruction. `TCP_009..TCP_012` cover last-accepted-client transition, discarded old remainder, reply routing and safe client/server teardown. `TCP_013` proves the Qt-6 `errorOccurred` meta-signal, absent legacy `error` signal and absence of the prior accept-path warning. `TCP_014` proves current-socket reset, discarded partial state and deferred release; `TCP_015` proves no disconnected-child accumulation; `TCP_016` proves older A release leaves current B usable. `TCP_017..TCP_020` directly cover safe splitter prefix states and the 1 MiB bound; `TCP_021` directly covers structural protocol validation, valid unknown commands and the numeric payload prerequisite. `TCP_022..TCP_026` prove active server handling: structural-invalid discard/recovery, invalid-prefix abort/reconnect, short numeric-set discard, valid-unknown connection reuse and coalesced invalid/valid recovery. `TCP_027` records the current final-byte loss for QString and single-element QStringList payloads; `TCP_028` separates the resulting GuiSelection membership behavior. `TCP_030..TCP_031` bound reply encoding at 1 MiB and prove abort/reconnect on an over-limit `get`. With two live clients, only the last accepted socket is processed; accepting B clears A's fragment state and later A input is not processed. ConnectionState observes but never owns the current socket; protocol/splitter remain QObject-free. | `contract/RemoteControlContractTests::{TCP_001..TCP_031, TCP_DM_001}` | 5A.2a typed error connection and 5A.2b approved `deleteLater()` cleanup complete. 5A.3a stabilizes only TCP_007 fixture teardown after an intermittent direct-QObject-deletion warning; production shutdown safety remains an open risk. 5B.2b approved frame validation is active: invalid prefixes abort and structural-invalid/short-numeric frames are ignored without response/signal. 5C.2a establishes unversioned legacy String/StringList last-byte loss; Selection is a separate approval-required semantic change. `displayError` remains a no-op; application-level reply pagination, real socket-error policy and platform faults remain excluded/approval-required. |
+| TCP remote control | `RemoteControl/RemoteControlServer.*`, private `RemoteControlConnectionState.*`, `RemoteControlFrameSplitter.*` and `RemoteControlProtocol.*` | Loopback port fallback; native binary framing; `set`/`get` bytes, signals, fragmentation, disconnect, current-socket behavior and safe decode/response byte vectors. `TCP_001..TCP_008` cover lifecycle, command/response bytes, safe fragmentation and reconnect; TCP_007 now waits for observed accepted sockets and an empty server child list before fixture destruction. `TCP_009..TCP_012` cover last-accepted-client transition, discarded old remainder, reply routing and safe client/server teardown. `TCP_013` proves the Qt-6 `errorOccurred` meta-signal, absent legacy `error` signal and absence of the prior accept-path warning. `TCP_014` proves current-socket reset, discarded partial state and deferred release; `TCP_015` proves no disconnected-child accumulation; `TCP_016` proves older A release leaves current B usable. `TCP_017..TCP_020` directly cover safe splitter prefix states and the 1 MiB bound; `TCP_021` directly covers structural protocol validation, valid unknown commands and the numeric payload prerequisite. `TCP_022..TCP_026` prove active server handling: structural-invalid discard/recovery, invalid-prefix abort/reconnect, short numeric-set discard, valid-unknown connection reuse and coalesced invalid/valid recovery. `TCP_027` records the current final-byte loss for QString and single-element QStringList payloads; `TCP_028` separates the resulting GuiSelection membership behavior. `TCP_030..TCP_031` bound reply encoding at 1 MiB and prove abort/reconnect on an over-limit `get`; `TCP_032` covers approved case-sensitive wildcard ID enumeration while no-star lookups retain their legacy behavior. With two live clients, only the last accepted socket is processed; accepting B clears A's fragment state and later A input is not processed. ConnectionState observes but never owns the current socket; protocol/splitter remain QObject-free. | `contract/RemoteControlContractTests::{TCP_001..TCP_032, TCP_DM_001}` | 5A.2a typed error connection and 5A.2b approved `deleteLater()` cleanup complete. 5A.3a stabilizes only TCP_007 fixture teardown after an intermittent direct-QObject-deletion warning; production shutdown safety remains an open risk. 5B.2b approved frame validation is active: invalid prefixes abort and structural-invalid/short-numeric frames are ignored without response/signal. 5C.2a establishes unversioned legacy String/StringList last-byte loss; Selection is a separate approval-required semantic change. `displayError` remains a no-op; application-level reply pagination, real socket-error policy and platform faults remain excluded/approval-required. |
 | Plot widgets | `DropWidgets/Plots/PlotWidget.*`, `FFTPlotWidget.*` | Plot configuration, data mapping, legend/cursor/FFT presentation and event behavior. | `contract/plotwidget/PlotWidgetContractTests::{PLOT_001..PLOT_006, FFT_001..FFT_008}` | Time-domain and FFT data contracts characterized; rendering and unsafe paths remain unverified |
 | Plot measurements | `DropWidgets/Plots/PlotMeasurements.*` | Normalize sample order; interpolation; interval count/min/max/mean/RMS; THD and NaN invalid cases. | `unit/PlotMeasurementsTests::{constantSignal,linearSignal,sineAndHarmonics,nonUniformSamples,invalidIntervals}`; run by `tests/run-tests-msys2.ps1` | baseline tested; local runner integrated |
 | Drag/drop widgets | `DropWidgets/DropWidgetsUiLoader.*`, `DropWidget.h`, `QBLed/QCheckBox/QComboBox/QDoubleSpinBox/QLCDNumber/QLabel/QLed/QLineEdit/QListView/QProgressBar/QPushButton/QSlider/QSpinBox/QTSLed/QTableWidgeD.*`, `CreateID.*` | UI loading, widget-to-ID mapping, drag/drop acceptance, value conversion, XML save/load, signal/UI state. | — | mapped, unverified |
@@ -1058,42 +1058,3 @@ Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See
 `CRASH_NULL_SAFETY_5A.md`.
-
-## DropWidget structural modernization (2026-08-12)
-
-`DW_001..DW_018` remain the behavior boundary for the Designer-facing adapter
-classes. `DropWidgetUpdate`, `DropWidgetBinding` and `DropWidgetDataAccess`
-now hold shared update, direct signal-binding and value/XML conversion logic;
-`DropWidgetConnectionMenu` retains the observed highlight/remove menu variants
-including the QLineEdit standard-menu and QLed cleanup flags;
-the concrete wrappers retain their names, Qt properties, type admission,
-rounding, direct-connection and repeated-connection behavior. The loader's
-standard adapter mapping is data-driven, but unsupported-widget fallback and
-the PlotWidget special path remain unchanged. `QTableWidgeD` retains row/order
-and removal behavior while `DropWidgetTableCells` constructs its historical
-numeric/editable-bool/read-only-bool cells and bindings.
-
-Focused CMake evidence is green for `DropWidgetAdapterTests`,
-`MainWindowIntegrationTests` and the full XML suite; the existing qmake
-DropWidget target was reconfigured, rebuilt and passed offscreen. The five
-protected SHA-256 values match `MANIFEST.md`, their `-text` EOL protection is
-intact, and the sensitivity/artifact scan is clean. No legacy fixture, XML
-schema, Designer class name, public adapter header or Qt metaobject surface
-changed.
-
-The remaining regular connection-menu variants and direct request/value
-bindings now also use those same internal helpers. Their observed ordering,
-separator placement, direct-connection mode and repeated-connection behavior
-remain unchanged; raw stale-binding, source-backed drag/drop and visual paths
-remain explicit exclusions.
-
-`QBLed`, `QLed` and `QTSLed` now share their previously triplicated drop
-transaction through `DropWidgetIndicatorBinding`, while retaining the
-per-adapter indicator, static bit counter and legacy dialog/manager sequence.
-
-`DW_019` establishes a shared safe drag-source precondition for the regular
-single-leaf adapters: foreign, empty and top-level selections are rejected
-before a `selectedItems()[0]` access; a selected leaf stays eligible under the
-existing per-widget type rules. `DropWidgetDropBinding` centralizes the
-ordinary one-ID drop reset/tooltip/registration transaction. The exceptional
-checkbox, multi-selection and table paths remain separate by contract.
