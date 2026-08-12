@@ -46,6 +46,7 @@ private slots:
     void PLOT_018_unmanaged_wheel_sync_is_a_noop();
     void PLOT_019_unmanaged_clear_bindings_is_a_noop();
     void PLOT_020_senderless_axis_edit_is_a_noop();
+    void PLOT_021_senderless_legend_edit_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -470,6 +471,21 @@ void PlotWidgetContractTests::PLOT_020_senderless_axis_edit_is_a_noop()
                                       Q_ARG(QCPAxis*, plot.xAxis),
                                       Q_ARG(QCPAxis::SelectablePart, QCPAxis::spAxisLabel)));
     QCOMPARE(plot.xAxis->label(), originalLabel);
+}
+
+void PlotWidgetContractTests::PLOT_021_senderless_legend_edit_is_a_noop()
+{
+    QWidget host;
+    PlotWidget plot(nullptr, &host, nullptr);
+    QCPGraph* plotGraph = plot.addGraph();
+    plotGraph->setName("original");
+    QCPAbstractLegendItem* item = plot.legend->itemWithPlottable(plotGraph);
+    QVERIFY(item);
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "legendDoubleClick", Qt::DirectConnection,
+                                      Q_ARG(QCPLegend*, plot.legend),
+                                      Q_ARG(QCPAbstractLegendItem*, item)));
+    QCOMPARE(plotGraph->name(), QString("original"));
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

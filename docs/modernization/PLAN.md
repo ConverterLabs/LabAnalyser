@@ -972,3 +972,6 @@ MainWindow context; normal manager cleanup remains unchanged.
 
 `PLOT_020` rejects senderless axis-label slot invocations before opening the
 legacy dialog; connected axis edits keep their existing route.
+
+`PLOT_021` likewise rejects senderless or unmanaged legend-edit requests
+before UI or manager access.

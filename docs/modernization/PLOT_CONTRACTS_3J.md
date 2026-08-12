@@ -121,3 +121,6 @@ the local graph model unchanged and avoids a manager dereference.
 
 `PLOT_020` invokes axis-label editing without the connected plot sender. It
 does not open the dialog or mutate the axis; the normal signal route remains.
+
+`PLOT_021` invokes legend editing without a connected plot/manager context.
+It does not open the rename dialog or change the graph name.

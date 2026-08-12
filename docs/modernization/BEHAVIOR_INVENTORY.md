@@ -1180,3 +1180,6 @@ does not remove local graphs or dereference an absent manager.
 
 `PlotWidget::axisLabelDoubleClick` is mapped to `PLOT_020`: senderless calls
 are rejected before dialog or axis access.
+
+`PlotWidget::legendDoubleClick` is mapped to `PLOT_021`: missing sender or
+manager context is rejected before the rename dialog.

@@ -1271,6 +1271,12 @@ void PlotWidget::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
 {
   // Rename a graph by double clicking on its legend item
   Q_UNUSED(legend)
+  auto SenderOC = QObject::sender();
+  QCustomPlot *Sender = qobject_cast<QCustomPlot*>(SenderOC);
+  MainWindow *MW = this->MainWindow_p;
+  if (!Sender || !MW || !MW->GetLogic() || !item)
+      return;
+
   if (item) // only react if item was clicked (user could have clicked on border padding of legend where there is no item, then item is 0)
   {
     QCPPlottableLegendItem *plItem = qobject_cast<QCPPlottableLegendItem*>(item);
@@ -1281,12 +1287,9 @@ void PlotWidget::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
     QString newName = QInputDialog::getText(this, "Set Alias", "New graph name:", QLineEdit::Normal, plItem->plottable()->name(), &ok);
     if (ok)
     {
-        MainWindow *MW = this->MainWindow_p;
         MW->GetLogic()->SetAlias(plItem->plottable()->ID(), newName);
 
       plItem->plottable()->setName(newName);
-      auto SenderOC = QObject::sender();
-      QCustomPlot *Sender = qobject_cast<QCustomPlot*>(SenderOC);
       Sender->replot();
     }
   }
