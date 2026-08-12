@@ -582,9 +582,13 @@ void DataManagementCharacterizationTests::DM_009_setDataWidgetPropagationAndRequ
     QCOMPARE(requests.count(), 1);
     QCOMPARE(requests.at(0).at(0).toString(), QString("get"));
     QCOMPARE(requests.at(0).at(1).toString(), QString("parameter"));
+    manager.AddContainerElement("explicit", "double", "Parameter", "");
     manager.UpdateRequest(QString("explicit"));
     QCOMPARE(requests.count(), 2);
     QCOMPARE(requests.at(1).at(1).toString(), QString("explicit"));
+    manager.UpdateRequest(QString());
+    manager.UpdateRequest(QString("missing"));
+    QCOMPARE(requests.count(), 2);
 }
 
 void DataManagementCharacterizationTests::DM_010_setOwnershipAndRepeatedDataFlow()

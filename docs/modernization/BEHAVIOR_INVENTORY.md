@@ -1138,6 +1138,9 @@ still emits once without attempting an invalid parent connection.
 returns null rather than dereferencing a non-object; normal registered plot
 lookup remains unchanged.
 
+`DM_009` also covers explicit update requests: only an existing non-empty
+container ID emits `get`; empty and missing IDs are safe no-ops.
+
 Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See

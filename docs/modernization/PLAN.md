@@ -1010,3 +1010,7 @@ exists. Parent-backed Messenger routing and dispatch ordering are unchanged.
 `DM_SAFE_007` closes the separate public plot-registry null-pointer boundary:
 null registrations stay non-resolvable instead of being dereferenced. It does
 not alter plot naming, numbering or non-null lookup semantics.
+
+The explicit `DataManagementSetClass::UpdateRequest(ID)` overload now applies
+the same approved missing-ID no-op boundary as its sender-based counterpart;
+valid explicit requests retain the existing `get` dispatch.

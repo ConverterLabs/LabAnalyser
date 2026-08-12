@@ -9,7 +9,8 @@ order, plugin IID and `InterfaceData` ABI are unchanged.
 - `DM_SAFE_001`: direct `DataManagementSetClass::SendNewValue()` and
   parameterless `UpdateRequest()` without a sender, and connected unknown
   widgets, perform no lookup insertion, mutation or `MessageSender` emission.
-  `SetData()` with empty or missing IDs remains a no-op.
+  `SetData()` and both `UpdateRequest()` overloads with empty or missing IDs
+  remain no-ops; an explicit existing ID still dispatches `get`.
 - `DM_SAFE_002`: parentless/direct `MessengerClass` instances no longer
   dereference absent parent chains. `CloseProject` still emits its close signal
   but omits the notification when no application origin exists; the normal

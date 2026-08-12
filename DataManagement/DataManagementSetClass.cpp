@@ -115,6 +115,8 @@ void DataManagementSetClass::UpdateRequest()
 
 void DataManagementSetClass::UpdateRequest(QString ID)
 {
-        emit MessageSender("get", ID, InterfaceData());
+    if (ID.isEmpty() || !this->GetContainer(ID))
+        return;
+    emit MessageSender("get", ID, InterfaceData());
 }
 
