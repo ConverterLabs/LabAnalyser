@@ -99,6 +99,9 @@ add_executable(DropWidgetAdapterTests
     ${PROJECT_SOURCE_DIR}/tests/contract/dropwidgets/DropWidgetAdapterTests.cpp
     ${PROJECT_SOURCE_DIR}/tests/contract/dropwidgets/TestMainWindowSeam.cpp
     ${PROJECT_SOURCE_DIR}/tests/contract/dropwidgets/PlotWidgetLinkSeam.cpp
+    ${PROJECT_SOURCE_DIR}/mainwindow.h
+    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementSetClass.h
+    ${PROJECT_SOURCE_DIR}/DataManagement/UIDataManagementSetClass.h
     ${PROJECT_SOURCE_DIR}/plugins/InterfaceDataType.cpp
     ${PROJECT_SOURCE_DIR}/DataManagement/ContainerStore.cpp
     ${PROJECT_SOURCE_DIR}/DataManagement/DataRegistry.cpp
@@ -153,7 +156,7 @@ target_link_libraries(LabAnalyserPlotTestCore PUBLIC LabAnalyserQCustomPlot
     PkgConfig::MATIO PkgConfig::HDF5 PkgConfig::FFTW3 Boost::boost)
 add_executable(PlotWidgetContractTests ${PROJECT_SOURCE_DIR}/tests/contract/plotwidget/PlotWidgetContractTests.cpp)
 target_link_libraries(PlotWidgetContractTests PRIVATE LabAnalyserPlotTestCore)
-target_include_directories(PlotWidgetContractTests PRIVATE "${CMAKE_BINARY_DIR}/LabAnalyserPlotTestCore_autogen/include")
+target_include_directories(PlotWidgetContractTests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/LabAnalyserPlotTestCore_autogen/include")
 labanalyser_setup_gui_test(PlotWidgetContractTests)
 
 # Runtime-built plugin fixtures intentionally stay below the CMake build tree.
