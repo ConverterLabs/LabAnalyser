@@ -32,6 +32,7 @@
 #include "UIFunctions/MainWindowTreePath.h"
 #include "UIFunctions/MainWindowTreeViewState.h"
 #include "UIFunctions/MainWindowSubplotDialog.h"
+#include "UIFunctions/MainWindowFormLoader.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -522,28 +523,6 @@ SubPlotMainWindow* MainWindow::CreateSubPlotWindow(int rows, int cols, bool IsFF
     return MW;
 }
 
-//Create unique names in every tab, by appending the FileName (AppendSuffix)
-void MainWindow::AppendWidgetNames(QObjectList Childs, QString AppendSuffix)
-{
-    for(int i = 0; i < Childs.size(); i++)
-    {
-        if(Childs[i]->children().size()>0)
-        {
-            AppendWidgetNames(Childs[i]->children(), AppendSuffix);
-        }
-         QString name = Childs[i]->objectName();
-         if(name.size())
-         {
-            Childs[i]->setObjectName(name.append("_").append(AppendSuffix));            
-         }
-         if(qobject_cast<PlotWidget*>(Childs[i]))
-         {
-             this->GetLogic()->AddPlotPointer(Childs[i]->objectName(),Childs[i]);
-         }
-    }
-}
-
-
 void MainWindow::LoadFormFromXML(QString Path)
 {
     LoadFormFromXML(Path, QString());
@@ -551,121 +530,7 @@ void MainWindow::LoadFormFromXML(QString Path)
 
 void MainWindow::LoadFormFromXML(QString UiFileName, QString LastFormName, bool skip)
 {
-    UiFileName.replace("\\","/");
-    auto FilePartsI = UiFileName.split("/");
-    auto FilePartsII = FilePartsI.at(FilePartsI.size()-1);
-    auto FilePartsIII = FilePartsII.split(".");
-    if (FilePartsIII.size() < 2)
-    {
-        Error("Corrupt Form File");
-        return;
-    }
-    auto FileNameS = FilePartsIII.at(FilePartsIII.size()-2);
-
-    QWidget* tab = new QWidget();
-    QFileInfo fi(UiFileName);
-    QDir::setCurrent( fi.absoluteDir().absolutePath());
-    //tab->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    DropWidgetsUiLoader loader(this);
-    QFile file(UiFileName);
-    loader.setWorkingDirectory(fi.absoluteDir().absolutePath());
-    QWidget *formWidget = loader.load(&file, tab);
-    file.close();
-
-    if(!formWidget)
-    {
-        delete tab;
-        Error("Corrupt Form File");
-        return;
-    }
-
-    QTime time = QTime::currentTime();
-    QDate Date = QDate::currentDate();
-
-    QString DateTime;
-    DateTime.append(Date.toString("_yyyy_MM_dd_"));
-    DateTime.append(time.toString("hh_mm_ss"));
-
-    QString FormName;
-    if(LastFormName.size())
-        FormName = LastFormName;
-    else
-        FormName = FileNameS + DateTime;
-
-    //Append Date and Time to make it unique
-    AppendWidgetNames(formWidget->children(),FormName) ;
-
-    tab->setObjectName(FormName);
-
-    QGridLayout *gridLayout0 = new QGridLayout();
-    gridLayout0->setSpacing(6);
-    gridLayout0->setContentsMargins(11, 35, 11, 11);
-
-    QWidget *client0 = new QWidget;
-    client0->setLayout(gridLayout0);
-
-    QWidget *client = formWidget;
-    QScrollArea *scrollArea = new QScrollArea;
-
-    QPalette pal;
-    pal.setColor(QPalette::Window,QColor(0,0,0,0));
-    scrollArea->setPalette(pal);
-    scrollArea->setBackgroundRole(QPalette::Window);
-    scrollArea->setFrameShape(QFrame::NoFrame);
-
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setWidget(client0);
-    client0->layout()->addWidget(client);
-
-    QWidget *pageWidget = tab;
-    QGridLayout *gridLayout = new QGridLayout();
-    gridLayout->setSpacing(6);
-    gridLayout->setContentsMargins(0, 0, 0, 0);
-    pageWidget->setLayout(gridLayout);
-    pageWidget->layout()->addWidget(scrollArea);
-    QPalette pal2; pal2.setColor(QPalette::Window, Qt::white);
-    pageWidget->setPalette(pal2);
-    pageWidget->setAutoFillBackground(true);
-
-    ui->centralWidget->hide();
-    QDockWidget* NewDock = new QDockWidget(this);
-    NewDock->setObjectName(FormName);
-    NewDock->setWindowTitle(FileNameS);
-    NewDock->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetClosable);
-    NewDock->setAllowedAreas(Qt::LeftDockWidgetArea);
-    QGridLayout *gridLayoutDock = new QGridLayout();
-    gridLayoutDock->setSpacing(6);
-    gridLayoutDock->setContentsMargins(0, 0, 0, 0);
-    NewDock->setWidget(pageWidget);
-    NewDock->setAttribute(Qt::WA_DeleteOnClose);
-    NewDock->installEventFilter(this);
-
-    NewDock->setSizePolicy(QSizePolicy::Policy::Expanding,QSizePolicy::Policy::Expanding);
-
-    this->ui->centralWidget->hide();
-    this->addDockWidget(Qt::LeftDockWidgetArea, NewDock);
-
-    QList<QDockWidget *> dockWidgets = findChildren<QDockWidget *>();
-    for(auto itt: dockWidgets)
-    {
-        if(this->dockWidgetArea(itt) == Qt::LeftDockWidgetArea)
-        {
-            if(!(itt->isFloating()) && isVisible() && NewDock!=itt) //Front window
-            {
-                QMainWindow::tabifyDockWidget(itt,NewDock);
-                NewDock->show();
-                NewDock->raise();
-            }
-        }
-    }
-    connect(NewDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockWidget_topLevelChanged(bool)));
-    connect(NewDock, SIGNAL(destroyed(QObject*)), this, SLOT(dockWidget_destroyed(QObject*)));
-
-    //Save Filename
-    GetLogic()->AddFormFile(std::pair<QString, QString>(FormName, UiFileName));
-    GetLogic()->AddSkipFormFile(FormName,skip);
-    QApplication::processEvents();
-
+    MainWindowFormLoader::Load(*this, UiFileName, LastFormName, skip);
 }
 
 void MainWindow::on_actionLoadPlugin_triggered()

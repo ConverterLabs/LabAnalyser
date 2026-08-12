@@ -1062,6 +1062,10 @@ MainWindow retains accepted figure creation and legacy plot registration.
 `GUI_SAFE_008` assigns transient data-alias actions to their transient context
 menu, retaining all existing alias and multi-selection behavior.
 
+`MainWindowFormLoader` now isolates the dynamic-form loader/dock construction;
+the public MainWindow slot and legacy XML/UI contracts remain unchanged and
+are covered by the existing GUI and XML vectors.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

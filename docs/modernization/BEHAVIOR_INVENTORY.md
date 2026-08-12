@@ -642,6 +642,11 @@ remain mapped to GUI_012.
 with the existing temporary menu; GUI_016/020 retain their visible routing and
 payload contracts.
 
+`MainWindowFormLoader` is the private implementation boundary for public
+`LoadFormFromXML`. GUI_006–008/015 and XML_LEGACY_001–005 remain the contract
+coverage for its legacy form, CWD, error, registration and dynamic-dock
+behavior.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 

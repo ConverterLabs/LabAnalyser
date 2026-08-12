@@ -290,6 +290,12 @@ State only receives column sizing and update re-enablement.
 existing row/column selection. It owns no plot, manager or MainWindow state;
 MainWindow retains figure creation and registry coordination.
 
+`UIFunctions/MainWindowFormLoader` is the private implementation boundary for
+legacy `.ui` form loading and left-dock construction. It deliberately depends
+on the existing MainWindow facade and UIDataManagement boundary so legacy
+Designer class names, form registration and XML loading semantics remain
+unchanged; it is not a new public loader API.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

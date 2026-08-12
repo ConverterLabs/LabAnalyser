@@ -122,7 +122,6 @@ signals:
 private slots:
 
 
-    void AppendWidgetNames(QObjectList,QString);
     void ChangeMinMaxValue();
     void RemoveDevice();
     void SetAlias(QString);

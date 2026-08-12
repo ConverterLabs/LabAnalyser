@@ -318,6 +318,12 @@ accept/reject behavior and resulting valid subplot creation remain unchanged.
 `CreateSubPlotWindow`; GUI_012 covers the unchanged cancellation and 2×3/1×2
 creation paths.
 
+`MainWindowFormLoader` now owns the internal dynamic-form construction and
+left-dock wiring. `MainWindow::LoadFormFromXML` remains the public slot and
+the same GUI_006–008/015 and legacy XML vectors preserve naming, loader errors,
+partial unknown-widget loading, CWD mutation, registration, skip flags and
+dock lifecycle.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.

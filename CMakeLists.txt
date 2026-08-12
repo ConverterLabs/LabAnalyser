@@ -102,6 +102,7 @@ set(LABANALYSER_CORE_SOURCES
     UIFunctions/MainWindowTreePath.cpp
     UIFunctions/MainWindowTreeViewState.cpp
     UIFunctions/MainWindowSubplotDialog.cpp
+    UIFunctions/MainWindowFormLoader.cpp
     UIFunctions/SubPlotMainWindow.cpp
     TreeWidgetCustomDrop.cpp
     CustomWidgets/QBLedIndicator.cpp
@@ -116,6 +117,10 @@ set(LABANALYSER_CORE_SOURCES
 # Subdirectories reuse this exact graph for the one established PlotWidget
 # test-only compile seam, so keep paths anchored at the repository root.
 list(TRANSFORM LABANALYSER_CORE_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+# This private helper consumes the ui header generated from the root form; it
+# does not own a colocated .ui input of its own.
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/UIFunctions/MainWindowFormLoader.cpp"
+    PROPERTIES SKIP_AUTOUIC ON)
 
 add_library(LabAnalyserCore STATIC ${LABANALYSER_CORE_SOURCES})
 target_include_directories(LabAnalyserCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${HIGHFIVE_INCLUDE_DIR}")
