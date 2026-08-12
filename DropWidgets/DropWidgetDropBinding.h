@@ -26,6 +26,15 @@ inline void ResetConnections(QObject* widget)
     DropWidgetBinding::ConnectRequestUpdate(widget, SIGNAL(RequestUpdate()));
 }
 
+inline void ResetContextConnections(QObject* widget, DataManagementSetClass* manager)
+{
+    QObject::disconnect(widget, SIGNAL(customContextMenuRequested(QPoint)), widget,
+                        SLOT(contextMenu(QPoint)));
+    QObject::disconnect(widget, SIGNAL(RequestUpdate()), manager, SLOT(UpdateRequest()));
+    QObject::connect(widget, SIGNAL(customContextMenuRequested(QPoint)), widget, SLOT(contextMenu(QPoint)));
+    DropWidgetBinding::ConnectRequestUpdate(widget, SIGNAL(RequestUpdate()));
+}
+
 inline Context Prepare(QWidget* widget, QDropEvent* event)
 {
     ResetConnections(widget);

@@ -23,6 +23,7 @@
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
+#include "DropWidgetDropBinding.h"
 #include "DropWidgetDragSource.h"
 #include "DropWidgetIndicatorBinding.h"
 #include "../mainwindow.h"
@@ -70,12 +71,7 @@ void QCheckBoxD::dragEnterEvent(QDragEnterEvent *event)
 
 void QCheckBoxD::dropEvent(QDropEvent *event)
 {
-    //this->disconnect();
-    disconnect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    disconnect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
-
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+    DropWidgetDropBinding::ResetContextConnections(this, GetMainWindow()->GetLogic());
 
     QString ID =  CreateID(event->source());
     this->setToolTip(ID);
