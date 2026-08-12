@@ -105,6 +105,7 @@ set(LABANALYSER_CORE_SOURCES
     UIFunctions/MainWindowFormLoader.cpp
     UIFunctions/MainWindowTreeModel.cpp
     UIFunctions/MainWindowFigureFactory.cpp
+    UIFunctions/MainWindowDockPresentation.cpp
     UIFunctions/SubPlotMainWindow.cpp
     TreeWidgetCustomDrop.cpp
     CustomWidgets/QBLedIndicator.cpp
@@ -122,6 +123,8 @@ list(TRANSFORM LABANALYSER_CORE_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 # This private helper consumes the ui header generated from the root form; it
 # does not own a colocated .ui input of its own.
 set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/UIFunctions/MainWindowFormLoader.cpp"
+    PROPERTIES SKIP_AUTOUIC ON)
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/UIFunctions/MainWindowDockPresentation.cpp"
     PROPERTIES SKIP_AUTOUIC ON)
 
 add_library(LabAnalyserCore STATIC ${LABANALYSER_CORE_SOURCES})

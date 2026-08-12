@@ -335,6 +335,11 @@ SubPlotMainWindow, PlotWidget grid and manager registrations. MainWindow keeps
 the public creation slots; GUI_012/017 and the PlotWidget contracts retain the
 observed valid dimensions, naming, routing and plot-registration behavior.
 
+`MainWindowDockPresentation` contains the private non-owning dock state and
+event-filter presentation rules. GUI_004 preserves floating/docked behavior
+and GUI_006/007/015 preserve dynamic dock lifecycle. Its historical standard-
+dock name asymmetry is intentionally preserved, not normalized in this slice.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.

@@ -1073,6 +1073,10 @@ projection while MainWindow retains manager routing and widget ownership.
 public MainWindow slots, manager registrations and tested valid plot behavior
 remain unchanged.
 
+`MainWindowDockPresentation` isolates private dock state and event-filter
+presentation, preserving GUI_004 and dynamic dock lifecycle behavior without
+normalizing the observed historical dock-name asymmetry.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

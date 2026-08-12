@@ -35,6 +35,7 @@
 #include "UIFunctions/MainWindowFormLoader.h"
 #include "UIFunctions/MainWindowTreeModel.h"
 #include "UIFunctions/MainWindowFigureFactory.h"
+#include "UIFunctions/MainWindowDockPresentation.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -774,125 +775,12 @@ void MainWindow::dockWidget_destroyed(QObject* Sen)
 
 //this Function is used to change the WindowFlags, to make the Window maximizable
 void MainWindow::dockWidget_topLevelChanged(bool isFloating){
-
-    QDockWidget *SenderOC = qobject_cast<QDockWidget*>(QObject::sender());
-    if (!SenderOC)
-        return;
-
-    if(isFloating)
-    {
-        SenderOC->setMaximumWidth(16555);
-        SenderOC->setMaximumHeight(16555);
-        SenderOC->setWindowFlags(Qt::Window);
-        // setWindowFlags calls setParent() when changing the flags for a window, causing the widget to be hidden.
-        // You must call show() to make the widget visible again
-
-        if(SenderOC->objectName().compare("ParameterDock") &&
-                SenderOC->objectName().compare("StateDock") &&
-                SenderOC->objectName().compare("DataDock")&&
-                SenderOC->objectName().compare("OutputDock"))
-        {
-            SenderOC->setWindowFlags(SenderOC->windowFlags() | Qt::CustomizeWindowHint |
-                                           Qt::WindowMinimizeButtonHint |
-                                           Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-        }
-        else
-        {
-            SenderOC->setWindowFlags((SenderOC->windowFlags() | Qt::CustomizeWindowHint |
-                                      Qt::WindowMinimizeButtonHint |
-                                      Qt::WindowMaximizeButtonHint)& ~Qt::WindowCloseButtonHint );
-        }
-        SenderOC->show();
-    }
-    else
-    {
-        this->ui->centralWidget->hide();
-        if(SenderOC->objectName().compare("ParameterDock") == 0 ||
-                SenderOC->objectName().compare("ParameterDock") == 0 ||
-                SenderOC->objectName().compare("DataDock") == 0 ||
-                SenderOC->objectName().compare("OutputDock") == 0 )
-        {
-            if(this->dockWidgetArea(SenderOC) == Qt::BottomDockWidgetArea)
-            {
-                SenderOC->setMaximumWidth(16555);
-                SenderOC->setMaximumHeight(300);
-            }
-            else if(this->dockWidgetArea(SenderOC) ==Qt::RightDockWidgetArea)
-            {
-                SenderOC->setMaximumHeight(16555);
-                SenderOC->setMaximumWidth(600);
-            }
-        }
-    }
-    int i = 0;
-    QList<QDockWidget *> dockWidgets = findChildren<QDockWidget *>();
-    for(auto itt: dockWidgets)
-    {
-        if(this->dockWidgetArea(itt) == Qt::LeftDockWidgetArea)
-        {
-            if(SenderOC->objectName().compare("ParameterDock") &&
-                    SenderOC->objectName().compare("StateDock") &&
-                    SenderOC->objectName().compare("DataDock")&&
-                    SenderOC->objectName().compare("OutputDock"))
-                if(!(itt->isFloating()))
-                    i++;
-        }
-    }
-    if(!i)
-        this->ui->centralWidget->show();
-    else
-         this->ui->centralWidget->hide();
-
-    QApplication::processEvents();
+    MainWindowDockPresentation::UpdateTopLevelState(*this,
+        qobject_cast<QDockWidget*>(QObject::sender()), isFloating);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
-
-  if (!event)
-      return false;
-
-  QDockWidget* DW = qobject_cast<QDockWidget*>(obj);
-  if(DW)
-  {
-      if (event->type() == QEvent::Show ) {
-      }
-      if (event->type() == QEvent::Close ) {
-         this->dockWidget_destroyed(DW);
-      }
-      if (event->type() == QEvent::Leave ) {
-         QList<QDockWidget *> dockWidgets = findChildren<QDockWidget *>();
-         int found = 0;
-         for(auto itt : dockWidgets)
-         {
-             if(this->dockWidgetArea(itt) == Qt::LeftDockWidgetArea)
-                found++;
-         }
-         if(!found)
-             this->ui->centralWidget->setHidden(false);
-         else
-             this->ui->centralWidget->setHidden(true);
-
-      }
-      if(DW->objectName().compare("ParameterDock") == 0)
-      {
-           if (event->type() == QEvent::Resize )
-           {
-               int Width = ui->ParameterDock->width();
-               ui->ParameterTreeWidget->setColumnWidth(0,Width*0.6);
-               ui->ParameterTreeWidget->setColumnWidth(1,Width*0.2);
-               ui->ParameterTreeWidget->setColumnWidth(2,Width*0.1);
-           }
-      }
-      if(DW->objectName().compare("DataDock") == 0)
-      {
-           if (event->type() == QEvent::Resize )
-           {
-               int Width = ui->DataTreeWidget->width();
-               ui->DataTreeWidget->setColumnWidth(0,Width*0.6);
-               ui->DataTreeWidget->setColumnWidth(1,Width*0.3);
-           }
-      }
-  }
+  MainWindowDockPresentation::HandleEvent(*this, obj, event);
   return QWidget::eventFilter(obj, event);
 }
 

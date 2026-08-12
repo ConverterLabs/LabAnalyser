@@ -305,6 +305,10 @@ the historical SubPlotMainWindow/PlotWidget grid. It owns no persistent state;
 Qt parents retain widget lifetime and the existing DataManagement facade retains
 plot/figure registry responsibility.
 
+`UIFunctions/MainWindowDockPresentation` is a private non-owning UI helper for
+dock floating, resize and event-filter presentation. MainWindow remains the
+QObject event-filter owner and retains all close/manager lifecycle routing.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

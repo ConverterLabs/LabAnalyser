@@ -656,6 +656,10 @@ path has no current production caller and remains documented as unexercised.
 GUI_012/017 and the PlotWidget contract suite continue to cover the public
 MainWindow creation routes and their valid registration behavior.
 
+`MainWindowDockPresentation` contains private dock floating, resize and
+event-filter presentation behavior. GUI_004 plus the dynamic-dock lifecycle
+vectors remain its contract; historical dock-name asymmetry is preserved.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 
