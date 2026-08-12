@@ -46,6 +46,8 @@ set(LABANALYSER_CORE_SOURCES
     DropWidgets/DropWidgetsUiLoader.cpp
     DropWidgets/DropWidgetBinding.cpp
     DropWidgets/DropWidgetDataAccess.h
+    DropWidgets/DropWidgetTableCells.cpp
+    DropWidgets/DropWidgetTableCells.h
     DropWidgets/DropWidgetUpdate.h
     DropWidgets/DropWidgetBinding.h
     DropWidgets/Plots/FFTPlotWidget.cpp

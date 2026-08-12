@@ -21,6 +21,7 @@
 
 #include "QTableWidgeD.h"
 #include "CreateID.h"
+#include "DropWidgetTableCells.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 #include "QLineEdit.h"
@@ -226,61 +227,9 @@ void QTableWidgeD::CreateRow( QString VText, QPoint Pos)
     {
         counter++;
 
-        QWidget *pWidget = new QWidget();
-
-        if(GetMainWindow()->GetLogic()->GetContainer(tmpID)->IsSigedNumber() ||
-           GetMainWindow()->GetLogic()->GetContainer(tmpID)->IsFloatingPointNumber() ||
-           GetMainWindow()->GetLogic()->GetContainer(tmpID)->IsUnsigedNumber() )
-        {
-            QLineEditD *tmp = new QLineEditD();
-            if(GetMainWindow()->GetLogic()->GetContainer(tmpID)->IsEditable()==0)
-                tmp->setReadOnly(true);
-
-            QHBoxLayout *pLayout = new QHBoxLayout(pWidget);
-            pLayout->addWidget(tmp);
-            pLayout->setAlignment(Qt::AlignCenter);
-            pLayout->setContentsMargins(0,0,0,0);
-            pWidget->setLayout(pLayout);
-            this->setCellWidget(r,counter-1,pWidget);
-            tmp->setObjectName(this->objectName() + "r" + QString::number(this->rowCount()) + "c" + QString::number(counter));
-            MW->GetLogic()->AddElementToContainerEntry(tmp->objectName(),tmpID,tmp->metaObject()->className(),tmp);
-            tmp->ConnectToID(MW->GetLogic(), tmpID);
-            QString text = "1234678.1234";
-            QFontMetrics fm(tmp->font());
-            int pixelsWide = fm.horizontalAdvance(text);
-            tmp->setFixedWidth(pixelsWide);
-            tmp->adjustSize();
-        }
-        if(GetMainWindow()->GetLogic()->GetContainer(tmpID)->IsBool())
-        {
-            if(GetMainWindow()->GetLogic()->GetContainer(tmpID)->IsEditable())
-            {
-                QCheckBoxD *tmp = new QCheckBoxD(0,0);
-                QHBoxLayout *pLayout = new QHBoxLayout(pWidget);
-                pLayout->addWidget(tmp);
-                pLayout->setAlignment(Qt::AlignCenter);
-                pLayout->setContentsMargins(0,0,0,0);
-                pWidget->setLayout(pLayout);
-                this->setCellWidget(r,counter-1,pWidget);
-                tmp->setObjectName(this->objectName() + "r" + QString::number(this->rowCount()) + "c" + QString::number(counter));
-                MW->GetLogic()->AddElementToContainerEntry(tmp->objectName(),tmpID,tmp->metaObject()->className(),tmp);
-                tmp->ConnectToID(MW->GetLogic(), tmpID);
-            }
-            else
-            {
-                QLed *tmp = new QLed();
-                QHBoxLayout *pLayout = new QHBoxLayout(pWidget);
-                pLayout->addWidget(tmp);
-                pLayout->setAlignment(Qt::AlignCenter);
-                pLayout->setContentsMargins(0,0,0,0);
-                pWidget->setLayout(pLayout);
-                this->setCellWidget(r,counter-1,pWidget);
-                tmp->setObjectName(this->objectName() + "r" + QString::number(this->rowCount()) + "c" + QString::number(counter));
-                MW->GetLogic()->AddElementToContainerEntry(tmp->objectName(),tmpID,tmp->metaObject()->className(),tmp);
-                tmp->ConnectToID(MW->GetLogic(), tmpID);
-            }
-
-        }
+        QWidget* cell = DropWidgetTableCells::CreateBoundCell(this, MW->GetLogic(), tmpID, counter);
+        if (cell)
+            this->setCellWidget(r, counter - 1, cell);
 
         tmpID = ID0 + QString::number(counter);
         // dot instead of comma
