@@ -293,3 +293,8 @@ owns the shared TreeItem-to-ID calculation, while `DropWidgetDragSource` owns
 the common first-selected-leaf admission and lookup for one-ID adapters.
 Multi-selection and table row contracts intentionally remain concrete-widget
 responsibilities.
+
+The shared drop-binding boundary also owns the common connection-removal
+presentation and manager-entry deletion sequence. It does not own the
+application-wide `MainWindow` lookup, locale, table-cell or QObject lifetime;
+those remain legacy concrete-adapter boundaries pending dedicated hardening.

@@ -295,3 +295,21 @@ passed. A multiple-row isolated fixture is not a safe replacement for the real
 form/MainWindow ownership graph because table-cell cleanup deliberately uses
 that global lookup. This global ownership dependence remains a documented
 MainWindow-bound risk rather than a new lifetime contract.
+
+### Non-plot hardening checkpoint (2026-08-12)
+
+`DW_022` now proves that an unbound `QPushButtonD::TimeOut()` is a safe no-op:
+it does not dereference the empty manager lookup or emit `released()`. The
+historical bound bool/unsigned timeout decision tree remains unchanged.
+`DW_023` characterizes the established `RemoveConnection` reset results for
+checkbox, combo box, line edit and slider before their common presentation and
+manager-removal sequence was moved to `DropWidgetDropBinding`.
+
+The remaining changes are intentionally not folded into generic helpers:
+`GetMainWindow()` still relies on the legacy top-level-widget assumption;
+`QSliderD` and `QTableWidgeD` still set the process-global C locale when
+binding; and table-cell removal still resolves cell objects through the real
+MainWindow. Changing any of those would change global-state, lifetime or
+cross-form behavior and requires a separately characterized hardening slice.
+The CMake application build and focused DropWidget/MainWindow/XML tests passed
+3/3; no `DropWidgets/Plots` or legacy fixture file changed.

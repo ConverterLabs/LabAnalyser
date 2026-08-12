@@ -354,6 +354,11 @@ The remaining QTable cleanup duplication was consolidated behind a private
 per-row operation; focused adapter and incremental application checks passed.
 Its MainWindow-owned dynamic-cell lookup remains an explicit later ownership
 hardening risk rather than a behavior change in this package.
+The non-plot adapter hardening checkpoint additionally makes an unbound
+`QPushButtonD::TimeOut` a safe no-op and consolidates the existing common
+`RemoveConnection` presentation/manager-removal sequence. The global
+MainWindow lookup, global locale mutation and dynamic table-cell ownership are
+explicit later hardening slices; no guessed behavioral normalization was made.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

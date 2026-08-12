@@ -227,6 +227,13 @@ selected-row deletion and full-table clearing. The MainWindow-owned
 multiple isolated-row cleanup is therefore not treated as a safe standalone
 ownership contract.
 
+`DW_022` adds the safe unbound `QPushButtonD::TimeOut` no-op boundary; the
+existing bound timeout behavior remains unmodified. `DW_023` maps the shared
+presentation/reset effects of adapter `RemoveConnection` calls. Global
+MainWindow lookup, global C-locale assignment during slider/table binding, and
+real-form table-cell ownership remain explicit exclusions rather than assumed
+safe contracts.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not
