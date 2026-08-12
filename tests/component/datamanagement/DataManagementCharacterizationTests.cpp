@@ -148,6 +148,7 @@ private slots:
     void DM_SAFE_004_registry_boundary_inputs_are_safe();
     void DM_SAFE_005_missing_minmax_container_is_safe();
     void DM_SAFE_006_parentless_manager_close_signal_is_safe();
+    void DM_SAFE_007_null_plot_registration_is_not_dereferenced();
     void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
     void DM_REG_002_skipFormFlags_override_and_project_cleanup();
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
@@ -762,6 +763,15 @@ void DataManagementCharacterizationTests::DM_SAFE_006_parentless_manager_close_s
 
     QVERIFY(QMetaObject::invokeMethod(&manager, "CloseProject", Qt::DirectConnection));
     QCOMPARE(closed.count(), 1);
+}
+
+void DataManagementCharacterizationTests::DM_SAFE_007_null_plot_registration_is_not_dereferenced()
+{
+    DataManagementClass manager;
+    manager.AddPlotPointer("null-plot", nullptr);
+
+    QCOMPARE(manager.GetPlotByName("null-plot"), nullptr);
+    QCOMPARE(manager.GetPlotByName("missing-plot"), nullptr);
 }
 
 void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()

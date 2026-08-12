@@ -1134,6 +1134,10 @@ container, getters return `(0, 0)`, and existing inverted ranges remain stored.
 `DM_SAFE_006` maps a parentless DataManagementClass: its CloseProject signal
 still emits once without attempting an invalid parent connection.
 
+`DM_SAFE_007` maps a null public plot registration: name lookup skips it and
+returns null rather than dereferencing a non-object; normal registered plot
+lookup remains unchanged.
+
 Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See

@@ -1006,3 +1006,7 @@ instances while retaining the public CloseProject signal.
 The same existing `DM_SAFE_002` parentless Messenger coverage now also backs a
 constructor guard that omits its six parent-bound Qt connections when no parent
 exists. Parent-backed Messenger routing and dispatch ordering are unchanged.
+
+`DM_SAFE_007` closes the separate public plot-registry null-pointer boundary:
+null registrations stay non-resolvable instead of being dereferenced. It does
+not alter plot naming, numbering or non-null lookup semantics.

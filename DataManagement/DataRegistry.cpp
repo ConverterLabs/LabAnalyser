@@ -82,7 +82,7 @@ void DataRegistry::DeletePlotPointer(QString id)
 QObject* DataRegistry::GetPlotByName(QString name) const
 {
     for (auto entry : PlotObjects)
-        if (entry.second->objectName().compare(name) == 0)
+        if (entry.second && entry.second->objectName().compare(name) == 0)
             return entry.second;
 
     return nullptr;
