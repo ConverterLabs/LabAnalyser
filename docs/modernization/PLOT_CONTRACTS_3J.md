@@ -105,3 +105,6 @@ null item inputs now return before the legacy dialog/alias route.
 `PLOT_015` calls `axisLabelDoubleClick()` through the metaobject with a null
 axis and label-selection part. It preserves the valid axis label; real axis
 dialog editing remains unchanged.
+
+`PLOT_016` invokes `titleDoubleClick()` through the metaobject with a null
+title. It is a no-op and does not enter the legacy title dialog.

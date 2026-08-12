@@ -41,6 +41,7 @@ private slots:
     void PLOT_013_missing_manager_or_axis_container_is_a_noop();
     void PLOT_014_empty_legend_double_click_is_a_noop();
     void PLOT_015_null_axis_double_click_is_a_noop();
+    void PLOT_016_null_title_double_click_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -410,6 +411,19 @@ void PlotWidgetContractTests::PLOT_015_null_axis_double_click_is_a_noop()
                                       Q_ARG(QCPAxis*, nullptr),
                                       Q_ARG(QCPAxis::SelectablePart, QCPAxis::spAxisLabel)));
     QCOMPARE(plot.xAxis->label(), before);
+}
+
+void PlotWidgetContractTests::PLOT_016_null_title_double_click_is_a_noop()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    QCOMPARE(plot.graphCount(), 0);
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "titleDoubleClick", Qt::DirectConnection,
+                                      Q_ARG(QMouseEvent*, nullptr),
+                                      Q_ARG(QCPPlotTitle*, nullptr)));
+    QCOMPARE(plot.graphCount(), 0);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

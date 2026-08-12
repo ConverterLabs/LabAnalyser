@@ -958,3 +958,5 @@ statusbar message for a real graph.
 dialog path; valid alias editing remains unchanged.
 
 `PLOT_015` rejects a null axis before the existing axis-label dialog route.
+
+`PLOT_016` rejects a null title before the existing title-edit dialog route.

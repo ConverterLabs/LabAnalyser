@@ -1224,6 +1224,9 @@ void PlotWidget::resizeEvent(QResizeEvent *event)
 void PlotWidget::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
 {
   Q_UNUSED(event)
+  if (!title)
+      return;
+
   // Set the plot title by double clicking on it
   bool ok;
   QString newTitle = QInputDialog::getText(this, "QCustomPlot example", "New plot title:", QLineEdit::Normal, title->text(), &ok);

@@ -1165,3 +1165,6 @@ unchanged and remains a separately controlled modal interaction.
 
 `PlotWidget::axisLabelDoubleClick` is mapped to `PLOT_015`: a missing axis is
 a no-op even when the selection part denotes an axis label.
+
+`PlotWidget::titleDoubleClick` is mapped to `PLOT_016`: a missing title is a
+no-op; valid title editing remains a separately controlled modal workflow.
