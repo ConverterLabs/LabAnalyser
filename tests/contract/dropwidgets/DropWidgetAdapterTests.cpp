@@ -58,6 +58,7 @@ private slots:
     void DW_020_shared_indicator_initialization_preserves_checkbox_state_contract();
     void DW_021_shared_tree_item_paths_preserve_multi_selection_ids();
     void DW_022_unbound_button_timeout_is_safe_noop();
+    void DW_023_remove_connection_preserves_widget_resets();
 };
 
 class ExposedTreeWidget : public TreeWidgetCustomDrop
@@ -166,6 +167,38 @@ void DropWidgetAdapterTests::DW_022_unbound_button_timeout_is_safe_noop()
     QSignalSpy released(&button, &QPushButton::released);
     button.TimeOut();
     QCOMPARE(released.count(), 0);
+}
+
+void DropWidgetAdapterTests::DW_023_remove_connection_preserves_widget_resets()
+{
+    QCheckBoxD check;
+    check.setChecked(true);
+    check.setToolTip("bound");
+    check.RemoveConnection();
+    QVERIFY(!check.isChecked());
+    QCOMPARE(check.text(), QString("CheckBox"));
+    QVERIFY(check.toolTip().isEmpty());
+
+    QComboBoxD combo;
+    combo.addItem("entry");
+    combo.setToolTip("bound");
+    combo.RemoveConnection();
+    QCOMPARE(combo.count(), 0);
+    QVERIFY(combo.toolTip().isEmpty());
+
+    QLineEditD line;
+    line.setText("entry");
+    line.setToolTip("bound");
+    line.RemoveConnection();
+    QVERIFY(line.text().isEmpty());
+    QVERIFY(line.toolTip().isEmpty());
+
+    QSliderD slider;
+    slider.setValue(37);
+    slider.setToolTip("bound");
+    slider.RemoveConnection();
+    QCOMPARE(slider.value(), 0);
+    QVERIFY(slider.toolTip().isEmpty());
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()
