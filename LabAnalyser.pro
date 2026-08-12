@@ -53,6 +53,7 @@ SOURCES += main.cpp\
         DropWidgets/CreateID.cpp \
         DropWidgets/DropWidgetsUiLoader.cpp \
         DropWidgets/DropWidgetBinding.cpp \
+        DropWidgets/DropWidgetConnectionMenu.cpp \
         DropWidgets/DropWidgetTableCells.cpp \
         DropWidgets/Plots/FFTPlotWidget.cpp \
         DropWidgets/Plots/PlotMeasurements.cpp \
@@ -111,6 +112,7 @@ HEADERS  += mainwindow.h\
             DropWidgets/CreateID.h \
             DropWidgets/DropWidget.h \
             DropWidgets/DropWidgetBinding.h \
+            DropWidgets/DropWidgetConnectionMenu.h \
             DropWidgets/DropWidgetDataAccess.h \
             DropWidgets/DropWidgetTableCells.h \
             DropWidgets/DropWidgetUpdate.h \

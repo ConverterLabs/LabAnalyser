@@ -16,6 +16,7 @@ SOURCES += DropWidgetAdapterTests.cpp TestMainWindowSeam.cpp PlotWidgetLinkSeam.
     $$REPOSITORY_ROOT/DataManagement/DataMessengerClass.cpp \
     $$REPOSITORY_ROOT/DropWidgets/CreateID.cpp \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetBinding.cpp \
+    $$REPOSITORY_ROOT/DropWidgets/DropWidgetConnectionMenu.cpp \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetTableCells.cpp \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetsUiLoader.cpp $$REPOSITORY_ROOT/TreeWidgetCustomDrop.cpp \
     $$REPOSITORY_ROOT/DropWidgets/QBLed.cpp $$REPOSITORY_ROOT/DropWidgets/QCheckBox.cpp \
@@ -48,6 +49,7 @@ HEADERS += $$REPOSITORY_ROOT/mainwindow.h \
     $$REPOSITORY_ROOT/DropWidgets/QSpinBox.h $$REPOSITORY_ROOT/DropWidgets/QTableWidgeD.h \
     $$REPOSITORY_ROOT/DropWidgets/QTSLed.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetBinding.h \
+    $$REPOSITORY_ROOT/DropWidgets/DropWidgetConnectionMenu.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetDataAccess.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetTableCells.h \
     $$REPOSITORY_ROOT/DropWidgets/DropWidgetsUiLoader.h $$REPOSITORY_ROOT/TreeWidgetCustomDrop.h \

@@ -22,6 +22,7 @@
 #include "QLineEdit.h"
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
+#include "DropWidgetConnectionMenu.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -45,23 +46,7 @@ QLineEditD::QLineEditD(QWidget *parent):QLineEdit(parent)
 
 void QLineEditD::contextMenu(QPoint pos)
 {
-    QMenu* menu = createStandardContextMenu();
-    QString Connection = GetMainWindow()->GetLogic()->GetContainerID(this);
-    if(Connection.size())
-    {
-         MainWindow *MW = GetMainWindow();
-         menu->addSeparator();
-        QAction *Highlight = new QAction;
-        connect(Highlight, &QAction::triggered, [=]{
-            MW->HighLightConnection(Connection);});
-        Highlight->setText("Highlight Connection");
-        menu->addAction(Highlight);
-        menu->addSeparator();
-
-        menu->addAction("Remove Connection", this , SLOT(RemoveConnection()));
-    }
-    menu->popup(this->mapToGlobal(pos));
-
+    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, true });
 }
 
 void QLineEditD::RemoveConnection()

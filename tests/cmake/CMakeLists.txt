@@ -112,6 +112,7 @@ add_executable(DropWidgetAdapterTests
     ${PROJECT_SOURCE_DIR}/DataManagement/DataMessengerClass.cpp
     ${PROJECT_SOURCE_DIR}/DropWidgets/CreateID.cpp
     ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetBinding.cpp
+    ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetConnectionMenu.cpp
     ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetTableCells.cpp
     ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetsUiLoader.cpp
     ${PROJECT_SOURCE_DIR}/TreeWidgetCustomDrop.cpp
