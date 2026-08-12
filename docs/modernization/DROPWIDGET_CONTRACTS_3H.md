@@ -351,3 +351,12 @@ preserves the original tooltip, manager binding and exactly one subsequent
 `set` emission. The existing valid-leaf rebinding order and its historical
 multi-leaf iteration are retained; no interactive drag execution or MIME
 format is changed.
+
+### Incomplete table XML rows (2026-08-12)
+
+`QTableWidgeD::SaveToXML()` now skips a row without a vertical-header item
+instead of dereferencing null. `DW_027` records that a valid remaining header
+keeps its existing `Connected_ID<row>` key and value. The former null-header
+path was established by source inspection and is not executed as an in-process
+crash contract. This does not synthesize missing table bindings or alter the
+historical reverse row traversal.

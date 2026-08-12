@@ -325,7 +325,8 @@ bool QTableWidgeD::LoadFromXML(const std::vector<std::pair<QString, QString>> &A
 bool QTableWidgeD::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text)
 {
     for(auto i = this->rowCount()-1; i >=0 ; i--)
-        Attributes.push_back(std::pair<QString, QString>("Connected_ID"+QString::number(i), this->verticalHeaderItem(i)->text()));
+        if (QTableWidgetItem* header = this->verticalHeaderItem(i))
+            Attributes.push_back(std::pair<QString, QString>("Connected_ID"+QString::number(i), header->text()));
 
     return true;
 

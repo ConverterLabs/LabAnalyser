@@ -250,6 +250,10 @@ source no longer disconnects an existing manager `set` route. Source, manager,
 mapper and type are validated before rebinding; valid drag execution remains
 covered only by the established integration paths.
 
+`DW_027` covers `QTableWidgeD::SaveToXML` with an incomplete row: missing
+vertical-header items are ignored safely, while existing header attributes use
+their current row-numbered key and value. No missing binding is synthesized.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

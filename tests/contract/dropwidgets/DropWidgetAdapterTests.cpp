@@ -63,6 +63,7 @@ private slots:
     void DW_023_remove_connection_preserves_widget_resets();
     void DW_025_missing_container_lookup_leaves_drop_targets_unchanged();
     void DW_026_invalid_lineedit_drop_preserves_existing_binding();
+    void DW_027_table_xml_ignores_incomplete_rows();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -289,6 +290,21 @@ void DropWidgetAdapterTests::DW_026_invalid_lineedit_drop_preserves_existing_bin
     QCOMPARE(sent.at(0).at(0).toString(), QString("set"));
     QCOMPARE(sent.at(0).at(1).toString(), id);
     QCOMPARE(sent.at(0).at(2).value<InterfaceData>().GetString(), QString("after-invalid-drop"));
+}
+
+void DropWidgetAdapterTests::DW_027_table_xml_ignores_incomplete_rows()
+{
+    QTableWidgeD table;
+    table.setRowCount(2);
+    table.setColumnCount(1);
+    table.setVerticalHeaderItem(0, new QTableWidgetItem("DW27::bound"));
+
+    std::vector<std::pair<QString, QString>> attributes;
+    QString text;
+    QVERIFY(table.SaveToXML(attributes, text));
+    QCOMPARE(attributes.size(), size_t(1));
+    QCOMPARE(attributes.front().first, QString("Connected_ID0"));
+    QCOMPARE(attributes.front().second, QString("DW27::bound"));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()
