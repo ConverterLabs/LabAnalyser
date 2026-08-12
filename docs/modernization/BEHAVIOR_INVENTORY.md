@@ -1147,3 +1147,7 @@ historical `Buffered` fallback ID, can add a graph. Foreign/empty-source drops,
 missing context, XY plots and unsupported items are no-ops; valid graph and
 Shift-axis routes retain their existing contracts. qcustomplot is vendored and
 outside the modified boundary.
+
+`PlotWidget::selectionChanged` is mapped to `PLOT_011`: it requires the
+existing `QCustomPlot` signal sender; senderless direct invocation preserves
+the graph selection and model.

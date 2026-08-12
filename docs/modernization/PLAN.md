@@ -947,3 +947,6 @@ and returns a map of `x`/`y` structs; the additive `IsConnected` DLL export
 turns a mid-transfer disconnect into `LabAnalyser:ConnectionLost`. Focused
 server and connector contracts are green; execution in MATLAB and the full
 Windows GitHub build remain pending.
+
+`PLOT_011` guards senderless `PlotWidget::selectionChanged()` invocation;
+valid user-originated selection synchronization remains unchanged.

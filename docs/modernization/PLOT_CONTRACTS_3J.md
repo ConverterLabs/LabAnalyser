@@ -86,3 +86,7 @@ resolution; it does not alter qcustomplot, valid graph creation, Shift X-axis
 behavior, data bytes or the historical buffered-ID spelling. Empty tree
 selection, missing MainWindow/manager, an XY plot and unsupported containers
 are rejected before index/dereference or graph update.
+
+`PLOT_011` establishes the sender boundary for `selectionChanged()`: a direct,
+senderless invocation is a no-op. The existing `selectionChangedByUser()`
+connection remains the valid synchronization route.

@@ -36,6 +36,7 @@ private slots:
     void PLOT_008_cursor_controls_are_safe_without_graphs();
     void PLOT_009_drop_item_resolution_is_bounded_and_type_checked();
     void PLOT_010_foreign_drop_is_a_noop();
+    void PLOT_011_senderless_selection_slot_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -330,6 +331,22 @@ void PlotWidgetContractTests::PLOT_010_foreign_drop_is_a_noop()
     plot.dropEvent(&event);
     QCOMPARE(plot.graphCount(), 1);
     QCOMPARE(graph(plot, 0)->ID(), QString("D::A"));
+}
+
+void PlotWidgetContractTests::PLOT_011_senderless_selection_slot_is_a_noop()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    publish(window, "D::Selection", data({0.0, 1.0}, {1.0, 2.0}));
+    plot.AddCustomGraph("D::Selection");
+    QCPGraph* first = graph(plot, 0);
+    QVERIFY(first);
+    QVERIFY(!first->selected());
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "selectionChanged", Qt::DirectConnection));
+    QVERIFY(!first->selected());
+    QCOMPARE(plot.graphCount(), 1);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

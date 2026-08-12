@@ -1284,6 +1284,8 @@ void PlotWidget::selectionChanged()
 {
     auto SenderOC = QObject::sender();
     QCustomPlot *Sender = qobject_cast<QCustomPlot*>(SenderOC);
+    if (!Sender)
+        return;
   /*
    normally, axis base line, axis tick labels and axis labels are selectable separately, but we want
    the user only to be able to select the axis as a whole, so we tie the selected states of the tick labels
