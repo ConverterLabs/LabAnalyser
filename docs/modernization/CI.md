@@ -41,10 +41,12 @@ The Release step uses the existing deploy mode with
 `-DeployDir dist\LabAnalyser-release`. Before upload, CI requires
 `LabAnalyser.exe`, Qt Core/Gui/Widgets DLLs, the MinGW compiler runtimes, and
 HDF5, matio and FFTW runtime DLLs. The existing deployment script also follows
-native dependencies recursively. The downloadable artifact is named
-`LabAnalyser-windows-release`, contains only `dist/LabAnalyser-release/`, and
-is retained for 14 days. This is a CI artifact only; it creates no GitHub
-Release or published package.
+native dependencies recursively. It additionally requires the exact ten-file
+MATLAB package at `dist/LabAnalyser-release/+LabAnalyser`. The downloadable
+artifact is named `LabAnalyser-windows-release`; its root therefore directly
+contains `+LabAnalyser` alongside `LabAnalyser.exe` and the runtime DLLs. It is
+retained for 14 days. This is a CI artifact only; it creates no GitHub Release
+or published package.
 
 ## Provisioned packages
 

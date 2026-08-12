@@ -879,7 +879,7 @@ package checkpoint; local focused RemoteControl and XML suites passed.
 ABI and native TCP frames were characterized against the unchanged Boost-based
 implementation, then preserved through a Winsock/RAII refactor. A standalone
 CMake build, focused CTest, static MinGW runtime linkage and exact
-`LabAnalyser/+LabAnalyser` deployment are integrated into the Windows build.
+top-level `+LabAnalyser` deployment is integrated into the Windows build.
 The workflow verifies the ten-file MATLAB package before uploading
 `LabAnalyser-windows-release`. Local package/build evidence is recorded in
 `MATLAB_REMOTE_CONNECTOR.md`; actual MATLAB execution and the next remote
@@ -901,3 +901,8 @@ and returns a map of `x`/`y` structs; the additive `IsConnected` DLL export
 turns a mid-transfer disconnect into `LabAnalyser:ConnectionLost`. Focused
 server and connector contracts are green; execution in MATLAB and the full
 Windows GitHub build remain pending.
+
+The release layout was corrected on 2026-08-12: the CMake install prefix is
+now the deployment root itself. Consequently `LabAnalyser-windows-release`
+contains `./+LabAnalyser` directly instead of
+`./LabAnalyser/+LabAnalyser`; CI asserts that exact location and file set.
