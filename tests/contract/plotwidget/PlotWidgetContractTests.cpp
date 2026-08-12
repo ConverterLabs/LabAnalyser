@@ -45,6 +45,7 @@ private slots:
     void PLOT_017_unmanaged_timer_update_is_a_noop();
     void PLOT_018_unmanaged_wheel_sync_is_a_noop();
     void PLOT_019_unmanaged_clear_bindings_is_a_noop();
+    void PLOT_020_senderless_axis_edit_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -457,6 +458,18 @@ void PlotWidgetContractTests::PLOT_019_unmanaged_clear_bindings_is_a_noop()
 
     plot.ClearAllGraphs();
     QCOMPARE(plot.graphCount(), 1);
+}
+
+void PlotWidgetContractTests::PLOT_020_senderless_axis_edit_is_a_noop()
+{
+    QWidget host;
+    PlotWidget plot(nullptr, &host, nullptr);
+    const QString originalLabel = plot.xAxis->label();
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "axisLabelDoubleClick", Qt::DirectConnection,
+                                      Q_ARG(QCPAxis*, plot.xAxis),
+                                      Q_ARG(QCPAxis::SelectablePart, QCPAxis::spAxisLabel)));
+    QCOMPARE(plot.xAxis->label(), originalLabel);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

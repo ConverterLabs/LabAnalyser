@@ -1247,6 +1247,11 @@ void PlotWidget::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
 
 void PlotWidget::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 {
+  auto SenderOC = QObject::sender();
+  QCustomPlot *Sender = qobject_cast<QCustomPlot*>(SenderOC);
+  if (!Sender || !axis || part != QCPAxis::spAxisLabel)
+      return;
+
   // Set an axis label by double clicking on it
   if (axis && part == QCPAxis::spAxisLabel) // only react when the actual axis label is clicked, not tick label or axis backbone
   {
@@ -1255,8 +1260,6 @@ void PlotWidget::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart par
     if (ok)
     {
       axis->setLabel(newLabel);
-      auto SenderOC = QObject::sender();
-      QCustomPlot *Sender = qobject_cast<QCustomPlot*>(SenderOC);
       Sender->replot();
 
      // ui->customPlot[0]->replot();

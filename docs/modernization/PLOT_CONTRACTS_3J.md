@@ -118,3 +118,6 @@ unmanaged widget is a no-op; normal multi-plot synchronization is unchanged.
 
 `PLOT_019` calls the public binding-cleanup hook without a manager. It leaves
 the local graph model unchanged and avoids a manager dereference.
+
+`PLOT_020` invokes axis-label editing without the connected plot sender. It
+does not open the dialog or mutate the axis; the normal signal route remains.

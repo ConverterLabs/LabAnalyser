@@ -1177,3 +1177,6 @@ does not traverse peer plots.
 
 `PlotWidget::ClearAllGraphs` is mapped to `PLOT_019`: without a manager it
 does not remove local graphs or dereference an absent manager.
+
+`PlotWidget::axisLabelDoubleClick` is mapped to `PLOT_020`: senderless calls
+are rejected before dialog or axis access.

@@ -969,3 +969,6 @@ managed peer-plot range synchronization remains unchanged.
 
 `PLOT_019` protects the public manager-binding cleanup hook against absent
 MainWindow context; normal manager cleanup remains unchanged.
+
+`PLOT_020` rejects senderless axis-label slot invocations before opening the
+legacy dialog; connected axis edits keep their existing route.
