@@ -321,6 +321,8 @@ void MainWindow::ChangeMinMaxValue()
 {
       //Change Min Max value for the selected Element (needed for filder and spinbox
       QList<QTreeWidgetItem*> selectedItems = ui->ParameterTreeWidget->selectedItems();
+      if (selectedItems.size() != 1 || !selectedItems[0] || selectedItems[0]->childCount() != 0)
+          return;
       QString ID;
       auto sit = selectedItems[0];
       while(sit)
@@ -330,6 +332,8 @@ void MainWindow::ChangeMinMaxValue()
           if(sit)
               ID.insert(0,"::");
       }
+      if (!GetLogic()->GetContainer(ID))
+          return;
       std::pair<double,double> MinMax = GetLogic()->MinMaxValue(ID);
       double MinValue = MinMax.first;
       double MaxValue = MinMax.second;
@@ -346,7 +350,11 @@ void MainWindow::ChangeMinMaxValue()
 void MainWindow::RemoveDevice( )
 {
     auto sender = QObject::sender();
+    if (!sender || !sender->parent())
+        return;
     auto ID = sender->parent()->objectName();
+    if (ID.isEmpty())
+        return;
     qDebug() << sender->objectName();
 
 
@@ -1120,6 +1128,8 @@ void MainWindow::dockWidget_destroyed(QObject* Sen)
 void MainWindow::dockWidget_topLevelChanged(bool isFloating){
 
     QDockWidget *SenderOC = qobject_cast<QDockWidget*>(QObject::sender());
+    if (!SenderOC)
+        return;
 
     if(isFloating)
     {

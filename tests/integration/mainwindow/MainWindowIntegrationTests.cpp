@@ -77,6 +77,7 @@ private slots:
     void GUI_019_parameter_min_max_dialog_contract();
     void GUI_020_data_alias_and_multi_selection_contract();
     void GUI_021_device_context_action_removes_without_confirmation();
+    void GUI_SAFE_001_senderless_and_invalid_selection_actions_are_noops();
     void cleanup();
     void cleanupTestCase();
 
@@ -1187,6 +1188,35 @@ void MainWindowIntegrationTests::GUI_021_device_context_action_removes_without_c
         QVERIFY(tree->selectedItems().isEmpty());
     }
     QVERIFY(manager->GetContainer(deviceName + "::Channel") != nullptr);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_001_senderless_and_invalid_selection_actions_are_noops()
+{
+    MainWindow window;
+    auto* manager = window.GetLogic();
+    QVERIFY(manager);
+    QTreeWidget* parameterTree = window.findChild<QTreeWidget*>("ParameterTreeWidget");
+    QVERIFY(parameterTree);
+    QCOMPARE(parameterTree->selectedItems().size(), 0);
+    QCOMPARE(manager->GetDevices().size(), 0);
+    QCOMPARE(manager->GetContainerCount(), 0);
+
+    // Former direct-slot calls dereferenced selectedItems()[0] or sender().
+    // The approved contract is no dialog, no mutation and no signal.
+    QSignalSpy messages(manager, &DataManagementClass::MessageSender);
+    QVERIFY(QMetaObject::invokeMethod(&window, "ChangeMinMaxValue", Qt::DirectConnection));
+    QVERIFY(QMetaObject::invokeMethod(&window, "RemoveDevice", Qt::DirectConnection));
+    window.dockWidget_topLevelChanged(false);
+    QCOMPARE(messages.count(), 0);
+    QCOMPARE(manager->GetDevices().size(), 0);
+    QCOMPARE(manager->GetContainerCount(), 0);
+    QCOMPARE(parameterTree->selectedItems().size(), 0);
+
+    auto* topLevel = new QTreeWidgetItem(parameterTree, QStringList({"unknown-device"}));
+    parameterTree->setCurrentItem(topLevel, QItemSelectionModel::ClearAndSelect);
+    QVERIFY(QMetaObject::invokeMethod(&window, "ChangeMinMaxValue", Qt::DirectConnection));
+    QCOMPARE(messages.count(), 0);
+    QCOMPARE(manager->GetContainerCount(), 0);
 }
 
 void MainWindowIntegrationTests::cleanup()
