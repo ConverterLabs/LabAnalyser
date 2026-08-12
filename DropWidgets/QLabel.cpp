@@ -21,6 +21,7 @@
 
 #include "QLabel.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -133,13 +134,13 @@ void QLabelD::RemoveUserText()
 
 void QLabelD::setText(const QString &text)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
     if(OrginialText.isEmpty())
     {
         OrginialText = this->text();
     }
     UserDefinedText = true;
     QLabel::setText(text);
-    blockSignals(false);
+    });
 
 }

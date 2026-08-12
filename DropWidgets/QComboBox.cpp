@@ -21,6 +21,7 @@
 
 #include "QComboBox.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 QComboBoxD::QComboBoxD(QWidget *parent):QComboBox(parent)
@@ -121,7 +122,7 @@ void QComboBoxD::dropEvent(QDropEvent *event)
 
 void QComboBoxD::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
     if(Data.IsEditable() && Data.IsGuiSelection())
     {
         while(count())
@@ -133,7 +134,7 @@ void QComboBoxD::SetVariantData(ToFormMapper Data)
         }
          this->setCurrentText(Sel.first);
     }
-    blockSignals(false);
+    });
 
 }
 

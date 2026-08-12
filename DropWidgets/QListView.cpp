@@ -21,6 +21,7 @@
 
 #include "QListView.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -146,11 +147,11 @@ void QListViewD::DeleteAllEntries()
 
 void QListViewD::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
 
     if(Data.IsStringList())
         model->setStringList(Data.GetStringList());
-    blockSignals(false);
+    });
 
 }
 

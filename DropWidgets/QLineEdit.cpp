@@ -21,6 +21,7 @@
 
 #include "QLineEdit.h"
 #include "CreateID.h"
+#include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
 
@@ -145,9 +146,9 @@ void QLineEditD::dropEvent(QDropEvent *event)
 
 void QLineEditD::SetVariantData(ToFormMapper Data)
 {
-    blockSignals(true);
+    ApplyDropWidgetUpdate(this, [&]{
     setText(Data.GetString());
-    blockSignals(false);
+    });
 
 
 }
