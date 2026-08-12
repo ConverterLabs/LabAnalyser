@@ -260,12 +260,11 @@ try {
         $deployExePath = Join-Path $DeployDir 'LabAnalyser.exe'
         Copy-Item -LiteralPath $exePath -Destination $deployExePath -Force
 
-        $matlabPackageRoot = Join-Path $DeployDir 'LabAnalyser'
         Invoke-Native -Exe $cmake -Arguments @(
             '--install', $connectorBuildDir,
-            '--prefix', $matlabPackageRoot
+            '--prefix', $DeployDir
         )
-        $deployedConnector = Join-Path $matlabPackageRoot '+LabAnalyser\TCPClient.dll'
+        $deployedConnector = Join-Path $DeployDir '+LabAnalyser\TCPClient.dll'
         Assert-File -Path $deployedConnector -Description 'deployed MATLAB TCP connector DLL'
 
         Invoke-Native -Exe $windeployqt -Arguments @(

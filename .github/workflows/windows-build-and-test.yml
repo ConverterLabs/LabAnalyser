@@ -148,7 +148,7 @@ jobs:
               throw "Required deployment runtime file is missing: $pattern"
             }
           }
-          $matlabPackageDir = Join-Path $deployDir 'LabAnalyser\+LabAnalyser'
+          $matlabPackageDir = Join-Path $deployDir '+LabAnalyser'
           if (-not (Test-Path -LiteralPath $matlabPackageDir -PathType Container)) {
             throw "MATLAB package directory is missing: $matlabPackageDir"
           }

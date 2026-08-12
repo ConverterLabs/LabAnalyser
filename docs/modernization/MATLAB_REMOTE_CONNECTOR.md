@@ -47,25 +47,25 @@ root Windows CMake build. It builds `TCPClient.dll`, registers the focused CTest
 and installs the exact MATLAB package file set. `build-msys2.ps1` also builds
 and runs the connector test as part of the established qmake application flow.
 
-For `-Deploy`, the install prefix is `<DeployDir>/LabAnalyser`, producing:
+For `-Deploy`, the install prefix is `<DeployDir>`, producing:
 
 ```text
-LabAnalyser/
-`-- +LabAnalyser/
-    |-- Connect.m
-    |-- Disconnect.m
-    |-- ExReceive.m
-    |-- ExSendDouble.m
-    |-- ExSendString.m
-    |-- Get.m
-    |-- Set.m
-    |-- TCPClient.dll
-    |-- TCPClient.h
-    `-- TestRemote.m
++LabAnalyser/
+|-- Connect.m
+|-- Disconnect.m
+|-- ExReceive.m
+|-- ExSendDouble.m
+|-- ExSendString.m
+|-- Get.m
+|-- Set.m
+|-- TCPClient.dll
+|-- TCPClient.h
+`-- TestRemote.m
 ```
 
-The Windows GitHub workflow checks this exact file set before uploading the
-existing `LabAnalyser-windows-release` artifact. Generated binaries remain
+The Windows GitHub workflow checks this exact file set at artifact path
+`./+LabAnalyser` before uploading the existing `LabAnalyser-windows-release`
+artifact. Generated binaries remain
 ignored and are never committed.
 
 The MATLAB wrappers resolve `TCPClient.dll` and `TCPClient.h` from

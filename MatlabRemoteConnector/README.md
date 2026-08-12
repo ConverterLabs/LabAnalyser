@@ -215,16 +215,17 @@ ctest --test-dir build/matlab-connector --output-on-failure
 Die installierbare MATLAB-Paketstruktur wird so erzeugt:
 
 ```powershell
-cmake --install build/matlab-connector --prefix dist/LabAnalyser
+cmake --install build/matlab-connector --prefix dist/LabAnalyser-release
 ```
 
 Das Ergebnis liegt anschließend unter
-`dist/LabAnalyser/+LabAnalyser`. Die MinGW-Laufzeit wird statisch in
+`dist/LabAnalyser-release/+LabAnalyser`. Die MinGW-Laufzeit wird statisch in
 `TCPClient.dll` gebunden; die DLL benötigt nur Windows-Systembibliotheken.
 
 Der normale Root-Build `build-msys2.ps1` baut und testet den Connector
 ebenfalls. Mit `-Deploy` installiert er das MATLAB-Paket unter
-`<DeployDir>/LabAnalyser/+LabAnalyser`.
+`<DeployDir>/+LabAnalyser`. Im GitHub-Artefakt liegt das Paket dadurch direkt
+unter `./+LabAnalyser`, ohne zusätzlichen Zwischenordner.
 
 ## Aktuelle Einschränkungen und Risiken
 
