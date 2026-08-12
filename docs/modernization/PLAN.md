@@ -910,8 +910,8 @@ the old internal structure.
 ## DropWidget structural modernization package
 
 **Completed locally; remote package checkpoint pending.** The private adapter
-implementation now has shared update, direct-binding and data-access helpers;
-the standard UI-loader map is data-driven; and dynamic table-cell creation is
+implementation now has shared update, direct-binding, context-menu and
+data-access helpers; the standard UI-loader map is data-driven; dynamic table-cell creation is
 isolated from `QTableWidgeD` row lifecycle. The legacy Designer class names,
 Qt metaobjects, UI mapping, XML attributes, signal order and repeated
 connection semantics remain the compatibility boundary. The focused CMake

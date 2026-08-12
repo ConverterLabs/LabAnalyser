@@ -1064,6 +1064,8 @@ fix needs a separately approved ownership/binding change. See
 `DW_001..DW_018` remain the behavior boundary for the Designer-facing adapter
 classes. `DropWidgetUpdate`, `DropWidgetBinding` and `DropWidgetDataAccess`
 now hold shared update, direct signal-binding and value/XML conversion logic;
+`DropWidgetConnectionMenu` retains the observed highlight/remove menu variants
+including the QLineEdit standard-menu and QLed cleanup flags;
 the concrete wrappers retain their names, Qt properties, type admission,
 rounding, direct-connection and repeated-connection behavior. The loader's
 standard adapter mapping is data-driven, but unsupported-widget fallback and

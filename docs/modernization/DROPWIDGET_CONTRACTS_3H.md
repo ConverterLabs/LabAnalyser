@@ -22,6 +22,9 @@ duplicated in each adapter:
   convention;
 - `DropWidgetBinding` centralizes the existing direct request/value signal
   connections without deduplication, name migration or lifetime changes;
+- `DropWidgetConnectionMenu` centralizes the existing highlight/remove menu
+  construction while preserving each adapter's separator, standard-line-edit
+  menu, delete-on-close and dirty-state variants;
 - `DropWidgetDataAccess` centralizes numeric admission and LED bit/XML value
   conversions while each adapter retains its own range, rounding and visual
   behavior;

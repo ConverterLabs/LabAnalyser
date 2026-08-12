@@ -275,7 +275,8 @@ The historical Designer names remain the external `.ui` boundary, but the
 adapter implementations now share three internal mechanisms:
 `DropWidgetUpdate` for existing programmatic signal blocking,
 `DropWidgetBinding` for direct manager signal connections, and
-`DropWidgetDataAccess` for numeric/indicator/XML value conversion. The
+`DropWidgetDataAccess` for numeric/indicator/XML value conversion.
+`DropWidgetConnectionMenu` preserves the historical context-menu variants. The
 data-driven `DropWidgetsUiLoader` maps the same legacy class names and leaves
 the base-loader fallback and PlotWidget branch intact. `DropWidgetTableCells`
 constructs the existing dynamic table cells; `QTableWidgeD` retains row order,
