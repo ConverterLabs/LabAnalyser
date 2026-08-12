@@ -142,6 +142,7 @@ private slots:
     void DM_008_messengerDeviceRegistrationAndOwnership();
     void DM_009_setDataWidgetPropagationAndRequests();
     void DM_010_setOwnershipAndRepeatedDataFlow();
+    void DM_SAFE_001_senderless_and_unknown_setter_slots_are_noops();
     void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
     void DM_REG_002_skipFormFlags_override_and_project_cleanup();
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
@@ -616,6 +617,35 @@ void DataManagementCharacterizationTests::DM_010_setOwnershipAndRepeatedDataFlow
 
     delete owner;
     QVERIFY(messenger.isNull());
+}
+
+void DataManagementCharacterizationTests::DM_SAFE_001_senderless_and_unknown_setter_slots_are_noops()
+{
+    QObject owner;
+    owner.setObjectName("LabAnalyser");
+    DataManagementSetClass manager(&owner);
+    QSignalSpy messages(&manager, &DataManagementClass::MessageSender);
+
+    // The former direct calls dereferenced QObject::sender(); do not execute
+    // that unsafe baseline in-process. The approved contract is a no-op.
+    manager.SendNewValue();
+    manager.UpdateRequest();
+    QCOMPARE(messages.count(), 0);
+
+    ProbeDropWidget unknown;
+    unknown.setObjectName("unknown-widget");
+    QObject::connect(&unknown, &ProbeDropWidget::changed,
+                     &manager, &DataManagementSetClass::SendNewValue);
+    QObject::connect(&unknown, &ProbeDropWidget::requestUpdate,
+                     &manager, qOverload<>(&DataManagementSetClass::UpdateRequest));
+    emit unknown.changed();
+    emit unknown.requestUpdate();
+    QCOMPARE(unknown.getCalls, 0);
+    QCOMPARE(messages.count(), 0);
+
+    manager.SetData(QString());
+    manager.SetData(QString("missing"));
+    QCOMPARE(messages.count(), 0);
 }
 
 void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()

@@ -73,11 +73,17 @@ void DataManagementSetClass::SetData(const QString &ID)
 void DataManagementSetClass::SendNewValue()
 {
     auto SenderOC = QObject::sender();
+    if (!SenderOC)
+        return;
     QString ID = this->GetContainerID(SenderOC);
     if(!ID.size())
         return;
 
-    if(this->GetContainer(ID)->GetType().compare("Data") == 0)
+    ToFormMapper* container = this->GetContainer(ID);
+    if (!container)
+        return;
+
+    if(container->GetType().compare("Data") == 0)
     {
         //Data sould not be changed, request update with original data
         emit MessageSender("get", ID, InterfaceData());
@@ -87,7 +93,7 @@ void DataManagementSetClass::SendNewValue()
     auto DCObj = dynamic_cast<VariantDropWidget*>(SenderOC);
     if(DCObj)
     {
-        DCObj->GetVariantData(this->GetContainer(SenderOC));
+        DCObj->GetVariantData(container);
         emit MessageSender("set", ID, this->GetInterfaceData(SenderOC));
     }
 }
@@ -96,9 +102,12 @@ void DataManagementSetClass::SendNewValue()
 void DataManagementSetClass::UpdateRequest()
 {
     auto SenderOC = QObject::sender();
-    {
-        emit MessageSender("get", this->GetContainerID(SenderOC->objectName()), InterfaceData());
-    }
+    if (!SenderOC)
+        return;
+    const QString ID = this->GetContainerID(SenderOC);
+    if (ID.isEmpty() || !this->GetContainer(ID))
+        return;
+    emit MessageSender("get", ID, InterfaceData());
 }
 
 void DataManagementSetClass::UpdateRequest(QString ID)
