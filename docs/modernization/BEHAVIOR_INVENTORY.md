@@ -1123,6 +1123,10 @@ DataManagement binding/lookup/removal boundaries and a stored null form pointer.
 ChangeMinMaxValue selections as no-ops; `GUI_016` and `GUI_019..021` retain
 the valid action routes.
 
+`DM_SAFE_004` maps DataRegistry boundary inputs: out-of-range form lookups
+return an empty pair, and a numbered plot can be renamed without a numeric
+`#` suffix while retaining its stored number for internal bookkeeping.
+
 Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See

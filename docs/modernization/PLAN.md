@@ -993,3 +993,6 @@ data; valid XY range semantics remain unchanged.
 
 `PLOT_027` rejects PDF export without MainWindow context before opening the
 legacy file dialog.
+
+`DM_SAFE_004` hardens DataRegistry form-index and malformed plot-rename
+boundaries without changing valid form or numbered-plot behavior.

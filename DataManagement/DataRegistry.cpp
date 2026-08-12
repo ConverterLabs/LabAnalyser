@@ -50,9 +50,12 @@ void DataRegistry::RenamePlotPointer(QString oldId, QString newId)
             int number = PlotObjectsNumber[oldId];
             PlotObjectsNumber.erase(itNumber);
             auto numberVectorIt = std::find(PlotObjectsNumbers.begin(), PlotObjectsNumbers.end(), number);
-            PlotObjectsNumbers.erase(numberVectorIt);
+            if (numberVectorIt != PlotObjectsNumbers.end())
+                PlotObjectsNumbers.erase(numberVectorIt);
 
-            number = newId.split("#").at(1).toInt() - 1;
+            const QStringList nameParts = newId.split("#");
+            if (nameParts.size() > 1)
+                number = nameParts.at(1).toInt() - 1;
             AddPlotPointer(newId, data, number);
         } else {
             AddPlotPointer(newId, data);
@@ -71,7 +74,8 @@ void DataRegistry::DeletePlotPointer(QString id)
         auto number = PlotObjectsNumber[id];
         PlotObjectsNumber.erase(itNumber);
         auto numberVectorIt = std::find(PlotObjectsNumbers.begin(), PlotObjectsNumbers.end(), number);
-        PlotObjectsNumbers.erase(numberVectorIt);
+        if (numberVectorIt != PlotObjectsNumbers.end())
+            PlotObjectsNumbers.erase(numberVectorIt);
     }
 }
 
@@ -170,6 +174,8 @@ int DataRegistry::GetFormFileCount() const
 
 std::pair<QString, QString> DataRegistry::GetFormFileEntry(int index) const
 {
+    if (index < 0 || index >= static_cast<int>(FormFiles.size()))
+        return std::pair<QString, QString>();
     return FormFiles[index];
 }
 

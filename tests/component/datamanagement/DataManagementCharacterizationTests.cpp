@@ -145,6 +145,7 @@ private slots:
     void DM_SAFE_001_senderless_and_unknown_setter_slots_are_noops();
     void DM_SAFE_002_messenger_without_optional_parent_boundaries_is_safe();
     void DM_SAFE_003_null_widget_boundaries_do_not_create_or_dereference_bindings();
+    void DM_SAFE_004_registry_boundary_inputs_are_safe();
     void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
     void DM_REG_002_skipFormFlags_override_and_project_cleanup();
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
@@ -715,6 +716,26 @@ void DataManagementCharacterizationTests::DM_SAFE_003_null_widget_boundaries_do_
 
     manager.SetData(QString("parameter"));
     QCOMPARE(manager.GetContainerCount(), beforeContainers);
+}
+
+void DataManagementCharacterizationTests::DM_SAFE_004_registry_boundary_inputs_are_safe()
+{
+    QObject owner;
+    DataManagementClass manager(&owner);
+    const std::pair<QString, QString> emptyEntry;
+
+    QCOMPARE(manager.GetFormFileEntry(-1), emptyEntry);
+    QCOMPARE(manager.GetFormFileEntry(0), emptyEntry);
+    manager.AddFormFile({"form", "form.ui"});
+    QCOMPARE(manager.GetFormFileEntry(1), emptyEntry);
+
+    QObject plot;
+    plot.setObjectName("plot-object");
+    manager.AddPlotPointer("plot#8", &plot, 7);
+    manager.RenamePlotPointer("plot#8", "renamed-plot");
+    QCOMPARE(manager.GetPlotByName("plot-object"), &plot);
+    manager.DeletePlotPointer("renamed-plot");
+    QCOMPARE(manager.PlotCount(), 0);
 }
 
 void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()
