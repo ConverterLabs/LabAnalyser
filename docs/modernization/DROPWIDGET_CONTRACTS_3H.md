@@ -339,3 +339,15 @@ foreign drag event. Qt does not expose a controllable `QDropEvent::source()`
 for a real tree drag without initiating interactive drag execution, so the
 source-dependent handler branch is protected by the direct null guards and is
 not represented as a synthetic mouse gesture contract.
+
+### Line-edit drop validation hardening (2026-08-12)
+
+Baseline `DW_026` showed that `QLineEditD::dropEvent()` called the wildcard
+connection reset before checking its source: a constructed foreign drop then
+silently removed the existing `editingFinished()` to manager `set` route. The
+approved safety fix validates the tree source, MainWindow, ID lookup and
+admitted scalar/string mapper type before the first reset. A rejected drop now
+preserves the original tooltip, manager binding and exactly one subsequent
+`set` emission. The existing valid-leaf rebinding order and its historical
+multi-leaf iteration are retained; no interactive drag execution or MIME
+format is changed.

@@ -365,6 +365,9 @@ affected operations are no-ops. It deliberately does not change stale-binding,
 object-name migration, locale or dynamic table-cell ownership semantics.
 The subsequent list/table guard treats a missing `ToFormMapper` as a rejected
 drag target without changing valid ID binding or table-row behavior.
+`QLineEditD` now also validates a drop source, manager lookup and admitted type
+before replacing an existing binding; rejected drops preserve the previous
+manager `set` route (`DW_026`).
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

@@ -245,6 +245,11 @@ no mapper means no acceptance or target mutation. The existing valid tree-drop
 and dynamic-cell contracts remain unchanged; the unavailable synthetic
 `QDropEvent::source()` branch is not claimed as a full drag-execution test.
 
+`DW_026` records the repaired `QLineEditD` invalid-drop boundary: a foreign
+source no longer disconnects an existing manager `set` route. Source, manager,
+mapper and type are validated before rebinding; valid drag execution remains
+covered only by the established integration paths.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

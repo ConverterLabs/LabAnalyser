@@ -3,6 +3,7 @@
 #include <QPointer>
 #include <QFile>
 #include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QAction>
 #include <QImage>
 #include <QTimer>
@@ -61,6 +62,7 @@ private slots:
     void DW_022_unbound_button_timeout_is_safe_noop();
     void DW_023_remove_connection_preserves_widget_resets();
     void DW_025_missing_container_lookup_leaves_drop_targets_unchanged();
+    void DW_026_invalid_lineedit_drop_preserves_existing_binding();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -253,6 +255,40 @@ void DropWidgetAdapterTests::DW_025_missing_container_lookup_leaves_drop_targets
     QCOMPARE(list.model->stringList(), QStringList({"existing"}));
     QCOMPARE(table.rowCount(), 1);
     QCOMPARE(table.columnCount(), 1);
+}
+
+void DropWidgetAdapterTests::DW_026_invalid_lineedit_drop_preserves_existing_binding()
+{
+    const QString id("DW26::value");
+    auto* manager = GetMainWindow()->GetLogic();
+    manager->AddContainerElement(id, "QString", "Parameter", "");
+    manager->GetContainer(id)->SetData(QString("baseline"));
+
+    QLineEditD line;
+    line.setObjectName("dw26Line");
+    manager->AddElementToContainerEntry(line.objectName(), id, line.metaObject()->className(), &line);
+    line.ConnectToID(manager, id);
+
+    QSignalSpy sent(manager, &DataManagementClass::MessageSender);
+    line.setText("before-invalid-drop");
+    emit line.editingFinished();
+    QCOMPARE(sent.count(), 1);
+    QCOMPARE(sent.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(sent.at(0).at(1).toString(), id);
+    sent.clear();
+
+    QMimeData foreign;
+    QDropEvent invalidDrop(QPointF(1, 1), Qt::CopyAction, &foreign,
+                           Qt::LeftButton, Qt::NoModifier);
+    line.dropEvent(&invalidDrop);
+
+    QCOMPARE(line.toolTip(), id);
+    line.setText("after-invalid-drop");
+    emit line.editingFinished();
+    QCOMPARE(sent.count(), 1);
+    QCOMPARE(sent.at(0).at(0).toString(), QString("set"));
+    QCOMPARE(sent.at(0).at(1).toString(), id);
+    QCOMPARE(sent.at(0).at(2).value<InterfaceData>().GetString(), QString("after-invalid-drop"));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

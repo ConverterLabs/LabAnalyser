@@ -76,13 +76,15 @@ void QLineEditD::dragMoveEvent(QDragMoveEvent *de)
 
 void QLineEditD::dropEvent(QDropEvent *event)
 {
-    DropWidgetDropBinding::ResetConnections(this);
-
-
     QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
     if(!treeWidget)
         return;
     QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
+    MainWindow *MW = GetMainWindow();
+    if (!MW)
+        return;
+
+    bool rebound = false;
 
     for(auto si : selectedItems)
     {
@@ -91,14 +93,19 @@ void QLineEditD::dropEvent(QDropEvent *event)
             for( int col = 0; col < 1; ++col )
             {
                 QString ToolTip = DropWidgetTreePath::IdForItem(si, col);
+               ToFormMapper* container = MW->GetLogic()->GetContainer(ToolTip);
+               if (!container || !(container->IsFloatingPointNumber() || container->IsUnsigedNumber()
+                                   || container->IsSigedNumber() || container->IsString()))
+                   continue;
+
+               if (!rebound)
+               {
+                   DropWidgetDropBinding::ResetConnections(this);
+                   rebound = true;
+               }
                this->setToolTip(ToolTip);
                this->setToolTipDuration(2000);
 
-
-
-               MainWindow *MW = GetMainWindow();
-               if (!MW)
-                   return;
                MW->GetLogic()->DeleteEntryOfObject(this);
                MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ToolTip,this->metaObject()->className(),this);
                MW->ChangeForSaveDetected = true;
