@@ -22,6 +22,7 @@
 #include "QLabel.h"
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
+#include "DropWidgetDragSource.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -41,14 +42,10 @@ void QLabelD::dragMoveEvent(QDragMoveEvent *de)
 
 void QLabelD::dragEnterEvent(QDragEnterEvent *event)
 {
-    QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
-    if(!treeWidget)
+    if (!DropWidgetDragSource::HasFirstSelectedLeaf(event->source()))
         return;
-    QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
 
-    //event->acceptProposedAction();
-    if (selectedItems[0]->childCount() == 0)
-        event->acceptProposedAction();
+    event->acceptProposedAction();
 }
 
 void QLabelD::contextMenu(QPoint pos)

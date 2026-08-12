@@ -23,6 +23,7 @@
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
+#include "DropWidgetDragSource.h"
 #include "../mainwindow.h"
 
 
@@ -37,22 +38,16 @@ QPushButtonD::QPushButtonD(QWidget *parent) : QPushButton(parent)
 
 void QPushButtonD::dragEnterEvent(QDragEnterEvent *event)
 {
-    QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
-    if(!treeWidget)
+    if (!DropWidgetDragSource::HasFirstSelectedLeaf(event->source()))
         return;
 
-    QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
-
-    if (selectedItems[0]->childCount() == 0)
-    {
-        QString ID = CreateID(event->source());
-        QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetType();
-        QString DataType = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
-        if(Type.compare("State")==0)
-            event->acceptProposedAction();
-        if(Type.compare("Parameter")==0 && (GetMainWindow()->GetLogic()->GetContainer(ID)->IsBool() || GetMainWindow()->GetLogic()->GetContainer(ID)->IsUnsigedNumber()))
-            event->acceptProposedAction();
-    }
+    ToFormMapper* container = GetMainWindow()->GetLogic()->GetContainer(CreateID(event->source()));
+    if (!container)
+        return;
+    if (container->GetType().compare("State") == 0
+            || (container->GetType().compare("Parameter") == 0
+                && (container->IsBool() || container->IsUnsigedNumber())))
+        event->acceptProposedAction();
 }
 
 void QPushButtonD::dragMoveEvent(QDragMoveEvent *de)

@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
+#include "DropWidgetDragSource.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
 
@@ -59,20 +60,12 @@ void QLCDNumberD::RemoveConnection()
 
 void QLCDNumberD::dragEnterEvent(QDragEnterEvent *event)
 {
-    QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
-    if(!treeWidget)
+    if (!DropWidgetDragSource::HasFirstSelectedLeaf(event->source()))
         return;
-    QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
 
-    if (selectedItems[0]->childCount() == 0)
-    {
-        QString ID = CreateID(event->source());
-        QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
-        if(GetMainWindow()->GetLogic()->GetContainer(ID)->IsFloatingPointNumber()||
-           GetMainWindow()->GetLogic()->GetContainer(ID)->IsUnsigedNumber()||
-           GetMainWindow()->GetLogic()->GetContainer(ID)->IsSigedNumber())
-            event->acceptProposedAction();
-    }
+    ToFormMapper* container = GetMainWindow()->GetLogic()->GetContainer(CreateID(event->source()));
+    if (container && (container->IsFloatingPointNumber() || container->IsUnsigedNumber() || container->IsSigedNumber()))
+        event->acceptProposedAction();
 }
 
 void QLCDNumberD::dropEvent(QDropEvent *event)

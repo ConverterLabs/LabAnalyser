@@ -7,6 +7,7 @@
 #include <QImage>
 #include <QTimer>
 #include "DropWidgets/CreateID.h"
+#include "DropWidgets/DropWidgetDragSource.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
 #include "TreeWidgetCustomDrop.h"
 #include "DropWidgets/QBLed.h"
@@ -51,6 +52,7 @@ private slots:
     void DW_016_data_driven_adapter_signals_ranges_and_values();
     void DW_017_isolated_xml_properties_and_list_mutation();
     void DW_018_equal_slider_bounds_preserve_value();
+    void DW_019_drag_source_rejects_empty_and_nonleaf_selection();
 };
 
 class ExposedTreeWidget : public TreeWidgetCustomDrop
@@ -101,6 +103,24 @@ void DropWidgetAdapterTests::DW_001_construction_parenting_and_defaults()
     QPointer<QLineEditD> owned;
     { QWidget owner; owned = new QLineEditD(&owner); QVERIFY(owned); }
     QVERIFY(owned.isNull());
+}
+
+void DropWidgetAdapterTests::DW_019_drag_source_rejects_empty_and_nonleaf_selection()
+{
+    QWidget foreignSource;
+    QVERIFY(!DropWidgetDragSource::HasFirstSelectedLeaf(&foreignSource));
+
+    QTreeWidget tree;
+    QTreeWidgetItem root(&tree, QStringList("root"));
+    QTreeWidgetItem leaf(&root, QStringList("leaf"));
+    QVERIFY(!DropWidgetDragSource::HasFirstSelectedLeaf(&tree));
+
+    root.setSelected(true);
+    QVERIFY(!DropWidgetDragSource::HasFirstSelectedLeaf(&tree));
+
+    root.setSelected(false);
+    leaf.setSelected(true);
+    QVERIFY(DropWidgetDragSource::HasFirstSelectedLeaf(&tree));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

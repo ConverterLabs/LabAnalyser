@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
+#include "DropWidgetDragSource.h"
 #include "DropWidgetIndicatorBinding.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
@@ -46,19 +47,12 @@ void QTSLed::dragMoveEvent(QDragMoveEvent *de)
 
 void QTSLed::dragEnterEvent(QDragEnterEvent *event)
 {
-    QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
-    if(!treeWidget)
+    if (!DropWidgetDragSource::HasFirstSelectedLeaf(event->source()))
         return;
-    QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
 
-    if (selectedItems[0]->childCount() == 0)
-    {
-        QString ID = CreateID(event->source());
-        QString Type = GetMainWindow()->GetLogic()->GetContainer(ID)->GetDataType();
-        if(GetMainWindow()->GetLogic()->GetContainer(ID)->IsBool() ||
-           GetMainWindow()->GetLogic()->GetContainer(ID)->IsUnsigedNumber())
-            event->acceptProposedAction();
-    }
+    ToFormMapper* container = GetMainWindow()->GetLogic()->GetContainer(CreateID(event->source()));
+    if (container && (container->IsBool() || container->IsUnsigedNumber()))
+        event->acceptProposedAction();
 }
 
 
