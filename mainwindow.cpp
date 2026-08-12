@@ -777,22 +777,7 @@ void MainWindow::on_ParameterTreeWidget_customContextMenuRequested(const QPoint 
 
 void MainWindow::on_StateTreeWidget_customContextMenuRequested(const QPoint &pos)
 {
-    //Add a Min Max Context Menu when an element without childs is selected
-    //the tree repesents always the ID e.g ID Parameter::One --> Parameter -> one
-    QList<QTreeWidgetItem*> selectedItems = ui->StateTreeWidget->selectedItems();
-    if(selectedItems.size() == 1)
-    {
-      if(!(selectedItems[0]->parent()))
-        {
-          //this is top level, we can remove the device here
-            QMenu *menu = new QMenu(this);
-            menu->setObjectName(selectedItems[0]->text(0));
-
-            menu->setAttribute(Qt::WA_DeleteOnClose);
-            menu->addAction("Remove Device", this, SLOT(RemoveDevice()));
-            menu->popup(ui->StateDock->mapToGlobal(pos));
-        }
-    }
+    MainWindowContextMenus::ShowState(*ui->StateTreeWidget, *ui->StateDock, pos, *this, this);
 }
 
 void MainWindow::on_actionAbout_LabAnalyzer_triggered()
