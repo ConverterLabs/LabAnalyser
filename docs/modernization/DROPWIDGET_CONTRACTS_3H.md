@@ -243,3 +243,11 @@ This does not add connection deduplication, name migration or QObject lifetime
 handling. The affected offscreen CMake checkpoint passed
 `DropWidgetAdapterTests`, `MainWindowIntegrationTests` and the full XML suite
 (3/3); all protected legacy fixture hashes and `-text` EOL states matched.
+
+The three duplicated LED `dropEvent` implementations (`QBLed`, `QLed`,
+`QTSLed`) now delegate to private `DropWidgetIndicatorBinding`. It preserves
+the legacy transaction order: disconnect/reconnect, ID/type lookup, bool reset
+or unsigned bit dialog/counter update, initial state, tooltip, manager entry
+and dirty flag. The source-backed drag/drop path remains excluded from
+in-process characterization; existing adapter, MainWindow and XML contracts
+are the preservation evidence.

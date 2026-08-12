@@ -1086,3 +1086,7 @@ bindings now also use those same internal helpers. Their observed ordering,
 separator placement, direct-connection mode and repeated-connection behavior
 remain unchanged; raw stale-binding, source-backed drag/drop and visual paths
 remain explicit exclusions.
+
+`QBLed`, `QLed` and `QTSLed` now share their previously triplicated drop
+transaction through `DropWidgetIndicatorBinding`, while retaining the
+per-adapter indicator, static bit counter and legacy dialog/manager sequence.

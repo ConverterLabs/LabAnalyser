@@ -282,3 +282,9 @@ the base-loader fallback and PlotWidget branch intact. `DropWidgetTableCells`
 constructs the existing dynamic table cells; `QTableWidgeD` retains row order,
 manager lifecycle and removal behavior. These are private implementation
 boundaries, not new UI or ABI contracts.
+
+`DropWidgetIndicatorBinding` additionally owns the shared legacy LED drop
+transaction for `QBLed`, `QLed` and `QTSLed`: reconnect, ID lookup, bool/bit
+selection, tooltip and manager registration. Each concrete class retains its
+indicator type and static bit counter; no manager, dialog or ownership policy
+changed.

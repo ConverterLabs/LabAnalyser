@@ -937,3 +937,9 @@ CMake DropWidget/MainWindow/XML checkpoint (3/3). This remains a structural
 preservation step: no Designer name, UI/XML contract, public adapter API or
 Qt metaobject surface changed. The listed unsafe and interactive exclusions
 remain future hardening work.
+
+The repeated LED drop transaction was subsequently isolated in private
+`DropWidgetIndicatorBinding`; its concrete `QBLed`, `QLed` and `QTSLed`
+wrappers retain the existing manager lookup, bit-dialog, tooltip and mapping
+sequence. This is not a drag/drop behavior change; the source-backed event
+path remains an explicit contract gap.
