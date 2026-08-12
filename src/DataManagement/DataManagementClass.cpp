@@ -199,6 +199,14 @@ ToFormMapper* DataManagementClass::GetContainer(QString ContainerID)
     return Containers->Find(ContainerID);
 }
 
+QStringList DataManagementClass::GetContainerIDs() const
+{
+    QStringList ids;
+    for (const auto& kv : Containers->Map())
+        ids.append(kv.first);
+    return ids;
+}
+
 InterfaceData DataManagementClass::GetInterfaceData(QObject* Object)
 {
     if (!Object)

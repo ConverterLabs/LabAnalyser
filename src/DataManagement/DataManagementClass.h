@@ -22,6 +22,7 @@
 #ifndef DataManagementClass_H
 #define DataManagementClass_H
 #include <QMainWindow>
+#include <QStringList>
 #include <map>
 #include <memory>
 #include "mapper.h"
@@ -181,6 +182,11 @@ public:
         @return data container
     */
     ToFormMapper* GetContainer(QString);
+
+    /** Returns all registered container IDs.
+     *  Used to refresh explorer trees after a dock becomes visible.
+     */
+    QStringList GetContainerIDs() const;
 
     /** Returns the i-th unique identifier and all names of the therewith connected widgets
      *  @param  number of container index

@@ -181,6 +181,38 @@ MainWindow::MainWindow(QWidget *parent) :
     TreeViewState.reset(new MainWindowTreeViewState(ui->ParameterTreeWidget, ui->DataTreeWidget,
         ui->StateTreeWidget, ui->ParameterDock, ui->DataDock, ui->StateDock));
 
+    // Batch-update timer: drain pending tree value updates at most every 200 ms
+    // so that high-frequency plugin data does not saturate the GUI thread.
+    UpdateBatchTimer.setInterval(200);
+    UpdateBatchTimer.setSingleShot(false);
+    connect(&UpdateBatchTimer, &QTimer::timeout, this, &MainWindow::FlushPendingUpdates);
+    UpdateBatchTimer.start();
+
+    // When a hidden dock tab becomes visible again, refresh all its entries so
+    // that values updated while it was invisible are shown immediately.
+    connect(ui->ParameterDock, &QDockWidget::visibilityChanged, this, [this](bool visible) {
+        if (!visible)
+            return;
+        const QStringList ids = GetLogic()->GetContainerIDs();
+        for (const QString& id : ids) {
+            ToFormMapper* c = GetLogic()->GetContainer(id);
+            if (c && c->GetType().compare("Parameter") == 0)
+                MainWindowTreeModel::AddElement(ui->ParameterTreeWidget, id.split("::"), *c, &ParameterIndex);
+        }
+        PendingParameterUpdates.clear();
+    });
+    connect(ui->DataDock, &QDockWidget::visibilityChanged, this, [this](bool visible) {
+        if (!visible)
+            return;
+        const QStringList ids = GetLogic()->GetContainerIDs();
+        for (const QString& id : ids) {
+            ToFormMapper* c = GetLogic()->GetContainer(id);
+            if (c && c->GetType().compare("Data") == 0)
+                MainWindowTreeModel::AddElement(ui->DataTreeWidget, id.split("::"), *c, &DataIndex);
+        }
+        PendingDataUpdates.clear();
+    });
+
     ParseInputArguments();
 
 }
@@ -435,20 +467,24 @@ void MainWindow::on_actionLoadPlugin_triggered()
  void MainWindow::AddElementToWidget(QString ID, InterfaceData Data)
  {
     QTreeWidget *SelTreeWidget = nullptr;
+    MainWindowTreeModel::ItemIndex* index = nullptr;
 
     if(Data.GetType().compare("Parameter")==0)
     {
         SelTreeWidget = ui->ParameterTreeWidget;
+        index = &ParameterIndex;
     }
     else if(Data.GetType().compare("Data")==0)
     {
         SelTreeWidget = ui->DataTreeWidget;
+        index = &DataIndex;
     }
     else if(Data.GetType().compare("State")==0)
     {
         SelTreeWidget = ui->StateTreeWidget;
+        // State tree has no index (not in the hot update path)
     }
-    MainWindowTreeModel::AddElement(SelTreeWidget, ID.split("::"), Data);
+    MainWindowTreeModel::AddElement(SelTreeWidget, ID.split("::"), Data, index);
  }
 
  void MainWindow::UpdateElementValue(QString ID)
@@ -456,10 +492,44 @@ void MainWindow::on_actionLoadPlugin_triggered()
    ToFormMapper* container = GetLogic()->GetContainer(ID);
    if (!container)
        return;
-   if (container->GetType().compare("Parameter") != 0
-           && container->GetType().compare("Data") != 0)
+   const QString& type = container->GetType();
+   if (type.compare("Parameter") == 0) {
+       if (!ui->ParameterDock->isVisible()) {
+           PendingParameterUpdates.insert(ID);
+           return;
+       }
+   } else if (type.compare("Data") == 0) {
+       if (!ui->DataDock->isVisible()) {
+           PendingDataUpdates.insert(ID);
+           return;
+       }
+   } else {
        return;
-   AddElementToWidget(ID, *container);
+   }
+   // Dock is visible — enqueue for the next batch tick rather than writing
+   // synchronously so that many updates arriving within 200 ms are coalesced.
+   if (type.compare("Parameter") == 0)
+       PendingParameterUpdates.insert(ID);
+   else
+       PendingDataUpdates.insert(ID);
+ }
+
+ void MainWindow::FlushPendingUpdates()
+ {
+    auto flush = [&](QSet<QString>& pending, QTreeWidget* tree, MainWindowTreeModel::ItemIndex* index) {
+        if (pending.isEmpty() || !tree->isVisible())
+            return;
+        tree->setUpdatesEnabled(false);
+        for (const QString& id : pending) {
+            ToFormMapper* c = GetLogic()->GetContainer(id);
+            if (c)
+                MainWindowTreeModel::AddElement(tree, id.split("::"), *c, index);
+        }
+        pending.clear();
+        tree->setUpdatesEnabled(true);
+    };
+    flush(PendingParameterUpdates, ui->ParameterTreeWidget, &ParameterIndex);
+    flush(PendingDataUpdates, ui->DataTreeWidget, &DataIndex);
  }
 
  void MainWindow::PublishStart()
@@ -474,8 +544,12 @@ void MainWindow::on_actionLoadPlugin_triggered()
 
  void MainWindow::RemoveElementFromWidget(QString ID)
  {
+    PendingParameterUpdates.remove(ID);
+    PendingDataUpdates.remove(ID);
     MainWindowTreeModel::RemoveElement({ui->ParameterTreeWidget, ui->DataTreeWidget,
-                                        ui->StateTreeWidget}, ID.split("::"));
+                                        ui->StateTreeWidget},
+                                       ID.split("::"),
+                                       {&ParameterIndex, &DataIndex, nullptr});
  }
 
 void MainWindow::on_actionSave_Experiment_triggered()
@@ -510,6 +584,12 @@ void MainWindow::CloseProject(void)
 
     MainWindowProjectCleanup::Close(*this, *GetLogic(), *ui->ParameterTreeWidget,
                                     *ui->DataTreeWidget, *ui->StateTreeWidget);
+    // Clear the O(1) lookup indices so they don't hold stale pointers after
+    // the tree items have been deleted by Close.
+    ParameterIndex.clear();
+    DataIndex.clear();
+    PendingParameterUpdates.clear();
+    PendingDataUpdates.clear();
 }
 
 void MainWindow::on_Close_Project_triggered()

@@ -21,12 +21,16 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QHash>
+#include <QSet>
+#include <QTimer>
 #include <memory>
 #include "DataManagement/mapper.h"
 #include "plugins/platforminterface.h"
 #include "UIFunctions/SubPlotMainWindow.h"
 #include "RemoteControl/RemoteControlServer.h"
 #include "DataManagement/UIDataManagementSetClass.h"
+#include "UIFunctions/MainWindowTreeModel.h"
 #include "ui_About.h"
 #include <QAction>
 
@@ -154,6 +158,9 @@ private:
     void ParseInputArguments();
     Ui::MainWindow *ui;
     void RemoveElementFromWidget(QString ID);
+    // Flush pending update IDs for one tree to the widget.
+    void FlushPendingUpdates();
+
     int SubPlotWindowCount = 0;
     RemoteControlServer *Remote = NULL;
     QSystemTrayIcon* icon;
@@ -162,5 +169,17 @@ private:
     std::unique_ptr<MainWindowOutputLog> OutputLog;
     std::unique_ptr<MainWindowTreeViewState> TreeViewState;
     bool isloading = false;
+
+    // O(1) lookup indices: one per tree, keyed by full "::"-joined path.
+    MainWindowTreeModel::ItemIndex ParameterIndex;
+    MainWindowTreeModel::ItemIndex DataIndex;
+
+    // IDs whose tree-value column must be refreshed on the next timer tick.
+    QSet<QString> PendingParameterUpdates;
+    QSet<QString> PendingDataUpdates;
+
+    // Timer that drains the pending-update queues at ~200 ms intervals so we
+    // never repaint the tree more than 5 times per second during fast streams.
+    QTimer UpdateBatchTimer;
 
 };

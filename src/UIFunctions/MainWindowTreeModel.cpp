@@ -26,6 +26,8 @@ private:
     }
 };
 
+// Slow linear path used only by Highlight and the index-free RemoveElement
+// fallback (both are rare operations).
 QTreeWidgetItem* FindPath(QTreeWidget* tree, const QStringList& parts, QTreeWidgetItem** parent)
 {
     QTreeWidgetItem* current = nullptr;
@@ -59,13 +61,29 @@ QTreeWidgetItem* FindPath(QTreeWidget* tree, const QStringList& parts, QTreeWidg
 
 } // namespace
 
-void MainWindowTreeModel::AddElement(QTreeWidget* tree, const QStringList& parts, InterfaceData data)
+void MainWindowTreeModel::AddElement(QTreeWidget* tree, const QStringList& parts, InterfaceData data,
+                                     ItemIndex* index)
 {
     if (!tree)
         return;
+
+    const QString key = parts.join("::");
+
+    // Fast path: leaf already exists — just update the value columns.
+    if (index) {
+        auto it = index->find(key);
+        if (it != index->end()) {
+            it.value()->setText(1, data.GetString());
+            it.value()->setText(2, data.GetDataType());
+            it.value()->setText(3, data.GetStateDependency());
+            return;
+        }
+    }
+
+    // Slow path: build any missing intermediate nodes and the leaf.
     MainWindowTreeItem* current = nullptr;
-    for (int index = 0; index < parts.size(); ++index) {
-        const QString& part = parts.at(index);
+    for (int idx = 0; idx < parts.size(); ++idx) {
+        const QString& part = parts.at(idx);
         if (!current) {
             for (int i = 0; i < tree->topLevelItemCount(); ++i) {
                 QTreeWidgetItem* item = tree->topLevelItem(i);
@@ -93,23 +111,45 @@ void MainWindowTreeModel::AddElement(QTreeWidget* tree, const QStringList& parts
             current->addChild(child);
             current = child;
         }
-        if (index == parts.size() - 1) {
+        if (idx == parts.size() - 1) {
             current->setText(1, data.GetString());
             current->setText(2, data.GetDataType());
             current->setText(3, data.GetStateDependency());
+            if (index)
+                index->insert(key, current);
         }
     }
 }
 
-void MainWindowTreeModel::RemoveElement(const QList<QTreeWidget*>& trees, const QStringList& parts)
+void MainWindowTreeModel::RemoveElement(const QList<QTreeWidget*>& trees, const QStringList& parts,
+                                        const QList<ItemIndex*>& indices)
 {
-    for (QTreeWidget* tree : trees) {
+    const QString key = parts.join("::");
+    for (int t = 0; t < trees.size(); ++t) {
+        QTreeWidget* tree = trees.at(t);
         if (!tree)
             continue;
-        QTreeWidgetItem* parent = nullptr;
-        QTreeWidgetItem* current = FindPath(tree, parts, &parent);
-        if (!current)
+        ItemIndex* index = (t < indices.size()) ? indices.at(t) : nullptr;
+
+        QTreeWidgetItem* current = nullptr;
+        if (index) {
+            current = index->value(key, nullptr);
+            index->remove(key);
+        }
+        if (!current) {
+            QTreeWidgetItem* parent = nullptr;
+            current = FindPath(tree, parts, &parent);
+            if (!current)
+                continue;
+            if (parent)
+                parent->removeChild(current);
+            else
+                tree->removeItemWidget(current, 0);
+            delete current;
             continue;
+        }
+
+        QTreeWidgetItem* parent = current->parent();
         if (parent)
             parent->removeChild(current);
         else
