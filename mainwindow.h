@@ -67,6 +67,7 @@ class MainWindow;
 
 class QSimpleUpdater;
 class MainWindowOutputLog;
+class MainWindowTreeViewState;
 
 
 class MainWindow : public QMainWindow
@@ -174,6 +175,7 @@ private:
     QAction* restore;
     UIDataManagementSetClass *ExtendedDataManagement;
     std::unique_ptr<MainWindowOutputLog> OutputLog;
+    std::unique_ptr<MainWindowTreeViewState> TreeViewState;
     bool isloading = false;
 
 };

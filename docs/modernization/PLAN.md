@@ -1025,3 +1025,7 @@ Error/Notification dock-raise behavior are preserved by GUI_013 and GUI_018.
 `MainWindowTreePath` now centralizes the unchanged `::` ID derivation used by
 data context actions, Min/Max editing and export selection traversal. It is a
 private value helper; tree ownership and manager lookups remain in MainWindow.
+
+`GUI_022` characterizes `PublishStart`/`PublishFinished`; the private
+`MainWindowTreeViewState` now owns only this batch tree presentation work. It
+retains the existing Parameter/Data sorting asymmetry relative to State.

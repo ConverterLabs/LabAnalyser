@@ -603,6 +603,12 @@ lifecycle/action routing is covered, but PlotWidget data, FFT calculations,
 curves, interaction and rendering are deferred to 3J. No production source was
 changed in phase 3I.
 
+`GUI_022` subsequently records the current publish-view state transition:
+all three explorer trees disable updates and sorting at start; all re-enable
+updates at finish, while only Parameter and Data resume sorting. This is now
+implemented through the private non-owning `MainWindowTreeViewState` helper;
+tree ownership and data-manager semantics remain in `MainWindow`.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target

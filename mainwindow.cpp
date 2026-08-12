@@ -29,6 +29,7 @@
 #include "UIFunctions/SubPlotMainWindow.h"
 #include "UIFunctions/MainWindowOutputLog.h"
 #include "UIFunctions/MainWindowTreePath.h"
+#include "UIFunctions/MainWindowTreeViewState.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -159,6 +160,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->OutputText->setWordWrapMode(QTextOption::WrapAnywhere);
     ui->OutputText->setMaximumBlockCount(100);
     OutputLog.reset(new MainWindowOutputLog(ui->OutputText, ui->OutputDock));
+    TreeViewState.reset(new MainWindowTreeViewState(ui->ParameterTreeWidget, ui->DataTreeWidget,
+        ui->StateTreeWidget, ui->ParameterDock, ui->DataDock, ui->StateDock));
 
     ParseInputArguments();
 
@@ -403,6 +406,7 @@ void MainWindow::closeEvent ( QCloseEvent * event )
 MainWindow::~MainWindow()
 {
     delete Remote;
+    TreeViewState.reset();
     OutputLog.reset();
     delete ui;
 }
@@ -773,51 +777,12 @@ void MainWindow::on_actionLoadPlugin_triggered()
 
  void MainWindow::PublishStart()
  {
-     ui->ParameterTreeWidget->setUpdatesEnabled( false );
-     ui->ParameterTreeWidget->setSortingEnabled(false);
-
-     ui->DataTreeWidget->setUpdatesEnabled( false );
-     ui->DataTreeWidget->setSortingEnabled(false);
-
-     ui->StateTreeWidget->setUpdatesEnabled( false );
-     ui->StateTreeWidget->setSortingEnabled(false);
-
-
+     TreeViewState->BeginPublish();
  }
 
  void MainWindow::PublishFinished()
  {
-     QTreeWidget *SelTreeWidget = NULL;
-     ui->ParameterTreeWidget->setUpdatesEnabled( true );
-     ui->DataTreeWidget->setUpdatesEnabled( true );
-     ui->StateTreeWidget->setUpdatesEnabled( true );
-
-
-    SelTreeWidget = ui->ParameterTreeWidget;
-    int Width = ui->ParameterDock->width();
-    SelTreeWidget->setColumnWidth(0,Width*0.6);
-    SelTreeWidget->setColumnWidth(1,Width*0.2);
-    SelTreeWidget->setColumnWidth(2,Width*0.1);
-    SelTreeWidget->sortByColumn(0, Qt::AscendingOrder);
-    SelTreeWidget->setSortingEnabled(true);
-
-    SelTreeWidget = ui->DataTreeWidget;
-    Width = ui->DataDock->width();
-    SelTreeWidget->setColumnWidth(0,Width*0.6);
-    SelTreeWidget->setColumnWidth(1,Width*0.2);
-    SelTreeWidget->setColumnWidth(2,Width*0.1);
-    SelTreeWidget->sortByColumn(0, Qt::AscendingOrder);
-    SelTreeWidget->setSortingEnabled(true);
-
-    SelTreeWidget = ui->StateTreeWidget;
-    Width = ui->StateDock->width();
-    SelTreeWidget->setColumnWidth(0,Width*0.6);
-    SelTreeWidget->setColumnWidth(1,Width*0.2);
-    SelTreeWidget->setColumnWidth(2,Width*0.1);
-    SelTreeWidget->sortByColumn(0, Qt::AscendingOrder);
-
-
-
+     TreeViewState->EndPublish();
  }
 
  void MainWindow::RemoveElementFromWidget(QString ID)

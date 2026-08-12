@@ -281,6 +281,11 @@ the widgets nor application state.
 preserves the historical leaf-to-root `::` ID representation used by MainWindow
 tree actions. It owns no tree item, selection, manager or GUI state.
 
+`UIFunctions/MainWindowTreeViewState` isolates the batch-publish presentation
+state for the three explorer trees. It remains non-owning and preserves the
+historic asymmetry: Parameter and Data are re-sorted at publish end, while
+State only receives column sizing and update re-enablement.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

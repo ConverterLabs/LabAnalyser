@@ -78,6 +78,7 @@ private slots:
     void GUI_020_data_alias_and_multi_selection_contract();
     void GUI_021_device_context_action_removes_without_confirmation();
     void GUI_SAFE_001_senderless_and_invalid_selection_actions_are_noops();
+    void GUI_022_publish_tree_view_state_contract();
     void cleanup();
     void cleanupTestCase();
 
@@ -1217,6 +1218,43 @@ void MainWindowIntegrationTests::GUI_SAFE_001_senderless_and_invalid_selection_a
     QVERIFY(QMetaObject::invokeMethod(&window, "ChangeMinMaxValue", Qt::DirectConnection));
     QCOMPARE(messages.count(), 0);
     QCOMPARE(manager->GetContainerCount(), 0);
+}
+
+void MainWindowIntegrationTests::GUI_022_publish_tree_view_state_contract()
+{
+    MainWindow window;
+    QTreeWidget* parameter = window.findChild<QTreeWidget*>("ParameterTreeWidget");
+    QTreeWidget* data = window.findChild<QTreeWidget*>("DataTreeWidget");
+    QTreeWidget* state = window.findChild<QTreeWidget*>("StateTreeWidget");
+    QVERIFY(parameter);
+    QVERIFY(data);
+    QVERIFY(state);
+
+    parameter->setUpdatesEnabled(true);
+    data->setUpdatesEnabled(true);
+    state->setUpdatesEnabled(true);
+    parameter->setSortingEnabled(true);
+    data->setSortingEnabled(true);
+    state->setSortingEnabled(true);
+
+    window.PublishStart();
+    QVERIFY(!parameter->updatesEnabled());
+    QVERIFY(!data->updatesEnabled());
+    QVERIFY(!state->updatesEnabled());
+    QVERIFY(!parameter->isSortingEnabled());
+    QVERIFY(!data->isSortingEnabled());
+    QVERIFY(!state->isSortingEnabled());
+
+    window.PublishFinished();
+    QVERIFY(parameter->updatesEnabled());
+    QVERIFY(data->updatesEnabled());
+    QVERIFY(state->updatesEnabled());
+    QVERIFY(parameter->isSortingEnabled());
+    QVERIFY(data->isSortingEnabled());
+    QVERIFY(!state->isSortingEnabled());
+    QVERIFY(parameter->columnWidth(0) > 0);
+    QVERIFY(data->columnWidth(0) > 0);
+    QVERIFY(state->columnWidth(0) > 0);
 }
 
 void MainWindowIntegrationTests::cleanup()
