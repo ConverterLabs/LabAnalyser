@@ -1195,3 +1195,6 @@ or an empty graph selection is rejected when the action is triggered.
 
 `PlotWidget::UpdateGraphs` is also mapped to `PLOT_025`: incomplete DataPair
 offset state rejects the entire update before graph mutation.
+
+`PlotWidget::ResetZoom` is mapped to `PLOT_026`: an XY model with unbound or
+empty graph data is a no-op.

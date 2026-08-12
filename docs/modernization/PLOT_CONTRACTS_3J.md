@@ -136,3 +136,6 @@ selected graph. It is a no-op and retains graph selection/model state.
 
 `PLOT_025` replaces a manager container's vectors with a DataPair lacking its
 optional offset pointer. Graph data remain unchanged and the update returns.
+
+`PLOT_026` runs XY reset with two graph objects lacking X/Y data. Axis ranges
+remain unchanged and the min/max calculation is not entered.

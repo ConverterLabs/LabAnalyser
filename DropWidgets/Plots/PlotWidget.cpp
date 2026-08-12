@@ -2202,6 +2202,9 @@ void PlotWidget::ResetZoom()
             x = graph(1)->GetXDataPointer();
             y = graph(1)->GetYDataPointer();
         }
+        if (!x || !y || x->empty() || y->empty())
+            return;
+
         volatile double xmin = *(std::min_element(x->begin(),x->end())); //(l.begin(), l.end(
         volatile double xmax = *(std::max_element(x->begin(),x->end()));
 

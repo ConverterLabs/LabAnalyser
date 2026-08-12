@@ -51,6 +51,7 @@ private slots:
     void PLOT_023_unmanaged_remove_all_graphs_is_a_noop();
     void PLOT_024_unmanaged_highlight_action_is_a_noop();
     void PLOT_025_missing_plot_offset_leaves_graph_unchanged();
+    void PLOT_026_xy_reset_ignores_unbound_graphs();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -563,6 +564,23 @@ void PlotWidgetContractTests::PLOT_025_missing_plot_offset_leaves_graph_unchange
 
     QCOMPARE(plotGraph->GetYDataPointer()->at(0), 2.0);
     QCOMPARE(plotGraph->GetYDataPointer()->at(1), 3.0);
+}
+
+void PlotWidgetContractTests::PLOT_026_xy_reset_ignores_unbound_graphs()
+{
+    QWidget host;
+    PlotWidget plot(nullptr, &host, nullptr);
+    plot.addGraph();
+    plot.addGraph();
+    plot.SetXYPlot(true);
+    const QCPRange originalX = plot.xAxis->range();
+    const QCPRange originalY = plot.yAxis->range();
+
+    QVERIFY(QMetaObject::invokeMethod(&plot, "ResetZoom", Qt::DirectConnection));
+    QCOMPARE(plot.xAxis->range().lower, originalX.lower);
+    QCOMPARE(plot.xAxis->range().upper, originalX.upper);
+    QCOMPARE(plot.yAxis->range().lower, originalY.lower);
+    QCOMPARE(plot.yAxis->range().upper, originalY.upper);
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

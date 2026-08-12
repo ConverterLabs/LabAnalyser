@@ -987,3 +987,6 @@ missing MainWindow or a changed graph selection.
 
 `PLOT_025` treats a DataPair without its offset pointer as an incomplete update
 and retains existing graph data.
+
+`PLOT_026` prevents XY reset range calculation without complete nonempty graph
+data; valid XY range semantics remain unchanged.
