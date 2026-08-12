@@ -21,6 +21,7 @@
 
 
 #include "xmlexperimentreader.h"
+#include "XmlFigureDimensions.h"
 #include <QDebug>
 #include <QByteArray>
 #include "loadplugin.h"
@@ -215,8 +216,14 @@ void XmlExperimentReader::CreateFigureWindow()
        int cols = 0;
        QPoint Pos;
        QSize Size;
-       rows = reader.attributes().value("Rows").toInt();
-       cols = reader.attributes().value("Cols").toInt();
+       QString dimensionError;
+       if (!XmlFigureDimensions::ParseAndValidate(reader.attributes().value("Rows").toString(),
+                                                   reader.attributes().value("Cols").toString(),
+                                                   &rows, &cols, &dimensionError))
+       {
+           reader.raiseError(dimensionError);
+           return;
+       }
        Pos.setX(reader.attributes().value("PosX").toInt());
        Pos.setY(reader.attributes().value("PosY").toInt());
        Size.setWidth(reader.attributes().value("Width").toInt());

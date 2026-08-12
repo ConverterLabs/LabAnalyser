@@ -14,6 +14,7 @@
 #include "DropWidgets/Plots/PlotWidget.h"
 #include "LoadSave/xmlexperimentreader.h"
 #include "LoadSave/xmlexperimentwriter.h"
+#include "LoadSave/XmlFigureDimensions.h"
 
 namespace
 {
@@ -164,6 +165,7 @@ private slots:
     void XML_FIG_005_emptyAndNonPositiveGridsRemainSafe();
     void XML_FIG_006_unknownFigureChildIsSkipped();
     void XML_FIG_007_laterSectionsStopAfterExcessName();
+    void XML_FIG_008_invalidDimensionsAreRejectedBeforeWindowCreation();
     void XML_LEGACY_001_smallestRealFixtureWithMissingDependencies();
     void XML_LEGACY_002_realFixtureWithMissingDependencies();
     void XML_LEGACY_003_largestRealFixtureWithMissingDependencies();
@@ -418,7 +420,7 @@ void XmlExperimentContractTests::XML_FIG_004_excessPlotNamesRaiseParserErrorAfte
 void XmlExperimentContractTests::XML_FIG_005_emptyAndNonPositiveGridsRemainSafe()
 {
     const QList<QPair<QString, QString>> grids = {
-        {"0", "0"}, {"0", "2"}, {"-1", "2"}, {"not-a-number", "also-not-a-number"}
+        {"0", "0"}, {"0", "2"}
     };
     for (const QPair<QString, QString>& grid : grids) {
         QTemporaryDir directory;
@@ -434,6 +436,41 @@ void XmlExperimentContractTests::XML_FIG_005_emptyAndNonPositiveGridsRemainSafe(
         const auto closed = closeFigures(window);
         for (const QPointer<SubPlotMainWindow>& figure : closed)
             QVERIFY(figure.isNull());
+    }
+}
+
+void XmlExperimentContractTests::XML_FIG_008_invalidDimensionsAreRejectedBeforeWindowCreation()
+{
+    struct DimensionCase { QString rows; QString cols; QString error; };
+    const QList<DimensionCase> invalidCases = {
+        {"-1", "2", "Figure window Rows and Cols must be integers between 0 and 32."},
+        {"not-a-number", "2", "Figure window Rows and Cols must be integers between 0 and 32."},
+        {"33", "1", "Figure window Rows and Cols must be integers between 0 and 32."},
+        {"32", "9", "Figure window Rows x Cols must not exceed 256."}
+    };
+
+    int rows = -1;
+    int cols = -1;
+    QString error;
+    QVERIFY(XmlFigureDimensions::ParseAndValidate("32", "8", &rows, &cols, &error));
+    QCOMPARE(rows, 32);
+    QCOMPARE(cols, 8);
+    QVERIFY(XmlFigureDimensions::ParseAndValidate("0", "32", &rows, &cols, &error));
+    QCOMPARE(rows, 0);
+    QCOMPARE(cols, 32);
+
+    for (const DimensionCase& dimension : invalidCases) {
+        QVERIFY(!XmlFigureDimensions::ParseAndValidate(dimension.rows, dimension.cols, &rows, &cols, &error));
+        QCOMPARE(error, dimension.error);
+
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+        const QString path = writeFigureExperiment(directory, figureWindowXml(dimension.rows, dimension.cols, {}));
+        QVERIFY(!path.isEmpty());
+        MainWindow window;
+        XmlExperimentReader reader(window.GetLogic(), window.GetLogic()->GetMessenger(), window.GetLogic());
+        QVERIFY(reader.read(path));
+        QCOMPARE(window.findChildren<SubPlotMainWindow*>().size(), 0);
     }
 }
 

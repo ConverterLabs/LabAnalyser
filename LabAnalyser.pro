@@ -78,6 +78,7 @@ SOURCES += main.cpp\
         Import/parameterloader.cpp \
         LoadSave/loadplugin.cpp \
         LoadSave/PluginLeasePool.cpp \
+        LoadSave/XmlFigureDimensions.cpp \
         LoadSave/xmlexperimentreader.cpp \
         LoadSave/xmlexperimentwriter.cpp \
         mainwindow.cpp\
@@ -136,6 +137,7 @@ HEADERS  += mainwindow.h\
             Import/parameterloader.h \
             LoadSave/loadplugin.h \
             LoadSave/PluginLeasePool.h \
+            LoadSave/XmlFigureDimensions.h \
             LoadSave/xmlexperimentreader.h \
             LoadSave/xmlexperimentwriter.h \
             DataManagement/mapper.h \
