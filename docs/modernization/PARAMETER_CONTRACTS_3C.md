@@ -44,8 +44,8 @@ MSYS2 Qt 6.9 DLL), not an application or test-source failure.
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -Jobs 4
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -BuildDir build\phase3c-release -Clean -Jobs 4
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration debug -BuildDir build\phase3c-debug -Clean -Jobs 4
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-msys2.ps1 -Configuration release -BuildDir build\phase3c-release -Clean -Jobs 4
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-msys2.ps1 -Configuration debug -BuildDir build\phase3c-debug -Clean -Jobs 4
 ```
 
 The clean runner built and executed all four registered projects: Plot

@@ -1,0 +1,198 @@
+/***************************************************************************
+**                                                                        **
+**  LabAnlyser, a plugin based data modification and visualization tool   **
+**  Copyright (C) 2015-2021 Andreas Hoffmann                              **
+**                                                                        **
+**  LabAnlyser is free software: you can redistribute it and/or modify ´  **
+**  it under the terms of the GNU General Public License as published by  **
+**  the Free Software Foundation, either version 3 of the License, or     **
+**  (at your option) any later version.                                   **
+**                                                                        **
+**  This program is distributed in the hope that it will be useful,       **
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of        **
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         **
+**  GNU General Public License for more details.                          **
+**                                                                        **
+**  You should have received a copy of the GNU General Public License     **
+**  along with this program.  If not, see http://www.gnu.org/licenses/.   **
+**                                                                        **
+****************************************************************************
+****************************************************************************/
+
+#include "QListView.h"
+#include "CreateID.h"
+#include "DropWidgetBinding.h"
+#include "DropWidgetDropBinding.h"
+#include "DropWidgetListBinding.h"
+#include "DropWidgetTreePath.h"
+#include "DropWidgetUpdate.h"
+#include "app/mainwindow.h"
+
+
+
+QListViewD::QListViewD(QWidget *parent):QListView(parent)
+{
+     model = new QStringListModel(this);
+     this->setModel(model);
+     this->setContextMenuPolicy(Qt::CustomContextMenu);
+     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
+     DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
+
+      return;
+}
+
+void QListViewD::dragMoveEvent(QDragMoveEvent *de)
+{
+    de->accept();
+
+}
+
+void QListViewD::dragEnterEvent(QDragEnterEvent *event)
+{
+    QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
+    if(!treeWidget)
+        return;
+    QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
+    MainWindow* mainWindow = GetMainWindow();
+    if (!mainWindow)
+        return;
+    DataManagementSetClass* manager = mainWindow->GetLogic();
+
+    if(manager->IsObjectLinked(this))
+    {
+         event->acceptProposedAction();
+    }
+
+    if(selectedItems.size()==1)
+    {
+        if (selectedItems[0]->childCount() == 0)
+        {
+            QString ID = CreateID(event->source());
+            ToFormMapper* container = manager->GetContainer(ID);
+            if (!container)
+                return;
+            if (DropWidgetListBinding::SupportsParameterList(container))
+                event->acceptProposedAction();
+            mainWindow->GetStatusBar()->showMessage("This List is not linked to a List Parameter",2000);
+        }
+    }
+}
+
+void QListViewD::dropEvent(QDropEvent *event)
+{
+
+
+    QTreeWidget * treeWidget = qobject_cast<QTreeWidget*>(event->source());
+    if(!treeWidget)
+        return;
+    QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
+    auto MW = GetMainWindow();
+    if (!MW)
+        return;
+    DataManagementSetClass* manager = MW->GetLogic();
+    for(int i = 0; i < selectedItems.size(); i++)
+    {
+            QString ID;
+            if (selectedItems[i]->childCount() == 0)
+            {
+                ID = DropWidgetTreePath::IdForItem(selectedItems[i]);
+            ToFormMapper* container = manager->GetContainer(ID);
+            if (!container)
+                continue;
+            if (DropWidgetListBinding::SupportsParameterList(container))
+            {
+                DropWidgetDropBinding::ResetConnections(this);
+
+                QString ID =  CreateID(event->source());
+                this->setToolTip(ID);
+                this->setToolTipDuration(2000);
+                model->setStringList(container->GetStringList());
+                manager->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
+                 MW->ChangeForSaveDetected = true;
+                 DropWidgetBinding::ConnectValueChanged(this, SIGNAL(NewEntry()), manager);
+
+            }
+            else
+            {
+                auto liste = model->stringList();
+                liste.append(ID);
+                model->setStringList(liste);
+                emit NewEntry();
+            }
+        }
+
+    }
+
+
+
+}
+
+void QListViewD::contextMenu(QPoint pos)
+{
+    QMenu *menu = new QMenu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    menu->addAction("Delete Entry", this, SLOT(DeleteEntry()));
+    menu->addAction("Delete all Entries", this, SLOT(DeleteAllEntries()));
+
+    menu->popup(this->mapToGlobal(pos));
+}
+
+void QListViewD::DeleteEntry()
+{
+   const int row = this->currentIndex().row();
+   if (row < 0 || row >= model->rowCount())
+       return;
+   model->removeRow(row);
+   emit NewEntry();
+}
+
+void QListViewD::DeleteAllEntries()
+{
+   if (!model->rowCount())
+       return;
+   model->removeRows(0, model->rowCount());
+   emit NewEntry();
+}
+
+void QListViewD::SetVariantData(ToFormMapper Data)
+{
+    ApplyDropWidgetUpdate(this, [&]{
+
+    if(Data.IsStringList())
+        model->setStringList(Data.GetStringList());
+    });
+
+}
+
+void QListViewD::GetVariantData(ToFormMapper *Data)
+{
+    if (!Data)
+        return;
+    if(model->rowCount())
+        Data->SetData(model->stringList());
+    else
+         Data->SetData(QStringList(QString("")));
+
+
+}
+
+
+bool QListViewD::LoadFromXML(const std::vector<std::pair<QString, QString>> &Attributes, const QString &Text)
+{
+    return false;
+
+}
+
+bool QListViewD::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes, QString &Text)
+{
+    return false;
+
+}
+
+
+void QListViewD::ConnectToID(DataManagementSetClass* DM, QString ID)
+{
+    setToolTip(ID);
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(NewEntry()), DM);
+    RequestUpdate();
+}

@@ -222,6 +222,11 @@ try {
             }
             Invoke-Native -Exe $qmake -Arguments $qmakeArguments
             $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
+            # qmake's source-local .moc includes are not always ordered as
+            # prerequisites by parallel MinGW make.  Materialize them first;
+            # this remains a no-op for targets without source-local moc files.
+            Invoke-Native -Exe $make -Arguments @('-f', 'Makefile.Release', 'mocables', "-j$Jobs")
+            $env:Path = "$mingwBin;$msysUsrBin;" + $env:Path
             Invoke-Native -Exe $make -Arguments @("-j$Jobs")
             $testExecutable = Join-Path $testBuildDir $testProject.ExecutableRelativePath
             Assert-File -Path $testExecutable -Description "test executable '$($testProject.Id)'"

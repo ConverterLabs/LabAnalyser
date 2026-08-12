@@ -14,23 +14,23 @@ LabAnalyser is a plugin-based, open-source tool for data modification and visual
 
 **Create editable variables (parameters) or data within a plugin (refer to https://github.com/ConverterLabs/PluginTemplate) and utilize LabAnalyser for visualization.
 Design user interfaces with QTCreator, load them into LabAnalyser, and link the UI elements to variables using a drag-and-drop mechanism.**
-![LabAnalyser](readme_pictures/show_variables.png)
+![LabAnalyser](docs/images/readme_pictures/show_variables.png)
 
 ---
 
 **Employ the signal-slot system of Qt in QTCreator to develop sophisticated user interfaces.**
 
-![Stateflow Visualization](readme_pictures/UseQTCreator.png)
+![Stateflow Visualization](docs/images/readme_pictures/UseQTCreator.png)
 
 ---
 
 **Load multiple user interfaces as required into LabAnalyser to visualize data points in real-time, scaling to hundreds of thousands.**
-![Array of Windows on Four Screens](readme_pictures/UndockAndCreate_MonitorArray.png)
+![Array of Windows on Four Screens](docs/images/readme_pictures/UndockAndCreate_MonitorArray.png)
 
 ---
 
 **Leverage features such as export to HDF5 or MATLAB files (*.mat) for data storage, or establish a direct connection to MATLAB via TCP/IP.**
-![Data Export Options](readme_pictures/export.png)
+![Data Export Options](docs/images/readme_pictures/export.png)
 
 ---
 
@@ -58,7 +58,7 @@ former `matOut` dependency is no longer required.
 For a scripted build, run this from the repository root in PowerShell:
 
 ```powershell
-.\build-msys2.ps1 -Configuration release -Clean -Deploy
+.\scripts\build-msys2.ps1 -Configuration release -Clean -Deploy
 ```
 
 The compilation files are kept in the separate build directory:
@@ -83,7 +83,7 @@ If PowerShell blocks local scripts because of the execution policy, run the
 same build with a process-local policy override:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-msys2.ps1 -Configuration release -Clean -Deploy
 ```
 
 ## For Linux (Tested on Arch Linux)
@@ -110,7 +110,7 @@ above, including `mingw-w64-x86_64-matio`.
 Create a Pipeline job using the repository's `Jenkinsfile`. The pipeline runs:
 
 ```powershell
-.\build-msys2.ps1 -Configuration release -Clean -Deploy
+.\scripts\build-msys2.ps1 -Configuration release -Clean -Deploy
 ```
 
 The resulting `dist\LabAnalyser-release` directory contains `LabAnalyser.exe`

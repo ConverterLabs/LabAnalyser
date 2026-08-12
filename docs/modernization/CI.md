@@ -7,7 +7,7 @@ Windows job. It runs on `windows-latest`, provisions MSYS2 `MINGW64`, and uses
 the same PowerShell entry points as local development:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\run-tests-msys2.ps1 -Clean -BuildRoot build\ci-tests -Jobs 2
 ```
 

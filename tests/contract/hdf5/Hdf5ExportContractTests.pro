@@ -9,24 +9,24 @@ TARGET = Hdf5ExportContractTests
 CONFIG += testcase console
 
 SOURCES += \
-    $$REPOSITORY_ROOT/Export/export2highfive.cpp \
-    $$REPOSITORY_ROOT/DataManagement/ContainerStore.cpp \
-    $$REPOSITORY_ROOT/DataManagement/DataRegistry.cpp \
-    $$REPOSITORY_ROOT/DataManagement/DeviceRegistry.cpp \
-    $$REPOSITORY_ROOT/DataManagement/WidgetBindingRegistry.cpp \
-    $$REPOSITORY_ROOT/DataManagement/DataManagementClass.cpp \
-    $$REPOSITORY_ROOT/plugins/InterfaceDataType.cpp \
+    $$REPOSITORY_ROOT/src/Export/export2highfive.cpp \
+    $$REPOSITORY_ROOT/src/DataManagement/ContainerStore.cpp \
+    $$REPOSITORY_ROOT/src/DataManagement/DataRegistry.cpp \
+    $$REPOSITORY_ROOT/src/DataManagement/DeviceRegistry.cpp \
+    $$REPOSITORY_ROOT/src/DataManagement/WidgetBindingRegistry.cpp \
+    $$REPOSITORY_ROOT/src/DataManagement/DataManagementClass.cpp \
+    $$REPOSITORY_ROOT/src/plugins/InterfaceDataType.cpp \
     Hdf5ExportContractTests.cpp
 
 HEADERS += \
-    $$REPOSITORY_ROOT/Export/export2highfive.h \
-    $$REPOSITORY_ROOT/DataManagement/DataManagementClass.h \
-    $$REPOSITORY_ROOT/DataManagement/ContainerStore.h \
-    $$REPOSITORY_ROOT/DataManagement/DataRegistry.h \
-    $$REPOSITORY_ROOT/DataManagement/DeviceRegistry.h \
-    $$REPOSITORY_ROOT/DataManagement/WidgetBindingRegistry.h \
-    $$REPOSITORY_ROOT/DataManagement/mapper.h \
-    $$REPOSITORY_ROOT/plugins/InterfaceDataType.h
+    $$REPOSITORY_ROOT/src/Export/export2highfive.h \
+    $$REPOSITORY_ROOT/src/DataManagement/DataManagementClass.h \
+    $$REPOSITORY_ROOT/src/DataManagement/ContainerStore.h \
+    $$REPOSITORY_ROOT/src/DataManagement/DataRegistry.h \
+    $$REPOSITORY_ROOT/src/DataManagement/DeviceRegistry.h \
+    $$REPOSITORY_ROOT/src/DataManagement/WidgetBindingRegistry.h \
+    $$REPOSITORY_ROOT/src/DataManagement/mapper.h \
+    $$REPOSITORY_ROOT/src/plugins/InterfaceDataType.h
 
-INCLUDEPATH += $$REPOSITORY_ROOT
+INCLUDEPATH += $$REPOSITORY_ROOT $$REPOSITORY_ROOT/src $$REPOSITORY_ROOT/src/DropWidgets
 LIBS += -lhdf5

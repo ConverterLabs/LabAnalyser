@@ -1092,6 +1092,13 @@ GUI_016 and GUI_019–021 preserve the valid-selection contracts.
 `MainWindowOutputLog` now also isolates standard output-menu and Clear Output
 construction; GUI_013 preserves the output-context behavior.
 
+## Repository layout migration
+
+The behavior-preserving repository-layout migration is tracked in
+`REPOSITORY_LAYOUT_MIGRATION.md`. Its support-file slice moves resources,
+scripts and documentation assets first; production and test paths are moved
+only through the documented module/test-target checklist.
+
 `MainWindowProjectActions` isolates private experiment Save/Load/Close dialog
 routing while MainWindow keeps public slots, signals, loading state and manager
 ownership. GUI_009–011 preserve the observed cancellation and path contracts.

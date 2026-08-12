@@ -1,6 +1,6 @@
 QT += testlib xml
 
-# Exercise the real PlotWidget/DataManagement/Messenger graph. qcustomplot is
+# Exercise the real PlotWidget/src/DataManagement/Messenger graph. qcustomplot is
 # inherited as a vendored runtime dependency; this target neither changes nor
 # tests its implementation in isolation.
 include(../../../LabAnalyser.pro)
@@ -24,6 +24,6 @@ TEMPLATE = app
 TARGET = PlotWidgetContractTests
 CONFIG += testcase console
 DEFINES += LABANALYSER_PLOTWIDGET_TEST_SEAMS
-SOURCES -= $$REPOSITORY_ROOT/main.cpp
+SOURCES -= $$REPOSITORY_ROOT/src/app/main.cpp
 SOURCES += PlotWidgetContractTests.cpp
-INCLUDEPATH += $$REPOSITORY_ROOT
+INCLUDEPATH += $$REPOSITORY_ROOT $$REPOSITORY_ROOT/src $$REPOSITORY_ROOT/src/DropWidgets

@@ -35,104 +35,109 @@ if(NOT LABANALYSER_GIT_VERSION)
 endif()
 
 add_library(LabAnalyserQCustomPlot STATIC
-    DropWidgets/Plots/qcustomplot.cpp
-    DropWidgets/Plots/qcustomplot.h)
-target_include_directories(LabAnalyserQCustomPlot PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+    src/DropWidgets/Plots/qcustomplot.cpp
+    src/DropWidgets/Plots/qcustomplot.h)
+target_include_directories(LabAnalyserQCustomPlot PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_link_libraries(LabAnalyserQCustomPlot PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::PrintSupport)
 # qcustomplot is vendored implementation code, retained as an internal target
 # rather than being treated as a project refactoring boundary.
 
 set(LABANALYSER_CORE_SOURCES
-    DropWidgets/CreateID.cpp
-    DropWidgets/DropWidgetsUiLoader.cpp
-    DropWidgets/DropWidgetBinding.cpp
-    DropWidgets/DropWidgetConnectionMenu.cpp
-    DropWidgets/DropWidgetConnectionMenu.h
-    DropWidgets/DropWidgetDataAccess.h
-    DropWidgets/DropWidgetDropBinding.h
-    DropWidgets/DropWidgetDragSource.h
-    DropWidgets/DropWidgetIndicatorBinding.h
-    DropWidgets/DropWidgetTreePath.h
-    DropWidgets/DropWidgetTableCells.cpp
-    DropWidgets/DropWidgetTableCells.h
-    DropWidgets/DropWidgetUpdate.h
-    DropWidgets/DropWidgetBinding.h
-    DropWidgets/Plots/FFTPlotWidget.cpp
-    DropWidgets/Plots/PlotMeasurements.cpp
-    DropWidgets/Plots/PlotWidget.cpp
-    DropWidgets/QBLed.cpp
-    DropWidgets/QCheckBox.cpp
-    DropWidgets/QComboBox.cpp
-    DropWidgets/QDoubleSpinBox.cpp
-    DropWidgets/QLCDNumber.cpp
-    DropWidgets/QLabel.cpp
-    DropWidgets/QLed.cpp
-    DropWidgets/QLineEdit.cpp
-    DropWidgets/QListView.cpp
-    DropWidgets/QProgressBar.cpp
-    DropWidgets/QPushButton.cpp
-    DropWidgets/QSlider.cpp
-    DropWidgets/QSpinBox.cpp
-    DropWidgets/QTSLed.cpp
-    DropWidgets/QTableWidgeD.cpp
-    Export/Export2Mat.cpp
-    Export/export2highfive.cpp
-    Export/exportinputs2xml.cpp
-    Import/parameterloader.cpp
-    LoadSave/loadplugin.cpp
-    LoadSave/PluginLeasePool.cpp
-    LoadSave/XmlFigureDimensions.cpp
-    LoadSave/xmlexperimentreader.cpp
-    LoadSave/xmlexperimentwriter.cpp
-    DataManagement/ContainerStore.cpp
-    DataManagement/DataRegistry.cpp
-    DataManagement/DeviceRegistry.cpp
-    DataManagement/WidgetBindingRegistry.cpp
-    DataManagement/MessageDispatchPolicy.cpp
-    DataManagement/ProjectIoCoordinator.cpp
-    DataManagement/UIDataManagementSetClass.cpp
-    DataManagement/DataManagementClass.cpp
-    DataManagement/DataManagementSetClass.cpp
-    DataManagement/DataMessengerClass.cpp
-    RemoteControl/RemoteControlConnectionState.cpp
-    RemoteControl/RemoteControlFrameSplitter.cpp
-    RemoteControl/RemoteControlProtocol.cpp
-    RemoteControl/RemoteControlServer.cpp
-    UIFunctions/MainWindowOutputLog.cpp
-    UIFunctions/MainWindowTreePath.cpp
-    UIFunctions/MainWindowTreeViewState.cpp
-    UIFunctions/MainWindowSubplotDialog.cpp
-    UIFunctions/MainWindowFormLoader.cpp
-    UIFunctions/MainWindowTreeModel.cpp
-    UIFunctions/MainWindowFigureFactory.cpp
-    UIFunctions/MainWindowDockPresentation.cpp
-    UIFunctions/MainWindowTrayController.cpp
-    UIFunctions/MainWindowProjectCleanup.cpp
-    UIFunctions/MainWindowContextMenus.cpp
-    UIFunctions/MainWindowProjectActions.cpp
-    UIFunctions/SubPlotMainWindow.cpp
-    TreeWidgetCustomDrop.cpp
-    CustomWidgets/QBLedIndicator.cpp
-    CustomWidgets/QLedIndicator.cpp
-    CustomWidgets/QTSLedIndicator.cpp
-    plugins/InterfaceDataType.cpp
-    mainwindow.cpp
-    mainwindow.ui
-    About.ui
-    resources.qrc)
+    src/DropWidgets/CreateID.cpp
+    src/DropWidgets/DropWidgetsUiLoader.cpp
+    src/DropWidgets/DropWidgetBinding.cpp
+    src/DropWidgets/DropWidgetConnectionMenu.cpp
+    src/DropWidgets/DropWidgetConnectionMenu.h
+    src/DropWidgets/DropWidgetDataAccess.h
+    src/DropWidgets/DropWidgetDropBinding.h
+    src/DropWidgets/DropWidgetDragSource.h
+    src/DropWidgets/DropWidgetIndicatorBinding.h
+    src/DropWidgets/DropWidgetTreePath.h
+    src/DropWidgets/DropWidgetTableCells.cpp
+    src/DropWidgets/DropWidgetTableCells.h
+    src/DropWidgets/DropWidgetUpdate.h
+    src/DropWidgets/DropWidgetBinding.h
+    src/DropWidgets/Plots/FFTPlotWidget.cpp
+    src/DropWidgets/Plots/PlotMeasurements.cpp
+    src/DropWidgets/Plots/PlotWidget.cpp
+    src/DropWidgets/QBLed.cpp
+    src/DropWidgets/QCheckBox.cpp
+    src/DropWidgets/QComboBox.cpp
+    src/DropWidgets/QDoubleSpinBox.cpp
+    src/DropWidgets/QLCDNumber.cpp
+    src/DropWidgets/QLabel.cpp
+    src/DropWidgets/QLed.cpp
+    src/DropWidgets/QLineEdit.cpp
+    src/DropWidgets/QListView.cpp
+    src/DropWidgets/QProgressBar.cpp
+    src/DropWidgets/QPushButton.cpp
+    src/DropWidgets/QSlider.cpp
+    src/DropWidgets/QSpinBox.cpp
+    src/DropWidgets/QTSLed.cpp
+    src/DropWidgets/QTableWidgeD.cpp
+    src/Export/Export2Mat.cpp
+    src/Export/export2highfive.cpp
+    src/Export/exportinputs2xml.cpp
+    src/Import/parameterloader.cpp
+    src/LoadSave/loadplugin.cpp
+    src/LoadSave/PluginLeasePool.cpp
+    src/LoadSave/XmlFigureDimensions.cpp
+    src/LoadSave/xmlexperimentreader.cpp
+    src/LoadSave/xmlexperimentwriter.cpp
+    src/DataManagement/ContainerStore.cpp
+    src/DataManagement/DataRegistry.cpp
+    src/DataManagement/DeviceRegistry.cpp
+    src/DataManagement/WidgetBindingRegistry.cpp
+    src/DataManagement/MessageDispatchPolicy.cpp
+    src/DataManagement/ProjectIoCoordinator.cpp
+    src/DataManagement/UIDataManagementSetClass.cpp
+    src/DataManagement/DataManagementClass.cpp
+    src/DataManagement/DataManagementSetClass.cpp
+    src/DataManagement/DataMessengerClass.cpp
+    src/RemoteControl/RemoteControlConnectionState.cpp
+    src/RemoteControl/RemoteControlFrameSplitter.cpp
+    src/RemoteControl/RemoteControlProtocol.cpp
+    src/RemoteControl/RemoteControlServer.cpp
+    src/UIFunctions/MainWindowOutputLog.cpp
+    src/UIFunctions/MainWindowTreePath.cpp
+    src/UIFunctions/MainWindowTreeViewState.cpp
+    src/UIFunctions/MainWindowSubplotDialog.cpp
+    src/UIFunctions/MainWindowFormLoader.cpp
+    src/UIFunctions/MainWindowTreeModel.cpp
+    src/UIFunctions/MainWindowFigureFactory.cpp
+    src/UIFunctions/MainWindowDockPresentation.cpp
+    src/UIFunctions/MainWindowTrayController.cpp
+    src/UIFunctions/MainWindowProjectCleanup.cpp
+    src/UIFunctions/MainWindowContextMenus.cpp
+    src/UIFunctions/MainWindowProjectActions.cpp
+    src/UIFunctions/SubPlotMainWindow.cpp
+    src/DropWidgets/TreeWidgetCustomDrop.cpp
+    src/CustomWidgets/QBLedIndicator.cpp
+    src/CustomWidgets/QLedIndicator.cpp
+    src/CustomWidgets/QTSLedIndicator.cpp
+    src/plugins/InterfaceDataType.cpp
+    src/app/mainwindow.cpp
+    src/app/mainwindow.ui
+    src/app/About.ui
+    resources/resources.qrc)
 
 # Subdirectories reuse this exact graph for the one established PlotWidget
 # test-only compile seam, so keep paths anchored at the repository root.
 list(TRANSFORM LABANALYSER_CORE_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 # This private helper consumes the ui header generated from the root form; it
 # does not own a colocated .ui input of its own.
-set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/UIFunctions/MainWindowFormLoader.cpp"
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/UIFunctions/MainWindowFormLoader.cpp"
     PROPERTIES SKIP_AUTOUIC ON)
-set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/UIFunctions/MainWindowDockPresentation.cpp"
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/UIFunctions/MainWindowDockPresentation.cpp"
+    PROPERTIES SKIP_AUTOUIC ON)
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/DataManagement/UIDataManagementSetClass.cpp"
+    PROPERTIES SKIP_AUTOUIC ON)
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/LoadSave/xmlexperimentreader.cpp"
     PROPERTIES SKIP_AUTOUIC ON)
 
 add_library(LabAnalyserCore STATIC ${LABANALYSER_CORE_SOURCES})
-target_include_directories(LabAnalyserCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${HIGHFIVE_INCLUDE_DIR}")
+set_property(TARGET LabAnalyserCore PROPERTY AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src/app")
+target_include_directories(LabAnalyserCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src" "${CMAKE_CURRENT_SOURCE_DIR}/src/app" "${CMAKE_CURRENT_SOURCE_DIR}/src/DropWidgets" "${HIGHFIVE_INCLUDE_DIR}")
 target_compile_definitions(LabAnalyserCore PUBLIC
     VERSION_MAJOR=1 VERSION_MINOR=1 VERSION_BUILD=1
     LABANALYSER_USE_FFTW
@@ -145,7 +150,7 @@ target_link_libraries(LabAnalyserCore
         Qt6::PrintSupport Qt6::OpenGL Qt6::OpenGLWidgets
         PkgConfig::MATIO PkgConfig::HDF5 PkgConfig::FFTW3 Boost::boost)
 
-add_executable(LabAnalyser main.cpp LabAnlyser.rc)
+add_executable(LabAnalyser src/app/main.cpp resources/LabAnlyser.rc)
 target_link_libraries(LabAnalyser PRIVATE LabAnalyserCore)
 # main.cpp includes mainwindow.h, which in turn includes the UIC-generated
 # About header produced for the core target.
@@ -153,7 +158,7 @@ target_include_directories(LabAnalyser PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/LabA
 
 include(CTest)
 if(WIN32 AND LABANALYSER_BUILD_MATLAB_CONNECTOR)
-    add_subdirectory(MatlabRemoteConnector)
+    add_subdirectory(src/MatlabRemoteConnector)
 endif()
 if(BUILD_TESTING AND LABANALYSER_BUILD_TESTS)
     add_subdirectory(tests/cmake)

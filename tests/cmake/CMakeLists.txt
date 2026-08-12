@@ -5,7 +5,7 @@
 find_package(Qt6 REQUIRED COMPONENTS Test)
 
 function(labanalyser_setup_test target)
-    target_include_directories(${target} PRIVATE "${PROJECT_SOURCE_DIR}")
+    target_include_directories(${target} PRIVATE "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/app" "${PROJECT_SOURCE_DIR}/src/DropWidgets")
     target_link_libraries(${target} PRIVATE Qt6::Test)
     add_test(NAME ${target} COMMAND ${target} -txt)
     set_tests_properties(${target} PROPERTIES
@@ -30,7 +30,7 @@ endfunction()
 # Unit target.
 add_executable(PlotMeasurementsTests
     ${PROJECT_SOURCE_DIR}/tests/PlotMeasurementsTests.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/Plots/PlotMeasurements.cpp)
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/Plots/PlotMeasurements.cpp)
 target_compile_definitions(PlotMeasurementsTests PRIVATE LABANALYSER_USE_FFTW)
 target_link_libraries(PlotMeasurementsTests PRIVATE Qt6::Core Qt6::Test PkgConfig::FFTW3)
 labanalyser_setup_test(PlotMeasurementsTests)
@@ -41,15 +41,15 @@ add_executable(DataManagementCharacterizationTests
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement/mainwindow.h
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement/DropWidgets/DropWidgets.h
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement/DropWidgets/Plots/PlotWidget.h
-    ${PROJECT_SOURCE_DIR}/DataManagement/ContainerStore.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DeviceRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/WidgetBindingRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/MessageDispatchPolicy.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementClass.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementSetClass.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataMessengerClass.cpp
-    ${PROJECT_SOURCE_DIR}/plugins/InterfaceDataType.cpp)
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/ContainerStore.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DeviceRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/WidgetBindingRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/MessageDispatchPolicy.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementSetClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataMessengerClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/plugins/InterfaceDataType.cpp)
 target_include_directories(DataManagementCharacterizationTests BEFORE PRIVATE
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement)
 target_link_libraries(DataManagementCharacterizationTests PRIVATE Qt6::Core Qt6::Widgets Qt6::Test Boost::boost)
@@ -58,13 +58,13 @@ labanalyser_setup_test(DataManagementCharacterizationTests)
 # HDF5 export boundary stays slim; it must not pull GUI/plot sources.
 add_executable(Hdf5ExportContractTests
     ${PROJECT_SOURCE_DIR}/tests/contract/hdf5/Hdf5ExportContractTests.cpp
-    ${PROJECT_SOURCE_DIR}/Export/export2highfive.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/ContainerStore.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DeviceRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/WidgetBindingRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementClass.cpp
-    ${PROJECT_SOURCE_DIR}/plugins/InterfaceDataType.cpp)
+    ${PROJECT_SOURCE_DIR}/src/Export/export2highfive.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/ContainerStore.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DeviceRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/WidgetBindingRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/plugins/InterfaceDataType.cpp)
 target_link_libraries(Hdf5ExportContractTests PRIVATE Qt6::Widgets Qt6::Test PkgConfig::HDF5 Boost::boost)
 labanalyser_setup_test(Hdf5ExportContractTests)
 
@@ -75,19 +75,19 @@ add_executable(RemoteControlContractTests
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement/mainwindow.h
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement/DropWidgets/DropWidgets.h
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement/DropWidgets/Plots/PlotWidget.h
-    ${PROJECT_SOURCE_DIR}/RemoteControl/RemoteControlConnectionState.cpp
-    ${PROJECT_SOURCE_DIR}/RemoteControl/RemoteControlFrameSplitter.cpp
-    ${PROJECT_SOURCE_DIR}/RemoteControl/RemoteControlProtocol.cpp
-    ${PROJECT_SOURCE_DIR}/RemoteControl/RemoteControlServer.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/ContainerStore.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DeviceRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/WidgetBindingRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/MessageDispatchPolicy.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementClass.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementSetClass.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataMessengerClass.cpp
-    ${PROJECT_SOURCE_DIR}/plugins/InterfaceDataType.cpp)
+    ${PROJECT_SOURCE_DIR}/src/RemoteControl/RemoteControlConnectionState.cpp
+    ${PROJECT_SOURCE_DIR}/src/RemoteControl/RemoteControlFrameSplitter.cpp
+    ${PROJECT_SOURCE_DIR}/src/RemoteControl/RemoteControlProtocol.cpp
+    ${PROJECT_SOURCE_DIR}/src/RemoteControl/RemoteControlServer.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/ContainerStore.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DeviceRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/WidgetBindingRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/MessageDispatchPolicy.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementSetClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataMessengerClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/plugins/InterfaceDataType.cpp)
 target_include_directories(RemoteControlContractTests BEFORE PRIVATE
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement)
 target_link_libraries(RemoteControlContractTests PRIVATE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Test Boost::boost)
@@ -99,42 +99,42 @@ add_executable(DropWidgetAdapterTests
     ${PROJECT_SOURCE_DIR}/tests/contract/dropwidgets/DropWidgetAdapterTests.cpp
     ${PROJECT_SOURCE_DIR}/tests/contract/dropwidgets/TestMainWindowSeam.cpp
     ${PROJECT_SOURCE_DIR}/tests/contract/dropwidgets/PlotWidgetLinkSeam.cpp
-    ${PROJECT_SOURCE_DIR}/mainwindow.h
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementSetClass.h
-    ${PROJECT_SOURCE_DIR}/DataManagement/UIDataManagementSetClass.h
-    ${PROJECT_SOURCE_DIR}/plugins/InterfaceDataType.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/ContainerStore.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DeviceRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/WidgetBindingRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/MessageDispatchPolicy.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementClass.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataMessengerClass.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/CreateID.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetBinding.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetConnectionMenu.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetTableCells.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/DropWidgetsUiLoader.cpp
-    ${PROJECT_SOURCE_DIR}/TreeWidgetCustomDrop.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QBLed.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QCheckBox.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QComboBox.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QDoubleSpinBox.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QLCDNumber.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QLabel.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QLed.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QLineEdit.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QListView.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QProgressBar.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QPushButton.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QSlider.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QSpinBox.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QTableWidgeD.cpp
-    ${PROJECT_SOURCE_DIR}/DropWidgets/QTSLed.cpp
-    ${PROJECT_SOURCE_DIR}/CustomWidgets/QBLedIndicator.cpp
-    ${PROJECT_SOURCE_DIR}/CustomWidgets/QLedIndicator.cpp
-    ${PROJECT_SOURCE_DIR}/CustomWidgets/QTSLedIndicator.cpp
-    ${PROJECT_SOURCE_DIR}/About.ui)
+    ${PROJECT_SOURCE_DIR}/src/app/mainwindow.h
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementSetClass.h
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/UIDataManagementSetClass.h
+    ${PROJECT_SOURCE_DIR}/src/plugins/InterfaceDataType.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/ContainerStore.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DeviceRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/WidgetBindingRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/MessageDispatchPolicy.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataMessengerClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/CreateID.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/DropWidgetBinding.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/DropWidgetConnectionMenu.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/DropWidgetTableCells.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/DropWidgetsUiLoader.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/TreeWidgetCustomDrop.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QBLed.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QCheckBox.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QComboBox.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QDoubleSpinBox.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QLCDNumber.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QLabel.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QLed.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QLineEdit.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QListView.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QProgressBar.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QPushButton.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QSlider.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QSpinBox.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QTableWidgeD.cpp
+    ${PROJECT_SOURCE_DIR}/src/DropWidgets/QTSLed.cpp
+    ${PROJECT_SOURCE_DIR}/src/CustomWidgets/QBLedIndicator.cpp
+    ${PROJECT_SOURCE_DIR}/src/CustomWidgets/QLedIndicator.cpp
+    ${PROJECT_SOURCE_DIR}/src/CustomWidgets/QTSLedIndicator.cpp
+    ${PROJECT_SOURCE_DIR}/src/app/About.ui)
 target_link_libraries(DropWidgetAdapterTests PRIVATE
     Qt6::Core Qt6::Widgets Qt6::UiTools Qt6::Network Qt6::PrintSupport Qt6::Test Boost::boost)
 labanalyser_setup_gui_test(DropWidgetAdapterTests)
@@ -150,7 +150,8 @@ labanalyser_add_full_graph_test(MainWindowIntegrationTests ${PROJECT_SOURCE_DIR}
 # sources, so it receives a separate private core variant rather than changing
 # the application target's visibility.
 add_library(LabAnalyserPlotTestCore STATIC ${LABANALYSER_CORE_SOURCES})
-target_include_directories(LabAnalyserPlotTestCore PUBLIC "${PROJECT_SOURCE_DIR}" "${HIGHFIVE_INCLUDE_DIR}")
+set_property(TARGET LabAnalyserPlotTestCore PROPERTY AUTOUIC_SEARCH_PATHS "${PROJECT_SOURCE_DIR}/src/app")
+target_include_directories(LabAnalyserPlotTestCore PUBLIC "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/app" "${PROJECT_SOURCE_DIR}/src/DropWidgets" "${HIGHFIVE_INCLUDE_DIR}")
 target_compile_definitions(LabAnalyserPlotTestCore PRIVATE
     LABANALYSER_PLOTWIDGET_TEST_SEAMS VERSION_MAJOR=1 VERSION_MINOR=1 VERSION_BUILD=1
     LABANALYSER_USE_FFTW GIT_VERSION=\"${LABANALYSER_GIT_VERSION}\")
@@ -171,7 +172,7 @@ function(labanalyser_add_plugin_fixture target source)
         PREFIX ""
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test-plugins/${target}/release"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test-plugins/${target}/release")
-    target_include_directories(${target} PRIVATE "${PROJECT_SOURCE_DIR}")
+    target_include_directories(${target} PRIVATE "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/src")
     target_link_libraries(${target} PRIVATE Qt6::Core Qt6::Widgets)
 endfunction()
 
@@ -184,17 +185,17 @@ labanalyser_add_plugin_fixture(HeapOwnedInterfacePlugin ${PROJECT_SOURCE_DIR}/te
 add_executable(PluginLoaderContractTests
     ${PROJECT_SOURCE_DIR}/tests/contract/plugins/PluginLoaderContractTests.cpp
     ${PROJECT_SOURCE_DIR}/tests/contract/plugins/DataManagementSetClassTestSeam.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementSetClass.h
-    ${PROJECT_SOURCE_DIR}/LoadSave/loadplugin.cpp
-    ${PROJECT_SOURCE_DIR}/LoadSave/PluginLeasePool.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/ContainerStore.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DeviceRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/WidgetBindingRegistry.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/MessageDispatchPolicy.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataManagementClass.cpp
-    ${PROJECT_SOURCE_DIR}/DataManagement/DataMessengerClass.cpp
-    ${PROJECT_SOURCE_DIR}/plugins/InterfaceDataType.cpp)
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementSetClass.h
+    ${PROJECT_SOURCE_DIR}/src/LoadSave/loadplugin.cpp
+    ${PROJECT_SOURCE_DIR}/src/LoadSave/PluginLeasePool.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/ContainerStore.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DeviceRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/WidgetBindingRegistry.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/MessageDispatchPolicy.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManagement/DataMessengerClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/plugins/InterfaceDataType.cpp)
 target_compile_definitions(PluginLoaderContractTests PRIVATE LABANALYSER_PLUGIN_LEASE_TESTING)
 target_link_libraries(PluginLoaderContractTests PRIVATE
     Qt6::Core Qt6::Widgets Qt6::UiTools Qt6::PrintSupport Qt6::OpenGL Qt6::OpenGLWidgets Qt6::Network Qt6::Test Boost::boost)

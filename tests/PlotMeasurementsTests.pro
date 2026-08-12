@@ -7,11 +7,11 @@ TARGET = PlotMeasurementsTests
 DEFINES += LABANALYSER_USE_FFTW
 LIBS += -lfftw3
 
-INCLUDEPATH += ..
+INCLUDEPATH += .. ../src
 
 SOURCES += \
     PlotMeasurementsTests.cpp \
-    ../DropWidgets/Plots/PlotMeasurements.cpp
+    ../src/DropWidgets/Plots/PlotMeasurements.cpp
 
 HEADERS += \
-    ../DropWidgets/Plots/PlotMeasurements.h
+    ../src/DropWidgets/Plots/PlotMeasurements.h

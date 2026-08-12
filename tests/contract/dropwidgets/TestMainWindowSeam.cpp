@@ -4,6 +4,8 @@
 // supplies only a live DataManagementSetClass for those constructor connects.
 #include "mainwindow.h"
 #include "DropWidgets/DropWidget.h"
+#include "UIFunctions/MainWindowOutputLog.h"
+#include "UIFunctions/MainWindowTreeViewState.h"
 
 DataManagementSetClass::DataManagementSetClass(QObject* parent)
     : DataManagementClass(parent) {}
@@ -97,7 +99,6 @@ void MainWindow::on_actionExport_Data_h5_triggered() {}
 void MainWindow::on_actionRemote_Connection_Port_2_triggered() {}
 void MainWindow::on_actionFFT_triggered() {}
 bool MainWindow::eventFilter(QObject*, QEvent*) { return false; }
-void MainWindow::AppendWidgetNames(QObjectList, QString) {}
 void MainWindow::ChangeMinMaxValue() {}
 void MainWindow::RemoveDevice() {}
 void MainWindow::SetAlias(QString) {}

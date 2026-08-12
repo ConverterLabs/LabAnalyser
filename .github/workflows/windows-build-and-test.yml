@@ -106,7 +106,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path build\ci-logs | Out-Null
           Start-Transcript -Path build\ci-logs\release-build.log -Force
           try {
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2 -Msys2Root $env:MSYS2_MINGW_ROOT
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-msys2.ps1 -Configuration release -Clean -Deploy -BuildDir build\ci-release -DeployDir dist\LabAnalyser-release -Jobs 2 -Msys2Root $env:MSYS2_MINGW_ROOT
             if ($LASTEXITCODE -ne 0) { throw "Release build failed with exit code $LASTEXITCODE." }
           }
           finally { Stop-Transcript }

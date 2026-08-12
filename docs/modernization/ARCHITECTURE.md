@@ -2,11 +2,12 @@
 
 ## Build and top-level flow
 
-`main.cpp` constructs `MainWindow` from `mainwindow.ui`.  `MainWindow` owns or
+`src/app/main.cpp` constructs `MainWindow` from `src/app/mainwindow.ui`.  `MainWindow` owns or
 coordinates the data manager, messenger, dynamic UI loader, project XML reader/
 writer, exports, plots, and local remote-control server.  `LabAnalyser.pro` is a
-single qmake application target; `tests/PlotMeasurementsTests.pro` is a separate
-qmake console target.  There is no CMake build or CI workflow.
+qmake application target; the target-based `CMakeLists.txt` mirrors the
+application and registered CTest targets. `tests/PlotMeasurementsTests.pro` is a
+separate qmake console target.
 
 ```text
 Qt UI / .ui forms --> MainWindow --> DataManagementSetClass --> Messenger <-- plugins
@@ -25,12 +26,12 @@ Qt UI / .ui forms --> MainWindow --> DataManagementSetClass --> Messenger <-- pl
 | Persistence/import | `xmlexperimentreader.*`, `xmlexperimentwriter.*`, `parameterloader.*`, `exportinputs2xml.*` | Experiment XML (`Experiment` with Tabs, Devices, Widgets, State, FigureWindows, Connections), parameter XML, absolute/relative paths, UI state. |
 | Export | `Export2Mat.*`, `export2highfive.*` | MATLAB MAT via libmatio and HDF5 via HighFive/HDF5. Output schema has not yet been fixture-characterized. |
 | Plot/numerics | `PlotWidget`, `FFTPlotWidget`, `PlotMeasurements`, vendored `qcustomplot` | Charts, FFT, interpolation, interval statistics, RMS and THD. `PlotMeasurements` is the only tested production module. |
-| Custom/drop widgets | `DropWidgets/*`, `CustomWidgets/*` | Thin Designer-facing adapters over shared update, binding and data-access helpers; data-driven UI-loader mapping; table-cell construction is isolated from table row lifecycle. |
+| Custom/drop widgets | `src/DropWidgets/*`, `src/CustomWidgets/*` | Thin Designer-facing adapters over shared update, binding and data-access helpers; data-driven UI-loader mapping; table-cell construction is isolated from table row lifecycle. |
 | Network | `RemoteControlServer`, private `RemoteControlConnectionState`, `RemoteControlFrameSplitter`, `RemoteControlProtocol` | `RemoteControlServer` remains the Qt transport and dispatch facade for the loopback binary `set`/`get` protocol (initial port 4080, incremented until bound). `RemoteControlConnectionState` observes the current non-owning socket and its sole frame state; `RemoteControlFrameSplitter` bounds native frames to 16 bytes--1 MiB and separates complete frames from remainder bytes; `RemoteControlProtocol` validates/decodes complete frames before dispatch. Invalid prefixes abort the current connection; bounded structural-invalid frames are discarded. The implementation still has only the last-accepted-client contract, not independent multi-client sessions or new socket ownership. |
 
 ## External formats and dependencies
 
-- Qt Designer `.ui` forms and `resources.qrc` are runtime/UI contracts.
+- Qt Designer `.ui` forms and `resources/resources.qrc` are runtime/UI contracts.
 - Experiment and parameter XML are parsed/written with Qt XML streams.
 - Plugin descriptions are XML and plugins are runtime-loaded Qt binaries.
 - MAT export uses libmatio 1.5.28 in the observed environment; HDF5 uses HDF5

@@ -6,6 +6,13 @@ party** = do not refactor as project code.  This is the milestone-1 source map;
 each later change must replace its applicable unverified entry with concrete test
 IDs and characterization vectors before modifying it.
 
+Repository-layout note: current production locations are rooted at `src/`:
+`src/app`, `src/DataManagement`, `src/DropWidgets`, `src/LoadSave`,
+`src/RemoteControl`, `src/UIFunctions`, `src/plugins` and their sibling module
+directories. Historical path spellings retained below identify the source files
+that were characterized before the mechanical layout migration; they do not
+name active root-level build inputs.
+
 | Subsystem | Production files / public surface | Observable contract and risks | Tests | Status |
 | --- | --- | --- | --- | --- |
 | Startup/UI | `main.cpp`; `mainwindow.*`; `About.ui`; `mainwindow.ui` | Application startup, Qt object names, menus/actions, docks, dynamic forms, project lifecycle. | — | mapped, unverified |
@@ -30,9 +37,9 @@ The qmake application lists 42 `.cpp` translation units and 44 `.h` headers.
 The source groups above cover all listed application files: `main`, `mainwindow`,
 `TreeWidgetCustomDrop`, `UIFunctions`, `DataManagement`, `LoadSave`, `Import`,
 `Export`, `RemoteControl`, `plugins`, `CustomWidgets`, `DropWidgets` and
-`DropWidgets/Plots`.  The 2 `.ui` files, 1 `.qrc`, root `LabAnalyser.pro`, test
-`.pro`, and `build-msys2.ps1` were also inventoried.  No `.pri`, CMake, Tcl,
-batch, shell, or Python project scripts were found.
+`src/DropWidgets/Plots`. The 2 `.ui` files, 1 `.qrc`, root `LabAnalyser.pro`,
+test `.pro`, `CMakeLists.txt`, and `scripts/build-msys2.ps1` were also
+inventoried.
 
 Function-level acceptance mapping has intentionally not been invented: apart
 from the five named PlotMeasurements test slots, no current tests identify
