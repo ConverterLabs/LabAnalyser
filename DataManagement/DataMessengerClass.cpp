@@ -25,13 +25,15 @@
 
 MessengerClass::MessengerClass(QObject *parent, QStatusBar* SB) : QObject(parent)
 {
-    connect(parent,SIGNAL(Error(QString)),this,SLOT(SendError(QString)));
-    connect(parent,SIGNAL(Info(QString)),this,SLOT(SendInfo(QString)));
-    connect(parent,SIGNAL(MessageSender(QString,QString,InterfaceData)),this,SLOT(MessageTransmitter(QString,QString,InterfaceData)));
+    if (parent) {
+        connect(parent,SIGNAL(Error(QString)),this,SLOT(SendError(QString)));
+        connect(parent,SIGNAL(Info(QString)),this,SLOT(SendInfo(QString)));
+        connect(parent,SIGNAL(MessageSender(QString,QString,InterfaceData)),this,SLOT(MessageTransmitter(QString,QString,InterfaceData)));
 
-    connect(this, SIGNAL(AddContainerElement(QString,QString,QString,QString)), parent, SLOT(AddContainerElement(QString,QString,QString,QString)));
-    connect(this, SIGNAL(SetData(QString,InterfaceData)), parent, SLOT(SetData(QString,InterfaceData)));
-    connect(this, SIGNAL(NewDataReceived(QString)), parent, SLOT(SetData(QString)));
+        connect(this, SIGNAL(AddContainerElement(QString,QString,QString,QString)), parent, SLOT(AddContainerElement(QString,QString,QString,QString)));
+        connect(this, SIGNAL(SetData(QString,InterfaceData)), parent, SLOT(SetData(QString,InterfaceData)));
+        connect(this, SIGNAL(NewDataReceived(QString)), parent, SLOT(SetData(QString)));
+    }
 
 
     this->MessageStatusbar = SB;

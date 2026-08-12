@@ -1002,3 +1002,7 @@ returns a neutral `(0, 0)` pair while retaining current valid range semantics.
 
 `DM_SAFE_006` avoids the invalid constructor connection for parentless manager
 instances while retaining the public CloseProject signal.
+
+The same existing `DM_SAFE_002` parentless Messenger coverage now also backs a
+constructor guard that omits its six parent-bound Qt connections when no parent
+exists. Parent-backed Messenger routing and dispatch ordering are unchanged.

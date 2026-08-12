@@ -1115,7 +1115,8 @@ evidence and was not executed as an in-process behavior contract.
 `DM_SAFE_001` maps `DataManagementSetClass::{SendNewValue,UpdateRequest,SetData}`
 for absent sender, empty/unknown IDs and unknown widgets: all are safe no-ops
 without signal or lookup insertion. `DM_SAFE_002` maps `MessengerClass` with
-missing parent hierarchy, null device registration and null statusbar; normal
+missing parent hierarchy, null device registration and null statusbar; its
+constructor now omits parent-bound Qt connections when no parent exists. Normal
 CloseProject notification/close ordering remains unchanged where the full
 application hierarchy exists. `DM_SAFE_003` maps null QObject arguments at
 DataManagement binding/lookup/removal boundaries and a stored null form pointer.
