@@ -414,3 +414,12 @@ slider and spinbox. A null output mapper is now a no-op and preserves widget
 state; the existing real-mapper conversion and signal contracts remain
 unchanged. The previous direct dereference is recorded from source inspection,
 not exercised as undefined behavior.
+
+### Combo output type hardening (2026-08-12)
+
+`QComboBoxD::GetVariantData()` now returns unchanged for a non-GuiSelection
+output mapper. `DW_034` checks that observed incompatible mapper state and the
+combo selection remain unchanged, while a real GuiSelection receives the
+current text. The historical `InterfaceData::SetData(QString)` constructor-path
+conversion is outside this slice and is deliberately compared as a prior-state
+difference rather than normalized.

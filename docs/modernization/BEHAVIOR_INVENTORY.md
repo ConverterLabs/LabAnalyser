@@ -280,6 +280,9 @@ clearing retain one emission each.
 `GetVariantData` implementations: no dereference and no widget-state mutation.
 Real mapper output contracts are unchanged.
 
+`DW_034` covers QComboBoxD output type admission: non-GuiSelection output
+mappers remain untouched, while the current text still writes to GuiSelection.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not

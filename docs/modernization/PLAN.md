@@ -386,6 +386,8 @@ preserve prior valid presentation and routing.
 delete actions without `NewEntry` (`DW_032`); actual removals retain one event.
 Concrete adapter `GetVariantData` implementations now treat null output mappers
 as safe no-ops (`DW_033`), without changing real-mapper conversion semantics.
+QComboBoxD additionally rejects incompatible non-GuiSelection output mappers
+before conversion (`DW_034`); the valid GuiSelection path is unchanged.
 The complete contracts, per-file coverage, function-level gaps, prioritized
 follow-up tests, test-only seams and remaining exclusions are documented in
 `DROPWIDGET_CONTRACTS_3H.md`.

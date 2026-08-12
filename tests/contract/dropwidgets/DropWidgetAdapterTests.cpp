@@ -71,6 +71,7 @@ private slots:
     void DW_031_common_drop_context_type_admission();
     void DW_032_list_mutation_ignores_empty_selection();
     void DW_033_variant_output_rejects_null_mapper();
+    void DW_034_combo_output_rejects_incompatible_mapper();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -485,6 +486,26 @@ void DropWidgetAdapterTests::DW_033_variant_output_rejects_null_mapper()
     QVERIFY(check.isChecked());
     QCOMPARE(slider.value(), 37);
     QCOMPARE(spin.value(), 3);
+}
+
+void DropWidgetAdapterTests::DW_034_combo_output_rejects_incompatible_mapper()
+{
+    QComboBoxD combo;
+    combo.addItems({"one", "two"});
+    combo.setCurrentIndex(1);
+
+    ToFormMapper incompatible = mapper("QString");
+    incompatible.SetData(QString("unchanged"));
+    const QString before = incompatible.GetString();
+    combo.GetVariantData(&incompatible);
+
+    QCOMPARE(incompatible.GetString(), before);
+    QCOMPARE(combo.currentText(), QString("two"));
+
+    ToFormMapper selection = mapper("GuiSelection");
+    selection.SetData(GuiSelection("one", {"one", "two"}));
+    combo.GetVariantData(&selection);
+    QCOMPARE(selection.GetGuiSelection().first, QString("two"));
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()
