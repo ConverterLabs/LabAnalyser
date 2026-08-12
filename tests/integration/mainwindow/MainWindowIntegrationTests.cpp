@@ -79,6 +79,7 @@ private slots:
     void GUI_021_device_context_action_removes_without_confirmation();
     void GUI_SAFE_001_senderless_and_invalid_selection_actions_are_noops();
     void GUI_022_publish_tree_view_state_contract();
+    void GUI_SAFE_002_null_figure_deletion_is_a_noop();
     void cleanup();
     void cleanupTestCase();
 
@@ -1255,6 +1256,14 @@ void MainWindowIntegrationTests::GUI_022_publish_tree_view_state_contract()
     QVERIFY(parameter->columnWidth(0) > 0);
     QVERIFY(data->columnWidth(0) > 0);
     QVERIFY(state->columnWidth(0) > 0);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_002_null_figure_deletion_is_a_noop()
+{
+    MainWindow window;
+    const int before = window.GetLogic()->GetPlotWindowsIncrementer();
+    window.DeleteFigure(nullptr);
+    QCOMPARE(window.GetLogic()->GetPlotWindowsIncrementer(), before);
 }
 
 void MainWindowIntegrationTests::cleanup()

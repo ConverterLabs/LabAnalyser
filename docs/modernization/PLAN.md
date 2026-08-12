@@ -1029,3 +1029,6 @@ private value helper; tree ownership and manager lookups remain in MainWindow.
 `GUI_022` characterizes `PublishStart`/`PublishFinished`; the private
 `MainWindowTreeViewState` now owns only this batch tree presentation work. It
 retains the existing Parameter/Data sorting asymmetry relative to State.
+
+`GUI_SAFE_002` adds the narrow missing-Figure and null-tree-item guards without
+altering normal figure registry deletion or export selection semantics.

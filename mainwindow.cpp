@@ -455,6 +455,8 @@ void MainWindow::on_actionFFT_triggered()
 
 void MainWindow::DeleteFigure(SubPlotMainWindow* FigurePointer)
 {
+    if (!FigurePointer)
+        return;
     this->GetLogic()->DeletePlotWindow(FigurePointer->objectName());
 }
 
@@ -981,6 +983,8 @@ void MainWindow::on_Close_Project_triggered()
 
 void MainWindow::AddSelectedItems(QTreeWidgetItem* elemtent, QStringList &itt)
 {
+    if (!elemtent)
+        return;
     for(int c = 0; c<elemtent->childCount(); c++)
     {
         AddSelectedItems(elemtent->child(c), itt);

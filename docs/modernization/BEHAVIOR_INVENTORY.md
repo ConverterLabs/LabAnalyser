@@ -609,6 +609,10 @@ updates at finish, while only Parameter and Data resume sorting. This is now
 implemented through the private non-owning `MainWindowTreeViewState` helper;
 tree ownership and data-manager semantics remain in `MainWindow`.
 
+`GUI_SAFE_002` maps `DeleteFigure(nullptr)` as a no-op. Recursive selected-item
+collection likewise ignores null item pointers; valid figure deletion and
+selection-derived IDs remain unchanged.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target
