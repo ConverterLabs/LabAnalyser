@@ -634,6 +634,10 @@ clear action contract.
 is released when the existing corrupt-form error route is taken; valid form
 loading and its CWD behavior are unchanged.
 
+The local subplot-size dialog is isolated in `MainWindowSubplotDialog`; its
+1–3 row and 1–4 column choices, modal rejection and MainWindow figure routing
+remain mapped to GUI_012.
+
 GUI_009/012 also cover post-`exec()` dialog lifetime: parentless About and
 Subplot dialogs no longer remain as hidden top-level objects after their
 existing modal workflows complete.

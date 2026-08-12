@@ -313,6 +313,11 @@ GUI_009 and GUI_012 additionally verify that the synchronous About and
 Subplot-selection dialogs are released after `exec()`. Their titles, actions,
 accept/reject behavior and resulting valid subplot creation remain unchanged.
 
+`MainWindowSubplotDialog` now contains only the local row/column selection UI.
+`MainWindow` remains responsible for applying an accepted selection through
+`CreateSubPlotWindow`; GUI_012 covers the unchanged cancellation and 2×3/1×2
+creation paths.
+
 Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
 plot/figure creation, command-line handling and dialogs. They each combine
 MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;

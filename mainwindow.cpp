@@ -30,6 +30,7 @@
 #include "UIFunctions/MainWindowOutputLog.h"
 #include "UIFunctions/MainWindowTreePath.h"
 #include "UIFunctions/MainWindowTreeViewState.h"
+#include "UIFunctions/MainWindowSubplotDialog.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -462,38 +463,10 @@ void MainWindow::DeleteFigure(SubPlotMainWindow* FigurePointer)
 
 void MainWindow::on_actionCreate_Subplot_triggered()
 {
-    //Row Column Dialog
-    QDialog * d = new QDialog(0, Qt::WindowSystemMenuHint | Qt::WindowTitleHint);
-    QWidget * uw = new QWidget(d);
-    QHBoxLayout * hbox = new QHBoxLayout(uw);
-    QVBoxLayout * vbox = new QVBoxLayout(d);
-    QComboBox * comboBoxA = new QComboBox();
-    comboBoxA->addItems(QStringList() << "1" << "2" << "3");
-    QComboBox * comboBoxB = new QComboBox();
-    comboBoxB->addItems(QStringList() << "1" << "2" << "3" << "4");
-    QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                        | QDialogButtonBox::Cancel);
-    QLabel *LR = new QLabel();
-    LR->setText(QString("Rows:"));
-    QLabel *LC = new QLabel();
-    LC->setText(QString("Columns:"));
-    QObject::connect(buttonBox, SIGNAL(accepted()), d, SLOT(accept()));
-    QObject::connect(buttonBox, SIGNAL(rejected()), d, SLOT(reject()));
-
-    hbox->addWidget(LR);
-    hbox->addWidget(comboBoxA);
-    hbox->addWidget(LC);
-    hbox->addWidget(comboBoxB);
-    vbox->addWidget(uw);
-    vbox->addWidget(buttonBox);
-    d->setLayout(vbox);
-
-    int result = d->exec();
-    if(result == QDialog::Accepted)
-    {
-        CreateSubPlotWindow(comboBoxA->currentText().toInt(),comboBoxB->currentText().toInt());
-    }
-    delete d;
+    int rows = 0;
+    int columns = 0;
+    if (MainWindowSubplotDialog::SelectDimensions(rows, columns))
+        CreateSubPlotWindow(rows, columns);
 }
 
 void MainWindow::CreateFFTPlotWindow()

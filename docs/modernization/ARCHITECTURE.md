@@ -286,6 +286,10 @@ state for the three explorer trees. It remains non-owning and preserves the
 historic asymmetry: Parameter and Data are re-sorted at publish end, while
 State only receives column sizing and update re-enablement.
 
+`UIFunctions/MainWindowSubplotDialog` is a private local UI boundary for the
+existing row/column selection. It owns no plot, manager or MainWindow state;
+MainWindow retains figure creation and registry coordination.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the
