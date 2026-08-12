@@ -2265,12 +2265,20 @@ void PlotWidget::dragEnterEvent(QDragEnterEvent *event)
 void PlotWidget::AddCustomXAxis(QString id)
 {
     MainWindow *MW = this->MainWindow_p;
-    MW->GetLogic()->AddElementToContainerEntry(this->objectName(),id,this->metaObject()->className(),this);
-    DataPair DP = MW->GetLogic()->GetContainer(id)->GetPointerPair();
-    if(DP.first)
+    DataManagementSetClass* manager = MW ? MW->GetLogic() : nullptr;
+    if (!manager || graphCount() == 0)
+        return;
+
+    manager->AddElementToContainerEntry(this->objectName(),id,this->metaObject()->className(),this);
+    ToFormMapper* xContainer = manager->GetContainer(id);
+    if (!xContainer)
+        return;
+
+    DataPair DP = xContainer->GetPointerPair();
+    if (DP.first && DP.second)
     {
-        ToFormMapper* Y = MainWindow_p->GetLogic()->GetContainer(graph(0)->name());
-        if(Y)
+        ToFormMapper* Y = manager->GetContainer(graph(0)->name());
+        if(Y && Y->GetPointerPair().second)
         {
             if(Y->GetPointerPair().second->size() == DP.second->size())
             {
@@ -2284,24 +2292,26 @@ void PlotWidget::AddCustomXAxis(QString id)
 void PlotWidget::AddCustomGraph(QString id, bool skip_register)
 {
     MainWindow *MW = this->MainWindow_p;
-    if(!skip_register)
-        MW->GetLogic()->AddElementToContainerEntry(this->objectName(),id,this->metaObject()->className(),this);
-
-    if(!(MW->GetLogic()->GetContainer(id)))
+    DataManagementSetClass* manager = MW ? MW->GetLogic() : nullptr;
+    if (!manager)
         return;
 
+    if(!skip_register)
+        manager->AddElementToContainerEntry(this->objectName(),id,this->metaObject()->className(),this);
 
+    ToFormMapper* container = manager->GetContainer(id);
+    if (!container)
+        return;
 
-    DataPair DP = MW->GetLogic()->GetContainer(id)->GetPointerPair();
-    if(DP.first && DP.second)
-    if(graphCount() == 0 &&  DP.first->size())
+    DataPair DP = container->GetPointerPair();
+    if (DP.first && DP.second && DP.third && graphCount() == 0 && DP.first->size())
     {
         Tmin = *(DP.third);
     }
 
     addGraph();
     graph()->setID(id);
-    graph()->setName(MW->GetLogic()->GetAlias(id));
+    graph()->setName(manager->GetAlias(id));
     QPen graphPen;
 
     if(__isFFT)

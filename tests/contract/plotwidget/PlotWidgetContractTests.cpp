@@ -38,6 +38,7 @@ private slots:
     void PLOT_010_foreign_drop_is_a_noop();
     void PLOT_011_senderless_selection_slot_is_a_noop();
     void PLOT_012_null_plottable_click_is_a_noop();
+    void PLOT_013_missing_manager_or_axis_container_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -363,6 +364,22 @@ void PlotWidgetContractTests::PLOT_012_null_plottable_click_is_a_noop()
     plot.AddCustomGraph("D::Clicked");
     plot.plottableClick(graph(plot, 0), nullptr);
     QCOMPARE(window.statusBar()->currentMessage(), QString("Clicked on graph 'D::Clicked'."));
+}
+
+void PlotWidgetContractTests::PLOT_013_missing_manager_or_axis_container_is_a_noop()
+{
+    QWidget host;
+    PlotWidget unmanaged(nullptr, &host, nullptr);
+    unmanaged.AddCustomGraph("Missing::Container");
+    QCOMPARE(unmanaged.graphCount(), 0);
+
+    MainWindow window;
+    QWidget managedHost(&window);
+    PlotWidget managed(&window, &managedHost, window.statusBar());
+    QVERIFY(QMetaObject::invokeMethod(&managed, "AddCustomXAxis", Qt::DirectConnection,
+                                      Q_ARG(QString, QString("Missing::Axis"))));
+    QCOMPARE(managed.graphCount(), 0);
+    QVERIFY(managed.XDataName().isEmpty());
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

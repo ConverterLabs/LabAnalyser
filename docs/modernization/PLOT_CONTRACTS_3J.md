@@ -93,3 +93,7 @@ connection remains the valid synchronization route.
 
 `PLOT_012` records `graphClicked()` with a null plottable as a no-op that
 preserves the statusbar text; a valid graph still reports its existing name.
+
+`PLOT_013` records no-op behavior for `AddCustomGraph()` without a manager and
+for `AddCustomXAxis()` without a graph or matching container. Valid manager
+backed graph creation is unchanged.
