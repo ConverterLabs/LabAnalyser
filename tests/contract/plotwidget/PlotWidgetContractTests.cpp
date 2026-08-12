@@ -1,6 +1,7 @@
 #include <QtTest>
 #include <QApplication>
 #include <QDir>
+#include <QInputDialog>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryDir>
@@ -30,6 +31,7 @@ private slots:
     void PLOT_004_data_shapes_and_non_finite_values();
     void PLOT_005_ranges_xml_and_navigation_state();
     void PLOT_006_connect_to_id_and_safe_cleanup();
+    void PLOT_007_quality_criteria_zero_frequency_has_bounded_indices();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -243,6 +245,32 @@ void PlotWidgetContractTests::PLOT_006_connect_to_id_and_safe_cleanup()
     QPointer<PlotWidget> guard(plot);
     delete plot;
     QVERIFY(guard.isNull());
+}
+
+void PlotWidgetContractTests::PLOT_007_quality_criteria_zero_frequency_has_bounded_indices()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    publish(window, "Quality::Sine", data({0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875},
+                                           {0.0, std::sqrt(0.5), 1.0, std::sqrt(0.5), 0.0,
+                                            -std::sqrt(0.5), -1.0, -std::sqrt(0.5)}));
+    plot.AddCustomGraph("Quality::Sine");
+    toggleFrequency(plot);
+
+    QTimer::singleShot(0, []() {
+        QInputDialog *dialog = qobject_cast<QInputDialog *>(QApplication::activeModalWidget());
+        if (dialog)
+        {
+            dialog->setDoubleValue(0.0);
+            dialog->accept();
+        }
+    });
+    QVERIFY(QMetaObject::invokeMethod(&plot, "ShowQualityCriteria", Qt::DirectConnection));
+    QVERIFY(QMetaObject::invokeMethod(&plot, "CalculateQualityCriteria", Qt::DirectConnection));
+    QCOMPARE(plot.graphCount(), 1);
+    QVERIFY(graph(plot, 0)->GetXFFTPointer());
+    QVERIFY(QMetaObject::invokeMethod(&plot, "ShowQualityCriteria", Qt::DirectConnection));
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

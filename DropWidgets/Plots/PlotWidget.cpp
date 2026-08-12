@@ -1634,7 +1634,8 @@ void PlotWidget::ShowQualityCriteria(void)
     if(__ShowQualityCriteria)
     {
         __ShowQualityCriteria = false;
-        QualityCriteriaText->deleteLater();
+        if (QualityCriteriaText)
+            QualityCriteriaText->deleteLater();
         QualityCriteriaText = nullptr;
     }
     else
@@ -1906,9 +1907,14 @@ void PlotWidget::CalculateQualityCriteria()
 
     for(int i = 0; i < graphCount(); i++)
     {
-        auto f = graph(i)->GetXFFTPointer();
-        auto a = graph(i)->GetYFFTPointer();
-        if(f && a)
+        QCPGraph *plotGraph = graph(i);
+        if (!plotGraph)
+            continue;
+
+        auto f = plotGraph->GetXFFTPointer();
+        auto a = plotGraph->GetYFFTPointer();
+        const int sampleCount = f && a ? static_cast<int>(std::min(f->size(), a->size())) : 0;
+        if(sampleCount > 0)
         {
             //find nearest element in f to f1
             auto f1_l =  std::distance(f->begin(), std::lower_bound(f->begin(), f->end(), f1-5));
@@ -1916,29 +1922,38 @@ void PlotWidget::CalculateQualityCriteria()
 
 
             double U1 = 0;
-            int f1m = std::round((f1_l+f1_u)/2);
-            int delta = std::round(f1_u-f1_l)/2;
+            int f1m = std::min(sampleCount - 1, std::max(0, static_cast<int>(std::round((f1_l+f1_u)/2))));
+            int delta = std::max(0, static_cast<int>(std::round(f1_u-f1_l)/2));
 
-            for( int i = f1m-delta; i < f1m+delta; i++)
+            if (f1m <= 0)
+                continue;
+
+            const int fundamentalFirst = std::max(0, f1m-delta);
+            const int fundamentalLast = std::min(sampleCount, f1m+delta);
+            for( int i = fundamentalFirst; i < fundamentalLast; i++)
             {
                 U1 += a->at(i);
             }
 
             auto U1sqare = U1*U1;
+            if (!std::isfinite(U1sqare) || U1sqare <= std::numeric_limits<double>::epsilon())
+                continue;
 
             //calculate THD
             double _THD = 0;
             double _WTHD = 0;
             double _RMS = 0;
             //iterate over all
-            for( int i = 0; i < f->size(); i++)
+            for( int i = 0; i < sampleCount; i++)
             {
                 _RMS += (a->at(i)*a->at(i));
              }
             int h = 2;
-            for( int i = 2*f1m; i < f->size(); i = i + f1m)
+            for( int i = 2*f1m; i < sampleCount; i = i + f1m)
             {
-                for(int j = i-delta; j < i+delta; j++)
+                const int harmonicFirst = std::max(0, i-delta);
+                const int harmonicLast = std::min(sampleCount, i+delta);
+                for(int j = harmonicFirst; j < harmonicLast; j++)
                 {
                     _THD += (a->at(i)*a->at(i))/U1sqare;
                     _WTHD += a->at(i) * a->at(i)/(U1sqare*h*h) ;
