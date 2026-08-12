@@ -34,6 +34,11 @@ public:
     // Legacy server decoder. Retained unchanged until the server delegation
     // slice adopts DecodeValidatedFrame().
     static DecodedFrame DecodeCompleteFrame(const QByteArray& frame);
+    static constexpr quint64 MaxEncodedReplySize = 1024 * 1024;
+    static bool CanEncodePaddedReplyElements(quint64 elements);
+    static bool CanEncodeVectorReplyElements(quint64 timeElements, quint64 dataElements);
+    static bool TryEncodeStringReply(const QString& value, QByteArray* reply);
+    static bool TryEncodeVectorReply(const std::vector<double>& time, const std::vector<double>& data, QByteArray* reply);
     static QByteArray EncodeEmptyReply();
     static QByteArray EncodeNumericReply(double value);
     static QByteArray EncodeStringReply(const QString& value);

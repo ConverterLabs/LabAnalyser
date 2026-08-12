@@ -128,6 +128,7 @@ void RemoteControlServer::HeaderReceived()
             if (decoded.CommandType == RemoteControlProtocol::Command::Get)
             {
                 QByteArray DataOut = RemoteControlProtocol::EncodeEmptyReply();
+                bool replyEncodable = true;
 
                 if (this->DataContainer)
                 {
@@ -141,35 +142,30 @@ void RemoteControlServer::HeaderReceived()
                         }
                         else if (Data_.IsString() || Data_.IsStringList())
                         {
-                            DataOut = RemoteControlProtocol::EncodeStringReply(Data_.GetString());
+                            replyEncodable = RemoteControlProtocol::TryEncodeStringReply(Data_.GetString(), &DataOut);
                         }
                         else if (Data_.IsGuiSelection())
                         {
-                            DataOut = RemoteControlProtocol::EncodeStringReply(Data_.GetGuiSelection().first);
+                            replyEncodable = RemoteControlProtocol::TryEncodeStringReply(Data_.GetGuiSelection().first, &DataOut);
                         }
                         else if (Data_.IsPairOfVectorOfDoubles())
                         {
                             auto pointerPair = Data_.GetPointerPair();  // Store result to ensure consistency
                             if (pointerPair.first && pointerPair.second) {
-                                std::vector<double> Time;
-                                std::vector<double> MeasuredDataOut;
-
                                 auto TP = pointerPair.first;
                                 auto DP = pointerPair.second;
-
-                                if (TP && !TP->empty()) {
-                                    Time.insert(Time.end(), TP->begin(), TP->end());
-                                } else {
-                                    Time.push_back(0.0);
+                                const quint64 timeElements = TP->empty() ? 1 : TP->size();
+                                const quint64 dataElements = DP->empty() ? 1 : DP->size();
+                                if (!RemoteControlProtocol::CanEncodeVectorReplyElements(timeElements, dataElements))
+                                {
+                                    replyEncodable = false;
                                 }
-
-                                if (DP && !DP->empty()) {
-                                    MeasuredDataOut.insert(MeasuredDataOut.end(), DP->begin(), DP->end());
-                                } else {
-                                    MeasuredDataOut.push_back(0.0);
+                                else
+                                {
+                                    std::vector<double> Time = TP->empty() ? std::vector<double>{0.0} : *TP;
+                                    std::vector<double> MeasuredDataOut = DP->empty() ? std::vector<double>{0.0} : *DP;
+                                    replyEncodable = RemoteControlProtocol::TryEncodeVectorReply(Time, MeasuredDataOut, &DataOut);
                                 }
-
-                                DataOut = RemoteControlProtocol::EncodeVectorReply(Time, MeasuredDataOut);
                             }
                             else
                             {
@@ -198,7 +194,7 @@ void RemoteControlServer::HeaderReceived()
                         // check if there are any keys
                         if (Keys.size())
                         {
-                            DataOut = RemoteControlProtocol::EncodeStringReply(Keys);
+                            replyEncodable = RemoteControlProtocol::TryEncodeStringReply(Keys, &DataOut);
                         }
                         else
                         {
@@ -209,6 +205,11 @@ void RemoteControlServer::HeaderReceived()
                 QTcpSocket* currentSocket = ConnectionState.GetCurrentSocket();
                 if (!currentSocket)
                     return;
+                if (!replyEncodable)
+                {
+                    currentSocket->abort();
+                    return;
+                }
                 currentSocket->write(DataOut);
             }
         }

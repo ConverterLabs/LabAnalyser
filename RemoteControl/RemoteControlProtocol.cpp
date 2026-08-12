@@ -1,6 +1,7 @@
 #include "RemoteControlProtocol.h"
 
 #include <cstring>
+#include <limits>
 
 namespace {
 bool readUInt32Safely(const QByteArray& bytes, int offset, uint32_t* value)
@@ -27,6 +28,9 @@ QByteArray encodeDouble(double value)
 {
     return QByteArray(reinterpret_cast<const char*>(&value), sizeof(value));
 }
+
+constexpr quint64 kReplyHeaderSize = 1 + sizeof(uint32_t);
+constexpr quint64 kDoubleSize = sizeof(double);
 }
 
 RemoteControlProtocol::DecodedFrame RemoteControlProtocol::DecodeValidatedFrame(const QByteArray& frame)
@@ -102,6 +106,58 @@ QByteArray RemoteControlProtocol::EncodeEmptyReply()
     return QByteArray(1, '\0') + encodeUInt32(0);
 }
 
+bool RemoteControlProtocol::CanEncodePaddedReplyElements(quint64 elements)
+{
+    return elements <= uint32_t(-1)
+            && elements <= (MaxEncodedReplySize - kReplyHeaderSize) / kDoubleSize;
+}
+
+bool RemoteControlProtocol::CanEncodeVectorReplyElements(quint64 timeElements, quint64 dataElements)
+{
+    if (timeElements > std::numeric_limits<quint64>::max() - dataElements)
+        return false;
+    return CanEncodePaddedReplyElements(timeElements + dataElements);
+}
+
+bool RemoteControlProtocol::TryEncodeStringReply(const QString& value, QByteArray* reply)
+{
+    if (!reply)
+        return false;
+
+    const std::string text = value.toStdString();
+    const quint64 textBytes = std::strlen(text.c_str());
+    if (textBytes == std::numeric_limits<quint64>::max()
+            || !CanEncodePaddedReplyElements(textBytes + 1))
+        return false;
+
+    const quint64 elements = textBytes + 1;
+    const quint64 payloadBytes = elements * kDoubleSize;
+    QByteArray encoded(1, '\1');
+    encoded.append(encodeUInt32(uint32_t(elements)));
+    encoded.append(text.data(), int(textBytes));
+    encoded.append(int(payloadBytes - textBytes), '\0');
+    *reply = encoded;
+    return true;
+}
+
+bool RemoteControlProtocol::TryEncodeVectorReply(const std::vector<double>& time,
+                                                  const std::vector<double>& data,
+                                                  QByteArray* reply)
+{
+    if (!reply || !CanEncodeVectorReplyElements(time.size(), data.size()))
+        return false;
+
+    const quint64 elements = time.size() + data.size();
+    QByteArray encoded(1, '\0');
+    encoded.append(encodeUInt32(uint32_t(elements)));
+    if (!time.empty())
+        encoded.append(reinterpret_cast<const char*>(time.data()), int(kDoubleSize * time.size()));
+    if (!data.empty())
+        encoded.append(reinterpret_cast<const char*>(data.data()), int(kDoubleSize * data.size()));
+    *reply = encoded;
+    return true;
+}
+
 QByteArray RemoteControlProtocol::EncodeNumericReply(double value)
 {
     return QByteArray(1, '\0') + encodeUInt32(1) + encodeDouble(value);
@@ -109,24 +165,14 @@ QByteArray RemoteControlProtocol::EncodeNumericReply(double value)
 
 QByteArray RemoteControlProtocol::EncodeStringReply(const QString& value)
 {
-    const std::string text = value.toStdString();
-    const uint32_t elements = uint32_t(std::strlen(text.c_str()) + 1);
-    QByteArray dataOut(1, '\1');
-    dataOut.append(encodeUInt32(elements));
-    std::vector<char> padded(elements * 8, 0);
-    for (uint32_t i = 0; i < elements; i++)
-        padded[i] = text[i];
-    dataOut.append(padded.data(), int(padded.size()));
-    return dataOut;
+    QByteArray reply;
+    TryEncodeStringReply(value, &reply);
+    return reply;
 }
 
 QByteArray RemoteControlProtocol::EncodeVectorReply(const std::vector<double>& time, const std::vector<double>& data)
 {
-    QByteArray dataOut(1, '\0');
-    dataOut.append(encodeUInt32(uint32_t(time.size() + data.size())));
-    if (!time.empty())
-        dataOut.append(reinterpret_cast<const char*>(time.data()), int(sizeof(double) * time.size()));
-    if (!data.empty())
-        dataOut.append(reinterpret_cast<const char*>(data.data()), int(sizeof(double) * data.size()));
-    return dataOut;
+    QByteArray reply;
+    TryEncodeVectorReply(time, data, &reply);
+    return reply;
 }

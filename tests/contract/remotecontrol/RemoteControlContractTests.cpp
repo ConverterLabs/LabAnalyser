@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <cstring>
 #include <cstdint>
+#include <limits>
 
 // Test-only seam: exposes the private QTcpServer member solely to observe its
 // QObject-owned accepted sockets. Production headers and targets are unchanged.
@@ -188,6 +189,8 @@ private slots:
     void TCP_027_qStringAndStringListLegacyPayloads();
     void TCP_028_guiSelectionLegacyPayloads();
     void TCP_029_optionalTrailingNulHelper();
+    void TCP_030_replyEncoderSizeLimits();
+    void TCP_031_oversizedGetReplyAbortsAndFreshConnectionRecovers();
     void TCP_DM_001_tcpSetMutatesContainerThroughMessenger();
     void frameSplitterPreservesPartialRemainder();
 };
@@ -812,6 +815,47 @@ void RemoteControlContractTests::TCP_029_optionalTrailingNulHelper() {
         QCOMPARE(RemoteControlProtocol::RemoveOptionalTrailingNul(payloads[index]), expected[index]);
         QCOMPARE(payloads[index], original);
     }
+}
+
+void RemoteControlContractTests::TCP_030_replyEncoderSizeLimits() {
+    const quint64 maxElements = (RemoteControlProtocol::MaxEncodedReplySize - 5) / sizeof(double);
+    QVERIFY(RemoteControlProtocol::CanEncodePaddedReplyElements(maxElements));
+    QVERIFY(RemoteControlProtocol::CanEncodeVectorReplyElements(maxElements - 1, 1));
+    QVERIFY(!RemoteControlProtocol::CanEncodePaddedReplyElements(maxElements + 1));
+    QVERIFY(!RemoteControlProtocol::CanEncodeVectorReplyElements(std::numeric_limits<quint64>::max(), 1));
+
+    QByteArray encoded;
+    const QString maxString(int(maxElements - 1), QLatin1Char('A'));
+    QVERIFY(RemoteControlProtocol::TryEncodeStringReply(maxString, &encoded));
+    QCOMPARE(encoded.size(), int(5 + maxElements * sizeof(double)));
+    QCOMPARE(uchar(encoded.at(0)), uchar(1));
+    QCOMPARE(readU32(encoded, 1), uint32_t(maxElements));
+    QCOMPARE(encoded.mid(5, 3), QByteArray("AAA"));
+    QVERIFY(!RemoteControlProtocol::TryEncodeStringReply(QString(int(maxElements), QLatin1Char('A')), &encoded));
+}
+
+void RemoteControlContractTests::TCP_031_oversizedGetReplyAbortsAndFreshConnectionRecovers() {
+    std::map<QString, ToFormMapper*> data;
+    const size_t oversizedElements = size_t((RemoteControlProtocol::MaxEncodedReplySize - 5) / sizeof(double)) + 1;
+    data["large"] = vectors(std::vector<double>(oversizedElements, 1.0), {});
+    data["small"] = numeric(9.0);
+    RemoteControlServer server(&data);
+    QSignalSpy messages(&server, &RemoteControlServer::MessageSender);
+    QVERIFY(messages.isValid());
+
+    QTcpSocket* client = connectClient(server, this);
+    client->write(frame("get", "large"));
+    QVERIFY(client->waitForBytesWritten(1000));
+    QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    QCOMPARE(messages.count(), 0);
+
+    QTcpSocket* fresh = connectClient(server, this);
+    fresh->write(frame("get", "small"));
+    QVERIFY(fresh->waitForBytesWritten(1000));
+    QCOMPARE(readReply(fresh, 13), numericReply(9.0));
+    QCOMPARE(messages.count(), 0);
+    QVERIFY(finalizeRemoteServer(server, {client, fresh}));
+    clear(data);
 }
 
 void RemoteControlContractTests::TCP_DM_001_tcpSetMutatesContainerThroughMessenger() {
