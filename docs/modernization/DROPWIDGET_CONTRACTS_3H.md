@@ -10,6 +10,36 @@ runner temporarily sets `QT_QPA_PLATFORM=offscreen` and restores the caller's
 environment on exit. Fixtures use `QFINDTESTDATA` from the repository-relative
 test source location and contain no machine paths.
 
+## Internal adapter modernization checkpoint (2026-08-12)
+
+The established `DW_001..DW_018` contracts now protect a structural migration
+of the non-plot adapter implementation. The historical Designer-facing names
+(`QSliderD`, `QLineEditD`, `QComboBoxD`, and peers) remain the compatibility
+surface used by legacy `.ui` documents, but shared implementation is no longer
+duplicated in each adapter:
+
+- `DropWidgetUpdate` retains the historic programmatic-update signal-blocking
+  convention;
+- `DropWidgetBinding` centralizes the existing direct request/value signal
+  connections without deduplication, name migration or lifetime changes;
+- `DropWidgetDataAccess` centralizes numeric admission and LED bit/XML value
+  conversions while each adapter retains its own range, rounding and visual
+  behavior;
+- `DropWidgetsUiLoader` maps the same Designer class names through a
+  data-driven factory and retains the base-loader fallback and PlotWidget
+  special path;
+- `DropWidgetTableCells` owns only historical table-cell construction,
+  preserving the original object-name formula, type choice and manager binding.
+
+No Qt public/metaobject surface, XML attribute, manager protocol, UI fixture or
+legacy experiment fixture changed. The focused CMake checkpoint built the
+application and ran `DropWidgetAdapterTests`, `MainWindowIntegrationTests` and
+the complete `XmlExperimentContractTests` green (3/3); the reconfigured
+existing qmake adapter target also rebuilt and passed offscreen. All five
+fixture SHA-256 values matched `MANIFEST.md`, `git ls-files --eol` retained
+`-text`/LF fixture bytes, and the configured sensitivity/artifact scan was
+clean. The byte-protected files are never rewritten by this migration.
+
 The 2026-08-04 instrumented suite passed with 15 Qt Test checks, zero failures
 and exit code 0. The full runner passed after the accepted split verification:
 the single `-Clean` invocation reached the hard 300-second execution limit only

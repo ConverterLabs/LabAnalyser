@@ -25,7 +25,7 @@ Qt UI / .ui forms --> MainWindow --> DataManagementSetClass --> Messenger <-- pl
 | Persistence/import | `xmlexperimentreader.*`, `xmlexperimentwriter.*`, `parameterloader.*`, `exportinputs2xml.*` | Experiment XML (`Experiment` with Tabs, Devices, Widgets, State, FigureWindows, Connections), parameter XML, absolute/relative paths, UI state. |
 | Export | `Export2Mat.*`, `export2highfive.*` | MATLAB MAT via libmatio and HDF5 via HighFive/HDF5. Output schema has not yet been fixture-characterized. |
 | Plot/numerics | `PlotWidget`, `FFTPlotWidget`, `PlotMeasurements`, vendored `qcustomplot` | Charts, FFT, interpolation, interval statistics, RMS and THD. `PlotMeasurements` is the only tested production module. |
-| Custom/drop widgets | `DropWidgets/*`, `CustomWidgets/*` | Widget-specific binding, data updates, XML save/load, and visual indicators. |
+| Custom/drop widgets | `DropWidgets/*`, `CustomWidgets/*` | Thin Designer-facing adapters over shared update, binding and data-access helpers; data-driven UI-loader mapping; table-cell construction is isolated from table row lifecycle. |
 | Network | `RemoteControlServer`, private `RemoteControlConnectionState`, `RemoteControlFrameSplitter`, `RemoteControlProtocol` | `RemoteControlServer` remains the Qt transport and dispatch facade for the loopback binary `set`/`get` protocol (initial port 4080, incremented until bound). `RemoteControlConnectionState` observes the current non-owning socket and its sole frame state; `RemoteControlFrameSplitter` bounds native frames to 16 bytes--1 MiB and separates complete frames from remainder bytes; `RemoteControlProtocol` validates/decodes complete frames before dispatch. Invalid prefixes abort the current connection; bounded structural-invalid frames are discarded. The implementation still has only the last-accepted-client contract, not independent multi-client sessions or new socket ownership. |
 
 ## External formats and dependencies
@@ -268,3 +268,16 @@ A future modern model must retain this through an explicit
 to retire old internal readers only after semantic parity is demonstrated with
 `XML_LEGACY_001..XML_LEGACY_005`; fixture SHA-256 bytes and `.gitattributes`
 protection remain immutable.
+
+## DropWidget compatibility adapters
+
+The historical Designer names remain the external `.ui` boundary, but the
+adapter implementations now share three internal mechanisms:
+`DropWidgetUpdate` for existing programmatic signal blocking,
+`DropWidgetBinding` for direct manager signal connections, and
+`DropWidgetDataAccess` for numeric/indicator/XML value conversion. The
+data-driven `DropWidgetsUiLoader` maps the same legacy class names and leaves
+the base-loader fallback and PlotWidget branch intact. `DropWidgetTableCells`
+constructs the existing dynamic table cells; `QTableWidgeD` retains row order,
+manager lifecycle and removal behavior. These are private implementation
+boundaries, not new UI or ABI contracts.

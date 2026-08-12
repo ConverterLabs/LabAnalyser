@@ -906,3 +906,27 @@ checks. A future `LegacyExperimentReader`/`LegacyExperimentAdapter` may bridge
 old documents to a new internal model; old reader code is removable only after
 that semantic parity is demonstrated. This does not require preservation of
 the old internal structure.
+
+## DropWidget structural modernization package
+
+**Completed locally; remote package checkpoint pending.** The private adapter
+implementation now has shared update, direct-binding and data-access helpers;
+the standard UI-loader map is data-driven; and dynamic table-cell creation is
+isolated from `QTableWidgeD` row lifecycle. The legacy Designer class names,
+Qt metaobjects, UI mapping, XML attributes, signal order and repeated
+connection semantics remain the compatibility boundary. The focused CMake
+checkpoint built the application and passed `DropWidgetAdapterTests`,
+`MainWindowIntegrationTests` and `XmlExperimentContractTests` (3/3); the
+existing qmake DropWidget target was reconfigured, rebuilt and passed
+offscreen. `XML_LEGACY_001..005` passed, all five protected fixture SHA-256
+values matched `MANIFEST.md`, and EOL/sensitivity/artifact checks were clean.
+
+CI remains the remote full CTest/qmake package checkpoint.
+The local non-clean central qmake runner was started and then continued once in
+the same build tree; both invocations ended only at the external 120-second
+limit after green plugin-fixture, unit, DataManagement, XML and parameter work
+and during later already-reconfigured contract targets. No compiler or test
+failure was observed, but this is not a claim of a complete local runner.
+No architectural claim is made for the retained dangerous top-level MainWindow
+lookup, source-dependent drag/drop, stale raw widget pointers, PlotWidget
+branch, visual pixel behavior or deferred table XML timer path.

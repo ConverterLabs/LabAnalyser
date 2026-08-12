@@ -1058,3 +1058,23 @@ Nonnull stale raw widget pointers are deliberately not treated as safe: the
 historical object-name registry has no QObject lifetime tracking, so a robust
 fix needs a separately approved ownership/binding change. See
 `CRASH_NULL_SAFETY_5A.md`.
+
+## DropWidget structural modernization (2026-08-12)
+
+`DW_001..DW_018` remain the behavior boundary for the Designer-facing adapter
+classes. `DropWidgetUpdate`, `DropWidgetBinding` and `DropWidgetDataAccess`
+now hold shared update, direct signal-binding and value/XML conversion logic;
+the concrete wrappers retain their names, Qt properties, type admission,
+rounding, direct-connection and repeated-connection behavior. The loader's
+standard adapter mapping is data-driven, but unsupported-widget fallback and
+the PlotWidget special path remain unchanged. `QTableWidgeD` retains row/order
+and removal behavior while `DropWidgetTableCells` constructs its historical
+numeric/editable-bool/read-only-bool cells and bindings.
+
+Focused CMake evidence is green for `DropWidgetAdapterTests`,
+`MainWindowIntegrationTests` and the full XML suite; the existing qmake
+DropWidget target was reconfigured, rebuilt and passed offscreen. The five
+protected SHA-256 values match `MANIFEST.md`, their `-text` EOL protection is
+intact, and the sensitivity/artifact scan is clean. No legacy fixture, XML
+schema, Designer class name, public adapter header or Qt metaobject surface
+changed.
