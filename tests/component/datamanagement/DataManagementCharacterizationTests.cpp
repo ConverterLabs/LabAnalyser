@@ -143,6 +143,7 @@ private slots:
     void DM_009_setDataWidgetPropagationAndRequests();
     void DM_010_setOwnershipAndRepeatedDataFlow();
     void DM_SAFE_001_senderless_and_unknown_setter_slots_are_noops();
+    void DM_SAFE_002_messenger_without_optional_parent_boundaries_is_safe();
     void DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal();
     void DM_REG_002_skipFormFlags_override_and_project_cleanup();
     void DM_REG_003_aliases_accept_unknown_empty_and_unicode_keys();
@@ -646,6 +647,42 @@ void DataManagementCharacterizationTests::DM_SAFE_001_senderless_and_unknown_set
     manager.SetData(QString());
     manager.SetData(QString("missing"));
     QCOMPARE(messages.count(), 0);
+}
+
+void DataManagementCharacterizationTests::DM_SAFE_002_messenger_without_optional_parent_boundaries_is_safe()
+{
+    MessengerClass parentless(nullptr, nullptr);
+    QSignalSpy parentlessInfo(&parentless, &MessengerClass::InfoWriter);
+    QSignalSpy parentlessError(&parentless, &MessengerClass::ErrorWriter);
+    QSignalSpy parentlessNotification(&parentless, &MessengerClass::NotificationWriter);
+    QSignalSpy parentlessClose(&parentless, &MessengerClass::CloseProject);
+    parentless.SendInfo(QString("ignored"));
+    parentless.SendError(QString("ignored"));
+    parentless.NewDeviceRegistration(nullptr);
+    parentless.MessageReceiver("CloseProject", "manual", InterfaceData());
+    QCOMPARE(parentlessInfo.count(), 0);
+    QCOMPARE(parentlessError.count(), 0);
+    QCOMPARE(parentlessNotification.count(), 0);
+    QCOMPARE(parentlessClose.count(), 1);
+
+    QObject root;
+    root.setObjectName("root");
+    MessengerClass direct(&root, nullptr);
+    QSignalSpy directNotification(&direct, &MessengerClass::NotificationWriter);
+    QSignalSpy directClose(&direct, &MessengerClass::CloseProject);
+    direct.MessageReceiver("CloseProject", "manual", InterfaceData());
+    QCOMPARE(directNotification.count(), 0);
+    QCOMPARE(directClose.count(), 1);
+
+    QObject application;
+    application.setObjectName("LabAnalyser");
+    DataManagementSetClass manager(&application);
+    QSignalSpy notifications(manager.GetMessenger(), &MessengerClass::NotificationWriter);
+    QSignalSpy closed(manager.GetMessenger(), &MessengerClass::CloseProject);
+    manager.GetMessenger()->MessageReceiver("CloseProject", "manual", InterfaceData());
+    QCOMPARE(notifications.count(), 1);
+    QCOMPARE(notifications.at(0).at(0).toString(), QString("LabAnalyser"));
+    QCOMPARE(closed.count(), 1);
 }
 
 void DataManagementCharacterizationTests::DM_REG_001_formFiles_preserve_order_duplicates_and_first_removal()

@@ -72,9 +72,13 @@ void MessengerClass::MessageReceiver(const QString &Command, const QString &ID, 
             break;
         case MessageDispatchIntent::WriteCloseProjectNotification:
             {
+                QObject* manager = this->parent();
+                QObject* application = manager ? manager->parent() : nullptr;
+                if (!application)
+                    break;
                 InterfaceData closeData;
                 closeData.SetData("Closing forced by: " + ID);
-                NotificationWriter(this->parent()->parent()->objectName(), closeData.GetString());
+                NotificationWriter(application->objectName(), closeData.GetString());
             }
             break;
         case MessageDispatchIntent::PublishFinished:
@@ -96,16 +100,20 @@ void MessengerClass::MessageTransmitter(const QString &Command, const QString &I
 
 void MessengerClass::SendInfo(QString text)
 {
-    InfoWriter(this->parent()->objectName(), text);
+    if (this->parent())
+        InfoWriter(this->parent()->objectName(), text);
 }
 
 void MessengerClass::SendError(QString text)
 {
-    ErrorWriter(this->parent()->objectName(), text);
+    if (this->parent())
+        ErrorWriter(this->parent()->objectName(), text);
 }
 
 void MessengerClass::NewDeviceRegistration(QObject * Object)
 {
+    if (!Object)
+        return;
     connect(this, SIGNAL(MessageSender(QString,QString,InterfaceData)), Object, SLOT(MessageReceiver(QString,QString,InterfaceData)));
     connect(Object, SIGNAL(MessageSender(QString,QString,InterfaceData)), this, SLOT(MessageReceiver(QString,QString,InterfaceData)));
 }
