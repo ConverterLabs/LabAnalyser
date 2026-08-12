@@ -38,6 +38,7 @@
 #include "UIFunctions/MainWindowDockPresentation.h"
 #include "UIFunctions/MainWindowTrayController.h"
 #include "UIFunctions/MainWindowProjectCleanup.h"
+#include "UIFunctions/MainWindowContextMenus.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -210,101 +211,23 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 //This function is connected to the contextMenuRequest of the DockWidgets
 void MainWindow::contextMenuTreeWidget(QPoint pos)
 {
-    //Add a Min Max Context Menu when an element without childs is selected
-    //the tree repesents always the ID e.g ID Parameter::One --> Parameter -> one
-    QList<QTreeWidgetItem*> selectedItems = ui->ParameterTreeWidget->selectedItems();
-    if(selectedItems.size() == 1)
-    {
-        if (selectedItems[0]->childCount() == 0)
-        {
-            QMenu *menu = new QMenu(this);
-            menu->setAttribute(Qt::WA_DeleteOnClose);
-            menu->addAction("Change Min/Max Values", this, SLOT(ChangeMinMaxValue()));
-            menu->popup(ui->ParameterDock->mapToGlobal(pos));
-        }
-        else if(!(selectedItems[0]->parent()))
-        {
-
-            //this is top level, we can remove the device here
-            QMenu *menu = new QMenu(this);
-            menu->setObjectName(selectedItems[0]->text(0));
-            menu->setAttribute(Qt::WA_DeleteOnClose);
-            menu->addAction("Remove Device", this, SLOT(RemoveDevice()));
-            menu->popup(ui->ParameterDock->mapToGlobal(pos));
-        }
-    }
+    MainWindowContextMenus::ShowParameter(*ui->ParameterTreeWidget, *ui->ParameterDock,
+                                          pos, *this, this);
 }
 
 void MainWindow::contextMenuTreeWidgetState(QPoint pos)
 {
-    //Add a Min Max Context Menu when an element without childs is selected
-    //the tree repesents always the ID e.g ID Parameter::One --> Parameter -> one
-    QList<QTreeWidgetItem*> selectedItems = ui->StateTreeWidget->selectedItems();
-    if(selectedItems.size() == 1)
-    {
-        if(!(selectedItems[0]->parent()))
-        {
-            //this is top level, we can remove the device here
-            QMenu *menu = new QMenu(this);
-            menu->setObjectName(selectedItems[0]->text(0));
-            menu->setAttribute(Qt::WA_DeleteOnClose);
-            menu->addAction("Remove Device", this, SLOT(RemoveDevice()));
-            menu->popup(ui->ParameterDock->mapToGlobal(pos));
-        }
-    }
+    MainWindowContextMenus::ShowState(*ui->StateTreeWidget, *ui->ParameterDock, pos, *this, this);
 }
 
 
 //This function is connected to the contextMenuRequest of the DockWidgets
 void MainWindow::contextMenuTreeWidgetData(QPoint pos)
 {
-    //Add a Min Max Context Menu when an element without childs is selected
-    //the tree repesents always the ID e.g ID Parameter::One --> Parameter -> one
-    QList<QTreeWidgetItem*> selectedItems = ui->DataTreeWidget->selectedItems();
-    if(selectedItems.size())
-    {
-        if (selectedItems[0]->childCount() == 0)
-        {
-            QMenu *menu = new QMenu(this);
-            menu->setAttribute(Qt::WA_DeleteOnClose);
-
-            QList<QTreeWidgetItem*> items = selectedItems;
-            QString Ids;
-            for(int i = 0; i < items.size(); i++)
-            {
-                if(items.at(i)->childCount()==0)
-                {
-                    Ids.push_back(MainWindowTreePath::IdForItem(items.at(i)));
-                }
-            }
-            QAction *SetAliasAction = new QAction(menu);
-                connect(SetAliasAction, &QAction::triggered, [=]{
-                    SetAlias(GetLogic()->GetAlias(Ids));});
-
-            QAction *RemoveAliasAction = new QAction(menu);
-                connect(RemoveAliasAction, &QAction::triggered, [=]{
-                    RemoveAlias(Ids);});
-
-            SetAliasAction->setText("Set Alias");
-            RemoveAliasAction->setText("Remove Alias");
-            menu->addAction( SetAliasAction);
-
-            if(this->GetLogic()->GetAlias(Ids).compare(Ids))
-                menu->addAction( RemoveAliasAction);
-
-            menu->popup(ui->DataTreeWidget->mapToGlobal(pos));
-        }
-        else if(!(selectedItems[0]->parent()))
-        {
-            //this is top level, we can remove the device here
-            QMenu *menu = new QMenu(this);
-            menu->setObjectName(selectedItems[0]->text(0));
-
-            menu->setAttribute(Qt::WA_DeleteOnClose);
-            menu->addAction("Remove Device", this, SLOT(RemoveDevice()));
-            menu->popup(ui->DataTreeWidget->mapToGlobal(pos));
-        }
-    }
+    MainWindowContextMenus::ShowData(*ui->DataTreeWidget, *ui->DataDock, pos, *this,
+                                     [this](const QString& id) { return GetLogic()->GetAlias(id); },
+                                     [this](const QString& id) { SetAlias(id); },
+                                     [this](const QString& id) { RemoveAlias(id); }, this);
 }
 
 void MainWindow::RemoveAlias(QString ID)

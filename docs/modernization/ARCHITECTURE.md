@@ -317,6 +317,10 @@ MainWindow retains the QSystemTrayIcon, public slots and window lifetime.
 existing figure, dynamic-form, explorer-tree and DataManagement close sequence.
 MainWindow retains loading deferral and all user-facing save/close decisions.
 
+`UIFunctions/MainWindowContextMenus` is a private menu-construction boundary
+for the three explorer trees. It owns no QAction behavior, manager state or
+dialog: MainWindow remains the QObject slot receiver and mutation boundary.
+
 ## DropWidget compatibility adapters
 
 The historical Designer names remain the external `.ui` boundary, but the

@@ -1085,6 +1085,10 @@ action/slot contract; GUI_003 and GUI_013 remain the behavioral coverage.
 sequence. MainWindow deliberately retains loading deferral and all visible
 Save/Discard/Cancel routing; GUI_006/007/011 preserve the lifecycle contract.
 
+`MainWindowContextMenus` isolates private explorer context-menu construction.
+MainWindow retains sender-dependent slots, dialogs and all manager mutation;
+GUI_016 and GUI_019–021 preserve the valid-selection contracts.
+
 CloseProject now uses a non-owning QPointer around the historical explicit dock
 delete, preventing a second deletion if the existing close handling already
 destroyed that dock.

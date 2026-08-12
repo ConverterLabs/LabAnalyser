@@ -668,6 +668,10 @@ restore through the unchanged MainWindow slots.
 cleanup sequence. GUI_006/007/011 cover dynamic forms, cancellation and safe
 dock cleanup; loading deferral and dialog decisions remain MainWindow behavior.
 
+`MainWindowContextMenus` constructs the private valid-selection context menus.
+GUI_016 and GUI_019–021 cover action availability, alias routing and device
+removal; mutation, dialogs and sender-dependent slots remain MainWindow.
+
 CloseProject's existing live-dock vectors additionally cover its guarded
 post-close deletion: an already-destroyed dock is not deleted twice.
 

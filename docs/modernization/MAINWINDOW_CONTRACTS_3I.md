@@ -349,6 +349,11 @@ figure close, dynamic-form dock cleanup, explorer-tree clearing and manager
 cleanup. The `isloading` deferral and all Save/Discard/Cancel routing remain
 in MainWindow. GUI_006/007/011 preserve this observable lifecycle.
 
+`MainWindowContextMenus` now contains the private menu construction for valid
+Parameter, State and Data tree selections. GUI_016 and GUI_019–021 preserve
+action availability, routing, alias behavior and the historical State-menu
+popup anchor; MainWindow retains the slots and all mutation/dialog behavior.
+
 `GUI_SAFE_008` verifies that the temporary Set/Remove Alias actions are owned
 by the temporary data context menu. The existing valid alias action, ID and
 multi-selection behavior remain covered by GUI_016 and GUI_020.
