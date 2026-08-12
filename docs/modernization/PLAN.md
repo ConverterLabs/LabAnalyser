@@ -926,3 +926,7 @@ Parameter-`QStringList` admission rule as drag enter. Plot widgets are outside
 this work. Global locale changes, table XML timer/ownership behavior, stale
 name-keyed bindings and the unconditional legacy list status message remain
 separate, behavior-sensitive work.
+
+The shared DropWidget context-menu helper is also protected against an invalid
+standard-line-edit downcast (`DW_037`); non-line-edit callers retain generic
+menus and valid line edits retain Qt's standard menu.

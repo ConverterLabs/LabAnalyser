@@ -1134,3 +1134,7 @@ fix needs a separately approved ownership/binding change. See
 limited to `Parameter` containers holding `QStringList`; missing, state-list
 and scalar containers are not list-binding candidates. The historical manual
 entry path and status-message behavior remain outside this narrow alignment.
+
+`DropWidgetConnectionMenu::Show` is mapped to `DW_037`: a true standard-menu
+option uses a standard menu only for a real `QLineEdit`; all other widgets use
+the existing generic owned menu, and a null widget is ignored.

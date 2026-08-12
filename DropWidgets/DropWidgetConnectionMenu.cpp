@@ -11,12 +11,16 @@ namespace DropWidgetConnectionMenu
 {
 void Show(QWidget* widget, const QPoint& position, const Options& options)
 {
+    if (!widget)
+        return;
+
     MainWindow* mainWindow = GetMainWindow();
     if (!mainWindow)
         return;
 
-    QMenu* menu = options.standardLineEditMenu
-            ? static_cast<QLineEdit*>(widget)->createStandardContextMenu()
+    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
+    QMenu* menu = options.standardLineEditMenu && lineEdit
+            ? lineEdit->createStandardContextMenu()
             : new QMenu(widget);
     if (options.deleteOnClose)
         menu->setAttribute(Qt::WA_DeleteOnClose);

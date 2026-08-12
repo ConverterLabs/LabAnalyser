@@ -5,6 +5,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QAction>
+#include <QMenu>
 #include <QImage>
 #include <QTimer>
 #include "DropWidgets/CreateID.h"
@@ -13,6 +14,7 @@
 #include "DropWidgets/DropWidgetDropBinding.h"
 #include "DropWidgets/DropWidgetIndicatorBinding.h"
 #include "DropWidgets/DropWidgetListBinding.h"
+#include "DropWidgets/DropWidgetConnectionMenu.h"
 #include "DropWidgets/DropWidgetTreePath.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
 #include "TreeWidgetCustomDrop.h"
@@ -75,6 +77,7 @@ private slots:
     void DW_034_combo_output_rejects_incompatible_mapper();
     void DW_035_indicator_type_admission_rejects_incompatible_mapper();
     void DW_036_list_binding_admits_only_parameter_string_lists();
+    void DW_037_context_menu_falls_back_for_non_line_edit();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -553,6 +556,19 @@ void DropWidgetAdapterTests::DW_036_list_binding_admits_only_parameter_string_li
     QVERIFY(!DropWidgetListBinding::SupportsParameterList(&state));
     QVERIFY(!DropWidgetListBinding::SupportsParameterList(&scalar));
     QVERIFY(!DropWidgetListBinding::SupportsParameterList(nullptr));
+}
+
+void DropWidgetAdapterTests::DW_037_context_menu_falls_back_for_non_line_edit()
+{
+    QWidget generic;
+    DropWidgetConnectionMenu::Show(&generic, QPoint(0, 0),
+                                   {false, true, false, true, false});
+    QTRY_VERIFY_WITH_TIMEOUT(!generic.findChildren<QMenu*>().isEmpty(), 1000);
+    for (QMenu* menu : generic.findChildren<QMenu*>())
+        menu->close();
+
+    DropWidgetConnectionMenu::Show(nullptr, QPoint(0, 0),
+                                   {false, false, false, true, false});
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

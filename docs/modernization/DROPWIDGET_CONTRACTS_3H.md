@@ -441,3 +441,10 @@ container whose domain type is `Parameter` is eligible for list binding.
 drop handling. A directly delivered `State` string-list drop therefore follows
 the pre-existing non-binding list-entry path instead of bypassing the rejected
 drag admission. The existing status-message wording is unchanged.
+
+### Context-menu type safety (2026-08-12)
+
+`DW_037` exercises the shared menu helper with a non-line-edit widget while
+the standard-line-edit option is present. It now uses the ordinary owned
+`QMenu` fallback rather than an invalid downcast; a null widget is a no-op.
+Real `QLineEditD` standard menus retain their existing path.
