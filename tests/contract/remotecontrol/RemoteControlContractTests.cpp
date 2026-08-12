@@ -191,6 +191,7 @@ private slots:
     void TCP_029_optionalTrailingNulHelper();
     void TCP_030_replyEncoderSizeLimits();
     void TCP_031_oversizedGetReplyAbortsAndFreshConnectionRecovers();
+    void TCP_032_wildcardIdEnumeration();
     void TCP_DM_001_tcpSetMutatesContainerThroughMessenger();
     void frameSplitterPreservesPartialRemainder();
 };
@@ -855,6 +856,40 @@ void RemoteControlContractTests::TCP_031_oversizedGetReplyAbortsAndFreshConnecti
     QCOMPARE(readReply(fresh, 13), numericReply(9.0));
     QCOMPARE(messages.count(), 0);
     QVERIFY(finalizeRemoteServer(server, {client, fresh}));
+    clear(data);
+}
+
+void RemoteControlContractTests::TCP_032_wildcardIdEnumeration() {
+    std::map<QString, ToFormMapper*> data;
+    data["AlphaBufferValue"] = numeric(1.0);
+    data["BetaValue"] = numeric(2.0);
+    data["TailBuffer"] = numeric(3.0);
+    RemoteControlServer server(&data);
+    QTcpSocket* client = connectClient(server, this);
+
+    const QByteArray requests = frame("get", "*")
+            + frame("get", "*Buffer*")
+            + frame("get", "Alpha*")
+            + frame("get", "*Buffer")
+            + frame("get", "Buffer*")
+            + frame("get", "*Missing*")
+            + frame("get", "*buffer*")
+            + frame("get", "**");
+    const QByteArray expected = paddedStringReply("AlphaBufferValue|BetaValue|TailBuffer")
+            + paddedStringReply("AlphaBufferValue|TailBuffer")
+            + paddedStringReply("AlphaBufferValue")
+            + paddedStringReply("TailBuffer")
+            + QByteArray(5, '\0')
+            + QByteArray(5, '\0')
+            + QByteArray(5, '\0')
+            + paddedStringReply("AlphaBufferValue|BetaValue|TailBuffer");
+    client->write(requests);
+    QVERIFY(client->waitForBytesWritten(1000));
+    QCOMPARE(readReply(client, expected.size()), expected);
+
+    client->disconnectFromHost();
+    QTRY_COMPARE(client->state(), QAbstractSocket::UnconnectedState);
+    QVERIFY(finalizeRemoteServer(server, {client}));
     clear(data);
 }
 

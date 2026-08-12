@@ -4,6 +4,7 @@
 *.qbs.user
 *.qbs.user.*
 *.autosave
+*.asv
 
 # Build directories and qmake output
 build/

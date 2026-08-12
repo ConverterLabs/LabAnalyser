@@ -24,6 +24,43 @@
 
 #include <cstring>
 
+namespace {
+bool matchesWildcard(const QString& value, const QString& pattern)
+{
+    qsizetype valueIndex = 0;
+    qsizetype patternIndex = 0;
+    qsizetype starIndex = -1;
+    qsizetype starValueIndex = 0;
+
+    while (valueIndex < value.size())
+    {
+        if (patternIndex < pattern.size() && pattern.at(patternIndex) == value.at(valueIndex))
+        {
+            ++patternIndex;
+            ++valueIndex;
+        }
+        else if (patternIndex < pattern.size() && pattern.at(patternIndex) == QLatin1Char('*'))
+        {
+            starIndex = patternIndex++;
+            starValueIndex = valueIndex;
+        }
+        else if (starIndex >= 0)
+        {
+            patternIndex = starIndex + 1;
+            valueIndex = ++starValueIndex;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    while (patternIndex < pattern.size() && pattern.at(patternIndex) == QLatin1Char('*'))
+        ++patternIndex;
+    return patternIndex == pattern.size();
+}
+}
+
 RemoteControlServer::RemoteControlServer(std::map<QString, ToFormMapper *> *DataContainerI)
 {
     this->DataContainer = DataContainerI;
@@ -133,7 +170,8 @@ void RemoteControlServer::HeaderReceived()
                 if (this->DataContainer)
                 {
                     auto it = this->DataContainer->find(ReceivedID);
-                    if (it != this->DataContainer->end())
+                    const bool wildcardQuery = ReceivedID.contains(QLatin1Char('*'));
+                    if (!wildcardQuery && it != this->DataContainer->end())
                     {
                         InterfaceData Data_ = *((*(this->DataContainer))[ReceivedID]);
                         if (Data_.IsNumeric())
@@ -180,7 +218,10 @@ void RemoteControlServer::HeaderReceived()
                         QString Keys;
                         for (auto it = this->DataContainer->begin(); it != this->DataContainer->end(); it++)
                         {
-                            if (it->first.contains(ReceivedID))
+                            const bool matches = wildcardQuery
+                                    ? matchesWildcard(it->first, ReceivedID)
+                                    : it->first.contains(ReceivedID);
+                            if (matches)
                             {
                                 Keys.append(it->first);
                                 Keys.append("|");

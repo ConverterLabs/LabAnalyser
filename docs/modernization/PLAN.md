@@ -872,3 +872,32 @@ narrow, format-neutral integer/allocation guard was evidenced. Existing
 PlotWidgetName partial-state behavior, XML format, native TCP byte order,
 valid replies and legacy fixtures remain unchanged. GitHub CI is the remaining
 package checkpoint; local focused RemoteControl and XML suites passed.
+
+## MATLAB remote connector checkpoint
+
+**Implemented locally; GitHub execution pending.** The connector's exported C
+ABI and native TCP frames were characterized against the unchanged Boost-based
+implementation, then preserved through a Winsock/RAII refactor. A standalone
+CMake build, focused CTest, static MinGW runtime linkage and exact
+`LabAnalyser/+LabAnalyser` deployment are integrated into the Windows build.
+The workflow verifies the ten-file MATLAB package before uploading
+`LabAnalyser-windows-release`. Local package/build evidence is recorded in
+`MATLAB_REMOTE_CONNECTOR.md`; actual MATLAB execution and the next remote
+workflow run remain unverified.
+
+The approved follow-up I/O hardening adds an absolute two-second deadline for
+each complete connector send/receive. The pre-change silent-peer vector waited
+until the fixture closed at 2.6 seconds; post-change silent and partial replies
+time out, discard the socket and make subsequent calls return promptly, while
+immediate peer close does not wait for the deadline. Existing successful wire
+vectors and the MATLAB package contract remain green.
+
+The approved wildcard follow-up is implemented as a compatible extension.
+`TCP_032` first characterized `*` and `*Buffer*` as literal, empty queries,
+then verifies case-sensitive whole-ID glob matching for all/contains/prefix/
+suffix/no-match/repeated-star cases. Exact IDs and the legacy no-star substring
+search remain unchanged. MATLAB expands a wildcard list into exact requests
+and returns a map of `x`/`y` structs; the additive `IsConnected` DLL export
+turns a mid-transfer disconnect into `LabAnalyser:ConnectionLost`. Focused
+server and connector contracts are green; execution in MATLAB and the full
+Windows GitHub build remain pending.

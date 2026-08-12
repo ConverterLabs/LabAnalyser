@@ -160,6 +160,8 @@ $qmake = Resolve-Tool -Name 'qmake' -Candidates $qmakeCandidates
 $make = Resolve-Tool -Name 'mingw32-make' -Candidates @(
     (Join-Path $mingwBin 'mingw32-make.exe')
 )
+$cmake = (Get-Command cmake.exe -ErrorAction Stop).Source
+$ctest = (Get-Command ctest.exe -ErrorAction Stop).Source
 $windeployqt = $null
 if ($Deploy) {
     $windeployqt = Resolve-Tool -Name 'windeployqt' -Candidates @(
@@ -222,6 +224,28 @@ try {
     $exePath = Join-Path $exeDir 'LabAnalyser.exe'
     Assert-File -Path $exePath -Description 'build output'
 
+    $connectorSourceDir = Join-Path $ScriptRootPath 'MatlabRemoteConnector'
+    $connectorBuildDir = Join-Path $BuildDir 'matlab-connector'
+    $connectorConfiguration = if ($Configuration -eq 'release') { 'Release' } else { 'Debug' }
+    Invoke-Native -Exe $cmake -Arguments @(
+        '-S', $connectorSourceDir,
+        '-B', $connectorBuildDir,
+        '-G', 'MinGW Makefiles',
+        "-DCMAKE_BUILD_TYPE=$connectorConfiguration",
+        '-DBUILD_TESTING=ON',
+        "-DCMAKE_CXX_COMPILER=$(Join-Path $mingwBin 'g++.exe')"
+    )
+    Invoke-Native -Exe $cmake -Arguments @(
+        '--build', $connectorBuildDir,
+        '--parallel', $Jobs
+    )
+    Invoke-Native -Exe $ctest -Arguments @(
+        '--test-dir', $connectorBuildDir,
+        '--output-on-failure'
+    )
+    $connectorDll = Join-Path $connectorBuildDir 'TCPClient.dll'
+    Assert-File -Path $connectorDll -Description 'MATLAB TCP connector DLL'
+
     if ($Deploy) {
         Assert-CleanTargetIsSafe -Path $DeployDir
         if ([String]::Equals($DeployDir, $BuildDir, [StringComparison]::OrdinalIgnoreCase)) {
@@ -235,6 +259,14 @@ try {
         New-Item -ItemType Directory -Force -Path $DeployDir | Out-Null
         $deployExePath = Join-Path $DeployDir 'LabAnalyser.exe'
         Copy-Item -LiteralPath $exePath -Destination $deployExePath -Force
+
+        $matlabPackageRoot = Join-Path $DeployDir 'LabAnalyser'
+        Invoke-Native -Exe $cmake -Arguments @(
+            '--install', $connectorBuildDir,
+            '--prefix', $matlabPackageRoot
+        )
+        $deployedConnector = Join-Path $matlabPackageRoot '+LabAnalyser\TCPClient.dll'
+        Assert-File -Path $deployedConnector -Description 'deployed MATLAB TCP connector DLL'
 
         Invoke-Native -Exe $windeployqt -Arguments @(
             "--$Configuration",
