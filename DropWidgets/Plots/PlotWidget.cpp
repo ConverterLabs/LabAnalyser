@@ -1592,9 +1592,8 @@ void PlotWidget::moveLegend()
 
 void PlotWidget::graphClicked(QCPAbstractPlottable *plottable)
 {
-    Q_UNUSED(plottable);
-    if(this->SB)
-    this->SB->showMessage(QString("Clicked on graph '%1'.").arg(plottable->name()), 1000);
+    if (this->SB && plottable)
+        this->SB->showMessage(QString("Clicked on graph '%1'.").arg(plottable->name()), 1000);
 }
 
 

@@ -950,3 +950,6 @@ Windows GitHub build remain pending.
 
 `PLOT_011` guards senderless `PlotWidget::selectionChanged()` invocation;
 valid user-originated selection synchronization remains unchanged.
+
+`PLOT_012` guards null plottable clicks while preserving the established
+statusbar message for a real graph.

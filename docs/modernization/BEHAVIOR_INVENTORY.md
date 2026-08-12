@@ -1151,3 +1151,6 @@ outside the modified boundary.
 `PlotWidget::selectionChanged` is mapped to `PLOT_011`: it requires the
 existing `QCustomPlot` signal sender; senderless direct invocation preserves
 the graph selection and model.
+
+`PlotWidget::graphClicked` is mapped to `PLOT_012`: a null plottable does not
+change statusbar state; valid graph clicks retain the existing message.

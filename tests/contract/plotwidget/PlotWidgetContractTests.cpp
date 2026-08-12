@@ -37,6 +37,7 @@ private slots:
     void PLOT_009_drop_item_resolution_is_bounded_and_type_checked();
     void PLOT_010_foreign_drop_is_a_noop();
     void PLOT_011_senderless_selection_slot_is_a_noop();
+    void PLOT_012_null_plottable_click_is_a_noop();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -347,6 +348,21 @@ void PlotWidgetContractTests::PLOT_011_senderless_selection_slot_is_a_noop()
     QVERIFY(QMetaObject::invokeMethod(&plot, "selectionChanged", Qt::DirectConnection));
     QVERIFY(!first->selected());
     QCOMPARE(plot.graphCount(), 1);
+}
+
+void PlotWidgetContractTests::PLOT_012_null_plottable_click_is_a_noop()
+{
+    MainWindow window;
+    QWidget host(&window);
+    PlotWidget plot(&window, &host, window.statusBar());
+    window.statusBar()->showMessage("unchanged");
+    plot.plottableClick(nullptr, nullptr);
+    QCOMPARE(window.statusBar()->currentMessage(), QString("unchanged"));
+
+    publish(window, "D::Clicked", data({0.0, 1.0}, {1.0, 2.0}));
+    plot.AddCustomGraph("D::Clicked");
+    plot.plottableClick(graph(plot, 0), nullptr);
+    QCOMPARE(window.statusBar()->currentMessage(), QString("Clicked on graph 'D::Clicked'."));
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

@@ -90,3 +90,6 @@ are rejected before index/dereference or graph update.
 `PLOT_011` establishes the sender boundary for `selectionChanged()`: a direct,
 senderless invocation is a no-op. The existing `selectionChangedByUser()`
 connection remains the valid synchronization route.
+
+`PLOT_012` records `graphClicked()` with a null plottable as a no-op that
+preserves the statusbar text; a valid graph still reports its existing name.
