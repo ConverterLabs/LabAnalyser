@@ -169,6 +169,43 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  cmake-build-and-ctest:
+    name: MSYS2 MINGW64 CMake and CTest
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Set up the qmake-parity MSYS2 dependencies
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-qt6-base mingw-w64-x86_64-qt6-tools
+            mingw-w64-x86_64-matio mingw-w64-x86_64-hdf5
+            mingw-w64-x86_64-highfive mingw-w64-x86_64-fftw mingw-w64-x86_64-boost
+      - name: Configure, build, and test CMake parity targets
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          export PATH=/mingw64/bin:/usr/bin:$PATH
+          export QT_QPA_PLATFORM=offscreen
+          cmake -S . -B build/cmake-ci -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DLABANALYSER_BUILD_TESTS=ON
+          cmake --build build/cmake-ci --parallel 2 2>&1 | tee build/cmake-build.log
+          ctest --test-dir build/cmake-ci --output-on-failure --parallel 2 2>&1 | tee build/cmake-ctest.log
+      - name: Upload CMake logs
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: windows-msys2-cmake-ctest-logs
+          path: |
+            build/cmake-build.log
+            build/cmake-ctest.log
+            build/cmake-ci/Testing/Temporary/LastTest.log
+          if-no-files-found: warn
+          retention-days: 14
+
   coverage:
     name: MSYS2 MINGW64 combined coverage
     runs-on: windows-latest
