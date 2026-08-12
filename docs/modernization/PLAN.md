@@ -1044,6 +1044,10 @@ entry, without changing normal dynamic-dock lifecycle behavior.
 matching dock through the existing manager facade, instead of looping over the
 same null lookup. Existing live dock close semantics remain unchanged.
 
+`GUI_SAFE_006` makes the temporary output-menu action menu-owned, preventing
+repeated context-menu use from retaining action objects under `MainWindow`
+without changing the visible clear action.
+
 The focused MainWindow package is complete for output presentation, tree-ID
 derivation, publish-view state and narrow null/path guards. Dynamic docks,
 project routing, dialogs, command-line parsing and figure lifecycle remain

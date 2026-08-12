@@ -83,6 +83,7 @@ private slots:
     void GUI_SAFE_003_extensionless_form_path_is_rejected_safely();
     void GUI_SAFE_004_null_dock_cleanup_is_a_noop();
     void GUI_SAFE_005_orphaned_form_record_close_project_is_safe();
+    void GUI_SAFE_006_output_context_actions_are_not_retained();
     void cleanup();
     void cleanupTestCase();
 
@@ -1308,6 +1309,30 @@ void MainWindowIntegrationTests::GUI_SAFE_005_orphaned_form_record_close_project
     QCOMPARE(window.GetLogic()->GetFormFileCount(), 0);
     QCOMPARE(window.SavePath, QString());
     QVERIFY(!window.ChangeForSaveDetected);
+}
+
+void MainWindowIntegrationTests::GUI_SAFE_006_output_context_actions_are_not_retained()
+{
+    MainWindow window;
+    auto* output = window.findChild<QPlainTextEdit*>("OutputText");
+    QVERIFY(output);
+    const int ownedActionCount = window.findChildren<QAction*>().size();
+    int menus = 0;
+    QTimer menuDriver;
+    menuDriver.setSingleShot(true);
+    connect(&menuDriver, &QTimer::timeout, [&] {
+        QMenu* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
+        QVERIFY(menu);
+        ++menus;
+        menu->close();
+    });
+
+    menuDriver.start();
+    window.OutputTextMenu(QPoint(1, 1));
+    menuDriver.stop();
+
+    QCOMPARE(menus, 1);
+    QCOMPARE(window.findChildren<QAction*>().size(), ownedActionCount);
 }
 
 void MainWindowIntegrationTests::cleanup()

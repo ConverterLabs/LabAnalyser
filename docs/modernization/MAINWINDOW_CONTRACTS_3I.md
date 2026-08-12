@@ -300,6 +300,11 @@ cover null figure/dock and extensionless form-path guards.
 facade instead of repeatedly looking up a null dock. Normal live dock close
 and registry cleanup routing remain unchanged.
 
+`GUI_SAFE_006` verifies that the temporary `Clear Output` action belongs to
+its temporary standard context menu. Repeated menu use no longer retains
+otherwise unreachable actions under `MainWindow`; the visible menu action and
+clear behavior remain those covered by GUI_013.
+
 Not extracted: dynamic form/dock lifecycle, project close/load/save flow,
 plot/figure creation, command-line handling and dialogs. They each combine
 MainWindow, XML/legacy-fixture, DataManagement or QObject-lifetime semantics;

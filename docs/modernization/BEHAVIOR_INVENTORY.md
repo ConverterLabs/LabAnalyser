@@ -626,6 +626,10 @@ unchanged.
 existing facade, preventing the source-evidenced repeated null lookup; normal
 live dock cleanup is unchanged.
 
+`GUI_SAFE_006` maps output-context-menu ownership: the transient Clear Output
+action is owned by its transient menu, while GUI_013 retains the user-visible
+clear action contract.
+
 ## PlotWidget phase 3J.1 characterization
 
 `contract/plotwidget/PlotWidgetContractTests` is an offscreen Qt Test target

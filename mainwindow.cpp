@@ -175,7 +175,7 @@ void MainWindow::OutputTextMenu( QPoint p )
      QAction * pAction;
 
      pMenu->addSeparator();
-     pAction = new QAction( "Clear Output", this );
+     pAction = new QAction( "Clear Output", pMenu );
      connect( pAction, SIGNAL( triggered() ), ui->OutputText, SLOT( clear() ) );
      pMenu->addAction( pAction );
 
