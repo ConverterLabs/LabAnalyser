@@ -1080,3 +1080,9 @@ protected SHA-256 values match `MANIFEST.md`, their `-text` EOL protection is
 intact, and the sensitivity/artifact scan is clean. No legacy fixture, XML
 schema, Designer class name, public adapter header or Qt metaobject surface
 changed.
+
+The remaining regular connection-menu variants and direct request/value
+bindings now also use those same internal helpers. Their observed ordering,
+separator placement, direct-connection mode and repeated-connection behavior
+remain unchanged; raw stale-binding, source-backed drag/drop and visual paths
+remain explicit exclusions.

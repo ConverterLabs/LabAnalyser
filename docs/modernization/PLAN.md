@@ -930,3 +930,10 @@ failure was observed, but this is not a claim of a complete local runner.
 No architectural claim is made for the retained dangerous top-level MainWindow
 lookup, source-dependent drag/drop, stale raw widget pointers, PlotWidget
 branch, visual pixel behavior or deferred table XML timer path.
+
+The final ordinary context-menu variants and direct adapter binding calls were
+consolidated through the existing private helpers and rechecked by the focused
+CMake DropWidget/MainWindow/XML checkpoint (3/3). This remains a structural
+preservation step: no Designer name, UI/XML contract, public adapter API or
+Qt metaobject surface changed. The listed unsafe and interactive exclusions
+remain future hardening work.

@@ -231,3 +231,15 @@ run. Each cell is lines / branches executed / branches taken / calls.
 Unchanged measurements are meaningful: their concrete adapter methods were
 already directly exercised by DW_002/DW_003, while DW_016 observes the Qt
 base-widget user-signal contract without entering the excluded manager paths.
+
+## Internal adapter consolidation (2026-08-12)
+
+The remaining ordinary highlight/remove context menus now delegate to
+`DropWidgetConnectionMenu`; its explicit options retain each historical
+separator placement, the `QLineEdit` standard menu, and the `QLed`
+delete-on-close/dirty-state variant. `QLabelD`, `QListViewD` and
+`QTableWidgeD` now use the existing `DropWidgetBinding` connection boundary.
+This does not add connection deduplication, name migration or QObject lifetime
+handling. The affected offscreen CMake checkpoint passed
+`DropWidgetAdapterTests`, `MainWindowIntegrationTests` and the full XML suite
+(3/3); all protected legacy fixture hashes and `-text` EOL states matched.
