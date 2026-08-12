@@ -243,3 +243,11 @@ is declared but has no repository implementation, so it remains a blocked
 boundary rather than a coordinator operation. XML legacy compatibility remains
 mandatory: fixtures are read-only inputs and read/write/read vectors use only
 temporary destinations.
+
+## Build-boundary parity
+
+The supported MSYS2 Windows build now has additive target-based CMake
+boundaries: `LabAnalyserQCustomPlot` is internal vendored code,
+`LabAnalyserCore` is the application graph, and contract targets preserve
+existing narrow seams where qmake already used them. This is build-graph
+isolation only; it changes no production runtime architecture. See `CMAKE.md`.

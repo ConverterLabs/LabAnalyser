@@ -872,3 +872,17 @@ narrow, format-neutral integer/allocation guard was evidenced. Existing
 PlotWidgetName partial-state behavior, XML format, native TCP byte order,
 valid replies and legacy fixtures remain unchanged. GitHub CI is the remaining
 package checkpoint; local focused RemoteControl and XML suites passed.
+
+## Milestone 6 package D: CMake/CTest parity
+
+**Completed locally; remote CMake checkpoint pending.** The additive CMake
+Release graph builds the application, internal vendored qcustomplot target,
+five portable plugin fixtures and all twelve qmake-runner suites. CTest passed
+12/12 with target-scoped offscreen/repository/plugin environment properties.
+qmake sources and projects remain unchanged and supported. The central qmake
+runner was attempted once plus one continuation in its existing non-clean
+tree; both met only the external 120-second limit with no observed compiler or
+test failure, so this package does not claim a local green qmake runner.
+The existing qmake CI job is unchanged; a separate Windows MSYS2 CMake/CTest
+job is the remote package checkpoint. Debug, Linux, install/package and
+deployment parity remain Milestone-6 work.

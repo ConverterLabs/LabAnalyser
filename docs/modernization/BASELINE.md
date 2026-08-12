@@ -297,3 +297,14 @@ lines (3088/6202), 44.21% executed branches (4777/10805), 24.68% branches
 taken at least once (2667/10805), 40.16% calls (3053/7602), and 66.51%
 functions (423/636). Legacy fixture hash alignment is `e33002f`; the tracked
 fixture bytes are protected from EOL conversion by `73a89b8`.
+
+## CMake/CTest parity baseline
+
+On MSYS2 MINGW64, CMake 4.0.2 configured and built the Release application,
+all runtime plugin fixtures and all 12 registered CTest projects. `ctest
+--output-on-failure --parallel 2` passed 12/12. qmake remains authoritative and
+parallel; its non-clean central runner was attempted once plus one continuation
+in the same build tree for this checkpoint, but each was externally limited to
+120 seconds without an observed compiler or test failure. Full qmake parity is
+therefore delegated to the unchanged qmake CI job. Details and commands are in
+`CMAKE.md`.
