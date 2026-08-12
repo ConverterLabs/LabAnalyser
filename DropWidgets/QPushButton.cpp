@@ -21,6 +21,7 @@
 
 #include "QPushButton.h"
 #include "CreateID.h"
+#include "DropWidgetBinding.h"
 #include "../mainwindow.h"
 
 
@@ -28,7 +29,7 @@ QPushButtonD::QPushButtonD(QWidget *parent) : QPushButton(parent)
 {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
     return;
 }
@@ -62,7 +63,7 @@ void QPushButtonD::dropEvent(QDropEvent *event)
 {
     this->disconnect();
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenu(QPoint)));
-    connect(this, SIGNAL(RequestUpdate()), GetMainWindow()->GetLogic(), SLOT(UpdateRequest()) );
+    DropWidgetBinding::ConnectRequestUpdate(this, SIGNAL(RequestUpdate()));
 
     QString ID =  CreateID(event->source());
     this->setToolTip(ID);
@@ -75,8 +76,8 @@ void QPushButtonD::dropEvent(QDropEvent *event)
 
     MW->GetLogic()->AddElementToContainerEntry(this->objectName(),ID,this->metaObject()->className(),this);
     MW->ChangeForSaveDetected = true;
-    connect(this, SIGNAL(pressed()), MW->GetLogic(),SLOT(SendNewValue()),Qt::DirectConnection );
-    connect(this, SIGNAL(released()), MW->GetLogic(),SLOT(SendNewValue()),Qt::DirectConnection );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(pressed()), MW->GetLogic(), Qt::DirectConnection);
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(released()), MW->GetLogic(), Qt::DirectConnection);
     connect(this, SIGNAL(pressed()), this, SLOT(StartTimeOut()),Qt::DirectConnection);
 
 }
@@ -164,6 +165,6 @@ void QPushButtonD::ConnectToID(DataManagementSetClass* DM, QString ID)
 {
     setToolTip(ID);
     setText(ID.split("::").back());
-    connect(this, SIGNAL(pressed()), DM, SLOT(SendNewValue()),Qt::DirectConnection );
-    connect(this, SIGNAL(released()), DM, SLOT(SendNewValue()),Qt::DirectConnection );
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(pressed()), DM, Qt::DirectConnection);
+    DropWidgetBinding::ConnectValueChanged(this, SIGNAL(released()), DM, Qt::DirectConnection);
 }
