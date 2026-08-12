@@ -22,6 +22,7 @@
 #include "QLed.h"
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
+#include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
@@ -113,28 +114,7 @@ void QLed::dropEvent(QDropEvent *event)
 
 void QLed::contextMenu(QPoint pos)
 {
-    QMenu *menu = new QMenu(this);
-    menu->setAttribute(Qt::WA_DeleteOnClose);
-
-    QString Connection = GetMainWindow()->GetLogic()->GetContainerID(this);
-    if(Connection.size())
-    {
-         MainWindow *MW = GetMainWindow();
-         menu->addSeparator();
-        QAction *Highlight = new QAction;
-        connect(Highlight, &QAction::triggered, [=]{
-            MW->HighLightConnection(Connection);});
-        Highlight->setText("Highlight Connection");
-        menu->addAction(Highlight);
-        menu->addSeparator();
-
-        menu->addAction("Remove Connection", this , SLOT(RemoveConnection()));
-    }
-
-    menu->popup(this->mapToGlobal(pos));
-
-
-    GetMainWindow()->ChangeForSaveDetected = true;
+    DropWidgetConnectionMenu::Show(this, pos, { true, true, true, false, true });
 }
 
 

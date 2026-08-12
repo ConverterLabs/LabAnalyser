@@ -37,7 +37,7 @@ QCheckBoxD::QCheckBoxD(QWidget *parent, bool show_label):QCheckBox(parent), m_sh
 
 void QCheckBoxD::contextMenu(QPoint pos)
 {
-    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, false });
+    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, false, true });
 }
 
 void QCheckBoxD::RemoveConnection()

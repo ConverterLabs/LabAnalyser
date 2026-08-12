@@ -22,6 +22,7 @@
 #include "QPushButton.h"
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
+#include "DropWidgetConnectionMenu.h"
 #include "../mainwindow.h"
 
 
@@ -110,21 +111,7 @@ void QPushButtonD::TimeOut()
 
 void QPushButtonD::contextMenu(QPoint pos)
 {
-    QMenu* menu = new QMenu(this);
-    QString Connection = GetMainWindow()->GetLogic()->GetContainerID(this);
-    if(Connection.size())
-    {
-         MainWindow *MW = GetMainWindow();
-        QAction *Highlight = new QAction;
-        connect(Highlight, &QAction::triggered, [=]{
-            MW->HighLightConnection(Connection);});
-        Highlight->setText("Highlight Connection");
-        menu->addAction(Highlight);
-        menu->addSeparator();
-        menu->addAction("Remove Connection", this , SLOT(RemoveConnection()));
-    }
-    menu->popup(this->mapToGlobal(pos));
-
+    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, false, false });
 }
 
 void QPushButtonD::RemoveConnection()

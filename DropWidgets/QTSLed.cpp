@@ -22,6 +22,7 @@
 #include "QTSLed.h"
 #include "CreateID.h"
 #include "DropWidgetBinding.h"
+#include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDataAccess.h"
 #include "DropWidgetUpdate.h"
 #include "../mainwindow.h"
@@ -62,22 +63,7 @@ void QTSLed::dragEnterEvent(QDragEnterEvent *event)
 
 void QTSLed::contextMenu(QPoint pos)
 {
-    QMenu* menu = new QMenu(this);
-    QString Connection = GetMainWindow()->GetLogic()->GetContainerID(this);
-    if(Connection.size())
-    {
-         MainWindow *MW = GetMainWindow();
-         menu->addSeparator();
-        QAction *Highlight = new QAction;
-        connect(Highlight, &QAction::triggered, [=]{
-            MW->HighLightConnection(Connection);});
-        Highlight->setText("Highlight Connection");
-        menu->addAction(Highlight);
-        menu->addSeparator();
-        menu->addAction("Remove Connection", this , SLOT(RemoveConnection()));
-    }
-    menu->popup(this->mapToGlobal(pos));
-
+    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, false, true });
 }
 
 void QTSLed::RemoveConnection()

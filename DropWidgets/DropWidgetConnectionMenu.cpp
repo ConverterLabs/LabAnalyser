@@ -21,7 +21,8 @@ void Show(QWidget* widget, const QPoint& position, const Options& options)
     if (!connection.isEmpty())
     {
         MainWindow* mainWindow = GetMainWindow();
-        menu->addSeparator();
+        if (options.separatorBeforeHighlight)
+            menu->addSeparator();
         QAction* highlight = new QAction;
         QObject::connect(highlight, &QAction::triggered, [=] {
             mainWindow->HighLightConnection(connection);

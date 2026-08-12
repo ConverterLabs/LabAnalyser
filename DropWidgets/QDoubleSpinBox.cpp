@@ -40,7 +40,7 @@ QDoubleSpinBoxD::QDoubleSpinBoxD(QWidget *parent):QDoubleSpinBox(parent)
 
 void QDoubleSpinBoxD::contextMenu(QPoint pos)
 {
-    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, false });
+    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, false, true });
 }
 
 void QDoubleSpinBoxD::RemoveConnection()

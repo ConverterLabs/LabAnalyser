@@ -46,7 +46,7 @@ QLineEditD::QLineEditD(QWidget *parent):QLineEdit(parent)
 
 void QLineEditD::contextMenu(QPoint pos)
 {
-    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, true });
+    DropWidgetConnectionMenu::Show(this, pos, { true, false, false, true, true });
 }
 
 void QLineEditD::RemoveConnection()

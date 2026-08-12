@@ -44,7 +44,7 @@ void QBLed::dragMoveEvent(QDragMoveEvent *de)
 
 void QBLed::contextMenu(QPoint pos)
 {
-    DropWidgetConnectionMenu::Show(this, pos, { false, false, false, false });
+    DropWidgetConnectionMenu::Show(this, pos, { false, false, false, false, true });
 }
 
 void QBLed::RemoveConnection()

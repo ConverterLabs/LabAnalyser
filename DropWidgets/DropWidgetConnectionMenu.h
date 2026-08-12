@@ -13,6 +13,7 @@ struct Options
     bool deleteOnClose;
     bool markChanged;
     bool standardLineEditMenu;
+    bool separatorBeforeHighlight;
 };
 
 void Show(QWidget* widget, const QPoint& position, const Options& options);

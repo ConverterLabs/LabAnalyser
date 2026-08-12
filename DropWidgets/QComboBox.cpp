@@ -37,7 +37,7 @@ QComboBoxD::QComboBoxD(QWidget *parent):QComboBox(parent)
 
 void QComboBoxD::contextMenu(QPoint pos)
 {
-    DropWidgetConnectionMenu::Show(this, pos, { false, false, false, false });
+    DropWidgetConnectionMenu::Show(this, pos, { false, false, false, false, true });
 }
 
 void QComboBoxD::RemoveConnection()
