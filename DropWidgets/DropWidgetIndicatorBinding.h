@@ -12,6 +12,31 @@
 // this helper only removes their byte-for-byte duplicated manager sequence.
 namespace DropWidgetIndicatorBinding
 {
+template <typename StateSetter>
+inline void InitializeState(QWidget* parent, ToFormMapper* container, uint32_t& bit,
+                            uint32_t& bitCounter, const QString& title,
+                            const QString& prompt, StateSetter setState)
+{
+    if (container->IsBool())
+    {
+        bit = 0;
+        setState(container->GetBool());
+    }
+    else if (container->IsUnsigedNumber())
+    {
+        bool ok = false;
+        const int selectedBit = QInputDialog::getInt(parent, title, prompt,
+                                                     bitCounter, 0, 63, 1, &ok);
+        bitCounter = selectedBit + 1;
+        if (bitCounter > 63)
+            bitCounter = 0;
+        if (ok)
+            bit = selectedBit;
+
+        setState((container->GetUnsignedData() & (1ULL << bit)) != 0);
+    }
+}
+
 template <typename Indicator>
 inline void BindFromDrop(Indicator* indicator, QDropEvent* event, uint32_t& bit, uint32_t& bitCounter)
 {
@@ -28,26 +53,10 @@ inline void BindFromDrop(Indicator* indicator, QDropEvent* event, uint32_t& bit,
     // Keep that lookup order even though the textual result is unused.
     container->GetDataType();
 
-    if (container->IsBool())
-    {
-        bit = 0;
-        indicator->SetState(container->GetBool());
-    }
-    else if (container->IsUnsigedNumber())
-    {
-        bool ok = false;
-        const int selectedBit = QInputDialog::getInt(indicator,
-                                                     QObject::tr("Index of Bit to be set"),
-                                                     QObject::tr("Index of Bit to be set (zero based):"),
-                                                     bitCounter, 0, 63, 1, &ok);
-        bitCounter = selectedBit + 1;
-        if (bitCounter > 63)
-            bitCounter = 0;
-        if (ok)
-            bit = selectedBit;
-
-        indicator->SetState((container->GetUnsignedData() & (1ULL << bit)) != 0);
-    }
+    InitializeState(indicator, container, bit, bitCounter,
+                    QObject::tr("Index of Bit to be set"),
+                    QObject::tr("Index of Bit to be set (zero based):"),
+                    [indicator](bool state) { indicator->SetState(state); });
 
     indicator->setToolTip(id + ":" + QString::number(bit));
     indicator->setToolTipDuration(2000);

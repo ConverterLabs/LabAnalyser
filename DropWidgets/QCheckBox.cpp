@@ -24,6 +24,7 @@
 #include "DropWidgetBinding.h"
 #include "DropWidgetConnectionMenu.h"
 #include "DropWidgetDragSource.h"
+#include "DropWidgetIndicatorBinding.h"
 #include "../mainwindow.h"
 
 uint32_t QCheckBoxD::bitcounter = 0;
@@ -81,24 +82,11 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
     this->setToolTipDuration(2000);
     auto MW = GetMainWindow();
 
-    if(MW->GetLogic()->GetContainer(ID)->IsBool())
-    {
-        this->bit = 0;
-        this->setChecked(MW->GetLogic()->GetContainer(ID)->GetBool());
-    }
-    else if(MW->GetLogic()->GetContainer(ID)->IsUnsigedNumber())
-    {
-       bool ok;
-       int i = QInputDialog::getInt(this, tr("Index of Bit to be set"),
-                                      tr("Index of Bit to be set (zero based):"), bitcounter, 0, 63, 1, &ok);
-       bitcounter = i+1;
-       if(bitcounter > 63)
-           bitcounter =0;
-       if (ok)
-            this->bit = i;
-
-       this->setChecked((bool) (MW->GetLogic()->GetContainer(ID)->GetUnsignedData() & (1ULL<<this->bit)));
-    }
+    ToFormMapper* container = MW->GetLogic()->GetContainer(ID);
+    DropWidgetIndicatorBinding::InitializeState(this, container, bit, bitcounter,
+                                                 tr("Index of Bit to be set"),
+                                                 tr("Index of Bit to be set (zero based):"),
+                                                 [this](bool state) { setChecked(state); });
     QStringList sp = ID.split("::");
     QString label = sp.back();
     label += ":";
