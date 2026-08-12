@@ -19,6 +19,7 @@ private slots:
     void sineAndHarmonics();
     void nonUniformSamples();
     void invalidIntervals();
+    void degenerateInputNormalization();
 };
 
 void PlotMeasurementsTests::constantSignal()
@@ -126,6 +127,25 @@ void PlotMeasurementsTests::invalidIntervals()
     }
     const auto zeroSamples = PlotMeasurements::normalizedSamples(zeroX, zeroY);
     QVERIFY(std::isnan(PlotMeasurements::calculateThdPercent(zeroSamples, 0.0, 1.0)));
+}
+
+void PlotMeasurementsTests::degenerateInputNormalization()
+{
+    const std::vector<double> x{2.0, 1.0, 1.0, std::numeric_limits<double>::quiet_NaN(), 3.0};
+    const std::vector<double> y{20.0, 10.0, 14.0, 99.0};
+    const auto samples = PlotMeasurements::normalizedSamples(x, y);
+    QCOMPARE(samples.size(), size_t(2));
+    QCOMPARE(samples.at(0).x, 1.0);
+    QCOMPARE(samples.at(0).y, 12.0);
+    QCOMPARE(samples.at(1).x, 2.0);
+    QCOMPARE(samples.at(1).y, 20.0);
+
+    double value = 0.0;
+    QVERIFY(!PlotMeasurements::interpolate(samples, std::numeric_limits<double>::infinity(), &value));
+    QVERIFY(!PlotMeasurements::interpolate(samples, 1.5, nullptr));
+    const auto statistics = PlotMeasurements::calculateIntervalStatistics(samples, 2.0, 1.0);
+    QVERIFY(statistics.valid);
+    QCOMPARE(statistics.mean, 16.0);
 }
 
 QTEST_APPLESS_MAIN(PlotMeasurementsTests)
