@@ -12,7 +12,7 @@ end
 end
 
 function [results, x] = getWildcard(pattern, port)
-results = containers.Map('KeyType', 'char', 'ValueType', 'any');
+results = struct('ID', {}, 'Time', {}, 'Data', {});
 x = [];
 
 encodedIds = LabAnalyser.ExReceive(pattern, port);
@@ -26,7 +26,7 @@ for index = 1:numel(ids)
     currentId = ids{index};
     [value, time] = getSingle(currentId, port);
     assertConnected(port, currentId);
-    results(currentId) = struct('x', time, 'y', value);
+    results(end + 1) = struct('ID', currentId, 'Time', time, 'Data', value); %#ok<AGROW>
 end
 end
 
