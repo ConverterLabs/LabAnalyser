@@ -22,122 +22,59 @@
 #include "DropWidgetsUiLoader.h"
 #include "DropWidgets.h"
 
-
-#include "../CustomWidgets/QLedIndicator.h"
-#include "../CustomWidgets/QTSLedIndicator.h"
-#include "../CustomWidgets/QTSLedIndicator.h"
-
 #include "Plots/PlotWidget.h"
 
+namespace
+{
+typedef QWidget* (*AdapterFactory)(QWidget* parent);
+
+template <typename Adapter>
+QWidget* CreateAdapter(QWidget* parent)
+{
+    return new Adapter(parent);
+}
+
+struct AdapterRegistration
+{
+    const char* designerClassName;
+    AdapterFactory factory;
+};
+
+QWidget* CreateDropWidgetAdapter(const QString& className, QWidget* parent)
+{
+    static const AdapterRegistration adapters[] = {
+        { "QPushButton", &CreateAdapter<QPushButtonD> },
+        { "QLineEdit", &CreateAdapter<QLineEditD> },
+        { "QCheckBox", &CreateAdapter<QCheckBoxD> },
+        { "QDoubleSpinBox", &CreateAdapter<QDoubleSpinBoxD> },
+        { "QSpinBox", &CreateAdapter<QSpinBoxD> },
+        { "QProgressBar", &CreateAdapter<QProgressBarD> },
+        { "QLCDNumber", &CreateAdapter<QLCDNumberD> },
+        { "QLabel", &CreateAdapter<QLabelD> },
+        { "QSlider", &CreateAdapter<QSliderD> },
+        { "QListView", &CreateAdapter<QListViewD> },
+        { "QLed", &CreateAdapter<QLed> },
+        { "QComboBox", &CreateAdapter<QComboBoxD> },
+        { "QTSLed", &CreateAdapter<QTSLed> },
+        { "QBLed", &CreateAdapter<QBLed> },
+        { "QTableWidget", &CreateAdapter<QTableWidgeD> }
+    };
+
+    for (const AdapterRegistration& adapter : adapters)
+    {
+        if (className == QLatin1String(adapter.designerClassName))
+            return adapter.factory(parent);
+    }
+    return NULL;
+}
+}
 
 QWidget* DropWidgetsUiLoader::createWidget(const QString &className, QWidget *parent , const QString &name)
 {
-  //P->XMLCounder++;
-  QWidget* widget = NULL;
-  if (className == "QPushButton")
+  QWidget* widget = CreateDropWidgetAdapter(className, parent);
+  if (widget)
   {
-     // replace any QPushButton instances with instance of our
-     // own QPushButtonD
-     widget = new QPushButtonD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QLineEdit")
-  {
-     // replace any QLineEdit instances with instance of our
-     // own QLineEditD
-     widget = new QLineEditD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QCheckBox")
-  {
-     // replace any QCheckBox instances with instance of our
-     // own QCheckBoxD
-     widget = new QCheckBoxD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QDoubleSpinBox")
-  {
-     // replace any QDoubleSpinBox instances with instance of our
-     // own QDoubleSpinBoxD
-     widget = new QDoubleSpinBoxD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QSpinBox")
-  {
-     // replace any QDoubleSpinBox instances with instance of our
-     // own QDoubleSpinBoxD
-     widget = new QSpinBoxD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QProgressBar")
-  {
-     // replace any QDoubleSpinBox instances with instance of our
-     // own QDoubleSpinBoxD
-     widget = new QProgressBarD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QLCDNumber")
-  {
-     // replace any QLCDNumber instances with instance of our
-     // own QLCDNumberD
-     widget = new QLCDNumberD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QLabel")
-  {
-     // replace any QLabel instances with instance of our
-     // own QLabelD
-     widget = new QLabelD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QSlider")
-  {
-     // replace any QSlider instances with instance of our
-     // own QSliderD
-     widget = new QSliderD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QListView")
-  {
-     // replace any QListView instances with instance of our
-     // own QListViewD
-     widget = new QListViewD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QLed")
-  {
-     // replace any QLed instances with instance of our
-     // own QLedD
-     widget = new QLed(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QComboBox")
-  {
-     // replace any QComboBox instances with instance of our
-     // own QComboBoxD
-     widget = new QComboBoxD(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QTSLed")
-  {
-     // replace any QTSLed instances with instance of our
-     // own QTSLed
-     widget = new QTSLed(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QBLed")
-  {
-     // replace any QBLed instances with instance of our
-     // own QBLed
-     widget = new QBLed(parent);
-     widget->setAcceptDrops(true);
-  }
-  else if (className == "QTableWidget")
-  {
-     // replace any QBLed instances with instance of our
-     // own QBLed
-     widget = new QTableWidgeD(parent);
-     widget->setAcceptDrops(true);
+      widget->setAcceptDrops(true);
   }
   else if (className == "PlotWidget")
   {
@@ -150,10 +87,6 @@ QWidget* DropWidgetsUiLoader::createWidget(const QString &className, QWidget *pa
            MW = qobject_cast<MainWindow*>( QApplication::topLevelWidgets().at(i++));
 
      widget = new PlotWidget((MainWindow*)MW, parent, ((MainWindow*)MW)->GetStatusBar());
-  }
-  else if (NULL != widget)
-  {
-     widget->setObjectName(name);
   }
   else
   {
