@@ -369,3 +369,12 @@ foreign drop leaves QBLed, QLed and QTSLed bit values and presentation intact.
 The previous null-mapper dereference is documented by source inspection rather
 than executed as a crash test. Existing bool/unsigned initialization, bit-index
 dialog and valid LED binding behavior are unchanged.
+
+### Checkbox missing-container hardening (2026-08-12)
+
+`QCheckBoxD` now performs its mapper lookup before resetting context
+connections or presentation. `DW_029` records that a foreign drop preserves
+the checkbox bit, checked state, label and tooltip. The first run of this new
+test exposed the pre-existing reset-before-lookup ordering; moving only that
+reset after successful lookup fixed the confirmed regression. Valid bool and
+unsigned binding, including the existing bit-dialog path, remains unchanged.

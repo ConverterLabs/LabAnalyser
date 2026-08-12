@@ -69,14 +69,16 @@ void QCheckBoxD::dropEvent(QDropEvent *event)
     MainWindow* mainWindow = GetMainWindow();
     if (!mainWindow)
         return;
-    DropWidgetDropBinding::ResetContextConnections(this, mainWindow->GetLogic());
 
     QString ID =  CreateID(event->source());
-    this->setToolTip(ID);
-    this->setToolTipDuration(2000);
     auto MW = mainWindow;
 
     ToFormMapper* container = MW->GetLogic()->GetContainer(ID);
+    if (!container)
+        return;
+    DropWidgetDropBinding::ResetContextConnections(this, MW->GetLogic());
+    this->setToolTip(ID);
+    this->setToolTipDuration(2000);
     DropWidgetIndicatorBinding::InitializeState(this, container, bit, bitcounter,
                                                  tr("Index of Bit to be set"),
                                                  tr("Index of Bit to be set (zero based):"),

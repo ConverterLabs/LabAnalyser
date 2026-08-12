@@ -65,6 +65,7 @@ private slots:
     void DW_026_invalid_lineedit_drop_preserves_existing_binding();
     void DW_027_table_xml_ignores_incomplete_rows();
     void DW_028_indicator_drop_rejects_missing_container();
+    void DW_029_checkbox_drop_rejects_missing_container();
     void DW_024_missing_mainwindow_context_is_safe_noop();
 };
 
@@ -334,6 +335,25 @@ void DropWidgetAdapterTests::DW_028_indicator_drop_rejects_missing_container()
     QCOMPARE(blink.toolTip(), QString("blink-bound"));
     QCOMPARE(led.toolTip(), QString("led-bound"));
     QCOMPARE(traffic.toolTip(), QString("traffic-bound"));
+}
+
+void DropWidgetAdapterTests::DW_029_checkbox_drop_rejects_missing_container()
+{
+    QCheckBoxD checkbox;
+    checkbox.SetBit(6);
+    checkbox.setText("bound checkbox");
+    checkbox.setToolTip("checkbox-bound");
+    checkbox.setChecked(true);
+
+    QMimeData foreign;
+    QDropEvent invalidDrop(QPointF(1, 1), Qt::CopyAction, &foreign,
+                           Qt::LeftButton, Qt::NoModifier);
+    checkbox.dropEvent(&invalidDrop);
+
+    QCOMPARE(checkbox.GetBit(), uint32_t(6));
+    QCOMPARE(checkbox.text(), QString("bound checkbox"));
+    QCOMPARE(checkbox.toolTip(), QString("checkbox-bound"));
+    QVERIFY(checkbox.isChecked());
 }
 
 void DropWidgetAdapterTests::DW_002_numeric_set_get_and_signal_suppression()

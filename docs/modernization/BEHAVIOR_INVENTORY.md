@@ -258,6 +258,10 @@ their current row-numbered key and value. No missing binding is synthesized.
 foreign drop preserves bit and presentation state. Valid bool/unsigned LED
 binding remains on its established path.
 
+`DW_029` covers the analogous QCheckBoxD boundary: a missing mapper preserves
+bit, checked state and presentation; its normal bool/unsigned binding remains
+unchanged.
+
 The seam is compiled only into this DropWidget test target because the real
 `DataManagementSetClass.cpp` pulls the excluded PlotWidget graph. It mirrors
 only the exercised `SetData` and `SendNewValue` forwarding paths and is not
