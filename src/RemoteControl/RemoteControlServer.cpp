@@ -61,6 +61,23 @@ bool matchesWildcard(const QString& value, const QString& pattern)
 }
 }
 
+RemoteControlServer::~RemoteControlServer()
+{
+    // Abort all accepted connections before the QWidget base destructor runs
+    // and before tcpServer deletes them as QObject children.  On Windows
+    // (MSYS2/MINGW64), the QWidget platform teardown processes the Windows
+    // message queue, during which Winsock async-select notifications for a
+    // still-connected socket are posted as Qt events.  Aborting while the
+    // socket object is still fully alive ensures no new events are queued
+    // between ~QWidget() and the tcpServer member destructor, keeping the
+    // subsequent QObjectPrivate::~QObjectPrivate() → removePostedEvents()
+    // call safe.
+    const auto accepted = tcpServer.findChildren<QTcpSocket *>(
+            QString(), Qt::FindDirectChildrenOnly);
+    for (QTcpSocket *socket : accepted)
+        socket->abort();
+}
+
 RemoteControlServer::RemoteControlServer(std::map<QString, ToFormMapper *> *DataContainerI)
 {
     this->DataContainer = DataContainerI;
