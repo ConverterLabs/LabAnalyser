@@ -36,6 +36,9 @@ public:
 
     bool Export2Mat(QString Path, QStringList);
     bool Export2Hdf5(QString Path, QStringList);
+    bool ExportLabData(QString Path);
+    bool ImportLabData(QString Path);
+    bool ImportMatData(QString Path);
 
     bool Export2Xml(QString Path,  QStringList);
     bool ImportFromXml(QString Path  );

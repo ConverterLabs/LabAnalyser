@@ -76,10 +76,12 @@ SOURCES += src/app/main.cpp\
         src/DropWidgets/QTSLed.cpp \
         src/DropWidgets/QTableWidgeD.cpp \
         src/Export/Export2Mat.cpp \
+        src/Export/LabDataArchive.cpp \
         src/DataManagement/UIDataManagementSetClass.cpp \
         src/Export/export2highfive.cpp \
         src/Export/exportinputs2xml.cpp \
         src/Import/parameterloader.cpp \
+        src/Import/MatDataImport.cpp \
         src/LoadSave/loadplugin.cpp \
         src/LoadSave/PluginLeasePool.cpp \
         src/LoadSave/XmlFigureDimensions.cpp \
@@ -121,6 +123,8 @@ SOURCES += src/app/main.cpp\
 
 HEADERS  += src/app/mainwindow.h\
             src/UIFunctions/MainWindowOutputLog.h \
+            src/Export/LabDataArchive.h \
+            src/Import/MatDataImport.h \
             src/UIFunctions/MainWindowTreePath.h \
             src/UIFunctions/MainWindowTreeViewState.h \
             src/UIFunctions/MainWindowSubplotDialog.h \

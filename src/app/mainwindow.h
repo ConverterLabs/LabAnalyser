@@ -122,6 +122,9 @@ private slots:
     void on_actionCreatePlot_triggered();
     void on_actionCreate_Subplot_triggered();
     void on_actionDaten_Exportieren_mat_triggered();
+    void on_actionExport_LabAnalyser_Data_triggered();
+    void on_actionImport_LabAnalyser_Data_triggered();
+    void on_actionImport_Mat_Data_triggered();
     void on_actionSave_triggered();
     void on_actionSave_Experiment_triggered();
     void on_actionLoadExperiment_triggered();

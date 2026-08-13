@@ -6,6 +6,7 @@
 
 #include <matio.h>
 #include "Export/Export2Mat.h"
+#include "Import/MatDataImport.h"
 #include "DataManagement/DataManagementSetClass.h"
 #include "DataManagement/UIDataManagementSetClass.h"
 #include "mainwindow.h"
@@ -62,6 +63,8 @@ private slots:
     void MAT_006_repeatedExportsOverwriteAndKeepRequestedOrder();
     void MAT_007_invalidPathAndUnknownIdBehavior();
     void MAT_008_uiCallerUsesSameConvention();
+    void MAT_009_uninitializedContainerExportsAsEmptyFields();
+    void MAT_010_exportedMatImportsAsIndependentDataSet();
 };
 
 void MatExportContractTests::MAT_001_nullManagerFailsWithoutFile() {
@@ -106,6 +109,55 @@ void MatExportContractTests::MAT_007_invalidPathAndUnknownIdBehavior() {
 }
 void MatExportContractTests::MAT_008_uiCallerUsesSameConvention() {
     MainWindow window; add(*window.GetLogic(),"ui",numeric(4.5)); QTemporaryDir dir; QVERIFY(!window.GetLogic()->Export2Mat(dir.filePath("ui.mat"),{"ui"})); QVERIFY(QFileInfo::exists(dir.filePath("ui.mat"))); QVERIFY(window.GetLogic()->Export2Mat(dir.filePath("none/ui.mat"),{"ui"}));
+}
+void MatExportContractTests::MAT_009_uninitializedContainerExportsAsEmptyFields() {
+    QObject owner;
+    DataManagementSetClass manager(&owner);
+    manager.AddContainerElement("pending", "double", "Data", QString());
+    QTemporaryDir dir;
+    MatExporter exporter(&manager);
+    QVERIFY(!exporter.Export2Mat(dir.filePath("pending.mat"), {"pending"}));
+
+    MatFile file{Mat_Open(dir.filePath("pending.mat").toUtf8().constData(), MAT_ACC_RDONLY)};
+    QVERIFY(file.value);
+    matvar_t* channels = Mat_VarRead(file.value, "ExportedChannels");
+    QVERIFY(channels);
+    QCOMPARE(text(field(channels, "ID", 0)), QString("pending"));
+    verifyDouble(field(channels, "Time", 0), {});
+    verifyDouble(field(channels, "Data", 0), {});
+    Mat_VarFree(channels);
+}
+void MatExportContractTests::MAT_010_exportedMatImportsAsIndependentDataSet() {
+    QObject sourceOwner;
+    DataManagementSetClass source(&sourceOwner);
+    add(source, "trace", vectorValue({42.5, 43.5, 44.5}, {10, 20, 30}));
+    add(source, "scalar", numeric(4.5));
+    QTemporaryDir dir;
+    const QString path = dir.filePath("source.mat");
+    MatExporter exporter(&source);
+    QVERIFY(!exporter.Export2Mat(path, {"trace", "scalar"}));
+
+    QObject targetOwner;
+    DataManagementSetClass target(&targetOwner);
+    QSignalSpy addToExplorer(target.GetMessenger(), SIGNAL(AddElementToWidget(QString,InterfaceData)));
+    QString root;
+    QString error;
+    QVERIFY2(MatDataImport::Import(target, path, &root, &error), qPrintable(error));
+    QVERIFY(root.startsWith("Export_source_"));
+    QCOMPARE(addToExplorer.count(), 2);
+    for (const QList<QVariant>& emission : addToExplorer) {
+        QCOMPARE(emission.at(1).value<InterfaceData>().GetType(), QString("Data"));
+    }
+    ToFormMapper* trace = target.GetContainer(root + "::trace");
+    QVERIFY(trace);
+    QVERIFY(trace->IsPairOfVectorOfDoubles());
+    QCOMPARE(*trace->GetPointerPair().first, std::vector<double>({42.5, 43.5, 44.5}));
+    QCOMPARE(*trace->GetPointerPair().second, std::vector<double>({10, 20, 30}));
+    QVERIFY(trace->GetPointerPair().third);
+    QCOMPARE(*trace->GetPointerPair().third, 42.5);
+    ToFormMapper* scalar = target.GetContainer(root + "::scalar");
+    QVERIFY(scalar);
+    QCOMPARE(scalar->GetAsDouble(), 4.5);
 }
 QTEST_MAIN(MatExportContractTests)
 #include "MatExportContractTests.moc"

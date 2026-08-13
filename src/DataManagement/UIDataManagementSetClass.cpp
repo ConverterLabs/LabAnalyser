@@ -182,6 +182,44 @@ bool UIDataManagementSetClass::LoadPlugin(QString FileName)
     return true;
 }
 
+bool UIDataManagementSetClass::ExportLabData(QString Path)
+{
+    QString error;
+    ProjectIoCoordinator coordinator(*this);
+    if (!coordinator.ExportLabData(Path, &error)) {
+        emit Error(QStringLiteral("LabAnalyser data export failed: ") + error);
+        return true;
+    }
+    GetMessenger()->WriteStatusMessage(QString("Data exported to '%1'.").arg(Path));
+    return false;
+}
+
+bool UIDataManagementSetClass::ImportLabData(QString Path)
+{
+    QString error;
+    QString root;
+    ProjectIoCoordinator coordinator(*this);
+    if (!coordinator.ImportLabData(Path, &root, &error)) {
+        emit Error(QStringLiteral("LabAnalyser data import failed: ") + error);
+        return true;
+    }
+    GetMessenger()->WriteStatusMessage(QString("Data imported as '%1'.").arg(root));
+    return false;
+}
+
+bool UIDataManagementSetClass::ImportMatData(QString Path)
+{
+    QString error;
+    QString root;
+    ProjectIoCoordinator coordinator(*this);
+    if (!coordinator.ImportMatData(Path, &root, &error)) {
+        emit Error(QStringLiteral("MAT data import failed: ") + error);
+        return true;
+    }
+    GetMessenger()->WriteStatusMessage(QString("MAT data imported as '%1'.").arg(root));
+    return false;
+}
+
 bool UIDataManagementSetClass::ImportFromXml(QString Path  )
 {
     ProjectIoCoordinator coordinator(*this);

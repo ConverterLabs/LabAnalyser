@@ -36,6 +36,9 @@ public:
     bool ExportParameters(const QString& path, const QStringList& exportIds) const;
     bool ExportMat(const QString& path, const QStringList& exportIds) const;
     bool ExportHdf5(const QString& path, const QStringList& exportIds) const;
+    bool ExportLabData(const QString& path, QString* error) const;
+    bool ImportLabData(const QString& path, QString* datasetRoot, QString* error) const;
+    bool ImportMatData(const QString& path, QString* datasetRoot, QString* error) const;
     bool ReadExperiment(const QString& path) const;
     bool WriteExperiment(const QString& path) const;
     PluginLoadOutcome LoadPlugin(const QString& path) const;

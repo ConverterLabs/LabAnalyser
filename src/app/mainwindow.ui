@@ -77,6 +77,10 @@
     <addaction name="actionDaten_Exportieren_mat"/>
     <addaction name="actionExport_Data_h5"/>
     <addaction name="separator"/>
+    <addaction name="actionExport_LabAnalyser_Data"/>
+    <addaction name="actionImport_LabAnalyser_Data"/>
+    <addaction name="actionImport_Mat_Data"/>
+    <addaction name="separator"/>
     <addaction name="actionMinimize_to_Tray"/>
     <addaction name="actionBeenden"/>
    </widget>
@@ -149,6 +153,10 @@
    <addaction name="separator"/>
    <addaction name="actionDaten_Exportieren_mat"/>
    <addaction name="actionExport_Data_h5"/>
+   <addaction name="separator"/>
+   <addaction name="actionExport_LabAnalyser_Data"/>
+   <addaction name="actionImport_LabAnalyser_Data"/>
+   <addaction name="actionImport_Mat_Data"/>
   </widget>
   <widget class="QDockWidget" name="ParameterDock">
    <property name="sizePolicy">
@@ -528,6 +536,45 @@ Experiment</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionExport_LabAnalyser_Data">
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/icons/icons/file-code-line (1).png</normaloff>:/icons/icons/file-code-line (1).png</iconset>
+   </property>
+   <property name="text">
+    <string>Export LabAnalyser Data (*.LAdat)</string>
+   </property>
+   <property name="iconText">
+    <string>Export
+LAdat</string>
+   </property>
+  </action>
+  <action name="actionImport_LabAnalyser_Data">
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/icons/icons/folder-open-line.png</normaloff>:/icons/icons/folder-open-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import LabAnalyser Data (*.LAdat)</string>
+   </property>
+   <property name="iconText">
+    <string>Import
+LAdat</string>
+   </property>
+  </action>
+  <action name="actionImport_Mat_Data">
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/icons/icons/folder-open-line.png</normaloff>:/icons/icons/folder-open-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import MAT Data (*.mat)</string>
+   </property>
+   <property name="iconText">
+    <string>Import
+MAT</string>
    </property>
   </action>
   <action name="actionSave">

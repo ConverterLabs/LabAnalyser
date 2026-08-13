@@ -19,7 +19,10 @@ inline QString BufferedId(const QString& id)
         return id;
 
     QStringList buffered = parts;
-    buffered.insert(1, "Buffered");
+    // Imported archives add an Export_<name>_<timestamp> root. Buffered
+    // remains below the source device, not directly below that import root.
+    const int deviceIndex = parts.first().startsWith("Export_") ? 1 : 0;
+    buffered.insert(deviceIndex + 1, "Buffered");
     return buffered.join("::");
 }
 

@@ -5,7 +5,9 @@
 #include "../Export/Export2Mat.h"
 #include "../Export/export2highfive.h"
 #include "../Export/exportinputs2xml.h"
+#include "../Export/LabDataArchive.h"
 #include "../Import/parameterloader.h"
+#include "../Import/MatDataImport.h"
 #include "../LoadSave/xmlexperimentreader.h"
 #include "../LoadSave/xmlexperimentwriter.h"
 #include "../LoadSave/loadplugin.h"
@@ -39,6 +41,21 @@ bool ProjectIoCoordinator::ExportHdf5(const QString& path, const QStringList& ex
 {
     Export2HDF5 exporter(&manager);
     return exporter.Export(path, exportIds);
+}
+
+bool ProjectIoCoordinator::ExportLabData(const QString& path, QString* error) const
+{
+    return LabDataArchive::ExportAll(manager, path, error);
+}
+
+bool ProjectIoCoordinator::ImportLabData(const QString& path, QString* datasetRoot, QString* error) const
+{
+    return LabDataArchive::Import(manager, path, datasetRoot, error);
+}
+
+bool ProjectIoCoordinator::ImportMatData(const QString& path, QString* datasetRoot, QString* error) const
+{
+    return MatDataImport::Import(manager, path, datasetRoot, error);
 }
 
 bool ProjectIoCoordinator::ReadExperiment(const QString& path) const

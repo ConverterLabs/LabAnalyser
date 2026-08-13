@@ -77,6 +77,14 @@ void MatExporter::ExportChannels()
             dataVariable = CreateString("Data", container->GetString().toUtf8());
         }
 
+        // A declared container may not have received a value yet.  libmatio
+        // struct fields must still be valid matvar_t instances; passing null
+        // here causes an access violation in the writer.
+        if (!timeVariable)
+            timeVariable = CreateDouble("Time", nullptr, 0);
+        if (!dataVariable)
+            dataVariable = CreateDouble("Data", nullptr, 0);
+
         Mat_VarSetStructFieldByName(exportedChannels, "ID", index, idVariable);
         Mat_VarSetStructFieldByName(exportedChannels, "Time", index, timeVariable);
         Mat_VarSetStructFieldByName(exportedChannels, "Data", index, dataVariable);

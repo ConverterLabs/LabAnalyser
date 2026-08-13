@@ -76,9 +76,11 @@ set(LABANALYSER_CORE_SOURCES
     src/DropWidgets/QTSLed.cpp
     src/DropWidgets/QTableWidgeD.cpp
     src/Export/Export2Mat.cpp
+    src/Export/LabDataArchive.cpp
     src/Export/export2highfive.cpp
     src/Export/exportinputs2xml.cpp
     src/Import/parameterloader.cpp
+    src/Import/MatDataImport.cpp
     src/LoadSave/loadplugin.cpp
     src/LoadSave/PluginLeasePool.cpp
     src/LoadSave/XmlFigureDimensions.cpp

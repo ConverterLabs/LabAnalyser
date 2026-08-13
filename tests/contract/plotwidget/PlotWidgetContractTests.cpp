@@ -330,6 +330,16 @@ void PlotWidgetContractTests::PLOT_009_drop_item_resolution_is_bounded_and_type_
     QCOMPARE(resolved, QString("Buffered::Buffered::Signal"));
     QCOMPARE(PlotWidgetDropBinding::BufferedId(QString("Buffered::Signal")),
              QString("Buffered::Buffered::Signal"));
+
+    QTreeWidgetItem importedRoot(&tree, QStringList("Export_source_20260813_173700"));
+    QTreeWidgetItem importedDevice(&importedRoot, QStringList("MMC-Zittau"));
+    QTreeWidgetItem importedLeaf(&importedDevice, QStringList("Signal"));
+    publish(window, "Export_source_20260813_173700::MMC-Zittau::Buffered::Signal",
+            data({0.0, 1.0}, {6.0, 7.0}));
+    QVERIFY(PlotWidgetDropBinding::ResolveSupportedItem(window.GetLogic(), &importedLeaf, &resolved));
+    QCOMPARE(resolved, QString("Export_source_20260813_173700::MMC-Zittau::Buffered::Signal"));
+    QCOMPARE(PlotWidgetDropBinding::BufferedId(QString("Export_source_20260813_173700::MMC-Zittau::Signal")),
+             QString("Export_source_20260813_173700::MMC-Zittau::Buffered::Signal"));
 }
 
 void PlotWidgetContractTests::PLOT_010_foreign_drop_is_a_noop()
