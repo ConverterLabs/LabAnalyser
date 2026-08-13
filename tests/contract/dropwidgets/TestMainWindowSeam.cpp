@@ -72,6 +72,7 @@ void MainWindow::PublishStart() {}
 void MainWindow::OutputTextMenu(QPoint) {}
 void MainWindow::ErrorWriter(const QString&, QString) {}
 void MainWindow::InfoWriter(const QString&, QString) {}
+void MainWindow::RefreshExplorerValues() {}
 void MainWindow::CloseProject() {}
 void MainWindow::contextMenuTreeWidget(QPoint) {}
 void MainWindow::contextMenuTreeWidgetData(QPoint) {}
