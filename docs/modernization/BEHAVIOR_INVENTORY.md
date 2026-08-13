@@ -1309,3 +1309,15 @@ empty graph data is a no-op.
 
 `PlotWidget::SaveToPdf` is mapped to `PLOT_027`: export requires MainWindow
 context and is otherwise a no-op before dialog/file handling.
+
+## Explorer current-value projection
+
+`MainWindowExplorerValues` is a private MainWindow presentation helper mapped
+to `GUI_023` and `GUI_024`. Parameter and Data explorers expose `Item`,
+`Value`, `Data Type` and `State`; the State explorer retains its historical
+columns. A single MainWindow-owned 500 ms timer reads only visible leaf rows
+from the existing DataManagement container map. It renders bool, signed,
+unsigned and floating scalars as text and leaves strings, lists, selections
+and vector/pair payloads blank. No per-ID connection, cell widget or data
+mutation is introduced. Collapsed/offscreen rows are deliberately not scanned;
+the per-tick work is bounded by the viewport rather than total tree size.

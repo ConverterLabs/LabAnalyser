@@ -204,7 +204,7 @@
         <bool>false</bool>
        </property>
        <property name="columnCount">
-        <number>2</number>
+        <number>4</number>
        </property>
        <attribute name="headerVisible">
         <bool>true</bool>
@@ -229,6 +229,16 @@
        <column>
         <property name="text">
          <string notr="true">2</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">3</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">4</string>
         </property>
        </column>
       </widget>
@@ -317,7 +327,7 @@
         <bool>false</bool>
        </property>
        <property name="columnCount">
-        <number>2</number>
+        <number>4</number>
        </property>
        <attribute name="headerVisible">
         <bool>true</bool>
@@ -336,6 +346,16 @@
        <column>
         <property name="text">
          <string notr="true">2</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">3</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">4</string>
         </property>
        </column>
       </widget>

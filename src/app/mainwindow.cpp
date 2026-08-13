@@ -34,6 +34,7 @@
 #include "UIFunctions/MainWindowSubplotDialog.h"
 #include "UIFunctions/MainWindowFormLoader.h"
 #include "UIFunctions/MainWindowTreeModel.h"
+#include "UIFunctions/MainWindowExplorerValues.h"
 #include "UIFunctions/MainWindowFigureFactory.h"
 #include "UIFunctions/MainWindowDockPresentation.h"
 #include "UIFunctions/MainWindowTrayController.h"
@@ -44,6 +45,7 @@
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
 #include <QFileInfo>
+#include <QTimer>
 
 
 
@@ -130,12 +132,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->StateDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockWidget_topLevelChanged(bool)));
 
     //Set Parameter Dock Header
-    ui->ParameterTreeWidget->headerItem()->setText(0, "Item");
-    ui->ParameterTreeWidget->headerItem()->setText(1, "Data Type");
+    ui->ParameterTreeWidget->setColumnCount(MainWindowExplorerValues::StateColumn + 1);
+    ui->ParameterTreeWidget->headerItem()->setText(MainWindowExplorerValues::NameColumn, "Item");
+    ui->ParameterTreeWidget->headerItem()->setText(MainWindowExplorerValues::ValueColumn, "Value");
+    ui->ParameterTreeWidget->headerItem()->setText(MainWindowExplorerValues::TypeColumn, "Data Type");
+    ui->ParameterTreeWidget->headerItem()->setText(MainWindowExplorerValues::StateColumn, "State");
 
-
-    ui->DataTreeWidget->headerItem()->setText(0, "Item");
-    ui->DataTreeWidget->headerItem()->setText(1, "Data Type");
+    ui->DataTreeWidget->setColumnCount(MainWindowExplorerValues::StateColumn + 1);
+    ui->DataTreeWidget->headerItem()->setText(MainWindowExplorerValues::NameColumn, "Item");
+    ui->DataTreeWidget->headerItem()->setText(MainWindowExplorerValues::ValueColumn, "Value");
+    ui->DataTreeWidget->headerItem()->setText(MainWindowExplorerValues::TypeColumn, "Data Type");
+    ui->DataTreeWidget->headerItem()->setText(MainWindowExplorerValues::StateColumn, "State");
 
     ui->DataTreeWidget->setAlternatingRowColors(true);
     ui->ParameterTreeWidget->setAlternatingRowColors(true);
@@ -173,6 +180,12 @@ MainWindow::MainWindow(QWidget *parent) :
     TreeViewState.reset(new MainWindowTreeViewState(ui->ParameterTreeWidget, ui->DataTreeWidget,
         ui->StateTreeWidget, ui->ParameterDock, ui->DataDock, ui->StateDock));
 
+    ExplorerValueRefreshTimer = new QTimer(this);
+    ExplorerValueRefreshTimer->setObjectName("ExplorerValueRefreshTimer");
+    ExplorerValueRefreshTimer->setInterval(500);
+    connect(ExplorerValueRefreshTimer, &QTimer::timeout, this, &MainWindow::RefreshExplorerValues);
+    ExplorerValueRefreshTimer->start();
+
     ParseInputArguments();
 
 }
@@ -189,10 +202,16 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     //Resize the dockables when window resizes
     QMainWindow::resizeEvent(event);
-    int Width = ui->ParameterDock->width();
-    ui->ParameterTreeWidget->setColumnWidth(0,Width*0.6);
-    ui->ParameterTreeWidget->setColumnWidth(1,Width*0.2);
-    ui->ParameterTreeWidget->setColumnWidth(2,Width*0.1);
+    MainWindowExplorerValues::ConfigureColumns(*ui->ParameterTreeWidget, ui->ParameterDock->width());
+    MainWindowExplorerValues::ConfigureColumns(*ui->DataTreeWidget, ui->DataDock->width());
+}
+
+void MainWindow::RefreshExplorerValues()
+{
+    if (!ExtendedDataManagement)
+        return;
+    MainWindowExplorerValues::RefreshVisible(*ui->ParameterTreeWidget, *ExtendedDataManagement);
+    MainWindowExplorerValues::RefreshVisible(*ui->DataTreeWidget, *ExtendedDataManagement);
 }
 
 

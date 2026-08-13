@@ -1,5 +1,6 @@
 #include "MainWindowTreeModel.h"
 
+#include "MainWindowExplorerValues.h"
 #include "plugins/InterfaceDataType.h"
 
 #include <QDockWidget>
@@ -63,6 +64,10 @@ void MainWindowTreeModel::AddElement(QTreeWidget* tree, const QStringList& parts
 {
     if (!tree)
         return;
+    const bool hasValueColumn = tree->objectName() == QStringLiteral("ParameterTreeWidget")
+        || tree->objectName() == QStringLiteral("DataTreeWidget");
+    const int typeColumn = hasValueColumn ? MainWindowExplorerValues::TypeColumn : 1;
+    const int stateColumn = hasValueColumn ? MainWindowExplorerValues::StateColumn : 2;
     MainWindowTreeItem* current = nullptr;
     for (int index = 0; index < parts.size(); ++index) {
         const QString& part = parts.at(index);
@@ -94,8 +99,8 @@ void MainWindowTreeModel::AddElement(QTreeWidget* tree, const QStringList& parts
             current = child;
         }
         if (index == parts.size() - 1) {
-            current->setText(1, data.GetDataType());
-            current->setText(2, data.GetStateDependency());
+            current->setText(typeColumn, data.GetDataType());
+            current->setText(stateColumn, data.GetStateDependency());
         }
     }
 }

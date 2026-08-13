@@ -104,6 +104,7 @@ set(LABANALYSER_CORE_SOURCES
     src/UIFunctions/MainWindowSubplotDialog.cpp
     src/UIFunctions/MainWindowFormLoader.cpp
     src/UIFunctions/MainWindowTreeModel.cpp
+    src/UIFunctions/MainWindowExplorerValues.cpp
     src/UIFunctions/MainWindowFigureFactory.cpp
     src/UIFunctions/MainWindowDockPresentation.cpp
     src/UIFunctions/MainWindowTrayController.cpp

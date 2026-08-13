@@ -106,6 +106,7 @@ SOURCES += src/app/main.cpp\
         src/UIFunctions/MainWindowSubplotDialog.cpp \
         src/UIFunctions/MainWindowFormLoader.cpp \
         src/UIFunctions/MainWindowTreeModel.cpp \
+        src/UIFunctions/MainWindowExplorerValues.cpp \
         src/UIFunctions/MainWindowFigureFactory.cpp \
         src/UIFunctions/MainWindowDockPresentation.cpp \
         src/UIFunctions/MainWindowTrayController.cpp \
@@ -125,6 +126,7 @@ HEADERS  += src/app/mainwindow.h\
             src/UIFunctions/MainWindowSubplotDialog.h \
             src/UIFunctions/MainWindowFormLoader.h \
             src/UIFunctions/MainWindowTreeModel.h \
+            src/UIFunctions/MainWindowExplorerValues.h \
             src/UIFunctions/MainWindowFigureFactory.h \
             src/UIFunctions/MainWindowDockPresentation.h \
             src/UIFunctions/MainWindowTrayController.h \

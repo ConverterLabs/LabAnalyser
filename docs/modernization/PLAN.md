@@ -1112,3 +1112,12 @@ derivation, publish-view state and narrow null/path guards. Dynamic docks,
 project routing, dialogs, command-line parsing and figure lifecycle remain
 separate high-coupling work because they cross legacy XML/UI, QObject lifetime
 and user-visible workflow boundaries.
+
+## Explorer current-value display
+
+The Parameter and Data explorer value projection is implemented as a private,
+viewport-limited 500 ms MainWindow timer (`GUI_023`, `GUI_024`). It reads the
+existing manager state only and displays supported scalar bool/integer/floating
+values without a per-ID signal fan-out; unsupported strings and aggregate
+payloads remain blank. State-tree column layout and all manager, plugin, XML
+and InterfaceData boundaries remain unchanged.

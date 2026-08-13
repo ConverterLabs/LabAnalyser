@@ -53,6 +53,7 @@ class MainWindow;
 class QSimpleUpdater;
 class MainWindowOutputLog;
 class MainWindowTreeViewState;
+class QTimer;
 
 
 class MainWindow : public QMainWindow
@@ -96,6 +97,7 @@ public slots:
     void OutputTextMenu( QPoint );
     void ErrorWriter(const QString &ID, const QString Data);
     void InfoWriter(const QString &ID, const QString Data);
+    void RefreshExplorerValues();
 
 
 
@@ -160,6 +162,7 @@ private:
     UIDataManagementSetClass *ExtendedDataManagement;
     std::unique_ptr<MainWindowOutputLog> OutputLog;
     std::unique_ptr<MainWindowTreeViewState> TreeViewState;
+    QTimer* ExplorerValueRefreshTimer = nullptr;
     bool isloading = false;
 
 };

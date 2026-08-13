@@ -26,6 +26,8 @@
 
 #include "DropWidgets/QLineEdit.h"
 #include "DataManagement/DataMessengerClass.h"
+#include "UIFunctions/MainWindowExplorerValues.h"
+#include "UIFunctions/MainWindowTreePath.h"
 #include "mainwindow.h"
 #include "plugins/platforminterface.h"
 
@@ -79,6 +81,8 @@ private slots:
     void GUI_021_device_context_action_removes_without_confirmation();
     void GUI_SAFE_001_senderless_and_invalid_selection_actions_are_noops();
     void GUI_022_publish_tree_view_state_contract();
+    void GUI_023_explorer_current_scalar_values_are_timer_driven_and_visible_only();
+    void GUI_024_explorer_scalar_formatting_contract();
     void GUI_SAFE_002_null_figure_deletion_is_a_noop();
     void GUI_SAFE_003_extensionless_form_path_is_rejected_safely();
     void GUI_SAFE_004_null_dock_cleanup_is_a_noop();
@@ -690,7 +694,7 @@ void MainWindowIntegrationTests::GUI_014_nested_trees_messenger_updates_and_vali
     QTreeWidget* parameterTree = window.findChild<QTreeWidget*>("ParameterTreeWidget");
     QTreeWidgetItem* gain = parameterTree->topLevelItem(0)->child(0)->child(0);
     QCOMPARE(gain->text(0), QString("Gain"));
-    QCOMPARE(gain->text(1), QString("double"));
+    QCOMPARE(gain->text(2), QString("double"));
     InterfaceData update("double", "Parameter");
     update.SetData(2.5);
     manager->GetMessenger()->MessageReceiver("set", "Parameter::Group::Gain", update);
@@ -708,6 +712,139 @@ void MainWindowIntegrationTests::GUI_014_nested_trees_messenger_updates_and_vali
         QDockWidget* dock = window.findChild<QDockWidget*>(treeCase.dock);
         QVERIFY(dock);
     }
+}
+
+void MainWindowIntegrationTests::GUI_023_explorer_current_scalar_values_are_timer_driven_and_visible_only()
+{
+    MainWindow window;
+    window.resize(1000, 700);
+    window.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&window));
+
+    auto* manager = window.GetLogic();
+    auto publish = [manager](const QString& id, InterfaceData data) {
+        manager->GetMessenger()->MessageReceiver("publish", id, data);
+        static_cast<DataManagementClass*>(manager)->SetData(id, data);
+    };
+
+    InterfaceData numeric("double", "Parameter");
+    numeric.SetData(1523.8);
+    publish("Parameter::Signals::Speed", numeric);
+    InterfaceData text("QString", "Parameter");
+    text.SetData(QStringLiteral("hidden text"));
+    publish("Parameter::Signals::Description", text);
+    InterfaceData array("QStringList", "Parameter");
+    array.SetData(QStringList{QStringLiteral("one"), QStringLiteral("two")});
+    publish("Parameter::Signals::Spectrum", array);
+    InterfaceData hidden("int32_t", "Parameter");
+    hidden.SetData(int32_t(9));
+    publish("Parameter::Collapsed::Hidden", hidden);
+
+    InterfaceData enabled("bool", "Data");
+    enabled.SetData(true);
+    publish("Data::Signals::Enabled", enabled);
+    QCOMPARE(manager->GetContainer("Parameter::Signals::Speed")->GetDouble(), 1523.8);
+    QVERIFY(manager->GetContainer("Data::Signals::Enabled")->GetBool());
+    QCOMPARE(MainWindowExplorerValues::FormatScalar(*manager->GetContainer("Parameter::Signals::Speed")),
+             QString("1523.8"));
+
+    QTreeWidget* parameterTree = window.findChild<QTreeWidget*>("ParameterTreeWidget");
+    QTreeWidget* dataTree = window.findChild<QTreeWidget*>("DataTreeWidget");
+    QDockWidget* parameterDock = window.findChild<QDockWidget*>("ParameterDock");
+    QDockWidget* dataDock = window.findChild<QDockWidget*>("DataDock");
+    QVERIFY(parameterTree && dataTree && parameterDock && dataDock);
+    QCOMPARE(parameterTree->headerItem()->text(0), QString("Item"));
+    QCOMPARE(parameterTree->headerItem()->text(1), QString("Value"));
+    QCOMPARE(parameterTree->headerItem()->text(2), QString("Data Type"));
+
+    const auto findLeaf = [](QTreeWidget* tree, const QString& name) {
+        const QList<QTreeWidgetItem*> items = tree->findItems(name,
+            Qt::MatchExactly | Qt::MatchRecursive, 0);
+        return items.size() == 1 ? items.constFirst() : nullptr;
+    };
+    QTreeWidgetItem* speed = findLeaf(parameterTree, QStringLiteral("Speed"));
+    QTreeWidgetItem* description = findLeaf(parameterTree, QStringLiteral("Description"));
+    QTreeWidgetItem* spectrum = findLeaf(parameterTree, QStringLiteral("Spectrum"));
+    QVERIFY(speed && description && spectrum);
+    QCOMPARE(speed->text(0), QString("Speed"));
+    QCOMPARE(MainWindowTreePath::IdForItem(speed), QString("Parameter::Signals::Speed"));
+    QVERIFY(speed->parent() && speed->parent()->parent());
+    speed->parent()->parent()->setExpanded(true);
+    speed->parent()->setExpanded(true);
+    parameterTree->scrollToItem(speed);
+    parameterDock->show();
+    parameterDock->raise();
+    QVERIFY(speed->text(1).isEmpty());
+    QMetaObject::invokeMethod(&window, "RefreshExplorerValues", Qt::DirectConnection);
+    QCOMPARE(speed->text(1), QString("1523.8"));
+    QTimer* refreshTimer = window.findChild<QTimer*>("ExplorerValueRefreshTimer");
+    QVERIFY(refreshTimer);
+    QSignalSpy refreshSpy(refreshTimer, &QTimer::timeout);
+    QTRY_VERIFY_WITH_TIMEOUT(refreshSpy.count() >= 1, 1200);
+    QCOMPARE(manager->GetContainer("Parameter::Signals::Speed")->GetDouble(), 1523.8);
+    QCOMPARE(speed->text(1), QString("1523.8"));
+    QVERIFY(description->text(1).isEmpty());
+    QVERIFY(spectrum->text(1).isEmpty());
+    QCOMPARE(speed->text(2), QString("double"));
+
+    InterfaceData update("double", "Parameter");
+    update.SetData(7.25);
+    manager->GetMessenger()->MessageReceiver("set", "Parameter::Signals::Speed", update);
+    QCOMPARE(speed->text(1), QString("1523.8"));
+    QTRY_COMPARE_WITH_TIMEOUT(speed->text(1), QString("7.25"), 1200);
+
+    QTreeWidgetItem* collapsed = findLeaf(parameterTree, QStringLiteral("Collapsed"));
+    QVERIFY(collapsed);
+    collapsed->setExpanded(false);
+    QTreeWidgetItem* hiddenLeaf = collapsed->child(0);
+    QVERIFY(hiddenLeaf);
+    hiddenLeaf->setText(1, QStringLiteral("not-refreshed"));
+    QMetaObject::invokeMethod(&window, "RefreshExplorerValues", Qt::DirectConnection);
+    QCOMPARE(hiddenLeaf->text(1), QString("not-refreshed"));
+
+    dataDock->show();
+    dataDock->raise();
+    QTreeWidgetItem* enabledLeaf = findLeaf(dataTree, QStringLiteral("Enabled"));
+    QVERIFY(enabledLeaf);
+    QVERIFY(enabledLeaf->parent() && enabledLeaf->parent()->parent());
+    enabledLeaf->parent()->parent()->setExpanded(true);
+    enabledLeaf->parent()->setExpanded(true);
+    dataTree->scrollToItem(enabledLeaf);
+    QTRY_COMPARE_WITH_TIMEOUT(enabledLeaf->text(1), QString("true"), 1200);
+
+    QCOMPARE(refreshTimer->interval(), 500);
+}
+
+void MainWindowIntegrationTests::GUI_024_explorer_scalar_formatting_contract()
+{
+    struct ValueCase {
+        InterfaceData data;
+        QString expected;
+    };
+
+    InterfaceData signedValue("int32_t", "Parameter");
+    signedValue.SetData(int32_t(-17));
+    InterfaceData unsignedValue("uint64_t", "Parameter");
+    unsignedValue.SetData(uint64_t(42));
+    InterfaceData floatingValue("double", "Parameter");
+    floatingValue.SetData(0.000314);
+    InterfaceData booleanValue("bool", "Parameter");
+    booleanValue.SetData(true);
+    InterfaceData textValue("QString", "Parameter");
+    textValue.SetData(QStringLiteral("not shown"));
+    InterfaceData listValue("QStringList", "Parameter");
+    listValue.SetData(QStringList{QStringLiteral("not"), QStringLiteral("shown")});
+
+    const QList<ValueCase> cases {
+        {signedValue, QStringLiteral("-17")},
+        {unsignedValue, QStringLiteral("42")},
+        {floatingValue, QStringLiteral("0.000314")},
+        {booleanValue, QStringLiteral("true")},
+        {textValue, QString()},
+        {listValue, QString()}
+    };
+    for (const ValueCase& valueCase : cases)
+        QCOMPARE(MainWindowExplorerValues::FormatScalar(valueCase.data), valueCase.expected);
 }
 
 void MainWindowIntegrationTests::GUI_015_form_dock_recreate_from_temporary_fixture()

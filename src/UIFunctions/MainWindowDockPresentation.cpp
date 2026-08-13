@@ -1,5 +1,6 @@
 #include "MainWindowDockPresentation.h"
 
+#include "UIFunctions/MainWindowExplorerValues.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -94,13 +95,10 @@ void MainWindowDockPresentation::HandleEvent(MainWindow& mainWindow, QObject* ob
     }
     if (dock->objectName().compare("ParameterDock") == 0 && event->type() == QEvent::Resize) {
         const int width = mainWindow.UI()->ParameterDock->width();
-        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(0, width * 0.6);
-        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(1, width * 0.2);
-        mainWindow.UI()->ParameterTreeWidget->setColumnWidth(2, width * 0.1);
+        MainWindowExplorerValues::ConfigureColumns(*mainWindow.UI()->ParameterTreeWidget, width);
     }
     if (dock->objectName().compare("DataDock") == 0 && event->type() == QEvent::Resize) {
         const int width = mainWindow.UI()->DataTreeWidget->width();
-        mainWindow.UI()->DataTreeWidget->setColumnWidth(0, width * 0.6);
-        mainWindow.UI()->DataTreeWidget->setColumnWidth(1, width * 0.3);
+        MainWindowExplorerValues::ConfigureColumns(*mainWindow.UI()->DataTreeWidget, width);
     }
 }
