@@ -136,6 +136,7 @@ private slots:
     void on_actionAbout_LabAnalyzer_triggered();
     void on_actionAbout_triggered();
     void on_pushButton_clicked();
+    void EditParameterValue(QTreeWidgetItem* item, int column);
 
     void on_actionExport_Data_h5_triggered();
 

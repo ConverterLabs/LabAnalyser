@@ -153,6 +153,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //Parameter Widget should have Context Menu for Min/Max Value editing
     ui->ParameterTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->ParameterTreeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuTreeWidget(QPoint)));
+    connect(ui->ParameterTreeWidget, &QTreeWidget::itemDoubleClicked,
+            this, &MainWindow::EditParameterValue);
 
 
     //StateTreeWidget Widget should have Context Menu for Min/Max Value editing
@@ -347,6 +349,62 @@ MainWindow::~MainWindow()
     TreeViewState.reset();
     OutputLog.reset();
     delete ui;
+}
+
+void MainWindow::EditParameterValue(QTreeWidgetItem* item, int)
+{
+    if (!item || item->childCount() != 0)
+        return;
+
+    const QString id = MainWindowTreePath::IdForItem(item);
+    ToFormMapper* mapper = GetLogic()->GetContainer(id);
+    if (!mapper || !mapper->IsNumeric())
+        return;
+
+    InterfaceData value(*mapper);
+    bool accepted = false;
+    if (value.IsBool()) {
+        const QString selected = QInputDialog::getItem(this, tr("Set Parameter Value"), id,
+                                                       {QStringLiteral("false"), QStringLiteral("true")},
+                                                       value.GetBool() ? 1 : 0, false, &accepted);
+        if (accepted)
+            value.SetDataKeepType(selected == QStringLiteral("true"));
+    } else {
+        const QString entered = QInputDialog::getText(this, tr("Set Parameter Value"), id,
+                                                      QLineEdit::Normal,
+                                                      MainWindowExplorerValues::FormatScalar(value), &accepted);
+        if (!accepted)
+            return;
+
+        bool valid = false;
+        const QString type = value.GetTypeInfo();
+        if (value.IsSigedNumber()) {
+            const qlonglong number = entered.toLongLong(&valid);
+            if (valid) {
+                if (type == QStringLiteral("int64_t")) value.SetDataKeepType(static_cast<int64_t>(number));
+                else value.SetDataKeepType(static_cast<int32_t>(number));
+            }
+        } else if (value.IsUnsigedNumber()) {
+            const qulonglong number = entered.toULongLong(&valid);
+            if (valid) {
+                if (type == QStringLiteral("uint64_t")) value.SetDataKeepType(static_cast<uint64_t>(number));
+                else value.SetDataKeepType(static_cast<uint32_t>(number));
+            }
+        } else if (value.IsFloatingPointNumber()) {
+            const double number = entered.toDouble(&valid);
+            if (valid) {
+                if (type == QStringLiteral("float")) value.SetDataKeepType(static_cast<float>(number));
+                else value.SetDataKeepType(number);
+            }
+        }
+        if (!valid)
+            return;
+    }
+
+    if (accepted) {
+        GetLogic()->GetMessenger()->MessageReceiver(QStringLiteral("set"), id, value);
+        RefreshExplorerValues();
+    }
 }
 
 void MainWindow::on_actionLoad_Form_triggered()
