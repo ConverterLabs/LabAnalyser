@@ -372,7 +372,9 @@ void MainWindow::EditParameterValue(QTreeWidgetItem* item, int)
     } else {
         const QString entered = QInputDialog::getText(this, tr("Set Parameter Value"), id,
                                                       QLineEdit::Normal,
-                                                      MainWindowExplorerValues::FormatScalar(value), &accepted);
+                                                      QString::number(value.GetFloatingPointData(), 'g',
+                                                                      value.GetTypeInfo() == QStringLiteral("float") ? 7 : 12),
+                                                      &accepted);
         if (!accepted)
             return;
 
