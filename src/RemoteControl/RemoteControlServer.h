@@ -35,6 +35,7 @@ class RemoteControlServer : public QWidget
     Q_OBJECT
 public:
     explicit RemoteControlServer( std::map<QString, ToFormMapper*> *DataContainerI = 0);
+    ~RemoteControlServer() override;
     int GetPort() {return m_port-1;};
 
 private slots:
