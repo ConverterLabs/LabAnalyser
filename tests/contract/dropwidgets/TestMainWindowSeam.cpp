@@ -97,6 +97,10 @@ void MainWindow::on_actionAbout_LabAnalyzer_triggered() {}
 void MainWindow::on_actionAbout_triggered() {}
 void MainWindow::on_pushButton_clicked() {}
 void MainWindow::on_actionExport_Data_h5_triggered() {}
+void MainWindow::on_actionExport_LabAnalyser_Data_triggered() {}
+void MainWindow::on_actionImport_LabAnalyser_Data_triggered() {}
+void MainWindow::on_actionImport_Mat_Data_triggered() {}
+void MainWindow::EditParameterValue(QTreeWidgetItem*, int) {}
 void MainWindow::on_actionRemote_Connection_Port_2_triggered() {}
 void MainWindow::on_actionFFT_triggered() {}
 bool MainWindow::eventFilter(QObject*, QEvent*) { return false; }
