@@ -27,14 +27,8 @@ QString FormatScalar(InterfaceData data)
         return QString::number(data.GetSignedData());
     if (data.IsUnsigedNumber())
         return QString::number(data.GetUnsignedData());
-    if (data.IsFloatingPointNumber()) {
-        QString value = QString::number(data.GetFloatingPointData(), 'f', 2);
-        while (value.endsWith(QLatin1Char('0')))
-            value.chop(1);
-        if (value.endsWith(QLatin1Char('.')))
-            value.chop(1);
-        return value;
-    }
+    if (data.IsFloatingPointNumber())
+        return QString::number(data.GetFloatingPointData());
     return QString();
 }
 
