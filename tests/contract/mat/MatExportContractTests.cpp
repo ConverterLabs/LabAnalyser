@@ -65,6 +65,7 @@ private slots:
     void MAT_008_uiCallerUsesSameConvention();
     void MAT_009_uninitializedContainerExportsAsEmptyFields();
     void MAT_010_exportedMatImportsAsIndependentDataSet();
+    void MAT_011_largeVectorExportPreservesDataWithoutExtraExporterCopy();
 };
 
 void MatExportContractTests::MAT_001_nullManagerFailsWithoutFile() {
@@ -158,6 +159,40 @@ void MatExportContractTests::MAT_010_exportedMatImportsAsIndependentDataSet() {
     ToFormMapper* scalar = target.GetContainer(root + "::scalar");
     QVERIFY(scalar);
     QCOMPARE(scalar->GetAsDouble(), 4.5);
+}
+void MatExportContractTests::MAT_011_largeVectorExportPreservesDataWithoutExtraExporterCopy() {
+    constexpr size_t sampleCount = 262144;
+    std::vector<double> time(sampleCount);
+    std::vector<double> data(sampleCount);
+    for (size_t index = 0; index < sampleCount; ++index) {
+        time[index] = 1000.0 + static_cast<double>(index) * 0.001;
+        data[index] = static_cast<double>(index) * 0.25;
+    }
+
+    QObject owner;
+    DataManagementSetClass manager(&owner);
+    add(manager, "large", vectorValue(time, data));
+    QTemporaryDir dir;
+    MatExporter exporter(&manager);
+    const QString path = dir.filePath("large.mat");
+    QVERIFY2(!exporter.Export2Mat(path, {"large"}), "large vector export must succeed");
+
+    MatFile file{Mat_Open(path.toUtf8().constData(), MAT_ACC_RDONLY)};
+    QVERIFY(file.value);
+    matvar_t* channels = Mat_VarRead(file.value, "ExportedChannels");
+    QVERIFY(channels);
+    matvar_t* exportedTime = field(channels, "Time", 0);
+    matvar_t* exportedData = field(channels, "Data", 0);
+    QVERIFY(exportedTime && exportedData);
+    QCOMPARE(exportedTime->dims[0], sampleCount);
+    QCOMPARE(exportedData->dims[0], sampleCount);
+    const auto* writtenTime = static_cast<const double*>(exportedTime->data);
+    const auto* writtenData = static_cast<const double*>(exportedData->data);
+    QCOMPARE(writtenTime[0], time.front());
+    QCOMPARE(writtenTime[sampleCount - 1], time.back());
+    QCOMPARE(writtenData[0], data.front());
+    QCOMPARE(writtenData[sampleCount - 1], data.back());
+    Mat_VarFree(channels);
 }
 QTEST_MAIN(MatExportContractTests)
 #include "MatExportContractTests.moc"

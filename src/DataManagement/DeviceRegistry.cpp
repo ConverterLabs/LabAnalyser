@@ -1,6 +1,5 @@
 #include "DeviceRegistry.h"
 
-#include "DataMessengerClass.h"
 #include "../plugins/platforminterface.h"
 
 Platform_Interface* DeviceRegistry::Find(QString name) const
@@ -63,8 +62,15 @@ void DeviceRegistry::Cleanup(DeviceRecord& record)
         // record. The plugin root and returned interface remain application-
         // resident because Legacy-V1 does not declare their ownership.
         if (record.messenger && record.pluginObject) {
-            if (MessengerClass* messenger = qobject_cast<MessengerClass*>(record.messenger.data()))
-                emit messenger->MessageSender("CloseProject", record.pluginObject->objectName(), InterfaceData());
+            // Do not broadcast through Messenger::MessageSender here: a plugin
+            // may also connect that signal directly to its worker, which can
+            // feed CloseProject back into the application during teardown.
+            // Only the plugin root receives the lifecycle request.
+            QMetaObject::invokeMethod(record.pluginObject, "MessageReceiver",
+                                      Qt::DirectConnection,
+                                      Q_ARG(QString, QStringLiteral("CloseProject")),
+                                      Q_ARG(QString, record.pluginObject->objectName()),
+                                      Q_ARG(InterfaceData, InterfaceData()));
             QObject::disconnect(record.messenger, nullptr, record.pluginObject, nullptr);
             QObject::disconnect(record.pluginObject, nullptr, record.messenger, nullptr);
         }

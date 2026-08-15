@@ -15,8 +15,10 @@ public:
     bool Export2Mat(QString Filename_, QStringList Ids_);
 
 private:
-    void WriteTimeStamp();
-    void ExportChannels();
+    bool WriteTimeStamp();
+    bool ExportChannels();
+    bool HasSafePayloadSize() const;
+    void CloseFile();
 
     QString Filename;
     std::map<QString, InterfaceData> Data;
