@@ -332,5 +332,13 @@ void PluginLoaderContractTests::PLUGIN_019_publicAddDeviceRemainsHostDelete()
     QCOMPARE(destructions, 1);
     QVERIFY(!manager.GetDevice("HostDelete"));
 }
-QTEST_MAIN(PluginLoaderContractTests)
+int main(int argc, char** argv)
+{
+    if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM")) {
+        qputenv("QT_QPA_PLATFORM", "offscreen");
+    }
+    PluginLoaderContractTests test;
+    return QTest::qExec(&test, argc, argv);
+}
+
 #include "PluginLoaderContractTests.moc"
