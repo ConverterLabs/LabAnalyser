@@ -1,4 +1,5 @@
 #include <QtTest>
+#include <QApplication>
 #include <QBuffer>
 #include <QFileInfo>
 #include <QPluginLoader>
@@ -337,6 +338,7 @@ int main(int argc, char** argv)
     if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM")) {
         qputenv("QT_QPA_PLATFORM", "offscreen");
     }
+    QApplication app(argc, argv);
     PluginLoaderContractTests test;
     return QTest::qExec(&test, argc, argv);
 }

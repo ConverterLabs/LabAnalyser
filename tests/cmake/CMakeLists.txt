@@ -198,6 +198,6 @@ add_executable(PluginLoaderContractTests
     ${PROJECT_SOURCE_DIR}/src/plugins/InterfaceDataType.cpp)
 target_compile_definitions(PluginLoaderContractTests PRIVATE LABANALYSER_PLUGIN_LEASE_TESTING)
 target_link_libraries(PluginLoaderContractTests PRIVATE
-    Qt6::Core Qt6::Widgets Qt6::UiTools Qt6::PrintSupport Qt6::OpenGL Qt6::OpenGLWidgets Qt6::Network Qt6::Test Boost::boost)
+    Qt6::Core Qt6::Widgets Qt6::Network Qt6::Test Boost::boost)
 labanalyser_setup_gui_test(PluginLoaderContractTests)
 add_dependencies(PluginLoaderContractTests CompatiblePlugin WrongIidPlugin QObjectOnlyPlugin MemberOwnedInterfacePlugin HeapOwnedInterfacePlugin)
