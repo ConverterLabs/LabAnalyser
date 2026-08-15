@@ -113,6 +113,7 @@ set(LABANALYSER_CORE_SOURCES
     src/UIFunctions/MainWindowProjectCleanup.cpp
     src/UIFunctions/MainWindowContextMenus.cpp
     src/UIFunctions/MainWindowProjectActions.cpp
+    src/UIFunctions/UiLayoutEditMode.cpp
     src/UIFunctions/SubPlotMainWindow.cpp
     src/DropWidgets/TreeWidgetCustomDrop.cpp
     src/CustomWidgets/QBLedIndicator.cpp

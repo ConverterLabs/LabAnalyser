@@ -4,6 +4,7 @@
 #include "ui_mainwindow.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
 #include "DropWidgets/Plots/PlotWidget.h"
+#include "UIFunctions/UiLayoutEditMode.h"
 
 #include <QApplication>
 #include <QDate>
@@ -26,8 +27,10 @@ void AppendWidgetNames(MainWindow& mainWindow, const QObjectList& children, cons
         if (!child->children().isEmpty())
             AppendWidgetNames(mainWindow, child->children(), suffix);
         const QString name = child->objectName();
-        if (!name.isEmpty())
+        if (!name.isEmpty()) {
+            child->setProperty("LabAnalyserOriginalObjectName", name);
             child->setObjectName(name + "_" + suffix);
+        }
         if (qobject_cast<PlotWidget*>(child))
             mainWindow.GetLogic()->AddPlotPointer(child->objectName(), child);
     }
@@ -120,5 +123,6 @@ void MainWindowFormLoader::Load(MainWindow& mainWindow, QString uiFileName, QStr
 
     mainWindow.GetLogic()->AddFormFile(std::pair<QString, QString>(formName, uiFileName));
     mainWindow.GetLogic()->AddSkipFormFile(formName, skip);
+    UiLayoutEditMode::For(mainWindow)->RegisterForm(formWidget, uiFileName);
     QApplication::processEvents();
 }

@@ -118,6 +118,7 @@ private slots:
     void contextMenuTreeWidgetData(QPoint);
     void contextMenuTreeWidgetState(QPoint);
     void on_actionLoad_Form_triggered();
+    void on_actionEdit_UI_layout_toggled(bool checked);
     void on_actionBeenden_triggered();
     void on_actionCreatePlot_triggered();
     void on_actionCreate_Subplot_triggered();

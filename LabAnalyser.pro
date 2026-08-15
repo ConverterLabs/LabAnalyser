@@ -22,6 +22,7 @@
 QT       += core gui
 QT       += uitools
 QT       += network
+QT       += xml
 #CONFIG += c++17
 #CONFIG += force_debug_info
 
@@ -115,6 +116,7 @@ SOURCES += src/app/main.cpp\
         src/UIFunctions/MainWindowProjectCleanup.cpp \
         src/UIFunctions/MainWindowContextMenus.cpp \
         src/UIFunctions/MainWindowProjectActions.cpp \
+        src/UIFunctions/UiLayoutEditMode.cpp \
         src/UIFunctions/SubPlotMainWindow.cpp \
         src/DropWidgets/TreeWidgetCustomDrop.cpp\
         src/CustomWidgets/QBLedIndicator.cpp \
@@ -137,6 +139,7 @@ HEADERS  += src/app/mainwindow.h\
             src/UIFunctions/MainWindowProjectCleanup.h \
             src/UIFunctions/MainWindowContextMenus.h \
             src/UIFunctions/MainWindowProjectActions.h \
+            src/UIFunctions/UiLayoutEditMode.h \
             src/CustomWidgets/QBLedIndicator.h \
             src/CustomWidgets/QLedIndicator.h \
             src/CustomWidgets/QTSLedIndicator.h \

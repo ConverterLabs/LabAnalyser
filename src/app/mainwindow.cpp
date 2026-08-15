@@ -41,6 +41,7 @@
 #include "UIFunctions/MainWindowProjectCleanup.h"
 #include "UIFunctions/MainWindowContextMenus.h"
 #include "UIFunctions/MainWindowProjectActions.h"
+#include "UIFunctions/UiLayoutEditMode.h"
 
 #include "DropWidgets/DropWidgets.h"
 #include "DropWidgets/DropWidgetsUiLoader.h"
@@ -456,6 +457,13 @@ void MainWindow::DeleteFigure(SubPlotMainWindow* FigurePointer)
     if (!FigurePointer)
         return;
     this->GetLogic()->DeletePlotWindow(FigurePointer->objectName());
+}
+
+void MainWindow::on_actionEdit_UI_layout_toggled(bool checked)
+{
+    UiLayoutEditMode::For(*this)->SetEnabled(checked);
+    statusBar()->showMessage(checked ? tr("UI layout editing enabled")
+                                     : tr("UI layout editing disabled"), 3000);
 }
 
 void MainWindow::on_actionCreate_Subplot_triggered()

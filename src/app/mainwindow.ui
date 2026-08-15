@@ -65,6 +65,7 @@
     </property>
     <addaction name="actionLoadPlugin"/>
     <addaction name="actionLoad_Form"/>
+    <addaction name="actionEdit_UI_layout"/>
     <addaction name="separator"/>
     <addaction name="actionLoadExperiment"/>
     <addaction name="actionSave"/>
@@ -536,6 +537,17 @@ Experiment</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionEdit_UI_layout">
+   <property name="text">
+    <string>Edit loaded UI layout</string>
+   </property>
+   <property name="toolTip">
+    <string>Move existing widgets in loaded user interfaces</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionExport_LabAnalyser_Data">

@@ -38,6 +38,7 @@
 #include "../LoadSave/loadplugin.h"
 
 #include "../Export/export2highfive.h"
+#include "UIFunctions/UiLayoutEditMode.h"
 
 
 
@@ -68,6 +69,12 @@ bool UIDataManagementSetClass::SaveExperiment(QString Path)
 
 
     bool Error = false;
+    MainWindow* MW = qobject_cast<MainWindow*>(parent());
+    QString uiSaveError;
+    if (MW && !UiLayoutEditMode::For(*MW)->SaveDirtyForms(&uiSaveError)) {
+        this->Error(uiSaveError);
+        return true;
+    }
     //create a backup
     ProjectIoCoordinator coordinator(*this);
     if ((coordinator.WriteExperiment(Path)))
