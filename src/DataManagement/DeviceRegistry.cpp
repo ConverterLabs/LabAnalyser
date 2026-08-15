@@ -1,5 +1,6 @@
 #include "DeviceRegistry.h"
 
+#include "DataMessengerClass.h"
 #include "../plugins/platforminterface.h"
 
 Platform_Interface* DeviceRegistry::Find(QString name) const
@@ -58,9 +59,12 @@ void DeviceRegistry::Cleanup(DeviceRecord& record)
         break;
     case CleanupStrategy::RetainLegacyPlugin:
         // A Legacy-V1 plugin does not declare who owns the returned interface.
-        // Disconnect only this Messenger/plugin-object pair before retiring the
-        // active record; the loader and interface remain application-resident.
+        // Ask the plugin to stop its own runtime work before retiring the active
+        // record. The plugin root and returned interface remain application-
+        // resident because Legacy-V1 does not declare their ownership.
         if (record.messenger && record.pluginObject) {
+            if (MessengerClass* messenger = qobject_cast<MessengerClass*>(record.messenger.data()))
+                emit messenger->MessageSender("CloseProject", record.pluginObject->objectName(), InterfaceData());
             QObject::disconnect(record.messenger, nullptr, record.pluginObject, nullptr);
             QObject::disconnect(record.pluginObject, nullptr, record.messenger, nullptr);
         }
