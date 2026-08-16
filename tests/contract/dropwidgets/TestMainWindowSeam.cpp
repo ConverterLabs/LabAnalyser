@@ -78,6 +78,7 @@ void MainWindow::contextMenuTreeWidget(QPoint) {}
 void MainWindow::contextMenuTreeWidgetData(QPoint) {}
 void MainWindow::contextMenuTreeWidgetState(QPoint) {}
 void MainWindow::on_actionLoad_Form_triggered() {}
+void MainWindow::on_actionEdit_UI_layout_toggled(bool) {}
 void MainWindow::on_actionBeenden_triggered() {}
 void MainWindow::on_actionCreatePlot_triggered() {}
 void MainWindow::on_actionCreate_Subplot_triggered() {}
