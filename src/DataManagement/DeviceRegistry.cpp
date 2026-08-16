@@ -42,7 +42,8 @@ void DeviceRegistry::AddWithCleanupStrategy(QString name, QString path,
                                              QObject* messenger)
 {
     if (!Devices[name].interface) {
-        Devices[name] = { device, path, cleanup, pluginObject, messenger };
+        Devices[name] = { device, path, cleanup, pluginObject,
+                          device ? device->GetObject() : nullptr, messenger };
         DevicePaths[name] = path;
     }
 }
@@ -73,6 +74,10 @@ void DeviceRegistry::Cleanup(DeviceRecord& record)
                                       Q_ARG(InterfaceData, InterfaceData()));
             QObject::disconnect(record.messenger, nullptr, record.pluginObject, nullptr);
             QObject::disconnect(record.pluginObject, nullptr, record.messenger, nullptr);
+            if (record.deviceObject) {
+                QObject::disconnect(record.messenger, nullptr, record.deviceObject, nullptr);
+                QObject::disconnect(record.deviceObject, nullptr, record.messenger, nullptr);
+            }
         }
         break;
     case CleanupStrategy::PluginReleaseV2:

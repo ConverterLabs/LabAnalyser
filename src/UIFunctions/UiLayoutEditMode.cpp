@@ -6,8 +6,12 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QBoxLayout>
+#include <QGraphicsOpacityEffect>
 #include <QGridLayout>
+#include <QLabel>
 #include <QLayout>
+#include <QKeyEvent>
+#include <QKeySequence>
 #include <QMouseEvent>
 #include <QSaveFile>
 #include <QWidget>
@@ -22,6 +26,7 @@ constexpr auto GridColumnProperty = "LabAnalyserLayoutGridColumn";
 constexpr auto GridRowSpanProperty = "LabAnalyserLayoutGridRowSpan";
 constexpr auto GridColumnSpanProperty = "LabAnalyserLayoutGridColumnSpan";
 constexpr auto BeforeProperty = "LabAnalyserLayoutBefore";
+constexpr auto LayoutParentProperty = "LabAnalyserLayoutParent";
 
 QDomElement FindWidget(QDomElement element, const QString& name)
 {
@@ -43,6 +48,14 @@ QDomElement ItemForWidget(QDomElement widget)
     return item.tagName() == QStringLiteral("item") ? item : QDomElement{};
 }
 
+QDomElement LayoutForParent(QDomDocument& document, const QString& parentName)
+{
+    QDomElement parent = FindWidget(document.documentElement(), parentName);
+    if (parent.isNull())
+        return {};
+    return parent.firstChildElement(QStringLiteral("layout"));
+}
+
 QWidget* GridWidgetAt(QGridLayout& layout, int row, int column)
 {
     for (int index = 0; index < layout.count(); ++index) {
@@ -58,9 +71,65 @@ QWidget* GridWidgetAt(QGridLayout& layout, int row, int column)
     return nullptr;
 }
 
-bool MoveInGrid(QGridLayout& layout, QWidget& widget, const QPoint& position)
+QLayout* EditableLayoutAt(QWidget& form, const QPoint& globalPosition)
 {
-    const int sourceIndex = layout.indexOf(&widget);
+    QWidget* candidate = form.childAt(form.mapFromGlobal(globalPosition));
+    while (candidate) {
+        if (QLayout* layout = candidate->layout())
+            return layout;
+        if (candidate == &form)
+            break;
+        candidate = candidate->parentWidget();
+    }
+    return nullptr;
+}
+
+QWidget* LayoutItemForWidget(QWidget* widget, QLayout** owningLayout)
+{
+    for (QWidget* candidate = widget; candidate; candidate = candidate->parentWidget()) {
+        QWidget* parent = candidate->parentWidget();
+        if (!parent)
+            continue;
+        QLayout* layout = parent->layout();
+        if (layout && layout->indexOf(candidate) >= 0) {
+            if (owningLayout)
+                *owningLayout = layout;
+            return candidate;
+        }
+    }
+    return nullptr;
+}
+
+void MarkGridPosition(QWidget& widget, QWidget* parent, int row, int column,
+                      int rowSpan, int columnSpan)
+{
+    widget.setProperty(MovedProperty, true);
+    widget.setProperty(LayoutParentProperty,
+                       parent ? parent->property(OriginalNameProperty).toString() : QString());
+    widget.setProperty(GridRowProperty, row);
+    widget.setProperty(GridColumnProperty, column);
+    widget.setProperty(GridRowSpanProperty, rowSpan);
+    widget.setProperty(GridColumnSpanProperty, columnSpan);
+    widget.setProperty(BeforeProperty, {});
+}
+
+void MarkBoxPosition(QWidget& widget, QWidget* parent, QWidget* after)
+{
+    widget.setProperty(MovedProperty, true);
+    widget.setProperty(LayoutParentProperty,
+                       parent ? parent->property(OriginalNameProperty).toString() : QString());
+    widget.setProperty(BeforeProperty,
+                       after ? after->property(OriginalNameProperty).toString() : QString());
+    widget.setProperty(GridRowProperty, {});
+    widget.setProperty(GridColumnProperty, {});
+    widget.setProperty(GridRowSpanProperty, {});
+    widget.setProperty(GridColumnSpanProperty, {});
+}
+
+bool MoveInGrid(QLayout& sourceLayout, QGridLayout& layout, QWidget& widget,
+                const QPoint& position)
+{
+    const int sourceIndex = sourceLayout.indexOf(&widget);
     if (sourceIndex < 0)
         return false;
 
@@ -68,7 +137,9 @@ bool MoveInGrid(QGridLayout& layout, QWidget& widget, const QPoint& position)
     int sourceColumn = 0;
     int sourceRowSpan = 1;
     int sourceColumnSpan = 1;
-    layout.getItemPosition(sourceIndex, &sourceRow, &sourceColumn, &sourceRowSpan, &sourceColumnSpan);
+    if (auto* sourceGrid = qobject_cast<QGridLayout*>(&sourceLayout))
+        sourceGrid->getItemPosition(sourceIndex, &sourceRow, &sourceColumn,
+                                    &sourceRowSpan, &sourceColumnSpan);
 
     int targetRow = sourceRow;
     int targetColumn = sourceColumn;
@@ -93,7 +164,7 @@ bool MoveInGrid(QGridLayout& layout, QWidget& widget, const QPoint& position)
             }
         }
     }
-    if (targetRow == sourceRow && targetColumn == sourceColumn)
+    if (&sourceLayout == &layout && targetRow == sourceRow && targetColumn == sourceColumn)
         return false;
 
     QWidget* target = GridWidgetAt(layout, targetRow, targetColumn);
@@ -105,31 +176,34 @@ bool MoveInGrid(QGridLayout& layout, QWidget& widget, const QPoint& position)
         int targetColumnSpan = 1;
         layout.getItemPosition(targetIndex, &targetWidgetRow, &targetWidgetColumn,
                                &targetRowSpan, &targetColumnSpan);
-        layout.removeWidget(&widget);
+        sourceLayout.removeWidget(&widget);
         layout.removeWidget(target);
-        layout.addWidget(target, sourceRow, sourceColumn, targetRowSpan, targetColumnSpan);
+        if (auto* sourceGrid = qobject_cast<QGridLayout*>(&sourceLayout))
+            sourceGrid->addWidget(target, sourceRow, sourceColumn, targetRowSpan, targetColumnSpan);
+        else if (auto* sourceBox = qobject_cast<QBoxLayout*>(&sourceLayout))
+            sourceBox->insertWidget(sourceIndex, target);
         layout.addWidget(&widget, targetWidgetRow, targetWidgetColumn,
                          sourceRowSpan, sourceColumnSpan);
-        target->setProperty(MovedProperty, true);
-        target->setProperty(GridRowProperty, sourceRow);
-        target->setProperty(GridColumnProperty, sourceColumn);
-        target->setProperty(GridRowSpanProperty, targetRowSpan);
-        target->setProperty(GridColumnSpanProperty, targetColumnSpan);
+        if (auto* sourceGrid = qobject_cast<QGridLayout*>(&sourceLayout))
+            MarkGridPosition(*target, sourceGrid->parentWidget(), sourceRow, sourceColumn,
+                             targetRowSpan, targetColumnSpan);
+        else if (auto* sourceBox = qobject_cast<QBoxLayout*>(&sourceLayout))
+            MarkBoxPosition(*target, sourceBox->parentWidget(),
+                            sourceIndex + 1 < sourceBox->count()
+                                ? sourceBox->itemAt(sourceIndex + 1)->widget() : nullptr);
     } else {
-        layout.removeWidget(&widget);
+        sourceLayout.removeWidget(&widget);
         layout.addWidget(&widget, targetRow, targetColumn, sourceRowSpan, sourceColumnSpan);
     }
-    widget.setProperty(MovedProperty, true);
-    widget.setProperty(GridRowProperty, targetRow);
-    widget.setProperty(GridColumnProperty, targetColumn);
-    widget.setProperty(GridRowSpanProperty, sourceRowSpan);
-    widget.setProperty(GridColumnSpanProperty, sourceColumnSpan);
+    MarkGridPosition(widget, layout.parentWidget(), targetRow, targetColumn,
+                     sourceRowSpan, sourceColumnSpan);
     return true;
 }
 
-bool MoveInBox(QBoxLayout& layout, QWidget& widget, const QPoint& position)
+bool MoveInBox(QLayout& sourceLayout, QBoxLayout& layout, QWidget& widget,
+               const QPoint& position)
 {
-    const int sourceIndex = layout.indexOf(&widget);
+    const int sourceIndex = sourceLayout.indexOf(&widget);
     if (sourceIndex < 0)
         return false;
     int destination = layout.count();
@@ -146,19 +220,35 @@ bool MoveInBox(QBoxLayout& layout, QWidget& widget, const QPoint& position)
             break;
         }
     }
-    layout.removeWidget(&widget);
-    if (destination > sourceIndex)
+    sourceLayout.removeWidget(&widget);
+    if (&sourceLayout == &layout && destination > sourceIndex)
         --destination;
-    if (destination == sourceIndex) {
+    if (&sourceLayout == &layout && destination == sourceIndex) {
         layout.insertWidget(sourceIndex, &widget);
         return false;
+    }
+    QWidget* target = destination < layout.count() ? layout.itemAt(destination)->widget() : nullptr;
+    if (target && &sourceLayout != &layout) {
+        layout.removeWidget(target);
+        if (auto* sourceGrid = qobject_cast<QGridLayout*>(&sourceLayout)) {
+            int row = 0;
+            int column = 0;
+            int rowSpan = 1;
+            int columnSpan = 1;
+            sourceGrid->getItemPosition(sourceIndex, &row, &column, &rowSpan, &columnSpan);
+            sourceGrid->addWidget(target, row, column, rowSpan, columnSpan);
+            MarkGridPosition(*target, sourceGrid->parentWidget(), row, column, rowSpan, columnSpan);
+        } else if (auto* sourceBox = qobject_cast<QBoxLayout*>(&sourceLayout)) {
+            sourceBox->insertWidget(sourceIndex, target);
+            MarkBoxPosition(*target, sourceBox->parentWidget(),
+                            sourceIndex + 1 < sourceBox->count()
+                                ? sourceBox->itemAt(sourceIndex + 1)->widget() : nullptr);
+        }
     }
     layout.insertWidget(destination, &widget);
     QWidget* after = destination + 1 < layout.count()
         ? layout.itemAt(destination + 1)->widget() : nullptr;
-    widget.setProperty(MovedProperty, true);
-    widget.setProperty(BeforeProperty,
-                       after ? after->property(OriginalNameProperty).toString() : QString());
+    MarkBoxPosition(widget, layout.parentWidget(), after);
     return true;
 }
 }
@@ -217,48 +307,166 @@ UiLayoutEditMode::Form* UiLayoutEditMode::FindForm(QWidget* widget)
     return nullptr;
 }
 
+UiLayoutEditMode::LayoutState UiLayoutEditMode::CaptureLayout(QLayout* layout) const
+{
+    LayoutState state;
+    state.layout = layout;
+    if (!layout)
+        return state;
+    for (int index = 0; index < layout->count(); ++index) {
+        QWidget* itemWidget = layout->itemAt(index)->widget();
+        if (!itemWidget)
+            continue;
+        LayoutItemState item;
+        item.widget = itemWidget;
+        item.index = index;
+        if (auto* grid = qobject_cast<QGridLayout*>(layout))
+            grid->getItemPosition(index, &item.row, &item.column, &item.rowSpan, &item.columnSpan);
+        state.items.push_back(item);
+    }
+    return state;
+}
+
+void UiLayoutEditMode::MarkLayoutForSave(const LayoutState& state)
+{
+    if (!state.layout)
+        return;
+    if (auto* grid = qobject_cast<QGridLayout*>(state.layout.data())) {
+        for (const LayoutItemState& item : state.items)
+            if (item.widget)
+                MarkGridPosition(*item.widget, grid->parentWidget(), item.row, item.column,
+                                 item.rowSpan, item.columnSpan);
+        return;
+    }
+    if (auto* box = qobject_cast<QBoxLayout*>(state.layout.data())) {
+        for (int index = 0; index < state.items.size(); ++index) {
+            QWidget* after = index + 1 < state.items.size()
+                ? state.items.at(index + 1).widget.data() : nullptr;
+            if (state.items.at(index).widget)
+                MarkBoxPosition(*state.items.at(index).widget, box->parentWidget(), after);
+        }
+    }
+}
+
+void UiLayoutEditMode::UndoLastMove()
+{
+    if (undoHistory.isEmpty())
+        return;
+    const Move move = undoHistory.takeLast();
+    for (const LayoutState& state : move.layouts)
+        for (const LayoutItemState& item : state.items)
+            if (item.widget && item.widget->parentWidget() && item.widget->parentWidget()->layout())
+                item.widget->parentWidget()->layout()->removeWidget(item.widget);
+
+    for (const LayoutState& state : move.layouts) {
+        if (!state.layout)
+            continue;
+        if (auto* grid = qobject_cast<QGridLayout*>(state.layout.data())) {
+            for (const LayoutItemState& item : state.items)
+                if (item.widget)
+                    grid->addWidget(item.widget, item.row, item.column, item.rowSpan, item.columnSpan);
+        } else if (auto* box = qobject_cast<QBoxLayout*>(state.layout.data())) {
+            for (const LayoutItemState& item : state.items)
+                if (item.widget)
+                    box->insertWidget(item.index, item.widget);
+        }
+        MarkLayoutForSave(state);
+    }
+    if (!move.layouts.isEmpty() && !move.layouts.first().items.isEmpty())
+        if (QWidget* widget = move.layouts.first().items.first().widget)
+            if (Form* form = FindForm(widget))
+                form->dirty = true;
+}
+
 bool UiLayoutEditMode::eventFilter(QObject* watched, QEvent* event)
 {
     auto* widget = qobject_cast<QWidget*>(watched);
     while (widget && !widget->property(OriginalNameProperty).isValid())
         widget = widget->parentWidget();
-    if (!editEnabled || !widget)
+    if (!editEnabled || (!widget && !draggedWidget))
         return QObject::eventFilter(watched, event);
 
-    if (event->type() == QEvent::MouseButtonPress) {
+    if (event->type() == QEvent::KeyPress) {
+        const auto* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->matches(QKeySequence::Undo)) {
+            UndoLastMove();
+            return true;
+        }
+    } else if (event->type() == QEvent::MouseButtonPress) {
         auto* mouseEvent = static_cast<QMouseEvent*>(event);
-        if (mouseEvent->button() == Qt::LeftButton && widget->parentWidget()) {
-            if (QLayout* layout = widget->parentWidget()->layout()) {
-                if (layout->indexOf(widget) >= 0) {
-                    draggedWidget = widget;
-                    dragOffset = mouseEvent->position().toPoint();
+        if (widget && mouseEvent->button() == Qt::LeftButton && widget->parentWidget()) {
+            QLayout* owningLayout = nullptr;
+            if (QWidget* layoutItem = LayoutItemForWidget(widget, &owningLayout)) {
+                if (owningLayout) {
+                    draggedWidget = layoutItem;
+                    dragOffset = layoutItem->mapFromGlobal(mouseEvent->globalPosition().toPoint());
+                    if (Form* form = FindForm(layoutItem)) {
+                        dragForm = form->widget;
+                        if (dragForm) {
+                            auto* preview = new QLabel(dragForm);
+                            preview->setPixmap(layoutItem->grab());
+                            preview->resize(layoutItem->size());
+                            preview->setAttribute(Qt::WA_TransparentForMouseEvents);
+                            preview->setStyleSheet(QStringLiteral("border: 2px dashed #268bd2;"));
+                            auto* opacity = new QGraphicsOpacityEffect(preview);
+                            opacity->setOpacity(0.72);
+                            preview->setGraphicsEffect(opacity);
+                            preview->move(dragForm->mapFromGlobal(mouseEvent->globalPosition().toPoint())
+                                          - dragOffset);
+                            preview->show();
+                            preview->raise();
+                            dragPreview = preview;
+                        }
+                    }
                 }
             }
             // Edit mode must not trigger the embedded control when that
             // control cannot be reordered by its current layout.
             return true;
         }
-    } else if (event->type() == QEvent::MouseMove && draggedWidget == widget
+    } else if (event->type() == QEvent::MouseMove && draggedWidget
                && (static_cast<QMouseEvent*>(event)->buttons() & Qt::LeftButton)) {
-        // The owning layout remains authoritative while dragging.  The move is
-        // committed on release, so no widget becomes a free-floating child.
+        if (dragPreview && dragForm) {
+            const auto* mouseEvent = static_cast<QMouseEvent*>(event);
+            dragPreview->move(dragForm->mapFromGlobal(mouseEvent->globalPosition().toPoint()) - dragOffset);
+            dragPreview->raise();
+        }
         return true;
-    } else if (event->type() == QEvent::MouseButtonRelease && draggedWidget == widget) {
+    } else if (event->type() == QEvent::MouseButtonRelease && draggedWidget) {
+        QWidget* dragged = draggedWidget;
         bool moved = false;
-        if (QWidget* parent = widget->parentWidget()) {
-            if (QLayout* layout = parent->layout()) {
-                const QPoint position = parent->mapFromGlobal(
-                    static_cast<QMouseEvent*>(event)->globalPosition().toPoint());
-                if (auto* grid = qobject_cast<QGridLayout*>(layout))
-                    moved = MoveInGrid(*grid, *widget, position);
-                else if (auto* box = qobject_cast<QBoxLayout*>(layout))
-                    moved = MoveInBox(*box, *widget, position);
+        const auto* mouseEvent = static_cast<QMouseEvent*>(event);
+        if (dragPreview)
+            dragPreview->hide();
+        if (QWidget* sourceParent = dragged->parentWidget()) {
+            if (QLayout* sourceLayout = sourceParent->layout()) {
+                if (dragForm && FindForm(dragged) == FindForm(dragForm)) {
+                    if (QLayout* targetLayout = EditableLayoutAt(*dragForm,
+                        mouseEvent->globalPosition().toPoint())) {
+                        Move undo;
+                        undo.layouts.push_back(CaptureLayout(sourceLayout));
+                        if (targetLayout != sourceLayout)
+                            undo.layouts.push_back(CaptureLayout(targetLayout));
+                        const QPoint targetPosition = targetLayout->parentWidget()->mapFromGlobal(
+                            mouseEvent->globalPosition().toPoint());
+                        if (auto* grid = qobject_cast<QGridLayout*>(targetLayout))
+                            moved = MoveInGrid(*sourceLayout, *grid, *dragged, targetPosition);
+                        else if (auto* box = qobject_cast<QBoxLayout*>(targetLayout))
+                            moved = MoveInBox(*sourceLayout, *box, *dragged, targetPosition);
+                        if (moved)
+                            undoHistory.push_back(undo);
+                    }
+                }
             }
         }
         if (moved) {
-            if (Form* form = FindForm(widget))
-            form->dirty = true;
+            if (Form* form = FindForm(dragged))
+                form->dirty = true;
         }
+        if (dragPreview)
+            dragPreview->deleteLater();
+        dragPreview = nullptr;
+        dragForm = nullptr;
         draggedWidget = nullptr;
         return true;
     }
@@ -303,6 +511,10 @@ bool UiLayoutEditMode::SaveLayout(const QString& fileName, QWidget& form, QStrin
             QDomElement item = ItemForWidget(sourceWidget);
             if (item.isNull())
                 continue;
+            QDomElement targetLayout = LayoutForParent(document,
+                child->property(LayoutParentProperty).toString());
+            if (!targetLayout.isNull() && item.parentNode() != targetLayout)
+                targetLayout.appendChild(item);
             if (child->property(GridRowProperty).isValid()) {
                 item.setAttribute(QStringLiteral("row"), child->property(GridRowProperty).toInt());
                 item.setAttribute(QStringLiteral("column"), child->property(GridColumnProperty).toInt());
@@ -344,6 +556,7 @@ bool UiLayoutEditMode::SaveLayout(const QString& fileName, QWidget& form, QStrin
             widget->setProperty(GridRowSpanProperty, {});
             widget->setProperty(GridColumnSpanProperty, {});
             widget->setProperty(BeforeProperty, {});
+            widget->setProperty(LayoutParentProperty, {});
         }
     return true;
 }

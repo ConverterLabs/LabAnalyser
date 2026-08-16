@@ -45,6 +45,7 @@ private:
         QString descriptorPath;
         CleanupStrategy cleanup = CleanupStrategy::HostDelete;
         QPointer<QObject> pluginObject;
+        QPointer<QObject> deviceObject;
         QPointer<QObject> messenger;
     };
 
