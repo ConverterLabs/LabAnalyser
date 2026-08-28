@@ -15,10 +15,20 @@ QString readText(const matvar_t* variable)
 {
     if (!variable || variable->class_type != MAT_C_CHAR || !variable->data)
         return QString();
-    const size_t size = variable->rank == 2 ? variable->dims[0] * variable->dims[1] : Mat_VarGetSize(variable);
-    if (size > size_t(std::numeric_limits<int>::max()))
+    const size_t characters = variable->rank == 2
+        ? variable->dims[0] * variable->dims[1] : Mat_VarGetSize(variable);
+    if (characters > size_t(std::numeric_limits<int>::max()))
         return QString();
-    QString result = QString::fromUtf8(static_cast<const char*>(variable->data), int(size));
+    QString result;
+    // Older LabAnalyser MAT exports were written as MATLAB UTF-16 character
+    // matrices. Reading their raw two-byte code units as UTF-8 produced IDs
+    // such as "F\0D\0P..." in the data explorer.
+    if (variable->data_type == MAT_T_UTF16 || variable->data_type == MAT_T_UINT16)
+        result = QString::fromUtf16(static_cast<const ushort*>(variable->data), int(characters));
+    else if (variable->data_type == MAT_T_UTF8 || variable->data_type == MAT_T_UINT8)
+        result = QString::fromUtf8(static_cast<const char*>(variable->data), int(characters));
+    else
+        return QString();
     while (result.endsWith(QChar::Null))
         result.chop(1);
     return result;

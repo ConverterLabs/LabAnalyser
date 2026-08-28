@@ -66,6 +66,7 @@ private slots:
     void MAT_009_uninitializedContainerExportsAsEmptyFields();
     void MAT_010_exportedMatImportsAsIndependentDataSet();
     void MAT_011_largeVectorExportPreservesDataWithoutExtraExporterCopy();
+    void MAT_012_legacyUtf16ChannelIdsImportWithoutBinaryNames();
 };
 
 void MatExportContractTests::MAT_001_nullManagerFailsWithoutFile() {
@@ -193,6 +194,44 @@ void MatExportContractTests::MAT_011_largeVectorExportPreservesDataWithoutExtraE
     QCOMPARE(writtenData[0], data.front());
     QCOMPARE(writtenData[sampleCount - 1], data.back());
     Mat_VarFree(channels);
+}
+void MatExportContractTests::MAT_012_legacyUtf16ChannelIdsImportWithoutBinaryNames() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath("legacy-utf16.mat");
+    MatFile output{Mat_CreateVer(path.toUtf8().constData(), nullptr, MAT_FT_MAT5)};
+    QVERIFY(output.value);
+
+    const char* fields[] = {"ID", "Time", "Data"};
+    const size_t structDims[] = {1, 1};
+    matvar_t* channels = Mat_VarCreateStruct("ExportedChannels", 2, structDims, fields, 3);
+    QVERIFY(channels);
+    const ushort legacyId[] = {'F', 'D', 'P', 'O', 'R', 'T', 'C', 'I', 'D', '_', 'C', 'H', '1'};
+    const size_t textDims[] = {1, sizeof(legacyId) / sizeof(legacyId[0])};
+    const double sample = 2.0;
+    const size_t dataDims[] = {1, 1};
+    const size_t emptyTextDims[] = {1, 0};
+    Mat_VarSetStructFieldByName(channels, "ID", 0,
+        Mat_VarCreate("ID", MAT_C_CHAR, MAT_T_UTF16, 2, textDims,
+                      const_cast<ushort*>(legacyId), 0));
+    Mat_VarSetStructFieldByName(channels, "Time", 0,
+        Mat_VarCreate("Time", MAT_C_CHAR, MAT_T_UTF8, 2, emptyTextDims, nullptr, 0));
+    Mat_VarSetStructFieldByName(channels, "Data", 0,
+        Mat_VarCreate("Data", MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dataDims,
+                      const_cast<double*>(&sample), 0));
+    QCOMPARE(Mat_VarWrite(output.value, channels, MAT_COMPRESSION_NONE), 0);
+    Mat_VarFree(channels);
+    Mat_Close(output.value);
+    output.value = nullptr;
+
+    QObject owner;
+    DataManagementSetClass manager(&owner);
+    QString root;
+    QString error;
+    QVERIFY2(MatDataImport::Import(manager, path, &root, &error), qPrintable(error));
+    ToFormMapper* imported = manager.GetContainer(root + "::FDPORTCID_CH1");
+    QVERIFY(imported);
+    QCOMPARE(imported->GetAsDouble(), sample);
 }
 QTEST_MAIN(MatExportContractTests)
 #include "MatExportContractTests.moc"

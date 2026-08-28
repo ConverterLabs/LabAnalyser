@@ -59,25 +59,27 @@ void DeviceRegistry::Cleanup(DeviceRecord& record)
         break;
     case CleanupStrategy::RetainLegacyPlugin:
         // A Legacy-V1 plugin does not declare who owns the returned interface.
-        // Ask the plugin to stop its own runtime work before retiring the active
-        // record. The plugin root and returned interface remain application-
-        // resident because Legacy-V1 does not declare their ownership.
-        if (record.messenger && record.pluginObject) {
-            // Do not broadcast through Messenger::MessageSender here: a plugin
-            // may also connect that signal directly to its worker, which can
-            // feed CloseProject back into the application during teardown.
-            // Only the plugin root receives the lifecycle request.
-            QMetaObject::invokeMethod(record.pluginObject, "MessageReceiver",
-                                      Qt::DirectConnection,
-                                      Q_ARG(QString, QStringLiteral("CloseProject")),
-                                      Q_ARG(QString, record.pluginObject->objectName()),
-                                      Q_ARG(InterfaceData, InterfaceData()));
+        // Stop the returned device before retiring the active record. The
+        // factory root and interface remain application-resident because
+        // Legacy-V1 does not declare their ownership.
+        if (record.messenger) {
             QObject::disconnect(record.messenger, nullptr, record.pluginObject, nullptr);
             QObject::disconnect(record.pluginObject, nullptr, record.messenger, nullptr);
             if (record.deviceObject) {
                 QObject::disconnect(record.messenger, nullptr, record.deviceObject, nullptr);
                 QObject::disconnect(record.deviceObject, nullptr, record.messenger, nullptr);
             }
+        }
+        if (record.deviceObject) {
+            // Do not broadcast through Messenger::MessageSender here: a
+            // device may feed CloseProject back into the manager while it is
+            // being torn down. The direct lifecycle call is required for
+            // legacy factories whose root is only a Platform_Fabric.
+            QMetaObject::invokeMethod(record.deviceObject, "MessageReceiver",
+                                      Qt::DirectConnection,
+                                      Q_ARG(QString, QStringLiteral("CloseProject")),
+                                      Q_ARG(QString, record.deviceObject->objectName()),
+                                      Q_ARG(InterfaceData, InterfaceData()));
         }
         break;
     case CleanupStrategy::PluginReleaseV2:

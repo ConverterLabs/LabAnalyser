@@ -300,8 +300,9 @@ void PluginLoaderContractTests::PLUGIN_017_legacyRemovalDisconnectsOnlyItsMessen
     QCOMPARE(heapObject->property("test_messageReceives").toInt(), heapBefore + 1);
 
     manager.CloseDevice("MemberLegacySignals");
+    const int memberAfterClose = memberObject->property("test_messageReceives").toInt();
     manager.GetMessenger()->MessageTransmitter("info", "ownership", payload);
-    QCOMPARE(memberObject->property("test_messageReceives").toInt(), memberBefore + 1);
+    QCOMPARE(memberObject->property("test_messageReceives").toInt(), memberAfterClose);
     QCOMPARE(heapObject->property("test_messageReceives").toInt(), heapBefore + 2);
 }
 
