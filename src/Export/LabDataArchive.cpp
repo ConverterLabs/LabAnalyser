@@ -5,6 +5,7 @@
 #include "DataManagement/mapper.h"
 
 #include <QDateTime>
+#include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -14,10 +15,14 @@
 
 #include <cstring>
 #include <limits>
+#include <zstd.h>
 
 namespace {
-constexpr char Magic[] = "LABANALYSER-LADAT-1\n";
-constexpr quint64 PrefixBytes = sizeof(Magic) - 1 + sizeof(quint64);
+constexpr char MagicV1[] = "LABANALYSER-LADAT-1\n";
+constexpr char MagicV2[] = "LABANALYSER-LADAT-2\n";
+constexpr quint64 PrefixBytes = sizeof(MagicV1) - 1 + sizeof(quint64);
+constexpr quint64 CompressionThreshold = 4 * 1024;
+constexpr quint64 MaxChannelPayloadBytes = 1024ULL * 1024ULL * 1024ULL;
 
 bool writeBytes(QIODevice& file, const char* data, qint64 size) { return size >= 0 && file.write(data, size) == size; }
 bool writeU64(QIODevice& file, quint64 value) {
@@ -40,19 +45,7 @@ bool readText(QIODevice& file, QString* text) {
 bool writeDouble(QIODevice& file, double value) { quint64 bits = 0; static_assert(sizeof(bits) == sizeof(value)); std::memcpy(&bits, &value, sizeof(bits)); return writeU64(file, bits); }
 bool readDouble(QIODevice& file, double* value) { quint64 bits = 0; if (!readU64(file, &bits)) return false; std::memcpy(value, &bits, sizeof(bits)); return true; }
 
-quint64 textBytes(const QString& text) { return 8 + quint64(text.toUtf8().size()); }
 QString storedType(ToFormMapper& value) { return value.IsPairOfVectorOfDoubles() ? QStringLiteral("DataPair") : value.GetTypeInfo(); }
-quint64 payloadBytes(ToFormMapper& value) {
-    if (value.IsPairOfVectorOfDoubles()) { const DataPair pair = value.GetPointerPair(); const quint64 t = pair.first ? pair.first->size() : 0; const quint64 d = pair.second ? pair.second->size() : 0; return 24 + 8 * (t + d); }
-    if (value.IsString()) return textBytes(value.GetString());
-    if (value.IsStringList()) { quint64 n = 8; for (const QString& item : value.GetStringList()) n += textBytes(item); return n; }
-    if (value.IsGuiSelection()) { const GuiSelection s = value.GetGuiSelection(); quint64 n = textBytes(s.first) + 8; for (const QString& item : s.second) n += textBytes(item); return n; }
-    if (value.IsBool()) return 1;
-    if (value.GetTypeInfo() == QStringLiteral("int8_t") || value.GetTypeInfo() == QStringLiteral("uint8_t")) return 1;
-    if (value.GetTypeInfo() == QStringLiteral("int16_t") || value.GetTypeInfo() == QStringLiteral("uint16_t")) return 2;
-    if (value.GetTypeInfo() == QStringLiteral("int32_t") || value.GetTypeInfo() == QStringLiteral("uint32_t") || value.GetTypeInfo() == QStringLiteral("float")) return 4;
-    return 8;
-}
 
 bool writePayload(QIODevice& file, ToFormMapper& value) {
     const QString type = value.GetTypeInfo();
@@ -79,6 +72,86 @@ bool writePayload(QIODevice& file, ToFormMapper& value) {
     return writeDouble(file, value.GetDouble());
 }
 
+bool readPayload(QIODevice& file, const QString& type, InterfaceData* value);
+
+struct StoredPayload {
+    QByteArray bytes;
+    QString codec = QStringLiteral("none");
+    quint64 rawBytes = 0;
+};
+
+bool serializePayload(ToFormMapper& value, QByteArray* raw)
+{
+    raw->clear();
+    QBuffer buffer(raw);
+    return buffer.open(QIODevice::WriteOnly) && writePayload(buffer, value);
+}
+
+bool makeStoredPayload(ToFormMapper& value, StoredPayload* stored)
+{
+    QByteArray raw;
+    if (!serializePayload(value, &raw))
+        return false;
+
+    stored->rawBytes = quint64(raw.size());
+    stored->bytes = raw;
+    stored->codec = QStringLiteral("none");
+    if (stored->rawBytes < CompressionThreshold)
+        return true;
+
+    const size_t bound = ZSTD_compressBound(size_t(raw.size()));
+    if (bound > size_t(std::numeric_limits<int>::max()))
+        return true;
+    QByteArray compressed(int(bound), Qt::Uninitialized);
+    const size_t result = ZSTD_compress(compressed.data(), bound, raw.constData(), size_t(raw.size()), 3);
+    if (ZSTD_isError(result) || result >= size_t(raw.size()))
+        return true;
+    compressed.resize(int(result));
+    stored->bytes = compressed;
+    stored->codec = QStringLiteral("zstd");
+    return true;
+}
+
+bool parseSize(const QJsonObject& channel, const char* name, quint64* value)
+{
+    bool ok = false;
+    const QJsonValue json = channel.value(QLatin1String(name));
+    if (json.isString())
+        *value = json.toString().toULongLong(&ok);
+    return ok;
+}
+
+bool readStoredPayload(QFile& file, quint64 payloadStart, quint64 offset, quint64 storedBytes,
+                       quint64 rawBytes, const QString& codec, const QString& valueType,
+                       InterfaceData* value)
+{
+    const quint64 fileSize = quint64(file.size());
+    if (storedBytes > MaxChannelPayloadBytes || rawBytes > MaxChannelPayloadBytes ||
+        payloadStart > fileSize || offset > fileSize || storedBytes > fileSize || offset > fileSize - payloadStart ||
+        storedBytes > fileSize - payloadStart - offset ||
+        !file.seek(qint64(payloadStart + offset)))
+        return false;
+
+    QByteArray stored(int(storedBytes), Qt::Uninitialized);
+    if (storedBytes && file.read(stored.data(), stored.size()) != stored.size())
+        return false;
+    QByteArray raw;
+    if (codec == QStringLiteral("none")) {
+        if (storedBytes != rawBytes)
+            return false;
+        raw = stored;
+    } else if (codec == QStringLiteral("zstd")) {
+        raw.resize(int(rawBytes));
+        const size_t result = ZSTD_decompress(raw.data(), size_t(raw.size()), stored.constData(), size_t(stored.size()));
+        if (ZSTD_isError(result) || result != size_t(raw.size()))
+            return false;
+    } else {
+        return false;
+    }
+    QBuffer buffer(&raw);
+    return buffer.open(QIODevice::ReadOnly) && readPayload(buffer, valueType, value) && buffer.atEnd();
+}
+
 bool readPayload(QIODevice& file, const QString& type, InterfaceData* value) {
     if (type == QStringLiteral("DataPair")) { quint64 tc=0, dc=0; double offset=0; if (!readU64(file,&tc)||!readU64(file,&dc)||!readDouble(file,&offset)||tc>1000000000ULL||dc>1000000000ULL) return false; auto time=boost::shared_ptr<std::vector<double>>(new std::vector<double>); auto data=boost::shared_ptr<std::vector<double>>(new std::vector<double>); time->reserve(size_t(tc)); data->reserve(size_t(dc)); double x=0; for(quint64 i=0;i<tc;++i){if(!readDouble(file,&x))return false;time->push_back(x);} for(quint64 i=0;i<dc;++i){if(!readDouble(file,&x))return false;data->push_back(x);} value->SetData(DataPair(time,data,offset)); return true; }
     if (type == QStringLiteral("QString")) { QString v; if(!readText(file,&v))return false; value->SetData(v); return true; }
@@ -92,14 +165,80 @@ bool readPayload(QIODevice& file, const QString& type, InterfaceData* value) {
 
 namespace LabDataArchive {
 bool ExportAll(DataManagementSetClass& manager, const QString& path, QString* error) {
-    QJsonArray channels; quint64 offset = 0;
+    QJsonArray channels;
+    QVector<StoredPayload> payloads;
+    quint64 offset = 0;
     const auto* containers = manager.GetContainerPointer();
-    for (const auto& entry : *containers) { if (!entry.second) continue; ToFormMapper& value=*entry.second; const quint64 bytes=payloadBytes(value); QJsonObject channel{{"id",entry.first},{"dataType",value.GetDataType()},{"category",value.GetType()},{"stateDependency",value.GetStateDependency()},{"alias",manager.GetAlias(entry.first)},{"min",value.MinValue},{"max",value.MaxValue},{"valueType",storedType(value)},{"offset",QString::number(offset)},{"bytes",QString::number(bytes)}}; channels.append(channel); offset += bytes; }
-    const QJsonObject header{{"format",QStringLiteral("LabAnalyserData")},{"version",1},{"createdUtc",QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)},{"byteOrder",QStringLiteral("littleEndian")},{"channels",channels}};
-    const QByteArray json=QJsonDocument(header).toJson(QJsonDocument::Compact); QSaveFile file(path); if(!file.open(QIODevice::WriteOnly)){if(error)*error=file.errorString();return false;} if(!writeBytes(file,Magic,sizeof(Magic)-1)||!writeU64(file,json.size())||!writeBytes(file,json.constData(),json.size())){if(error)*error=file.errorString();return false;} for(const auto& entry:*containers) if(entry.second&&!writePayload(file,*entry.second)){if(error)*error=QStringLiteral("Could not write channel payload");return false;} if(!file.commit()){if(error)*error=file.errorString();return false;} return true;
+    for (const auto& entry : *containers) {
+        if (!entry.second)
+            continue;
+        ToFormMapper& value = *entry.second;
+        StoredPayload payload;
+        if (!makeStoredPayload(value, &payload) || offset > std::numeric_limits<quint64>::max() - quint64(payload.bytes.size())) {
+            if (error) *error = QStringLiteral("Could not prepare channel payload");
+            return false;
+        }
+        QJsonObject channel{{"id",entry.first},{"dataType",value.GetDataType()},{"category",value.GetType()},
+            {"stateDependency",value.GetStateDependency()},{"alias",manager.GetAlias(entry.first)},
+            {"min",value.MinValue},{"max",value.MaxValue},{"valueType",storedType(value)},
+            {"codec",payload.codec},{"offset",QString::number(offset)},
+            {"storedBytes",QString::number(payload.bytes.size())},{"rawBytes",QString::number(payload.rawBytes)}};
+        channels.append(channel);
+        payloads.append(payload);
+        offset += quint64(payload.bytes.size());
+    }
+    const QJsonObject header{{"format",QStringLiteral("LabAnalyserData")},{"version",2},
+        {"createdUtc",QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)},
+        {"byteOrder",QStringLiteral("littleEndian")},{"channels",channels}};
+    const QByteArray json = QJsonDocument(header).toJson(QJsonDocument::Compact);
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) { if (error) *error = file.errorString(); return false; }
+    if (!writeBytes(file, MagicV2, sizeof(MagicV2)-1) || !writeU64(file, json.size()) ||
+        !writeBytes(file, json.constData(), json.size())) { if (error) *error = file.errorString(); return false; }
+    for (const StoredPayload& payload : payloads)
+        if (!writeBytes(file, payload.bytes.constData(), payload.bytes.size())) { if (error) *error = QStringLiteral("Could not write channel payload"); return false; }
+    if (!file.commit()) { if (error) *error = file.errorString(); return false; }
+    return true;
 }
 
 bool Import(DataManagementSetClass& manager, const QString& path, QString* datasetRoot, QString* error) {
-    QFile file(path); if(!file.open(QIODevice::ReadOnly)){if(error)*error=file.errorString();return false;} QByteArray magic(sizeof(Magic)-1,Qt::Uninitialized); if(file.read(magic.data(),magic.size())!=magic.size()||magic!=QByteArray(Magic,sizeof(Magic)-1)){if(error)*error=QStringLiteral("Not a LabAnalyser data archive");return false;} quint64 headerSize=0;if(!readU64(file,&headerSize)||headerSize>16*1024*1024){if(error)*error=QStringLiteral("Invalid archive header");return false;} const QByteArray json=file.read(qint64(headerSize));const QJsonDocument document=QJsonDocument::fromJson(json);if(!document.isObject()||document.object().value("format").toString()!=QStringLiteral("LabAnalyserData")||document.object().value("version").toInt()!=1){if(error)*error=QStringLiteral("Unsupported archive format");return false;} const quint64 payloadStart=PrefixBytes+headerSize; const QString base=QFileInfo(path).completeBaseName().replace(QStringLiteral("::"),QStringLiteral("_")); const QString root=QStringLiteral("Export_%1_%2").arg(base,QDateTime::currentDateTimeUtc().toString("yyyyMMdd_HHmmss")); for(const QJsonValue& item:document.object().value("channels").toArray()){const QJsonObject c=item.toObject();bool ok=false;const quint64 offset=c.value("offset").toString().toULongLong(&ok);const quint64 bytes=c.value("bytes").toString().toULongLong(&ok);if(!ok||offset>quint64(file.size())||bytes>quint64(file.size())||offset+bytes>quint64(file.size())-payloadStart||!file.seek(qint64(payloadStart+offset))){if(error)*error=QStringLiteral("Invalid channel offset");return false;} InterfaceData value(c.value("dataType").toString(),c.value("category").toString()); value.SetStateDependency(c.value("stateDependency").toString()); if(!readPayload(file,c.value("valueType").toString(),&value)){if(error)*error=QStringLiteral("Invalid channel payload");return false;} const QString id=root+QStringLiteral("::")+c.value("id").toString(); manager.GetMessenger()->MessageReceiver(QStringLiteral("publish"), id, value); manager.SetMinMaxValue(id,c.value("min").toDouble(),c.value("max").toDouble()); manager.SetAlias(id,c.value("alias").toString()); } if(datasetRoot)*datasetRoot=root;return true;
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) { if (error) *error = file.errorString(); return false; }
+    QByteArray magic(sizeof(MagicV1)-1, Qt::Uninitialized);
+    if (file.read(magic.data(), magic.size()) != magic.size()) { if (error) *error = QStringLiteral("Not a LabAnalyser data archive"); return false; }
+    const int magicVersion = magic == QByteArray(MagicV1, sizeof(MagicV1)-1) ? 1 :
+                             magic == QByteArray(MagicV2, sizeof(MagicV2)-1) ? 2 : 0;
+    if (!magicVersion) { if (error) *error = QStringLiteral("Not a LabAnalyser data archive"); return false; }
+    quint64 headerSize = 0;
+    if (!readU64(file, &headerSize) || headerSize > 16 * 1024 * 1024) { if (error) *error = QStringLiteral("Invalid archive header"); return false; }
+    const QByteArray json = file.read(qint64(headerSize));
+    const QJsonDocument document = QJsonDocument::fromJson(json);
+    if (!document.isObject() || document.object().value("format").toString() != QStringLiteral("LabAnalyserData") ||
+        document.object().value("version").toInt() != magicVersion) { if (error) *error = QStringLiteral("Unsupported archive format"); return false; }
+    const quint64 payloadStart = PrefixBytes + headerSize;
+    const QString base = QFileInfo(path).completeBaseName().replace(QStringLiteral("::"),QStringLiteral("_"));
+    const QString root = QStringLiteral("Export_%1_%2").arg(base,QDateTime::currentDateTimeUtc().toString("yyyyMMdd_HHmmss"));
+    for (const QJsonValue& item : document.object().value("channels").toArray()) {
+        const QJsonObject c = item.toObject();
+        quint64 offset = 0, storedBytes = 0, rawBytes = 0;
+        const bool fieldsValid = parseSize(c, "offset", &offset) &&
+            (magicVersion == 1 ? parseSize(c, "bytes", &storedBytes) :
+             parseSize(c, "storedBytes", &storedBytes) && parseSize(c, "rawBytes", &rawBytes));
+        if (magicVersion == 1) rawBytes = storedBytes;
+        InterfaceData value(c.value("dataType").toString(),c.value("category").toString());
+        value.SetStateDependency(c.value("stateDependency").toString());
+        const QString codec = magicVersion == 1 ? QStringLiteral("none") : c.value("codec").toString();
+        if (!fieldsValid || !readStoredPayload(file, payloadStart, offset, storedBytes, rawBytes, codec,
+                                               c.value("valueType").toString(), &value)) {
+            if (error) *error = QStringLiteral("Invalid channel payload");
+            return false;
+        }
+        const QString id = root + QStringLiteral("::") + c.value("id").toString();
+        manager.GetMessenger()->MessageReceiver(QStringLiteral("publish"), id, value);
+        manager.SetMinMaxValue(id,c.value("min").toDouble(),c.value("max").toDouble());
+        manager.SetAlias(id,c.value("alias").toString());
+    }
+    if (datasetRoot) *datasetRoot = root;
+    return true;
 }
 }

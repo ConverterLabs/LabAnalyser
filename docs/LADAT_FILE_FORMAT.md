@@ -1,4 +1,4 @@
-# LabAnalyser `.LAdat` file format (version 1)
+# LabAnalyser `.LAdat` file format (versions 1 and 2)
 
 This document specifies the native LabAnalyser data archive written by
 `LabDataArchive::ExportAll()` and read by `LabDataArchive::Import()`.
@@ -9,7 +9,8 @@ channels, scalar values, text, selections, parameters and time-series data.
 ## Scope and compatibility
 
 - Extension: `.LAdat`.
-- Current format/version: `LabAnalyserData`, version `1`.
+- Current writer format: `LabAnalyserData`, version `2`.
+- The reader remains compatible with version `1` archives.
 - The file is a **binary container with a compact UTF-8 JSON header**.  It is
   not an XML, MAT or HDF5 file.
 - Integer and floating-point bytes are little-endian in version 1.  Do not
@@ -23,15 +24,15 @@ All offsets below are byte offsets from the beginning of the file.
 
 | Offset | Field | Encoding |
 |---:|---|---|
-| 0 | magic | ASCII bytes `LABANALYSER-LADAT-1\n` (20 bytes, no terminator) |
+| 0 | magic | ASCII bytes `LABANALYSER-LADAT-1\n` or `LABANALYSER-LADAT-2\n` (20 bytes, no terminator) |
 | 20 | `headerSize` | unsigned 64-bit little-endian integer |
 | 28 | JSON header | exactly `headerSize` UTF-8 bytes; compact JSON, no trailing terminator required |
 | `28 + headerSize` | payload area | concatenated channel payloads |
 
 `headerSize` is limited by the current reader to 16 MiB.  A channel's
 `offset` is relative to the start of the payload area, not to the file start.
-The importer validates `offset` and `bytes` against the file boundaries before
-seeking to the payload.
+The importer validates every offset and stored payload length against the file
+boundaries before seeking to the payload.
 
 ## JSON header
 
@@ -40,7 +41,7 @@ The exported header has this shape (whitespace shown only for readability):
 ```json
 {
   "format": "LabAnalyserData",
-  "version": 1,
+  "version": 2,
   "createdUtc": "2026-08-28T10:15:30.123Z",
   "byteOrder": "littleEndian",
   "channels": [
@@ -53,19 +54,21 @@ The exported header has this shape (whitespace shown only for readability):
       "min": -10.0,
       "max": 10.0,
       "valueType": "DataPair",
+      "codec": "zstd",
       "offset": "0",
-      "bytes": "48"
+      "storedBytes": "31",
+      "rawBytes": "48"
     }
   ]
 }
 ```
 
-Required fields for a version-1 importer are:
+The fields common to both versions are:
 
 | Field | Type | Meaning |
 |---|---|---|
 | `format` | string | Must equal `LabAnalyserData`. |
-| `version` | number | Must equal `1`. |
+| `version` | number | Must equal the version encoded by the magic. |
 | `channels` | array | The ordered channel descriptors. |
 | `id` | string | Original LabAnalyser channel/parameter identifier. |
 | `dataType` | string | LabAnalyser `InterfaceData` data type; preserve it. |
@@ -74,7 +77,14 @@ Required fields for a version-1 importer are:
 | `alias` | string | User-visible alias; may be empty. |
 | `min`, `max` | JSON number | Stored limits. |
 | `valueType` | string | Selects the binary payload layout below. |
-| `offset`, `bytes` | decimal strings | Unsigned 64-bit values. Strings avoid JSON-number precision loss. |
+| `offset` | decimal string | Unsigned 64-bit payload-relative offset; strings avoid JSON-number precision loss. |
+
+Version-specific storage fields:
+
+| Version | Fields | Meaning |
+|---|---|---|
+| 1 | `bytes` | Raw payload length.  All payloads are uncompressed. |
+| 2 | `codec`, `storedBytes`, `rawBytes` | `codec` is `none` or `zstd`; the two lengths are the stored and decoded payload lengths. |
 
 The exporter writes channels in the lexical order of the DataManagement
 container map.  An importer must not rely on this order for channel identity;
@@ -112,9 +122,11 @@ The `valueType` field determines the following exact payload content.
 | `float` | one `f32` |
 | `double` and other current numeric fallback types | one `f64` |
 
-The `bytes` header field is the byte length calculated by the exporter for the
-payload.  Version-1 readers should use it for bounds validation; a robust
-implementation should also ensure that decoding consumes exactly `bytes`.
+For version 2, the exporter uses Zstandard level 3 only when a payload is at
+least 4096 bytes and the compressed representation is strictly smaller.
+Otherwise it stores the original payload with `codec: "none"`.  The current
+reader limits both `storedBytes` and `rawBytes` to 1 GiB, verifies successful
+decompression, and requires the decoded payload parser to consume all bytes.
 
 ## Current LabAnalyser import behaviour
 
@@ -137,18 +149,19 @@ not rewrite the source archive.
 
 ## Writer guidance
 
-To produce a compatible version-1 archive:
+To produce a compatible version-2 archive:
 
-1. Serialize all payloads with the layouts above and calculate their lengths.
-2. Put the cumulative, payload-relative offset and length in each JSON channel
-   descriptor as decimal strings.
-3. Write the magic, the little-endian JSON byte count, the UTF-8 JSON header,
+1. Serialize each payload with the layouts above.
+2. Optionally encode a payload with Zstandard and select `zstd` only if it is
+   smaller than the raw representation; otherwise use `none`.
+3. Put the cumulative, payload-relative offset, codec, stored length and raw
+   length in each JSON channel descriptor as decimal strings.
+4. Write the version-2 magic, the little-endian JSON byte count, the UTF-8 JSON header,
    then the payloads in descriptor order.
-4. Write atomically when possible; LabAnalyser itself uses `QSaveFile`.
+5. Write atomically when possible; LabAnalyser itself uses `QSaveFile`.
 
-Do not add compression, a schema migration, altered byte order or changed
-string encoding under version 1.  Introduce a new `version` and retain a
-version-1 reader for any incompatible extension.
+Do not change byte order or string encoding under version 2.  Retain the
+version-1 reader whenever a writer is upgraded further.
 
 ## Reference implementation
 

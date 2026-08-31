@@ -19,6 +19,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(MATIO REQUIRED IMPORTED_TARGET matio)
 pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
 pkg_check_modules(HDF5 REQUIRED IMPORTED_TARGET hdf5)
+pkg_check_modules(ZSTD REQUIRED IMPORTED_TARGET libzstd)
 find_package(Boost REQUIRED)
 # MSYS2 packages HighFive as headers beside HDF5 rather than as a CMake
 # package.  Use the HDF5 pkg-config include prefix, not a machine path.
@@ -152,7 +153,7 @@ target_link_libraries(LabAnalyserCore
         LabAnalyserQCustomPlot
         Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network Qt6::Xml Qt6::UiTools
         Qt6::PrintSupport Qt6::OpenGL Qt6::OpenGLWidgets
-        PkgConfig::MATIO PkgConfig::HDF5 PkgConfig::FFTW3 Boost::boost)
+        PkgConfig::MATIO PkgConfig::HDF5 PkgConfig::FFTW3 PkgConfig::ZSTD Boost::boost)
 
 add_executable(LabAnalyser src/app/main.cpp resources/LabAnlyser.rc)
 target_link_libraries(LabAnalyser PRIVATE LabAnalyserCore)

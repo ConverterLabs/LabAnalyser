@@ -49,10 +49,11 @@ add_executable(DataManagementCharacterizationTests
     ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementClass.cpp
     ${PROJECT_SOURCE_DIR}/src/DataManagement/DataManagementSetClass.cpp
     ${PROJECT_SOURCE_DIR}/src/DataManagement/DataMessengerClass.cpp
+    ${PROJECT_SOURCE_DIR}/src/Export/LabDataArchive.cpp
     ${PROJECT_SOURCE_DIR}/src/plugins/InterfaceDataType.cpp)
 target_include_directories(DataManagementCharacterizationTests BEFORE PRIVATE
     ${PROJECT_SOURCE_DIR}/tests/component/datamanagement)
-target_link_libraries(DataManagementCharacterizationTests PRIVATE Qt6::Core Qt6::Widgets Qt6::Test Boost::boost)
+target_link_libraries(DataManagementCharacterizationTests PRIVATE Qt6::Core Qt6::Widgets Qt6::Test PkgConfig::ZSTD Boost::boost)
 labanalyser_setup_test(DataManagementCharacterizationTests)
 
 # HDF5 export boundary stays slim; it must not pull GUI/plot sources.
@@ -157,7 +158,7 @@ target_compile_definitions(LabAnalyserPlotTestCore PRIVATE
     LABANALYSER_USE_FFTW GIT_VERSION=\"${LABANALYSER_GIT_VERSION}\")
 target_link_libraries(LabAnalyserPlotTestCore PUBLIC LabAnalyserQCustomPlot
     Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network Qt6::Xml Qt6::UiTools Qt6::PrintSupport Qt6::OpenGL Qt6::OpenGLWidgets
-    PkgConfig::MATIO PkgConfig::HDF5 PkgConfig::FFTW3 Boost::boost)
+    PkgConfig::MATIO PkgConfig::HDF5 PkgConfig::FFTW3 PkgConfig::ZSTD Boost::boost)
 add_executable(PlotWidgetContractTests ${PROJECT_SOURCE_DIR}/tests/contract/plotwidget/PlotWidgetContractTests.cpp)
 target_link_libraries(PlotWidgetContractTests PRIVATE LabAnalyserPlotTestCore)
 target_include_directories(PlotWidgetContractTests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/LabAnalyserPlotTestCore_autogen/include")

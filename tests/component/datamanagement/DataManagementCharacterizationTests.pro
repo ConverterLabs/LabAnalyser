@@ -1,4 +1,5 @@
 QT += core testlib widgets
+LIBS += -lzstd
 
 CONFIG += testcase console c++11
 TEMPLATE = app
@@ -16,6 +17,7 @@ SOURCES += \
     ../../../src/DataManagement/DataManagementClass.cpp \
     ../../../src/DataManagement/DataManagementSetClass.cpp \
     ../../../src/DataManagement/DataMessengerClass.cpp \
+    ../../../src/Export/LabDataArchive.cpp \
     ../../../src/plugins/InterfaceDataType.cpp
 
 HEADERS += \
@@ -30,6 +32,7 @@ HEADERS += \
     ../../../src/DataManagement/MessageDispatchPolicy.h \
     ../../../src/DataManagement/DataManagementSetClass.h \
     ../../../src/DataManagement/DataMessengerClass.h \
+    ../../../src/Export/LabDataArchive.h \
     ../../../src/DataManagement/mapper.h \
     ../../../src/plugins/InterfaceDataType.h \
     ../../../src/plugins/platforminterface.h

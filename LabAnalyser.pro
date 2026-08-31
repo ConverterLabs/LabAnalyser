@@ -48,7 +48,7 @@ TEMPLATE = app
 
 unix: INCLUDEPATH += /usr/include
 INCLUDEPATH += $$PWD/src $$PWD/src/app $$PWD/src/DropWidgets
-LIBS += -lmatio
+LIBS += -lmatio -lzstd
 
 
 SOURCES += src/app/main.cpp\

@@ -1,11 +1,17 @@
 #include <QtTest>
+#include <QFile>
+#include <QJsonDocument>
 #include <QPointer>
 #include <QSignalSpy>
+#include <QTemporaryDir>
+
+#include <cstring>
 
 #include "DataManagement/DataManagementClass.h"
 #include "DataManagement/DataManagementSetClass.h"
 #include "DataManagement/DataMessengerClass.h"
 #include "DropWidgets/DropWidgets.h"
+#include "Export/LabDataArchive.h"
 
 Q_DECLARE_METATYPE(InterfaceData)
 
@@ -124,6 +130,25 @@ InterfaceData number(double value)
     data.SetData(value);
     return data;
 }
+
+void writeU64LE(QFile& file, quint64 value)
+{
+    char bytes[8];
+    for (int index = 0; index < 8; ++index)
+        bytes[index] = char((value >> (index * 8)) & 0xff);
+    QCOMPARE(file.write(bytes, sizeof(bytes)), qint64(sizeof(bytes)));
+}
+
+bool readU64LE(QFile& file, quint64* value)
+{
+    char bytes[8];
+    if (file.read(bytes, sizeof(bytes)) != sizeof(bytes))
+        return false;
+    *value = 0;
+    for (int index = 0; index < 8; ++index)
+        *value |= quint64(uchar(bytes[index])) << (index * 8);
+    return true;
+}
 }
 
 class DataManagementCharacterizationTests : public QObject
@@ -172,6 +197,7 @@ private slots:
     void DM_DEV_002_duplicate_names_do_not_take_the_rejected_pointer();
     void DM_DEV_003_close_remove_and_reregistration_keep_legacy_path_state();
     void DM_DEV_004_project_cleanup_order_qobject_lifetime_and_instance_isolation();
+    void DM_LADAT_001_v2CompressionAndV1ImportCompatibility();
 };
 
 void DataManagementCharacterizationTests::initTestCase()
@@ -1480,6 +1506,73 @@ void DataManagementCharacterizationTests::DM_MSG_003_parentHierarchy_emptyInputs
     QCOMPARE(qvariant_cast<InterfaceData>(sent.at(1).at(2)).GetStringList(), QStringList({"first", "\u03bc"}));
     QCOMPARE(notifications.at(1).at(0).toString(), QString("LabAnalyser"));
     QCOMPARE(notifications.at(1).at(1).toString(), QString("Closing forced by: manual"));
+}
+
+void DataManagementCharacterizationTests::DM_LADAT_001_v2CompressionAndV1ImportCompatibility()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+
+    DataManagementSetClass source;
+    auto time = boost::shared_ptr<std::vector<double>>(new std::vector<double>(8192, 0.0));
+    auto data = boost::shared_ptr<std::vector<double>>(new std::vector<double>(8192, 42.0));
+    InterfaceData series;
+    series.SetData(DataPair(time, data, 1.25));
+    source.AddContainerElement("series", series.GetDataType(), "Data", "state");
+    source.DataManagementClass::SetData("series", series);
+    source.SetMinMaxValue("series", -1.0, 99.0);
+    source.SetAlias("series", "compressed series");
+
+    const QString archivePath = directory.filePath("archive.LAdat");
+    QString error;
+    QVERIFY2(LabDataArchive::ExportAll(source, archivePath, &error), qPrintable(error));
+
+    QFile archive(archivePath);
+    QVERIFY(archive.open(QIODevice::ReadOnly));
+    QCOMPARE(archive.read(20), QByteArray("LABANALYSER-LADAT-2\n"));
+    quint64 headerSize = 0;
+    QVERIFY(readU64LE(archive, &headerSize));
+    const QJsonDocument header = QJsonDocument::fromJson(archive.read(qint64(headerSize)));
+    QVERIFY(header.isObject());
+    QCOMPARE(header.object().value("version").toInt(), 2);
+    const QJsonObject channel = header.object().value("channels").toArray().first().toObject();
+    QCOMPARE(channel.value("codec").toString(), QString("zstd"));
+    QVERIFY(channel.value("storedBytes").toString().toULongLong() < channel.value("rawBytes").toString().toULongLong());
+
+    DataManagementSetClass imported;
+    QString root;
+    QVERIFY2(LabDataArchive::Import(imported, archivePath, &root, &error), qPrintable(error));
+    ToFormMapper* restored = imported.GetContainer(root + "::series");
+    QVERIFY(restored != nullptr);
+    const DataPair restoredPair = restored->GetPointerPair();
+    QCOMPARE(restoredPair.first->size(), size_t(8192));
+    QCOMPARE(restoredPair.second->size(), size_t(8192));
+    QCOMPARE(restoredPair.first->at(0), 0.0);
+    QCOMPARE(restoredPair.second->at(8191), 42.0);
+    QCOMPARE(*restoredPair.third, 1.25);
+    QCOMPARE(imported.GetAlias(root + "::series"), QString("compressed series"));
+
+    const QString v1Path = directory.filePath("legacy-v1.LAdat");
+    QFile v1(v1Path);
+    QVERIFY(v1.open(QIODevice::WriteOnly));
+    const QJsonObject v1Channel{{"id", "legacy"}, {"dataType", "double"}, {"category", "Data"},
+        {"stateDependency", ""}, {"alias", "legacy alias"}, {"min", 1.0}, {"max", 9.0},
+        {"valueType", "double"}, {"offset", "0"}, {"bytes", "8"}};
+    const QByteArray v1Header = QJsonDocument(QJsonObject{{"format", "LabAnalyserData"}, {"version", 1},
+        {"byteOrder", "littleEndian"}, {"channels", QJsonArray{v1Channel}}}).toJson(QJsonDocument::Compact);
+    QCOMPARE(v1.write("LABANALYSER-LADAT-1\n"), qint64(20));
+    writeU64LE(v1, quint64(v1Header.size()));
+    QCOMPARE(v1.write(v1Header), qint64(v1Header.size()));
+    double legacyValue = 4.5;
+    quint64 bits = 0;
+    std::memcpy(&bits, &legacyValue, sizeof(bits));
+    writeU64LE(v1, bits);
+    v1.close();
+
+    DataManagementSetClass v1Imported;
+    QVERIFY2(LabDataArchive::Import(v1Imported, v1Path, &root, &error), qPrintable(error));
+    QCOMPARE(v1Imported.GetContainer(root + "::legacy")->GetDouble(), 4.5);
+    QCOMPARE(v1Imported.GetAlias(root + "::legacy"), QString("legacy alias"));
 }
 
 QTEST_MAIN(DataManagementCharacterizationTests)
