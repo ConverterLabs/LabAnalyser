@@ -822,6 +822,15 @@ void MainWindow::ParseInputArguments()
                 this->isloading = false;
 
             }
+            else if(QFileInfo(command).suffix().compare(QStringLiteral("LAdat"), Qt::CaseInsensitive) == 0)
+            {
+                const QString Path = QApplication::arguments().at(i);
+                if(!Path.size())
+                    return;
+                QFileInfo fi(Path);
+                this->StdSavePath = fi.absolutePath();
+                ExtendedDataManagement->ImportLabData(Path);
+            }
             i++;
         }
     // FILENAME now contains path and name of the file to open.
