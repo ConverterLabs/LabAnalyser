@@ -831,6 +831,15 @@ void MainWindow::ParseInputArguments()
                 this->StdSavePath = fi.absolutePath();
                 ExtendedDataManagement->ImportLabData(Path);
             }
+            else if(QFileInfo(command).suffix().compare(QStringLiteral("LAdev"), Qt::CaseInsensitive) == 0)
+            {
+                const QString Path = QApplication::arguments().at(i);
+                if(!Path.size())
+                    return;
+                QFileInfo fi(Path);
+                this->StdSavePath = fi.absolutePath();
+                ExtendedDataManagement->LoadPlugin(Path);
+            }
             i++;
         }
     // FILENAME now contains path and name of the file to open.
