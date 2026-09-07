@@ -2,8 +2,10 @@
 #include <QApplication>
 #include <QDir>
 #include <QInputDialog>
+#include <QHeaderView>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QTableWidget>
 #include <QTemporaryDir>
 #include <QTimer>
 #include <cmath>
@@ -131,6 +133,12 @@ void PlotWidgetContractTests::PLOT_001_construction_parenting_and_default_state(
     QVERIFY(plot.legend->visible());
     QVERIFY(plot.findChild<QWidget*>("PlotToolbox"));
     QVERIFY(plot.findChild<QWidget*>("MeasurementPanel"));
+    QTableWidget* measurementTable = plot.findChild<QTableWidget*>("MeasurementTable");
+    QVERIFY(measurementTable);
+    QCOMPARE(measurementTable->horizontalScrollBarPolicy(), Qt::ScrollBarAsNeeded);
+    QCOMPARE(measurementTable->horizontalScrollMode(), QAbstractItemView::ScrollPerPixel);
+    for (int column = 0; column < measurementTable->columnCount(); ++column)
+        QCOMPARE(measurementTable->horizontalHeader()->sectionResizeMode(column), QHeaderView::Interactive);
     QVERIFY(plot.findChild<QTimer*>());
 }
 

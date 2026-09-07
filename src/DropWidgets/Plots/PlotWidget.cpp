@@ -449,6 +449,7 @@ void PlotWidget::initializeMeasurementPanel()
     panelLayout->addWidget(CursorSummaryLabel);
 
     MeasurementTable = new QTableWidget(MeasurementPanel);
+    MeasurementTable->setObjectName("MeasurementTable");
     MeasurementTable->setColumnCount(12);
     MeasurementTable->setHorizontalHeaderLabels({"Name", "Cursor 1", "Cursor 2", "Delta", "1/dT [Hz]", "Slope", "Min", "Max", "Mean", "RMS", "THD", ""});
     MeasurementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -457,12 +458,14 @@ void PlotWidget::initializeMeasurementPanel()
     MeasurementTable->setAlternatingRowColors(true);
     MeasurementTable->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     MeasurementTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    MeasurementTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     MeasurementTable->verticalHeader()->setVisible(false);
-    MeasurementTable->horizontalHeader()->setStretchLastSection(false);
-    MeasurementTable->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    for (int column = 0; column < MeasurementTable->columnCount() - 1; ++column)
-        MeasurementTable->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
-    MeasurementTable->horizontalHeader()->setSectionResizeMode(MeasurementTable->columnCount() - 1, QHeaderView::Stretch);
+    QHeaderView* header = MeasurementTable->horizontalHeader();
+    header->setStretchLastSection(false);
+    header->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    header->setMinimumSectionSize(32);
+    for (int column = 0; column < MeasurementTable->columnCount(); ++column)
+        header->setSectionResizeMode(column, QHeaderView::Interactive);
 
     const int valueColumnWidth = 86;
     MeasurementTable->setColumnWidth(0, 220);
