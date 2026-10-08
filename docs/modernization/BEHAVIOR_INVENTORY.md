@@ -1,5 +1,36 @@
 # Behavior inventory
 
+## Requested plot toolbox hover (2026-10-08)
+
+`PlotWidget::initializePlotTools`, `updateToolboxGeometry`,
+`updateMeasurementPanelGeometry` and the hover branch of `event` map to
+`PLOT_028..PLOT_029`. The toolbox retains its child controls and top strip bounds,
+is hidden initially, appears on hover in that strip and remains usable during
+time-unit popup selection. It overlays the full plot viewport; optional bottom
+measurement-panel reservation remains. This visibility/viewport change is
+explicitly user-approved. No tool action or persisted state changed. See
+`PLOT_TOOLBOX_HOVER.md` for baseline, candidate evidence and verification limits.
+
+The subsequently requested `PinPlotToolbox` button extends `initializePlotTools`
+and `event`: its checked state keeps only its own plot's toolbox visible across
+hover moves, leave and resize; unchecking restores hover behavior. `PLOT_030`
+maps the toggle callback, initial icon/state, geometry preservation and per-plot
+isolation. No XML/settings state is added.
+
+The requested docking correction additionally maps the pin callback and
+`updateMeasurementPanelGeometry` to `PLOT_031`: pinned mode reserves top-toolbar
+space, combines it with the optional bottom measurement panel and preserves
+axis ranges; unpinning restores the full hover viewport. Tiny-window height
+is bounded. This supersedes pinned overlay geometry in the initial pin slice.
+
+User-approved `PlotToolboxPinned` XML persistence maps `SaveToXML` and
+`LoadFromXML` to `PLOT_032` and full-application `XML_009`: independent pinned
+and unpinned round trips, repeated reads, absent/malformed attributes and
+last-value handling. Missing/invalid values restore hover mode, including on
+previously pinned instances. The existing integer boolean convention applies;
+pin restoration also updates the docked viewport. Legacy fixture inputs are
+unchanged; no schema migration or plugin API change is introduced.
+
 Status legend: **baseline tested** = current automated test executed; **mapped,
 unverified** = interface/source identified but no behavioral test exists; **third
 party** = do not refactor as project code.  This is the milestone-1 source map;

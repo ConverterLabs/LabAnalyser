@@ -1,5 +1,39 @@
 # Modernization plan
 
+## Requested plot toolbox visibility
+
+2026-10-08: implemented the explicitly requested hover-only top toolbox as an
+overlay. PlotWidget contracts passed 40 checks; PlotMeasurements passed 8.
+The Release test graph and subsequently requested application build compiled;
+remote checks remain unverified for this slice. See `PLOT_TOOLBOX_HOVER.md` for baseline evidence,
+scope and the five-minute local verification limit.
+
+Deployment now uses the established qmake/MSYS2 Release script, as explicitly
+requested after missing icons in the CMake deployment. The build and its two
+connector/package checks passed; the directly linked resources, Windows GUI
+subsystem and installed EXE hash were verified. CMake visual/resource parity
+remains open (`CMAKE.md`).
+
+The subsequently requested per-plot pin icon is implemented and tested by
+`PLOT_030`. The complete PlotWidget suite passed 41 checks, and the established
+qmake Release build plus its two connector/package checks passed. The installed
+EXE hash matches the build; pinning introduces no persistence field.
+
+The user subsequently requested full plot visibility in pinned/docked mode.
+That mode now reserves toolbar space above the plot, including with the bottom
+measurement panel enabled. `PLOT_031` characterized the previous geometry before
+the approved correction; 42 candidate PlotWidget checks passed, the incremental
+qmake Release build and both connector/package checks passed, and the installed
+replacement hash was verified. Unpinning restores the full hover viewport.
+
+The user then explicitly requested XML persistence. Each plot now writes
+optional `PlotToolboxPinned=0|1`; missing/invalid values preserve legacy hover
+defaults. New `PLOT_032`/`XML_009` baseline vectors passed before production
+changes. Candidate checks passed: PlotWidget 43, complete XML 24 (all legacy
+vectors included), MainWindow 34 and DropWidget 39. The qmake Release build,
+two connector/package checks, five legacy hashes, sensitivity/artifact scan and
+installed EXE hash passed. See `PLOT_TOOLBOX_HOVER.md` and the persistence decision.
+
 ## Fast local verification and remote checkpoints
 
 **Updated 2026-08-10.** Behavioral contracts and their required coverage are

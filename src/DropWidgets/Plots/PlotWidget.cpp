@@ -29,6 +29,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QHoverEvent>
 #include <QIcon>
 #include <QInputDialog>
 #include <QLabel>
@@ -38,6 +39,7 @@
 #include <QDoubleValidator>
 #include <QFormLayout>
 #include <QPixmap>
+#include <QPainter>
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QSignalBlocker>
@@ -499,6 +501,8 @@ void PlotWidget::initializePlotTools()
 
     PlotToolbox = new QFrame(this);
     PlotToolbox->setObjectName("PlotToolbox");
+    PlotToolbox->hide();
+    setAttribute(Qt::WA_Hover);
     PlotToolbox->setFrameShape(QFrame::StyledPanel);
     PlotToolbox->setStyleSheet(
         "QFrame#PlotToolbox { background: palette(button); border: 0; border-bottom: 1px solid palette(mid); }"
@@ -562,6 +566,34 @@ void PlotWidget::initializePlotTools()
     connect(resetButton, &QToolButton::clicked, this, &PlotWidget::ResetZoom);
     toolLayout->addStretch(1);
 
+    PinToolboxButton = new QToolButton(PlotToolbox);
+    PinToolboxButton->setObjectName("PinPlotToolbox");
+    PinToolboxButton->setCheckable(true);
+    PinToolboxButton->setAutoRaise(true);
+    PinToolboxButton->setToolTip("Pin toolbox");
+    PinToolboxButton->setIconSize(QSize(16, 16));
+    // A native vector drawing keeps the pin crisp without another image dependency.
+    QPixmap pinPixmap(32, 32);
+    pinPixmap.setDevicePixelRatio(2);
+    pinPixmap.fill(Qt::transparent);
+    {
+        QPainter painter(&pinPixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setPen(QPen(PinToolboxButton->palette().color(QPalette::ButtonText), 1.3));
+        painter.drawPolygon(QPolygonF{QPointF(5, 2), QPointF(11, 2), QPointF(10, 4),
+                                      QPointF(10, 7), QPointF(12, 10), QPointF(4, 10),
+                                      QPointF(6, 7), QPointF(6, 4)});
+        painter.drawLine(QPointF(8, 10), QPointF(8, 15));
+    }
+    PinToolboxButton->setIcon(QIcon(pinPixmap));
+    toolLayout->addWidget(PinToolboxButton);
+    connect(PinToolboxButton, &QToolButton::toggled, this, [this](bool pinned) {
+        PinToolboxButton->setToolTip(pinned ? "Unpin toolbox" : "Pin toolbox");
+        PlotToolbox->setVisible(pinned || PlotToolbox->geometry().contains(mapFromGlobal(QCursor::pos())));
+        updateMeasurementPanelGeometry();
+        replot(QCustomPlot::rpQueued);
+    });
+
     setToolMode(PlotToolMode::Navigate);
     updateCursorItems();
     updateReadout();
@@ -605,7 +637,8 @@ void PlotWidget::updateMeasurementPanelGeometry()
     if (!MeasurementPanel)
         return;
 
-    const int toolboxHeight = PlotToolbox ? qMax(28, PlotToolbox->sizeHint().height() + 4) : 32;
+    const int toolboxHeight = PinToolboxButton && PinToolboxButton->isChecked()
+            ? qMin(height(), qMax(28, PlotToolbox->sizeHint().height() + 4)) : 0;
     if (!cursorMeasurementVisible())
     {
         MeasurementPanel->hide();
@@ -2597,6 +2630,21 @@ void PlotWidget::mouseWheel()
 
 
 bool PlotWidget::event( QEvent *event ){
+    if (PlotToolbox)
+    {
+        // Hover events also propagate from the toolbox's child controls.
+        // Keep the strip open while the time-unit popup is being used.
+        const bool popupOpen = TimeUnitComboBox && TimeUnitComboBox->view()->isVisible();
+        if (event->type() == QEvent::HoverEnter || event->type() == QEvent::HoverMove)
+        {
+            const auto *hover = static_cast<QHoverEvent *>(event);
+            PlotToolbox->setVisible((PinToolboxButton && PinToolboxButton->isChecked()) || popupOpen ||
+                                   PlotToolbox->geometry().contains(hover->position().toPoint()));
+        }
+        else if (event->type() == QEvent::HoverLeave && !popupOpen &&
+                 !(PinToolboxButton && PinToolboxButton->isChecked()))
+            PlotToolbox->hide();
+    }
     if(_touchDevice)
      {
          if(event->type() == QEvent::MouseButtonDblClick ||
@@ -2772,6 +2820,7 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
     int timeAxisUnit = static_cast<int>(TimeAxisUnit::Seconds);
     int scopeToolMode = static_cast<int>(PlotToolMode::Navigate);
     bool showCursors = false;
+    bool toolboxPinned = false;
     bool cursorAActive = false;
     bool cursorBActive = false;
     double cursorAX = 0.0;
@@ -2801,6 +2850,8 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
             timeAxisUnit = itt.second.toInt();
         else if(itt.first == QString("ScopeToolMode"))
             scopeToolMode = itt.second.toInt();
+        else if(itt.first == QString("PlotToolboxPinned"))
+            toolboxPinned = itt.second.toInt();
         else if(itt.first == QString("ShowCursors"))
             showCursors = itt.second.toInt();
         else if(itt.first == QString("ScopeReadoutVisible"))
@@ -2853,6 +2904,8 @@ bool PlotWidget::LoadFromXML(const std::vector<std::pair<QString, QString>> &Att
        else
            setToolMode(PlotToolMode::Navigate);
        setCursorsVisible(showCursors);
+       if (PinToolboxButton)
+           PinToolboxButton->setChecked(toolboxPinned);
 
        return true;
 }
@@ -2902,6 +2955,10 @@ bool PlotWidget::SaveToXML(std::vector<std::pair<QString, QString>> &Attributes,
 
     Attribut.first = "ShowCursors";
     Attribut.second = QString::number(CursorsVisible);
+    Attributes.push_back(Attribut);
+
+    Attribut.first = "PlotToolboxPinned";
+    Attribut.second = QString::number(PinToolboxButton && PinToolboxButton->isChecked());
     Attributes.push_back(Attribut);
 
     Attribut.first = "ScopeCursorAActive";
@@ -2962,4 +3019,3 @@ void PlotWidget::GetVariantData(ToFormMapper *Data)
 {
 
 }
-

@@ -7,6 +7,7 @@
 #include <QPointer>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+#include <QToolButton>
 
 #include "mainwindow.h"
 #include "DataManagement/UIDataManagementSetClass.h"
@@ -158,6 +159,7 @@ private slots:
     void XML_006_readerWriterSemanticRoundTrip();
     void XML_007_uiDataManagementSaveLoadConventions();
     void XML_008_figureWindowStateIsPersisted();
+    void XML_009_plotToolboxPinRoundTrip();
     void XML_FIG_001_exactPlotNameCount();
     void XML_FIG_002_fewerPlotNamesKeepGeneratedNames();
     void XML_FIG_003_noPlotNamesKeepGeneratedNames();
@@ -319,6 +321,62 @@ void XmlExperimentContractTests::XML_008_figureWindowStateIsPersisted()
     QCOMPARE(figureElement.attribute("Cols"), QString("2"));
     QCOMPARE(figureElement.attribute("Width"), QString("321"));
     QCOMPARE(figureElement.attribute("Height"), QString("123"));
+}
+
+void XmlExperimentContractTests::XML_009_plotToolboxPinRoundTrip()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    MainWindow source;
+    auto* figure = source.CreateSubPlotWindow(1, 2);
+    QVERIFY(figure);
+    const auto plots = figure->findChildren<PlotWidget*>();
+    QCOMPARE(plots.size(), 2);
+    plots.at(0)->findChild<QToolButton*>("PinPlotToolbox")->setChecked(true);
+    const QString output = directory.filePath("plot-toolbox.xml");
+    QVERIFY(!source.GetLogic()->SaveExperiment(output));
+    const auto widgets = readDocument(output).elementsByTagName("Widget");
+    int savedPlots = 0;
+    for (int index = 0; index < widgets.size(); ++index)
+    {
+        const auto element = widgets.at(index).toElement();
+        for (auto* plot : plots)
+            if (element.attribute("Name") == plot->objectName())
+            {
+                QVERIFY(element.hasAttribute("PlotToolboxPinned"));
+                QCOMPARE(element.attribute("PlotToolboxPinned"),
+                         QString::number(plot->findChild<QToolButton*>("PinPlotToolbox")->isChecked()));
+                ++savedPlots;
+            }
+    }
+    QCOMPARE(savedPlots, 2);
+    MainWindow restored;
+    QVERIFY(!restored.GetLogic()->LoadExperiment(output));
+    for (auto* original : plots)
+    {
+        auto* plot = restored.findChild<PlotWidget*>(original->objectName());
+        QVERIFY(plot);
+        QCOMPARE(plot->findChild<QToolButton*>("PinPlotToolbox")->isChecked(),
+                 original->findChild<QToolButton*>("PinPlotToolbox")->isChecked());
+    }
+    auto legacyDocument = readDocument(output);
+    const auto legacyWidgets = legacyDocument.elementsByTagName("Widget");
+    for (int index = 0; index < legacyWidgets.size(); ++index)
+        legacyWidgets.at(index).toElement().removeAttribute("PlotToolboxPinned");
+    const QString legacyOutput = directory.filePath("plot-toolbox-without-pin.xml");
+    QFile legacyFile(legacyOutput);
+    QVERIFY(legacyFile.open(QIODevice::WriteOnly));
+    const auto legacyBytes = legacyDocument.toByteArray();
+    QCOMPARE(legacyFile.write(legacyBytes), qint64(legacyBytes.size()));
+    legacyFile.close();
+    MainWindow legacyRestored;
+    QVERIFY(!legacyRestored.GetLogic()->LoadExperiment(legacyOutput));
+    for (auto* original : plots)
+    {
+        auto* plot = legacyRestored.findChild<PlotWidget*>(original->objectName());
+        QVERIFY(plot);
+        QVERIFY(!plot->findChild<QToolButton*>("PinPlotToolbox")->isChecked());
+    }
 }
 
 void XmlExperimentContractTests::XML_FIG_001_exactPlotNameCount()

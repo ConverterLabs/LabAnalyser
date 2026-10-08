@@ -3,12 +3,16 @@
 #include <QDir>
 #include <QInputDialog>
 #include <QHeaderView>
+#include <QHoverEvent>
+#include <QComboBox>
+#include <QToolButton>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTableWidget>
 #include <QTemporaryDir>
 #include <QTimer>
 #include <cmath>
+#include <algorithm>
 
 #include "DataManagement/DataMessengerClass.h"
 #include "DropWidgets/Plots/FFTPlotWidget.h"
@@ -55,6 +59,11 @@ private slots:
     void PLOT_025_missing_plot_offset_leaves_graph_unchanged();
     void PLOT_026_xy_reset_ignores_unbound_graphs();
     void PLOT_027_unmanaged_pdf_export_is_a_noop();
+    void PLOT_028_toolbox_geometry_and_controls();
+    void PLOT_029_toolbox_hover_visibility();
+    void PLOT_030_toolbox_pinning_is_local_to_each_plot();
+    void PLOT_031_pinned_toolbox_and_measurement_panel_layout();
+    void PLOT_032_toolbox_pin_xml_state();
     void FFT_001_fft_widget_construction_and_destruction();
     void FFT_002_uniform_sine_frequency_bins_and_mode();
     void FFT_003_dc_and_sine_amplitude_scaling();
@@ -609,6 +618,229 @@ void PlotWidgetContractTests::PLOT_027_unmanaged_pdf_export_is_a_noop()
 
     QVERIFY(QMetaObject::invokeMethod(&plot, "SaveToPdf", Qt::DirectConnection));
     QCOMPARE(plot.graphCount(), 0);
+}
+
+void PlotWidgetContractTests::PLOT_028_toolbox_geometry_and_controls()
+{
+    QWidget host;
+    host.resize(640, 480);
+    host.show();
+    PlotWidget plot(nullptr, &host, nullptr);
+    plot.resize(640, 480);
+    QVERIFY(plot.findChild<QWidget*>("PlotToolbox")->isHidden());
+    plot.show();
+    QCoreApplication::processEvents();
+    QWidget* toolbox = plot.findChild<QWidget*>("PlotToolbox");
+    QVERIFY(toolbox);
+    QCOMPARE(toolbox->geometry().topLeft(), QPoint(0, 0));
+    QCOMPARE(toolbox->width(), plot.width());
+    QVERIFY(toolbox->height() >= 28);
+    QCOMPARE(plot.viewport(), plot.rect());
+}
+
+void PlotWidgetContractTests::PLOT_029_toolbox_hover_visibility()
+{
+    QWidget host;
+    host.resize(640, 480);
+    host.show();
+    PlotWidget plot(nullptr, &host, nullptr);
+    plot.resize(640, 480);
+    plot.show();
+    QCoreApplication::processEvents();
+    QWidget* toolbox = plot.findChild<QWidget*>("PlotToolbox");
+    QVERIFY(toolbox);
+    const auto hoverAt = [&plot](const QPoint &position) {
+        QHoverEvent hover(QEvent::HoverMove, position, plot.mapToGlobal(position), QPointF());
+        QApplication::sendEvent(&plot, &hover);
+    };
+    hoverAt(QPoint(10, toolbox->height() - 1));
+    QVERIFY(!toolbox->isHidden());
+    const QRect viewport = plot.viewport();
+    hoverAt(QPoint(10, toolbox->height()));
+    QVERIFY(toolbox->isHidden());
+    QCOMPARE(plot.viewport(), viewport);
+    hoverAt(QPoint(10, 2));
+    QVERIFY(!toolbox->isHidden());
+    QEvent leave(QEvent::HoverLeave);
+    QApplication::sendEvent(&plot, &leave);
+    QVERIFY(toolbox->isHidden());
+    plot.resize(800, 600);
+    QCoreApplication::processEvents();
+    QCOMPARE(toolbox->width(), 800);
+    QCOMPARE(plot.viewport(), plot.rect());
+    hoverAt(QPoint(790, 2));
+    QVERIFY(!toolbox->isHidden());
+    QToolButton* boxZoom = nullptr;
+    for (QToolButton* button : toolbox->findChildren<QToolButton*>())
+        if (button->toolTip() == QStringLiteral("Box zoom"))
+            boxZoom = button;
+    QVERIFY(boxZoom);
+    boxZoom->click();
+    QVERIFY(boxZoom->isChecked());
+    QComboBox* units = toolbox->findChild<QComboBox*>();
+    QVERIFY(units);
+    units->showPopup();
+    QApplication::sendEvent(&plot, &leave);
+    QVERIFY(!toolbox->isHidden());
+    units->setCurrentIndex(1);
+    units->hidePopup();
+    hoverAt(QPoint(10, toolbox->height()));
+    QVERIFY(toolbox->isHidden());
+    QCOMPARE(units->currentIndex(), 1);
+}
+
+void PlotWidgetContractTests::PLOT_030_toolbox_pinning_is_local_to_each_plot()
+{
+    QWidget host;
+    host.resize(800, 600);
+    host.show();
+    PlotWidget plot(nullptr, &host, nullptr);
+    PlotWidget otherPlot(nullptr, &host, nullptr);
+    plot.resize(640, 480);
+    plot.show();
+    QCoreApplication::processEvents();
+    QWidget* toolbox = plot.findChild<QWidget*>("PlotToolbox");
+    QWidget* otherToolbox = otherPlot.findChild<QWidget*>("PlotToolbox");
+    QVERIFY(toolbox);
+    QVERIFY(otherToolbox);
+    QHoverEvent enter(QEvent::HoverMove, QPointF(10, 2),
+                      plot.mapToGlobal(QPoint(10, 2)), QPointF());
+    QApplication::sendEvent(&plot, &enter);
+    QVERIFY(!toolbox->isHidden());
+    const QRect viewport = plot.viewport();
+    QEvent leave(QEvent::HoverLeave);
+    QApplication::sendEvent(&plot, &leave);
+    QVERIFY(toolbox->isHidden());
+    QVERIFY(otherToolbox->isHidden());
+    QCOMPARE(plot.viewport(), viewport);
+
+    QToolButton* pin = toolbox->findChild<QToolButton*>("PinPlotToolbox");
+    QVERIFY(pin);
+    QVERIFY(!pin->icon().isNull());
+    QVERIFY(pin->isCheckable());
+    QVERIFY(!pin->isChecked());
+    QApplication::sendEvent(&plot, &enter);
+    pin->click();
+    QVERIFY(pin->isChecked());
+    QCOMPARE(pin->toolTip(), QString("Unpin toolbox"));
+    QHoverEvent below(QEvent::HoverMove, QPointF(10, toolbox->height()),
+                      plot.mapToGlobal(QPoint(10, toolbox->height())), QPointF());
+    QApplication::sendEvent(&plot, &below);
+    QApplication::sendEvent(&plot, &leave);
+    QVERIFY(!toolbox->isHidden());
+    QVERIFY(otherToolbox->isHidden());
+    QCOMPARE(plot.viewport().top(), toolbox->height());
+    QCOMPARE(plot.viewport().height() + toolbox->height(), plot.height());
+    plot.resize(700, 500);
+    QCoreApplication::processEvents();
+    QVERIFY(!toolbox->isHidden());
+    QCOMPARE(plot.viewport().top(), toolbox->height());
+    QCOMPARE(plot.viewport().height() + toolbox->height(), plot.height());
+    pin->click();
+    QVERIFY(!pin->isChecked());
+    QCOMPARE(plot.viewport(), plot.rect());
+    QCOMPARE(pin->toolTip(), QString("Pin toolbox"));
+    QApplication::sendEvent(&plot, &below);
+    QVERIFY(toolbox->isHidden());
+    QApplication::sendEvent(&plot, &enter);
+    QVERIFY(!toolbox->isHidden());
+    QApplication::sendEvent(&plot, &leave);
+    QVERIFY(toolbox->isHidden());
+}
+
+void PlotWidgetContractTests::PLOT_031_pinned_toolbox_and_measurement_panel_layout()
+{
+    QWidget host;
+    host.resize(800, 600);
+    host.show();
+    PlotWidget plot(nullptr, &host, nullptr);
+    plot.resize(640, 480);
+    plot.show();
+    QCoreApplication::processEvents();
+    QWidget* toolbox = plot.findChild<QWidget*>("PlotToolbox");
+    QWidget* panel = plot.findChild<QWidget*>("MeasurementPanel");
+    QToolButton* pin = plot.findChild<QToolButton*>("PinPlotToolbox");
+    QVERIFY(toolbox);
+    QVERIFY(panel);
+    QVERIFY(pin);
+    const QCPRange xRange = plot.xAxis->range();
+    const QCPRange yRange = plot.yAxis->range();
+    for (int repeat = 0; repeat < 2; ++repeat)
+    {
+        pin->setChecked(true);
+        plot.replot();
+        QCOMPARE(plot.viewport().top(), toolbox->height());
+        QCOMPARE(plot.viewport().height() + toolbox->height(), plot.height());
+        QVERIFY(plot.axisRect()->top() >= toolbox->height());
+        QVERIFY(QMetaObject::invokeMethod(&plot, "ToggleCursors", Qt::DirectConnection, Q_ARG(bool, true)));
+        QVERIFY(!panel->isHidden());
+        QCOMPARE(plot.viewport().top(), toolbox->height());
+        QCOMPARE(plot.viewport().height() + toolbox->height() + panel->height(), plot.height());
+        QCOMPARE(panel->y(), plot.viewport().y() + plot.viewport().height());
+        pin->setChecked(false);
+        QCOMPARE(plot.viewport().top(), 0);
+        QVERIFY(QMetaObject::invokeMethod(&plot, "ToggleCursors", Qt::DirectConnection, Q_ARG(bool, false)));
+        QVERIFY(panel->isHidden());
+        QCOMPARE(plot.viewport(), plot.rect());
+    }
+    QCOMPARE(plot.xAxis->range().lower, xRange.lower);
+    QCOMPARE(plot.xAxis->range().upper, xRange.upper);
+    QCOMPARE(plot.yAxis->range().lower, yRange.lower);
+    QCOMPARE(plot.yAxis->range().upper, yRange.upper);
+    plot.resize(640, 10);
+    QCoreApplication::processEvents();
+    pin->setChecked(true);
+    QCOMPARE(plot.viewport().top(), 10);
+    QCOMPARE(plot.viewport().height(), 0);
+    pin->setChecked(false);
+    QCOMPARE(plot.viewport(), plot.rect());
+}
+
+void PlotWidgetContractTests::PLOT_032_toolbox_pin_xml_state()
+{
+    QWidget host;
+    PlotWidget source(nullptr, &host, nullptr);
+    PlotWidget restored(nullptr, &host, nullptr);
+    QToolButton* sourcePin = source.findChild<QToolButton*>("PinPlotToolbox");
+    QToolButton* restoredPin = restored.findChild<QToolButton*>("PinPlotToolbox");
+    QVERIFY(sourcePin);
+    QVERIFY(restoredPin);
+    for (bool pinned : {false, true})
+    {
+        sourcePin->setChecked(pinned);
+        std::vector<std::pair<QString, QString>> attributes;
+        QString text;
+        QVERIFY(source.SaveToXML(attributes, text));
+        const auto pinAttribute = std::find_if(attributes.begin(), attributes.end(), [](const std::pair<QString, QString>& attribute) {
+            return attribute.first == QStringLiteral("PlotToolboxPinned");
+        });
+        QVERIFY(pinAttribute != attributes.end());
+        QCOMPARE(pinAttribute->second, QString::number(pinned));
+        restoredPin->setChecked(!pinned);
+        QVERIFY(restored.LoadFromXML(attributes, text));
+        QCOMPARE(restoredPin->isChecked(), pinned);
+        QCOMPARE(restored.viewport().top(), pinned ? qMin(restored.height(), restored.findChild<QWidget*>("PlotToolbox")->height()) : 0);
+        QVERIFY(restored.LoadFromXML(attributes, text));
+        QCOMPARE(restoredPin->isChecked(), pinned);
+        QCOMPARE(restored.xAxis->range().lower, source.xAxis->range().lower);
+        QCOMPARE(restored.xAxis->range().upper, source.xAxis->range().upper);
+        attributes.erase(std::remove_if(attributes.begin(), attributes.end(), [](const std::pair<QString, QString>& attribute) {
+            return attribute.first == QStringLiteral("PlotToolboxPinned");
+        }), attributes.end());
+        restoredPin->setChecked(true);
+        QVERIFY(restored.LoadFromXML(attributes, text));
+        QVERIFY(!restoredPin->isChecked());
+        attributes.emplace_back(QStringLiteral("PlotToolboxPinned"), QStringLiteral("invalid"));
+        restoredPin->setChecked(true);
+        QVERIFY(restored.LoadFromXML(attributes, text));
+        QVERIFY(!restoredPin->isChecked());
+        attributes.emplace_back(QStringLiteral("PlotToolboxPinned"), QStringLiteral("1"));
+        QVERIFY(restored.LoadFromXML(attributes, text));
+        QVERIFY(restoredPin->isChecked());
+        attributes.emplace_back(QStringLiteral("PlotToolboxPinned"), QStringLiteral("0"));
+        QVERIFY(restored.LoadFromXML(attributes, text));
+        QVERIFY(!restoredPin->isChecked());
+    }
 }
 
 void PlotWidgetContractTests::FFT_001_fft_widget_construction_and_destruction()

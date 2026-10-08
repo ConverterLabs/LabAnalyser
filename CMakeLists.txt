@@ -156,6 +156,9 @@ target_link_libraries(LabAnalyserCore
         PkgConfig::MATIO PkgConfig::HDF5 PkgConfig::FFTW3 PkgConfig::ZSTD Boost::boost)
 
 add_executable(LabAnalyser src/app/main.cpp resources/LabAnlyser.rc)
+if(WIN32)
+    set_target_properties(LabAnalyser PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 target_link_libraries(LabAnalyser PRIVATE LabAnalyserCore)
 # main.cpp includes mainwindow.h, which in turn includes the UIC-generated
 # About header produced for the core target.

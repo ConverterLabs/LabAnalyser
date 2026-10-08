@@ -195,6 +195,7 @@ bool _touchDevice;
     QToolButton *CursorsToolButton = nullptr;
     QToolButton *CursorSyncToolButton = nullptr;
     QToolButton *SpectrumToolButton = nullptr;
+    QToolButton *PinToolboxButton = nullptr;
     QComboBox *TimeUnitComboBox = nullptr;
     PlotToolMode CurrentToolMode = PlotToolMode::Navigate;
     TimeAxisUnit CurrentTimeAxisUnit = TimeAxisUnit::Seconds;

@@ -1,5 +1,16 @@
 # Decisions
 
+## Plot toolbox pin XML extension (2026-10-08)
+
+The user explicitly requested persisting the pin state. Add only optional
+`PlotToolboxPinned="0|1"` to existing plot Widget elements; absent/malformed
+attributes mean unpinned and retain the existing integer boolean convention.
+Older readers ignore unrecognized plot attributes, and the legacy inputs need
+no migration. Restore state through the pin button callback so docked geometry
+and its checked indicator agree. `PLOT_032` and `XML_009` characterize the old
+loss of state and validate the approved per-plot round trip; run the complete
+legacy XML, affected GUI/DropWidget suites and five fixture hash checks.
+
 ## ADR-001: Preserve qmake as the baseline build
 
 **Date:** 2026-08-03  

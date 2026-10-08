@@ -44,6 +44,25 @@ the limit. It is therefore not claimed locally green for this checkpoint.
 
 ## Known parity limits
 
+2026-10-08 deployment regression: the user reported missing toolbar icons in
+the CMake application. `resources.qrc` is currently in the static core archive,
+without an explicit application resource-initialization reference. The archive
+resource object can therefore be omitted at link time. The user requested the
+established qmake/MSYS2 build for deployment; CMake resource/visual parity is
+not demonstrated, and the deployed application is being replaced through
+`scripts/build-msys2.ps1`. No production behavior change is needed for that
+build selection.
+
+2026-10-08 Windows application subsystem correction: the first CMake-deployed
+EXE had PE subsystem 3 (console), while the existing qmake deployment had
+subsystem 2 (GUI). The user reported the extra console window. The application
+target now sets `WIN32_EXECUTABLE` on Windows, restoring the existing launch
+behavior; test targets retain their console output. The incremental Release
+application build passed and `objdump -p` confirmed subsystem 2 before copying
+the replacement EXE. Deployment SHA-256 matched the build artifact. Existing
+unchanged plot tests were not repeated. Interactive launch after replacement
+has not been verified by the agent.
+
 - Debug, Linux, install/package and deployment parity are not yet demonstrated.
 - CMake has no install or packaging target yet.
 - GitHub Actions keeps the established qmake job unchanged and adds a separate
